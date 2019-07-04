@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?p2f version='1.0.0'?>
+<p2f version='1.0.0'>
+  <ius size='3'>
+    <iu id='org.eclipse.sdk.ide' version='4.12.0.I20190605-1800'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/releases/2019-06/'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.egit.feature.group' version='5.4.0.201906121030-r'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/releases/2019-06/'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.m2e.feature.feature.group' version='1.12.0.20190529-1916'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/releases/2019-06/'/>
+      </repositories>
+    </iu>
+  </ius>
+</p2f>
