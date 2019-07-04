@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2019 1C-Soft LLC.
+
+   This program and the accompanying materials are made available under
+   the terms of the Eclipse Public License 2.0 which is available at
+   https://www.eclipse.org/legal/epl-2.0/
+
+   SPDX-License-Identifier: EPL-2.0
+
+   Contributors:
+       Vladimir Piskarev (1C) - initial API and implementation
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.lxtk</groupId>
+    <artifactId>releng</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../releng</relativePath>
+  </parent>
+  <artifactId>repository</artifactId>
+  <packaging>eclipse-repository</packaging>
+  <properties>
+    <lxtk.version.major>0</lxtk.version.major>
+    <lxtk.version.minor>1</lxtk.version.minor>
+    <lxtk.version.service>0</lxtk.version.service>
+    <lxtk.version>${lxtk.version.major}.${lxtk.version.minor}.${lxtk.version.service}.${buildQualifier}</lxtk.version>
+    <ant-optional.version>1.5.3-1</ant-optional.version>
+    <ant-xalan2.version>1.10.6</ant-xalan2.version>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-p2-repository-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble-repository</id>
+            <phase>package</phase>
+            <goals>
+              <goal>assemble-repository</goal>
+            </goals>
+            <configuration>
+              <repositoryName>LXTK ${lxtk.version.major}.${lxtk.version.minor}.${lxtk.version.service}</repositoryName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>archive-repository</id>
+            <phase>package</phase>
+            <goals>
+              <goal>archive-repository</goal>
+            </goals>
+            <configuration>
+              <finalName>lxtk-repository-${lxtk.version}</finalName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>version</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <echo message="${lxtk.version}" file="${project.build.directory}/VERSION"/>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>test-report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <junitreport todir="${project.build.directory}">
+                  <fileset dir="${project.build.directory}/../../">
+                    <include name="**/target/surefire-reports/TEST-*.xml"/>
+                  </fileset>
+                  <report format="noframes" todir="${project.build.directory}"/>
+                </junitreport>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant-optional</artifactId>
+            <version>${ant-optional.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-apache-xalan2</artifactId>
+            <version>${ant-xalan2.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>javadoc</id>
+      <properties>
+        <javadoc.title>LXTK ${lxtk.version.major}.${lxtk.version.minor} API Specification</javadoc.title>
+        <javadoc.header>&lt;span style='font-size:small'&gt;&lt;b&gt;LXTK&lt;/b&gt;&lt;br&gt;version ${lxtk.version.major}.${lxtk.version.minor}&lt;/span&gt;</javadoc.header>
+        <javadoc.copyright>Copyright (c) 2019 1C-Soft LLC. Made available under the &lt;a target='_blank' href='https://www.eclipse.org/legal/epl-2.0/'&gt;Eclipse Public License 2.0&lt;/a&gt;</javadoc.copyright>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-document-bundle-plugin</artifactId>
+            <version>${tycho.extras.version}</version>
+            <configuration>
+              <javadocOptions>
+                <encoding>UTF-8</encoding>
+                <ignoreError>false</ignoreError>
+                <includes>
+                  <include>org.lxtk</include>
+                  <include>org.lxtk.*</include>
+                </includes>
+                <excludes>
+                  <exclude>org.lxtk.internal.*</exclude>
+                  <exclude>org.lxtk.examples.*</exclude>
+                </excludes>
+                <additionalArguments>
+                  <additionalArgument>-windowtitle "${javadoc.title}"</additionalArgument>
+                  <additionalArgument>-doctitle "${javadoc.title}"</additionalArgument>
+                  <additionalArgument>-header "${javadoc.header}"</additionalArgument>
+                  <additionalArgument>-footer "${javadoc.header}"</additionalArgument>
+                  <additionalArgument>-bottom "${javadoc.copyright}"</additionalArgument>
+                  <additionalArgument>-tag noextend:t:Restriction:</additionalArgument>
+                  <additionalArgument>-tag noimplement:t:Restriction:</additionalArgument>
+                  <additionalArgument>-tag noinstantiate:t:Restriction:</additionalArgument>
+                  <additionalArgument>-tag noreference:a:Restriction:</additionalArgument>
+                </additionalArguments>
+              </javadocOptions>
+            </configuration>
+            <executions>
+              <execution>
+                <id>javadoc</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>javadoc</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

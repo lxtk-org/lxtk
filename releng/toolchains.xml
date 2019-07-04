@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Example of toolchains.xml file.
+
+   Someone running the build with -Pbree-libs would need their own version of
+   toolchains.xml in their home directory's .m2 directory (~/.m2/toolchains.xml)
+   which points to the location on their file system of the required JDKs.
+-->
+<toolchains>
+  <toolchain>
+    <type>jdk</type>
+    <provides>
+      <id>JavaSE-1.8</id>
+    </provides>
+    <configuration>
+      <jdkHome>/opt/jdk1.8.0_74/jre</jdkHome>
+    </configuration>
+  </toolchain>
+</toolchains>
