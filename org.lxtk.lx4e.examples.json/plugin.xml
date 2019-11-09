@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            id="org.lxtk.lx4e.examples.json.editor"
+            name="JSON Editor (LXTK Example)"
+            extensions="json"
+            default="false"
+            class="org.lxtk.lx4e.internal.examples.json.editor.JsonEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.lxtk.lx4e.examples.json.editor.scope"
+            parentId="org.eclipse.ui.textEditorScope"
+            name="Editing JSON Source (LXTK Example)"
+            description="Editing JSON Source Context">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.lxtk.lx4e.examples.json.editor.quickOutline"
+            categoryId="org.eclipse.ui.category.navigate"
+            name="Quick Outline"
+            description="Show the quick outline for the editor input">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            sequence="M1+O"
+            commandId="org.lxtk.lx4e.examples.json.editor.quickOutline"
+            contextId="org.lxtk.lx4e.examples.json.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.lxtk.lx4e.examples.json.editor.quickOutline"
+            class="org.lxtk.lx4e.internal.examples.json.editor.JsonOutlinePopupHandler">
+      </handler>
+   </extension>
+</plugin>

@@ -33,6 +33,12 @@
     <tycho.scmUrl>scm:git:https://github.com/1C-Company/lxtk.git</tycho.scmUrl>
   </properties>
   <modules>
+    <module>../org.lxtk</module>
+    <module>../org.lxtk.lx4e</module>
+    <module>../org.lxtk.lx4e.ui</module>
+    <module>../org.lxtk.lx4e.examples.json</module>
+    <module>../org.lxtk-feature</module>
+    <module>../org.lxtk.lx4e-feature</module>
     <module>../repository</module>
     <module>../targets</module>
   </modules>

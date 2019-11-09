@@ -129,8 +129,9 @@
                   <include>org.lxtk.*</include>
                 </includes>
                 <excludes>
-                  <exclude>org.lxtk.internal.*</exclude>
-                  <exclude>org.lxtk.examples.*</exclude>
+                  <exclude>org.lxtk.lx4e.internal</exclude>
+                  <exclude>org.lxtk.lx4e.internal.*</exclude>
+                  <exclude>org.lxtk.lx4e.examples.*</exclude>
                 </excludes>
                 <additionalArguments>
                   <additionalArgument>-windowtitle "${javadoc.title}"</additionalArgument>
@@ -142,6 +143,7 @@
                   <additionalArgument>-tag noimplement:t:Restriction:</additionalArgument>
                   <additionalArgument>-tag noinstantiate:t:Restriction:</additionalArgument>
                   <additionalArgument>-tag noreference:a:Restriction:</additionalArgument>
+                  <additionalArgument>-link https://docs.oracle.com/javase/8/docs/api/</additionalArgument>
                 </additionalArguments>
               </javadocOptions>
             </configuration>

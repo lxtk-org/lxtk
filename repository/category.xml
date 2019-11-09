@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2019 1C-Soft LLC.
+
+   This program and the accompanying materials are made available under
+   the terms of the Eclipse Public License 2.0 which is available at
+   https://www.eclipse.org/legal/epl-2.0/
+
+   SPDX-License-Identifier: EPL-2.0
+
+   Contributors:
+       Vladimir Piskarev (1C) - initial API and implementation
+-->
+<site>
+   <feature id="org.lxtk">
+      <category name="org.lxtk.category"/>
+   </feature>
+   <feature id="org.lxtk.source">
+      <category name="org.lxtk.category"/>
+   </feature>
+   <feature id="org.lxtk.lx4e">
+      <category name="org.lxtk.category"/>
+   </feature>
+   <feature id="org.lxtk.lx4e.source">
+      <category name="org.lxtk.category"/>
+   </feature>
+   <category-def name="org.lxtk.category" label="LXTK: Language Client/Server Toolkit">
+      <description>
+         LXTK - All Features
+      </description>
+   </category-def>
+</site>
