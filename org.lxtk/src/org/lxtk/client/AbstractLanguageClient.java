@@ -51,7 +51,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     implements LanguageClient, Feature<S>
 {
     private final Log log;
-    private final BiConsumer<URI, List<Diagnostic>> diagnosticRequestor;
+    private final BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor;
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures =
         new HashMap<>();
@@ -65,7 +65,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
      * @param features not <code>null</code>
      */
     public AbstractLanguageClient(Log log,
-        BiConsumer<URI, List<Diagnostic>> diagnosticRequestor,
+        BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor,
         Collection<Feature<? super S>> features)
     {
         this.log = Objects.requireNonNull(log);

@@ -50,7 +50,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
      * @param features not <code>null</code>
      */
     public EclipseLanguageClient(Log log,
-        BiConsumer<URI, List<Diagnostic>> diagnosticRequestor,
+        BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor,
         Collection<Feature<? super S>> features)
     {
         super(log, diagnosticRequestor, features);
