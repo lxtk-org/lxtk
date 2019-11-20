@@ -115,7 +115,9 @@ public class JsonLanguageClient
                 super.initialize(server, capabilities, documentSelector);
 
                 JsonObject schema = new JsonObject();
-                schema.addProperty("fileMatch", "package.json"); //$NON-NLS-1$ //$NON-NLS-2$
+                JsonArray fileMatch = new JsonArray();
+                fileMatch.add("package.json"); //$NON-NLS-1$
+                schema.add("fileMatch", fileMatch); //$NON-NLS-1$
                 schema.addProperty("url", //$NON-NLS-1$
                     "http://json.schemastore.org/package"); //$NON-NLS-1$
                 JsonArray schemas = new JsonArray();
@@ -132,7 +134,7 @@ public class JsonLanguageClient
             @Override
             protected String getMessageTitle(MessageParams params)
             {
-                return "JSON Language Server"; //$NON-NLS-1$
+                return "JSON Language Server";
             }
         };
     }
