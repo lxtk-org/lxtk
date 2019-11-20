@@ -14,6 +14,7 @@ package org.lxtk.lx4e.internal.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -58,13 +59,34 @@ public class Activator
         return new Status(IStatus.ERROR, PLUGIN_ID, 0, msg, e);
     }
 
+    public static IStatus createWarningStatus(String msg, Throwable e)
+    {
+        return new Status(IStatus.WARNING, PLUGIN_ID, 0, msg, e);
+    }
+
     public static void logError(String msg, Throwable e)
     {
         plugin.getLog().log(createErrorStatus(msg, e));
     }
 
+    public static void logWarning(String msg, Throwable e)
+    {
+        plugin.getLog().log(createWarningStatus(msg, e));
+    }
+
     public static void logError(Throwable e)
     {
         logError(e.getMessage(), e);
+    }
+
+    public static void logWarning(Throwable e)
+    {
+        logWarning(e.getMessage(), e);
+    }
+
+    @Override
+    protected void initializeImageRegistry(ImageRegistry registry)
+    {
+        LSPImages.initialize(registry);
     }
 }

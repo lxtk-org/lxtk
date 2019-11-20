@@ -12,9 +12,9 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.completion;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
@@ -26,9 +26,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -36,54 +34,33 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.swt.graphics.Image;
 import org.lxtk.CompletionProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
+import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.LSPImages;
 
 /**
  * TODO JavaDoc
  */
-// TODO The current implementation is superficial and needs much more work
+// TODO The current implementation needs more work
 // In particular:
-// - Snippets are currently inserted as 'plain text'
-// - 'CompletionList.isIncomplete' is currently ignored
-// - Filtering of completion items is currently not supported
 // - Context information is currently not supported
 // - Auto-activation is currently not supported
 // - Aggregation of completion providers is currently not supported
 //   (the best matching provider is used)
 // - Documentation in markdown is currently displayed as 'plain text'
+// - Snippet support is ad hoc
 public class ContentAssistProcessor
     implements IContentAssistProcessor
 {
     private static final ICompletionProposal[] NO_PROPOSALS =
         new ICompletionProposal[0];
-    private static final Comparator<CompletionItem> COMPLETION_COMPARATOR =
-        new Comparator<CompletionItem>()
-        {
-            @Override
-            public int compare(CompletionItem a, CompletionItem b)
-            {
-                if (a.getSortText() != null && b.getSortText() != null)
-                {
-                    int value = a.getSortText().compareToIgnoreCase(
-                        b.getSortText());
-                    if (value != 0)
-                        return value;
-                }
-                int value = a.getLabel().compareTo(b.getLabel());
-                if (value != 0)
-                    return value;
-                return a.getKind().compareTo(b.getKind());
-            };
-        };
 
     private final Supplier<LanguageOperationTarget> targetSupplier;
     private String errorMessage;
@@ -106,12 +83,14 @@ public class ContentAssistProcessor
         LanguageOperationTarget target = targetSupplier.get();
         if (target == null)
             return null;
-        CompletionProvider completionProvider =
-            target.getLanguageService().getDocumentMatcher().getBestMatch(
-                target.getLanguageService().getCompletionProviders(),
-                CompletionProvider::getDocumentSelector,
-                target.getDocumentUri(), target.getLanguageId());
-        if (completionProvider == null)
+        URI documentUri = target.getDocumentUri();
+        LanguageService languageService = target.getLanguageService();
+        CompletionProvider provider =
+            languageService.getDocumentMatcher().getBestMatch(
+                languageService.getCompletionProviders(),
+                CompletionProvider::getDocumentSelector, documentUri,
+                target.getLanguageId());
+        if (provider == null)
             return null;
         IDocument document = viewer.getDocument();
         Position position;
@@ -121,13 +100,13 @@ public class ContentAssistProcessor
         }
         catch (BadLocationException e)
         {
+            Activator.logError(e);
             return null;
         }
         CompletableFuture<Either<List<CompletionItem>, CompletionList>> future =
-            completionProvider.getCompletionItems(new CompletionParams(
-                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                position));
-        Either<List<CompletionItem>, CompletionList> result;
+            provider.getCompletionItems(new CompletionParams(
+                DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        Either<List<CompletionItem>, CompletionList> result = null;
         try
         {
             result = future.get(getCompletionTimeout().toMillis(),
@@ -135,66 +114,39 @@ public class ContentAssistProcessor
         }
         catch (CancellationException | InterruptedException e)
         {
-            return null;
         }
         catch (ExecutionException e)
         {
             Activator.logError(e);
             errorMessage = e.getMessage();
-            return null;
         }
         catch (TimeoutException e)
         {
+            Activator.logWarning(e);
             errorMessage = Messages.ContentAssistProcessor_Request_timed_out;
-            return null;
         }
         if (result == null)
             return null;
-        List<CompletionItem> items = result.isLeft() ? result.getLeft()
-            : result.getRight().getItems();
-        items.sort(COMPLETION_COMPARATOR);
+        List<CompletionItem> items;
+        boolean isIncomplete = false;
+        if (result.isLeft())
+            items = result.getLeft();
+        else
+        {
+            isIncomplete = result.getRight().isIncomplete();
+            items = result.getRight().getItems();
+        }
         List<ICompletionProposal> proposals = new ArrayList<>(items.size());
         for (CompletionItem item : items)
         {
-            String replacementString;
-            int replacementOffset, replacementLength;
-            TextEdit textEdit = item.getTextEdit();
-            if (textEdit != null)
-            {
-                replacementString = textEdit.getNewText();
-                IRegion region;
-                try
-                {
-                    region = DocumentUtil.toRegion(document,
-                        textEdit.getRange());
-                }
-                catch (BadLocationException e)
-                {
-                    continue;
-                }
-                replacementOffset = region.getOffset();
-                replacementLength = region.getLength();
-            }
-            else
-            {
-                replacementString = item.getInsertText();
-                if (replacementString == null)
-                    replacementString = item.getLabel();
-                replacementOffset = offset;
-                replacementLength = 0;
-            }
-            String documentationString = null;
-            Either<String, MarkupContent> documentation =
-                item.getDocumentation();
-            if (documentation != null)
-                documentationString = documentation.isLeft()
-                    ? documentation.getLeft()
-                    : documentation.getRight().getValue();
-            proposals.add(new CompletionProposal(replacementString,
-                replacementOffset, replacementLength,
-                replacementString.length(), getImage(item), item.getLabel(),
-                null, documentationString));
+            ICompletionProposal proposal = isIncomplete
+                ? new LSIncompleteCompletionProposal(documentUri, document,
+                    offset, item, provider, getImage(item))
+                : new LSCompletionProposal(documentUri, document, offset, item,
+                    provider, getImage(item));
+            proposals.add(proposal);
         }
+        proposals = filterAndSortCompletionProposals(proposals);
         return proposals.toArray(NO_PROPOSALS);
     }
 
@@ -230,6 +182,20 @@ public class ContentAssistProcessor
     }
 
     /**
+     * Filters and sorts the proposals. The passed list may be modified
+     * and returned, or a new list may be created and returned.
+     *
+     * @param proposals the list of collected proposals (never <code>null</code>)
+     * @return the list of filtered and sorted proposals, ready for display
+     *  (not <code>null</code>)
+     */
+    protected List<ICompletionProposal> filterAndSortCompletionProposals(
+        List<ICompletionProposal> proposals)
+    {
+        return proposals;
+    }
+
+    /**
      * TODO JavaDoc
      *
      * @param item never <code>null</code>
@@ -237,7 +203,7 @@ public class ContentAssistProcessor
      */
     protected Image getImage(CompletionItem item)
     {
-        return null;
+        return LSPImages.imageFromCompletionItem(item);
     }
 
     /**

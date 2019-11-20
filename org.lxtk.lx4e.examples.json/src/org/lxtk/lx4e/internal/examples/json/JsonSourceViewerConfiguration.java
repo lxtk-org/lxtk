@@ -31,6 +31,7 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.examples.json.JsonCore;
 import org.lxtk.lx4e.examples.json.JsonInputElementProvider;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
+import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
 
 /**
@@ -69,6 +70,7 @@ public class JsonSourceViewerConfiguration
         ContentAssistant assistant = new ContentAssistant(true);
         assistant.setContentAssistProcessor(new ContentAssistProcessor(
             this::getLanguageOperationTarget), IDocument.DEFAULT_CONTENT_TYPE);
+        assistant.setSorter(new CompletionProposalSorter());
         assistant.setInformationControlCreator(new IInformationControlCreator()
         {
             @Override
@@ -77,6 +79,7 @@ public class JsonSourceViewerConfiguration
                 return new DefaultInformationControl(parent, true);
             }
         });
+        assistant.enableColoredLabels(true);
         return assistant;
     }
 
