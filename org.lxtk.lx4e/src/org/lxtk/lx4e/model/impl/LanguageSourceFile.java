@@ -312,7 +312,7 @@ public abstract class LanguageSourceFile
             SafeRun.run(rollback ->
             {
                 document = new EclipseTextDocument(uri, getLanguageId(),
-                    info.getBuffer().getDocument());
+                    info.getBuffer().getDocument(), getFile_());
                 rollback.add(document::dispose);
 
                 Disposable registration = getWorkspace().addTextDocument(

@@ -12,11 +12,13 @@
  *******************************************************************************/
 package org.lxtk.lx4e;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -40,6 +42,7 @@ public final class EclipseTextDocument
     private final URI uri;
     private final String languageId;
     private final IDocument document;
+    private final IFile file;
     private final AtomicReference<EclipseTextDocumentChangeEvent> lastChange =
         new AtomicReference<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChange =
@@ -75,12 +78,15 @@ public final class EclipseTextDocument
      * @param uri not <code>null</code>
      * @param languageId not <code>null</code>
      * @param document not <code>null</code>
+     * @param file may be <code>null</code>
      */
-    public EclipseTextDocument(URI uri, String languageId, IDocument document)
+    public EclipseTextDocument(URI uri, String languageId, IDocument document,
+        IFile file)
     {
         this.uri = Objects.requireNonNull(uri);
         this.languageId = Objects.requireNonNull(languageId);
         this.document = Objects.requireNonNull(document);
+        this.file = file;
         document.addDocumentListener(listener);
         lastChange.compareAndSet(null, new EclipseTextDocumentChangeEvent(
             new TextDocumentSnapshot(this, 0, document.get()),
@@ -95,6 +101,16 @@ public final class EclipseTextDocument
     public IDocument getUnderlyingDocument()
     {
         return document;
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the corresponding {@link File}, or <code>null</code> if none
+     */
+    public IFile getCorrespondingFile()
+    {
+        return file;
     }
 
     /**
