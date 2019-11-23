@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="problem"
+         name="TypeScript Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            id="org.lxtk.lx4e.examples.typescript.editor"
+            name="TypeScript Editor (LXTK Example)"
+            extensions="ts, js"
+            default="false"
+            class="org.lxtk.lx4e.internal.examples.typescript.editor.TypeScriptEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.lxtk.lx4e.examples.typescript.editor.scope"
+            parentId="org.eclipse.ui.textEditorScope"
+            name="Editing TypeScript Source (LXTK Example)"
+            description="Editing TypeScript Source Context">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
+            categoryId="org.eclipse.ui.category.navigate"
+            name="Quick Outline"
+            description="Show the quick outline for the editor input">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            sequence="M1+O"
+            commandId="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
+            contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
+            class="org.lxtk.lx4e.internal.examples.typescript.editor.TypeScriptOutlinePopupHandler">
+      </handler>
+   </extension>
+</plugin>

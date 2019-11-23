@@ -37,6 +37,7 @@
     <module>../org.lxtk.lx4e</module>
     <module>../org.lxtk.lx4e.ui</module>
     <module>../org.lxtk.lx4e.examples.json</module>
+    <module>../org.lxtk.lx4e.examples.typescript</module>
     <module>../org.lxtk-feature</module>
     <module>../org.lxtk.lx4e-feature</module>
     <module>../repository</module>
