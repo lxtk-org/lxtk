@@ -14,6 +14,7 @@ package org.lxtk.lx4e.internal.examples.typescript;
 
 import java.net.URI;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -22,6 +23,7 @@ import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
@@ -33,6 +35,7 @@ import org.lxtk.lx4e.examples.typescript.TypeScriptInputElementProvider;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
+import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
 
 /**
  * TODO JavaDoc
@@ -81,6 +84,26 @@ public class TypeScriptSourceViewerConfiguration
         });
         assistant.enableColoredLabels(true);
         return assistant;
+    }
+
+    @Override
+    public IHyperlinkDetector[] getHyperlinkDetectors(
+        ISourceViewer sourceViewer)
+    {
+        IAdaptable context = new IAdaptable()
+        {
+            @Override
+            public <T> T getAdapter(Class<T> adapter)
+            {
+                if (adapter == LanguageOperationTarget.class)
+                    return adapter.cast(getLanguageOperationTarget());
+                return null;
+            }
+        };
+        DefinitionHyperlinkDetector definitionHyperlinkDetector =
+            new DefinitionHyperlinkDetector();
+        definitionHyperlinkDetector.setContext(context);
+        return new IHyperlinkDetector[] { definitionHyperlinkDetector };
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

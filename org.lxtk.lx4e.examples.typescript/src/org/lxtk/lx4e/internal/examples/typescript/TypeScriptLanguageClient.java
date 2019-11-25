@@ -31,6 +31,7 @@ import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
 import org.lxtk.client.BufferingDiagnosticRequestor;
 import org.lxtk.client.CompletionFeature;
+import org.lxtk.client.DefinitionFeature;
 import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.Feature;
 import org.lxtk.client.TextDocumentSyncFeature;
@@ -111,8 +112,9 @@ public class TypeScriptLanguageClient
         Collection<Feature<? super LanguageServer>> features =
             new ArrayList<>();
         features.add(new TextDocumentSyncFeature(TypeScriptCore.WORKSPACE));
-        features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new CompletionFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new DefinitionFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
             diagnosticRequestor, features)
         {

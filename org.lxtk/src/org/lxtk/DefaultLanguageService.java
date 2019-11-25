@@ -18,6 +18,7 @@ import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItemCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.CompletionItemKindCapabilities;
+import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.SymbolKind;
@@ -31,6 +32,8 @@ public class DefaultLanguageService
     implements LanguageService
 {
     private final Registry<CompletionProvider> completionProviders =
+        Registry.newInstance();
+    private final Registry<DefinitionProvider> definitionProviders =
         Registry.newInstance();
     private final Registry<DocumentSymbolProvider> documentSymbolProviders =
         Registry.newInstance();
@@ -64,6 +67,21 @@ public class DefaultLanguageService
     public Registry<CompletionProvider> getCompletionProviders()
     {
         return completionProviders;
+    }
+
+    @Override
+    public DefinitionCapabilities getDefinitionCapabilities()
+    {
+        DefinitionCapabilities definition = new DefinitionCapabilities();
+        definition.setDynamicRegistration(true);
+        definition.setLinkSupport(true);
+        return definition;
+    }
+
+    @Override
+    public Registry<DefinitionProvider> getDefinitionProviders()
+    {
+        return definitionProviders;
     }
 
     @Override

@@ -49,6 +49,12 @@
             contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
+      <key
+            sequence="F3"
+            commandId="org.eclipse.ui.edit.text.open.hyperlink"
+            contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
