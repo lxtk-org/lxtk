@@ -23,6 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.lxtk.DocumentUri;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.EditorHelper;
 
 /**
@@ -84,7 +85,7 @@ public class LocationHyperlink
      */
     protected EditorHelper getEditorHelper()
     {
-        return new EditorHelper();
+        return DefaultEditorHelper.INSTANCE;
     }
 
     private static IWorkbenchPage getWorkbenchPage()

@@ -40,6 +40,12 @@
             name="Quick Outline"
             description="Show the quick outline for the editor input">
       </command>
+      <command
+            id="org.lxtk.lx4e.examples.typescript.editor.findReferences"
+            categoryId="org.eclipse.search.ui.category.search"
+            name="Find References"
+            description="Find references to the selected symbol">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -55,6 +61,12 @@
             contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
+      <key
+            sequence="M1+M2+G"
+            commandId="org.lxtk.lx4e.examples.typescript.editor.findReferences"
+            contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -62,5 +74,30 @@
             commandId="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
             class="org.lxtk.lx4e.internal.examples.typescript.editor.TypeScriptOutlinePopupHandler">
       </handler>
+      <handler
+            commandId="org.lxtk.lx4e.examples.typescript.editor.findReferences"
+            class="org.lxtk.lx4e.internal.examples.typescript.editor.FindReferencesHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:#ExampleTypeScriptEditorContext?after=group.open">
+         <command
+               commandId="org.eclipse.ui.edit.text.open.hyperlink"
+               style="push">
+         </command>
+         <command
+               commandId="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:#ExampleTypeScriptEditorContext?after=group.find">
+         <command
+               commandId="org.lxtk.lx4e.examples.typescript.editor.findReferences"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
 </plugin>

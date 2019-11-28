@@ -15,6 +15,7 @@ package org.lxtk;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.lxtk.util.Registry;
 
 /**
@@ -74,4 +75,18 @@ public interface LanguageService
      * @return the registry for document symbol providers (never <code>null</code>)
      */
     Registry<DocumentSymbolProvider> getDocumentSymbolProviders();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return references capabilities (never <code>null</code>)
+     */
+    ReferencesCapabilities getReferencesCapabilities();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the registry for reference providers (never <code>null</code>)
+     */
+    Registry<ReferenceProvider> getReferenceProviders();
 }

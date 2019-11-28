@@ -21,6 +21,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -34,6 +37,13 @@ import org.lxtk.lx4e.DocumentUtil;
  */
 public class EditorHelper
 {
+    /**
+     * TODO JavaDoc
+     */
+    protected EditorHelper()
+    {
+    }
+
     /**
      * TODO JavaDoc
      *
@@ -77,11 +87,10 @@ public class EditorHelper
         if (range == null)
             throw new IllegalArgumentException();
 
-        ITextEditor textEditor = Adapters.adapt(editor, ITextEditor.class);
+        ITextEditor textEditor = getTextEditor(editor);
         if (textEditor != null)
         {
-            IDocument document = textEditor.getDocumentProvider().getDocument(
-                textEditor.getEditorInput());
+            IDocument document = getDocument(textEditor);
             if (document != null)
             {
                 IRegion r;
@@ -96,5 +105,88 @@ public class EditorHelper
                 textEditor.selectAndReveal(r.getOffset(), r.getLength());
             }
         }
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param editor may be <code>null</code>
+     * @return the selected text range, or <code>null</code> if none
+     */
+    public Range getSelectedTextRange(IEditorPart editor)
+    {
+        ITextEditor textEditor = getTextEditor(editor);
+        if (textEditor == null)
+            return null;
+
+        ITextSelection s = getTextSelection(textEditor);
+        if (s == null)
+            return null;
+
+        IDocument document = getDocument(textEditor);
+        if (document == null)
+            return null;
+
+        try
+        {
+            return DocumentUtil.toRange(document, s.getOffset(), s.getLength());
+        }
+        catch (BadLocationException e)
+        {
+            return null;
+        }
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param editor may be <code>null</code>
+     * @return the current text selection, or <code>null</code> if none or empty
+     */
+    public ITextSelection getTextSelection(ITextEditor editor)
+    {
+        if (editor == null)
+            return null;
+
+        ISelectionProvider selectionProvider = editor.getSelectionProvider();
+        if (selectionProvider == null)
+            return null;
+
+        ISelection selection = selectionProvider.getSelection();
+        if (!(selection instanceof ITextSelection))
+            return null;
+
+        ITextSelection textSelection = (ITextSelection)selection;
+        int offset = textSelection.getOffset();
+        int length = textSelection.getLength();
+        if (offset < 0 || length < 0)
+            return null;
+
+        return textSelection;
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param editor may be <code>null</code>
+     * @return the edited document, or <code>null</code> if none
+     */
+    public IDocument getDocument(ITextEditor editor)
+    {
+        if (editor == null)
+            return null;
+        return editor.getDocumentProvider().getDocument(
+            editor.getEditorInput());
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param context may be <code>null</code>
+     * @return the corresponding text editor, or <code>null</code> if none
+     */
+    public ITextEditor getTextEditor(Object context)
+    {
+        return Adapters.adapt(context, ITextEditor.class);
     }
 }

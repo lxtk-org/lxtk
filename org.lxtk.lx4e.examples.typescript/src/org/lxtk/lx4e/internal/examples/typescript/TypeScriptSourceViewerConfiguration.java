@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.typescript;
 
-import java.net.URI;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -30,9 +28,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
-import org.lxtk.lx4e.examples.typescript.TypeScriptInputElementProvider;
-import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
 import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
@@ -108,20 +103,6 @@ public class TypeScriptSourceViewerConfiguration
 
     private LanguageOperationTarget getLanguageOperationTarget()
     {
-        if (editor == null)
-            return null;
-
-        ILanguageSourceFile sourceFile =
-            TypeScriptInputElementProvider.INSTANCE.getElement(
-                editor.getEditorInput());
-        if (sourceFile == null)
-            return null;
-
-        URI documentUri = sourceFile.getDocumentUri();
-        if (documentUri == null)
-            return null;
-
-        return new LanguageOperationTarget(documentUri, TypeScriptCore.LANG_ID,
-            TypeScriptCore.LANG_SERVICE);
+        return TypeScriptOperationTargetProvider.getOperationTarget(editor);
     }
 }

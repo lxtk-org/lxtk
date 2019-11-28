@@ -27,6 +27,14 @@ public class WordFinder
     /**
      * TODO JavaDoc
      *
+     */
+    protected WordFinder()
+    {
+    }
+
+    /**
+     * TODO JavaDoc
+     *
      * @param document not <code>null</code>
      * @param offset 0-based
      * @return the corresponding word region, or <code>null</code> if none

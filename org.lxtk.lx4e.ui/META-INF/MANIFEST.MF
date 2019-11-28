@@ -9,8 +9,12 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.lxtk.lx4e.internal.ui.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.expressions,
  org.eclipse.core.filesystem,
+ org.eclipse.core.resources,
+ org.eclipse.handly;bundle-version="[1.2.0,2.0.0)",
  org.eclipse.jface.text;bundle-version="[3.13.0,4.0.0)",
+ org.eclipse.search;bundle-version="[3.11.0,4.0.0)",
  org.eclipse.ui;bundle-version="[3.109.0,4.0.0)",
  org.eclipse.ui.ide;bundle-version="[3.14.0,4.0.0)",
  org.eclipse.ui.workbench.texteditor;bundle-version="[3.11.0,4.0.0)",
@@ -21,4 +25,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Export-Package: org.lxtk.lx4e.internal.ui;x-internal:=true,
  org.lxtk.lx4e.ui,
  org.lxtk.lx4e.ui.completion,
- org.lxtk.lx4e.ui.hyperlinks
+ org.lxtk.lx4e.ui.hyperlinks,
+ org.lxtk.lx4e.ui.references

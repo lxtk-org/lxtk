@@ -21,6 +21,7 @@ import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
+import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.SymbolKindCapabilities;
 import org.lxtk.util.Registry;
@@ -36,6 +37,8 @@ public class DefaultLanguageService
     private final Registry<DefinitionProvider> definitionProviders =
         Registry.newInstance();
     private final Registry<DocumentSymbolProvider> documentSymbolProviders =
+        Registry.newInstance();
+    private final Registry<ReferenceProvider> referenceProviders =
         Registry.newInstance();
 
     @Override
@@ -102,5 +105,19 @@ public class DefaultLanguageService
     public Registry<DocumentSymbolProvider> getDocumentSymbolProviders()
     {
         return documentSymbolProviders;
+    }
+
+    @Override
+    public ReferencesCapabilities getReferencesCapabilities()
+    {
+        ReferencesCapabilities references = new ReferencesCapabilities();
+        references.setDynamicRegistration(true);
+        return references;
+    }
+
+    @Override
+    public Registry<ReferenceProvider> getReferenceProviders()
+    {
+        return referenceProviders;
     }
 }

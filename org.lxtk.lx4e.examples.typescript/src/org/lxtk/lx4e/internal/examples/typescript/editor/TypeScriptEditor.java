@@ -36,6 +36,8 @@ public class TypeScriptEditor
         setDocumentProvider(documentProvider);
         setSourceViewerConfiguration(new TypeScriptSourceViewerConfiguration(
             getPreferenceStore(), this, documentProvider));
+        setEditorContextMenuId("#ExampleTypeScriptEditorContext"); //$NON-NLS-1$
+        setRulerContextMenuId("#ExampleTypeScriptRulerContext"); //$NON-NLS-1$
     }
 
     @Override

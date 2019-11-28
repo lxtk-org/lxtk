@@ -35,7 +35,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
-import org.lxtk.lx4e.util.WordFinder;
+import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
  * TODO JavaDoc
@@ -44,7 +44,6 @@ public abstract class AbstractLocationHyperlinkDetector
     extends AbstractHyperlinkDetector
 {
     private static final IHyperlink[] NO_HYPERLINKS = new IHyperlink[0];
-    private static final WordFinder WORD_FINDER = new WordFinder();
 
     @Override
     public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region,
@@ -180,7 +179,7 @@ public abstract class AbstractLocationHyperlinkDetector
      */
     protected IRegion findWord(IDocument document, int offset)
     {
-        return WORD_FINDER.findWord(document, offset);
+        return DefaultWordFinder.INSTANCE.findWord(document, offset);
     }
 
     /**
