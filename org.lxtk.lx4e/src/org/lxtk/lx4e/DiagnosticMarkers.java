@@ -13,19 +13,29 @@
 package org.lxtk.lx4e;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.handly.buffer.IBuffer;
 import org.eclipse.handly.buffer.TextFileBuffer;
 import org.eclipse.jface.text.BadLocationException;
@@ -55,6 +65,10 @@ public class DiagnosticMarkers
      */
     public static final String DIAGNOSTIC_ATTRIBUTE = "diagnostic"; //$NON-NLS-1$
 
+    private static final String SOURCE_UUID_ATTRIBUTE = "sourceUuid"; //$NON-NLS-1$
+
+    private static final IMarker[] NO_MARKERS = new IMarker[0];
+
     /**
      * Holds the given marker type.
      */
@@ -67,6 +81,9 @@ public class DiagnosticMarkers
      */
     protected Map<URI, Set<IMarker>> markers;
 
+    private final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    private final IResourceChangeListener moveProcessor = new MoveProcessor();
+    private final String sourceUuid = UUID.randomUUID().toString();
     private Gson gson;
 
     /**
@@ -77,6 +94,8 @@ public class DiagnosticMarkers
     public DiagnosticMarkers(String markerType)
     {
         this.markerType = Objects.requireNonNull(markerType);
+        workspace.addResourceChangeListener(moveProcessor,
+            IResourceChangeEvent.POST_CHANGE);
     }
 
     @Override
@@ -85,9 +104,7 @@ public class DiagnosticMarkers
         deleteMarkers(uri);
         if (diagnostics.isEmpty())
             return;
-        IFile[] files =
-            ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(
-                uri);
+        IFile[] files = workspace.getRoot().findFilesForLocationURI(uri);
         for (IFile file : files)
             if (file.exists())
                 createMarkers(file, uri, diagnostics);
@@ -96,6 +113,7 @@ public class DiagnosticMarkers
     @Override
     public void dispose()
     {
+        workspace.removeResourceChangeListener(moveProcessor);
         clear();
     }
 
@@ -104,17 +122,16 @@ public class DiagnosticMarkers
      */
     public void clear()
     {
-        getMarkers().values().forEach(markers -> markers.forEach(marker ->
+        Collection<IMarker> allMarkers = new ArrayList<>();
+        getMarkers().values().forEach(markers -> allMarkers.addAll(markers));
+        try
         {
-            try
-            {
-                marker.delete();
-            }
-            catch (CoreException e)
-            {
-                Activator.logError(e);
-            }
-        }));
+            workspace.deleteMarkers(allMarkers.toArray(NO_MARKERS));
+        }
+        catch (CoreException e)
+        {
+            Activator.logError(e);
+        }
         markers = null;
     }
 
@@ -128,16 +145,13 @@ public class DiagnosticMarkers
         Set<IMarker> markers = getMarkers().remove(uri);
         if (markers != null)
         {
-            for (IMarker marker : markers)
+            try
             {
-                try
-                {
-                    marker.delete();
-                }
-                catch (CoreException e)
-                {
-                    Activator.logError(e);
-                }
+                workspace.deleteMarkers(markers.toArray(NO_MARKERS));
+            }
+            catch (CoreException e)
+            {
+                Activator.logError(e);
             }
         }
     }
@@ -154,7 +168,6 @@ public class DiagnosticMarkers
     {
         if (!file.exists() || diagnostics.isEmpty())
             return;
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try
         {
             workspace.run(monitor -> doCreateMarkers(file, uri, diagnostics),
@@ -181,6 +194,7 @@ public class DiagnosticMarkers
                 {
                     Map<String, Object> attributes = new HashMap<>();
                     fillMarkerAttributes(attributes, file, uri, diagnostic);
+                    attributes.put(SOURCE_UUID_ATTRIBUTE, sourceUuid);
                     marker.setAttributes(attributes);
                 }
                 catch (Throwable e)
@@ -264,5 +278,53 @@ public class DiagnosticMarkers
         if (markers == null)
             markers = new HashMap<>();
         return markers;
+    }
+
+    private class MoveProcessor
+        implements IResourceChangeListener
+    {
+        @Override
+        public void resourceChanged(IResourceChangeEvent event)
+        {
+            Collection<IMarker> markers = new ArrayList<>();
+            collectMarkersAddedByMove(event.getDelta(), markers);
+            if (markers.isEmpty())
+                return;
+            WorkspaceJob job = new WorkspaceJob("Delete Markers") //$NON-NLS-1$
+            {
+                @Override
+                public IStatus runInWorkspace(IProgressMonitor monitor)
+                    throws CoreException
+                {
+                    workspace.deleteMarkers(markers.toArray(NO_MARKERS));
+                    return Status.OK_STATUS;
+                }
+            };
+            job.setSystem(true);
+            job.schedule();
+        }
+
+        private void collectMarkersAddedByMove(IResourceDelta delta,
+            Collection<IMarker> markers)
+        {
+            int flags = IResourceDelta.MOVED_FROM | IResourceDelta.MARKERS;
+            if ((delta.getFlags() & flags) == flags)
+            {
+                IMarkerDelta[] markerDeltas = delta.getMarkerDeltas();
+                for (IMarkerDelta markerDelta : markerDeltas)
+                {
+                    IMarker marker = markerDelta.getMarker();
+                    if (sourceUuid.equals(marker.getAttribute(
+                        SOURCE_UUID_ATTRIBUTE, null)))
+                    {
+                        markers.add(marker);
+                    }
+                }
+            }
+            IResourceDelta[] children = delta.getAffectedChildren(
+                IResourceDelta.ADDED | IResourceDelta.CHANGED);
+            for (IResourceDelta child : children)
+                collectMarkersAddedByMove(child, markers);
+        }
     }
 }
