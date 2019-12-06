@@ -21,6 +21,7 @@ class Messages
         "org.lxtk.eclipse.ui.completion.messages"; //$NON-NLS-1$
 
     public static String ContentAssistProcessor_Request_timed_out;
+    public static String LSIncompleteCompletionProposal_Tooltip_affordance_string;
 
     static
     {

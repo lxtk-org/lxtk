@@ -10,7 +10,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Vladimir Piskarev (1C) - adaptation
- *     (adapted from org.eclipse.jdt.internal.ui.text.JavaWordFinder)
+ *     (adapted from org.eclipse.jdt.internal.ui.text.JavaWordFinder
+ *               and org.eclipse.jface.text.DefaultTextHover.findWord)
  *******************************************************************************/
 package org.lxtk.lx4e.util;
 
@@ -53,9 +54,7 @@ public class WordFinder
             {
                 c = document.getChar(pos);
                 if (!isIdentifierPart(c))
-                {
                     break;
-                }
                 --pos;
             }
 

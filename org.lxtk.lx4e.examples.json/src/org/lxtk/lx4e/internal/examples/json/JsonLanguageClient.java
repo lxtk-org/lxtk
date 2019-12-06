@@ -31,6 +31,7 @@ import org.lxtk.client.BufferingDiagnosticRequestor;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.Feature;
+import org.lxtk.client.HoverFeature;
 import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
@@ -95,6 +96,7 @@ public class JsonLanguageClient
         features.add(new TextDocumentSyncFeature(JsonCore.WORKSPACE));
         features.add(new DocumentSymbolFeature(JsonCore.LANG_SERVICE));
         features.add(new CompletionFeature(JsonCore.LANG_SERVICE));
+        features.add(new HoverFeature(JsonCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
             diagnosticRequestor, features)
         {

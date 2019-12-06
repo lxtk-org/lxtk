@@ -14,6 +14,7 @@ package org.lxtk.lx4e.ui.completion;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
+//@formatter:off
 final class CompletionProposalTools {
 
     private CompletionProposalTools() {

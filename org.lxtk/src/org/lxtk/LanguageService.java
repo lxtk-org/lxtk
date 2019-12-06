@@ -15,6 +15,7 @@ package org.lxtk;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.lxtk.util.Registry;
 
@@ -75,6 +76,20 @@ public interface LanguageService
      * @return the registry for document symbol providers (never <code>null</code>)
      */
     Registry<DocumentSymbolProvider> getDocumentSymbolProviders();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return hover capabilities (never <code>null</code>)
+     */
+    HoverCapabilities getHoverCapabilities();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the registry for hover providers (never <code>null</code>)
+     */
+    Registry<HoverProvider> getHoverProviders();
 
     /**
      * TODO JavaDoc

@@ -18,6 +18,7 @@ import java.util.Comparator;
 import org.eclipse.jface.text.BadLocationException;
 import org.lxtk.lx4e.internal.ui.Activator;
 
+//@formatter:off
 final class LSCompletionProposalComparator implements Comparator<LSCompletionProposal> {
     @Override
     public int compare(LSCompletionProposal o1, LSCompletionProposal o2) {

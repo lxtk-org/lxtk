@@ -27,6 +27,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 @SuppressWarnings("javadoc")
+//@formatter:off
 public class LSPImages {
 
 

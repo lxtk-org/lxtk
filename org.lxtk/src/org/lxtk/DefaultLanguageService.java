@@ -20,6 +20,7 @@ import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.SymbolKind;
@@ -38,6 +39,8 @@ public class DefaultLanguageService
         Registry.newInstance();
     private final Registry<DocumentSymbolProvider> documentSymbolProviders =
         Registry.newInstance();
+    private final Registry<HoverProvider> hoverProviders =
+        Registry.newInstance();
     private final Registry<ReferenceProvider> referenceProviders =
         Registry.newInstance();
 
@@ -48,8 +51,8 @@ public class DefaultLanguageService
             new CompletionItemCapabilities();
         completionItem.setSnippetSupport(true);
         completionItem.setCommitCharactersSupport(true);
-        completionItem.setDocumentationFormat(Arrays.asList(new String[] {
-            MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT }));
+        completionItem.setDocumentationFormat(Arrays.asList(MarkupKind.MARKDOWN,
+            MarkupKind.PLAINTEXT));
         completionItem.setDeprecatedSupport(true);
         completionItem.setPreselectSupport(true);
 
@@ -105,6 +108,22 @@ public class DefaultLanguageService
     public Registry<DocumentSymbolProvider> getDocumentSymbolProviders()
     {
         return documentSymbolProviders;
+    }
+
+    @Override
+    public HoverCapabilities getHoverCapabilities()
+    {
+        HoverCapabilities hover = new HoverCapabilities();
+        hover.setDynamicRegistration(true);
+        hover.setContentFormat(Arrays.asList(MarkupKind.MARKDOWN,
+            MarkupKind.PLAINTEXT));
+        return hover;
+    }
+
+    @Override
+    public Registry<HoverProvider> getHoverProviders()
+    {
+        return hoverProviders;
     }
 
     @Override

@@ -52,6 +52,7 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.InsertTextFormat;
 import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextEdit;
@@ -61,12 +62,18 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
+import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
+import org.lxtk.lx4e.util.Markdown;
 
 @SuppressWarnings("javadoc")
+//@formatter:off
 class LSIncompleteCompletionProposal
         implements ICompletionProposal, ICompletionProposalExtension3, ICompletionProposalExtension4,
         ICompletionProposalExtension5, ICompletionProposalExtension6, ICompletionProposalExtension7,
@@ -116,6 +123,7 @@ class LSIncompleteCompletionProposal
     private Integer rankScore;
     private String documentFilter;
     private String documentFilterAddition = ""; //$NON-NLS-1$
+    private IInformationControlCreator informationControlCreator;
 
     /**
      * Constructor.
@@ -290,65 +298,45 @@ class LSIncompleteCompletionProposal
 
     @Override
     public IInformationControlCreator getInformationControlCreator() {
-//        return new AbstractReusableInformationControlCreator() {
-//            @Override
-//            protected IInformationControl doCreateInformationControl(Shell parent) {
-//                if (BrowserInformationControl.isAvailable(parent)) {
-//                    return new BrowserInformationControl(parent, JFaceResources.DIALOG_FONT, false) {
-//                        @Override
-//                        public IInformationControlCreator getInformationPresenterControlCreator() {
-//                            return parent1 -> new BrowserInformationControl(parent1, JFaceResources.DIALOG_FONT, true);
-//                        }
-//                    };
-//                }
-//                return new DefaultInformationControl(parent);
-//            }
-//        };
+        if (informationControlCreator == null)
+            informationControlCreator = newInformationControlCreator();
+        return informationControlCreator;
+    }
 
-        return null;
+    protected IInformationControlCreator newInformationControlCreator() {
+        return new FocusableInformationControlCreator() {
+                @Override
+                protected String getTooltipAffordanceString() {
+                    return EditorsUI.getPreferenceStore().getBoolean(
+                        AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SHOW_TEXT_HOVER_AFFORDANCE)
+                            ? Messages.LSIncompleteCompletionProposal_Tooltip_affordance_string
+                            : null;
+                    }
+            };
     }
 
     @Override
     public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
-//        if (LanguageServiceAccessor.checkCapability(languageServer,
-//            capability -> Boolean.TRUE.equals(capability.getCompletionProvider().getResolveProvider()))) {
-//            try {
-//                languageServer.getTextDocumentService().resolveCompletionItem(item).thenAcceptAsync(this::updateCompletionItem)
-//                .get(RESOLVE_TIMEOUT, TimeUnit.MILLISECONDS);
-//            } catch (ExecutionException | TimeoutException e) {
-//                LanguageServerPlugin.logError(e);
-//            } catch (InterruptedException e) {
-//                LanguageServerPlugin.logError(e);
-//                Thread.currentThread().interrupt();
-//            }
-//        }
-//
-//        StringBuilder res = new StringBuilder();
-//        if (item.getDetail() != null) {
-//            res.append("<p>" + item.getDetail() + "</p>"); //$NON-NLS-1$ //$NON-NLS-2$
-//        }
-//        if (res.length() > 0) {
-//            res.append("<br/>"); //$NON-NLS-1$
-//        }
-//        if (item.getDocumentation() != null) {
-//            String htmlDocString = LSPEclipseUtils.getHtmlDocString(item.getDocumentation());
-//            if (htmlDocString != null) {
-//                res.append(htmlDocString);
-//            }
-//        }
-//
-//        return LSPTextHover.styleHtml(res.toString());
-
         Either<String, MarkupContent> documentation = item.getDocumentation();
         if (documentation == null)
             documentation = resolvedCompletionItem().getDocumentation();
+        if (documentation == null)
+            return null;
 
-        // TODO Support documentation in markdown
-        String documentationString = null;
-        if (documentation != null)
-            documentationString = documentation.isLeft()
-                ? documentation.getLeft() : documentation.getRight().getValue();
-        return documentationString;
+        MarkupContent markupContent = documentation.isLeft()
+            ? new MarkupContent(MarkupKind.PLAINTEXT, documentation.getLeft())
+            : documentation.getRight();
+        if (markupContent == null)
+            return null;
+        return toAdditionalProposalInfo(markupContent);
+    }
+
+    protected Object toAdditionalProposalInfo(MarkupContent markupContent) {
+        String value = markupContent.getValue();
+        if (value.isEmpty())
+            return null;
+        String html = Markdown.toHtml(value, false);
+        return StyledBrowserInformationControlInput.of(html);
     }
 
     private synchronized CompletionItem resolvedCompletionItem() {

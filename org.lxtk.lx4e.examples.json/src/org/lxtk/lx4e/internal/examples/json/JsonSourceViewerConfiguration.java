@@ -18,13 +18,11 @@ import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
@@ -33,6 +31,7 @@ import org.lxtk.lx4e.examples.json.JsonInputElementProvider;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
+import org.lxtk.lx4e.ui.hover.TextHover;
 
 /**
  * TODO JavaDoc
@@ -71,16 +70,17 @@ public class JsonSourceViewerConfiguration
         assistant.setContentAssistProcessor(new ContentAssistProcessor(
             this::getLanguageOperationTarget), IDocument.DEFAULT_CONTENT_TYPE);
         assistant.setSorter(new CompletionProposalSorter());
-        assistant.setInformationControlCreator(new IInformationControlCreator()
-        {
-            @Override
-            public IInformationControl createInformationControl(Shell parent)
-            {
-                return new DefaultInformationControl(parent, true);
-            }
-        });
+        assistant.setInformationControlCreator(
+            parent -> new DefaultInformationControl(parent, true));
         assistant.enableColoredLabels(true);
         return assistant;
+    }
+
+    @Override
+    public ITextHover getTextHover(ISourceViewer sourceViewer,
+        String contentType)
+    {
+        return new TextHover(this::getLanguageOperationTarget);
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

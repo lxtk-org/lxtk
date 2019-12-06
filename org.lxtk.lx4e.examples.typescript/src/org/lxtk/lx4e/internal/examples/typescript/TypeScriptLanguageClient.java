@@ -34,6 +34,7 @@ import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DefinitionFeature;
 import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.Feature;
+import org.lxtk.client.HoverFeature;
 import org.lxtk.client.ReferencesFeature;
 import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
@@ -116,6 +117,7 @@ public class TypeScriptLanguageClient
         features.add(new CompletionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DefinitionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new HoverFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new ReferencesFeature(TypeScriptCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
             diagnosticRequestor, features)

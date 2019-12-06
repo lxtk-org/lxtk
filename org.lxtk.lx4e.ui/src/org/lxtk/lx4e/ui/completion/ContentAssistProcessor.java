@@ -54,7 +54,6 @@ import org.lxtk.lx4e.internal.ui.LSPImages;
 // - Auto-activation is currently not supported
 // - Aggregation of completion providers is currently not supported
 //   (the best matching provider is used)
-// - Documentation in markdown is currently displayed as 'plain text'
 // - Snippet support is ad hoc
 public class ContentAssistProcessor
     implements IContentAssistProcessor

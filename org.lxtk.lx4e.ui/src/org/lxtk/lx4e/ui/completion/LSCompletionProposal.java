@@ -29,6 +29,7 @@ import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 
+//@formatter:off
 class LSCompletionProposal extends LSIncompleteCompletionProposal
         implements ICompletionProposalExtension, ICompletionProposalExtension2 {
 
