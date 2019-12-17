@@ -32,7 +32,7 @@ import org.lxtk.util.Disposable;
 /**
  * TODO JavaDoc
  */
-public class HoverFeature
+public final class HoverFeature
     extends LanguageFeature
 {
     private static final String METHOD = "textDocument/hover"; //$NON-NLS-1$

@@ -33,6 +33,7 @@ import org.lxtk.client.BufferingDiagnosticRequestor;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DefinitionFeature;
 import org.lxtk.client.DocumentSymbolFeature;
+import org.lxtk.client.ExecuteCommandFeature;
 import org.lxtk.client.Feature;
 import org.lxtk.client.HoverFeature;
 import org.lxtk.client.ReferencesFeature;
@@ -114,6 +115,7 @@ public class TypeScriptLanguageClient
         Collection<Feature<? super LanguageServer>> features =
             new ArrayList<>();
         features.add(new TextDocumentSyncFeature(TypeScriptCore.WORKSPACE));
+        features.add(new ExecuteCommandFeature(TypeScriptCore.CMD_SERVICE));
         features.add(new CompletionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DefinitionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));

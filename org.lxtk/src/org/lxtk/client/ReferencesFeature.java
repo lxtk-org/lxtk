@@ -32,7 +32,7 @@ import org.lxtk.util.Disposable;
 /**
  * TODO JavaDoc
  */
-public class ReferencesFeature
+public final class ReferencesFeature
     extends LanguageFeature
 {
     private static final String METHOD = "textDocument/references"; //$NON-NLS-1$

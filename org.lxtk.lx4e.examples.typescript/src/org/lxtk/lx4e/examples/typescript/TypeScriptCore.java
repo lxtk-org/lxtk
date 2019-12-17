@@ -15,12 +15,14 @@ package org.lxtk.lx4e.examples.typescript;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.handly.model.IElementChangeListener;
+import org.lxtk.CommandService;
+import org.lxtk.DefaultCommandService;
 import org.lxtk.DefaultWorkspace;
 import org.lxtk.LanguageService;
 import org.lxtk.Workspace;
 import org.lxtk.lx4e.EclipseLanguageService;
-import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceFile;
 import org.lxtk.lx4e.internal.examples.typescript.ModelManager;
+import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceFile;
 import org.lxtk.lx4e.model.ILanguageElement;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 
@@ -30,6 +32,9 @@ import org.lxtk.lx4e.model.ILanguageSourceFile;
 public class TypeScriptCore
 {
     public static final Workspace WORKSPACE = new DefaultWorkspace();
+
+    public static final CommandService CMD_SERVICE =
+        new DefaultCommandService();
 
     public static final LanguageService LANG_SERVICE =
         new EclipseLanguageService();

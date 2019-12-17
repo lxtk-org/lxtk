@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.SynchronizationCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
+import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 
 class ClientCapabilitiesUtil
 {
@@ -56,6 +57,24 @@ class ClientCapabilitiesUtil
                 capabilities.setSynchronization(synchronization);
                 return synchronization;
             });
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param capabilities not <code>null</code>
+     * @return a {@link WorkspaceClientCapabilities} (never <code>null</code>)
+     */
+    public static WorkspaceClientCapabilities getOrCreateWorkspace(
+        ClientCapabilities capabilities)
+    {
+        return Optional.ofNullable(capabilities.getWorkspace()).orElseGet(() ->
+        {
+            WorkspaceClientCapabilities workspace =
+                new WorkspaceClientCapabilities();
+            capabilities.setWorkspace(workspace);
+            return workspace;
+        });
     }
 
     private ClientCapabilitiesUtil()
