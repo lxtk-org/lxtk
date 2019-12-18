@@ -47,6 +47,7 @@ import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.util.EclipseFuture;
+import org.lxtk.lx4e.util.ResourceUtil;
 
 /**
  * TODO JavaDoc
@@ -169,7 +170,8 @@ public class ReferenceSearchQuery
             EclipseTextDocument eclipseTextDocument =
                 (EclipseTextDocument)textDocument;
             document = eclipseTextDocument.getUnderlyingDocument();
-            file = eclipseTextDocument.getCorrespondingFile();
+            file = ResourceUtil.getFile(
+                eclipseTextDocument.getCorrespondingElement());
         }
         try
         {

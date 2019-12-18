@@ -98,7 +98,8 @@ public class JsonLanguageClient
         features.add(new CompletionFeature(JsonCore.LANG_SERVICE));
         features.add(new HoverFeature(JsonCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
-            diagnosticRequestor, features)
+            diagnosticRequestor, JsonWorkspaceEditChangeFactory.INSTANCE,
+            features)
         {
             @Override
             public void fillInitializeParams(InitializeParams params)

@@ -135,16 +135,10 @@ public class DocumentUtil
         if (edits.isEmpty())
             return;
 
-        MultiTextEdit rootEdit = new MultiTextEdit();
-        for (TextEdit edit : edits)
-        {
-            IRegion r = toRegion(document, edit.getRange());
-            rootEdit.addChild(new ReplaceEdit(r.getOffset(), r.getLength(),
-                edit.getNewText()));
-        }
+        MultiTextEdit edit = toMultiTextEdit(document, edits);
 
         RewriteSessionEditProcessor editProcessor =
-            new RewriteSessionEditProcessor(document, rootEdit, 0);
+            new RewriteSessionEditProcessor(document, edit, 0);
         IDocumentUndoManager undoManager =
             DocumentUndoManagerRegistry.getDocumentUndoManager(document);
         if (undoManager != null)
@@ -158,6 +152,30 @@ public class DocumentUtil
             if (undoManager != null)
                 undoManager.endCompoundChange();
         }
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param document not <code>null</code>
+     * @param edits text edits for the document (not <code>null</code>,
+     *  may be empty, must not contain <code>null</code>s)
+     * @return the created {@link MultiTextEdit} (never <code>null</code>)
+     * @throws MalformedTreeException if an edit overlaps with one of its siblings
+     * @throws BadLocationException if an edit's range is invalid in the document
+     */
+    public static MultiTextEdit toMultiTextEdit(IDocument document,
+        List<TextEdit> edits) throws MalformedTreeException,
+        BadLocationException
+    {
+        MultiTextEdit result = new MultiTextEdit();
+        for (TextEdit edit : edits)
+        {
+            IRegion r = toRegion(document, edit.getRange());
+            result.addChild(new ReplaceEdit(r.getOffset(), r.getLength(),
+                edit.getNewText()));
+        }
+        return result;
     }
 
     private DocumentUtil()

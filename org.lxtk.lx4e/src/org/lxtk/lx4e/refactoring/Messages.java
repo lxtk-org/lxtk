@@ -10,17 +10,21 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.ui;
+package org.lxtk.lx4e.refactoring;
 
 import org.eclipse.osgi.util.NLS;
 
 class Messages
     extends NLS
 {
-    private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME =
+        "org.lxtk.lx4e.refactoring.messages"; //$NON-NLS-1$
 
-    public static String EclipseLanguageClient_Apply_edit_job;
-    public static String EclipseLanguageClient_Message_title;
+    public static String TextFileChange_Cannot_apply_stale_change;
+    public static String UndoTextFileChange_Cannot_undo_stale_change;
+    public static String UndoTextFileChange_File_should_exist;
+    public static String UndoTextFileChange_File_should_not_exist;
+    public static String WorkspaceEditChangeFactory_Stale_workspace_edit;
 
     static
     {

@@ -208,6 +208,14 @@ public abstract class LanguageSourceFile
         builder.append(file.getFullPath());
     }
 
+    @Override
+    public <T> T getAdapter(Class<T> adapter)
+    {
+        if (adapter == IResource.class || adapter == IFile.class)
+            return adapter.cast(getFile_());
+        return super.getAdapter(adapter);
+    }
+
     /**
      * TODO JavaDoc
      *
@@ -312,7 +320,7 @@ public abstract class LanguageSourceFile
             SafeRun.run(rollback ->
             {
                 document = new EclipseTextDocument(uri, getLanguageId(),
-                    info.getBuffer().getDocument(), getFile_());
+                    info.getBuffer(), LanguageSourceFile.this);
                 rollback.add(document::dispose);
 
                 Disposable registration = getWorkspace().addTextDocument(

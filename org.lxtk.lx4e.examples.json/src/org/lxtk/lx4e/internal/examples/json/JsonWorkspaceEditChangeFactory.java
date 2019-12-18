@@ -10,25 +10,22 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.ui;
+package org.lxtk.lx4e.internal.examples.json;
 
-import org.eclipse.osgi.util.NLS;
+import org.lxtk.lx4e.examples.json.JsonCore;
+import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 
-class Messages
-    extends NLS
+/**
+ * TODO JavaDoc
+ */
+public class JsonWorkspaceEditChangeFactory
+    extends WorkspaceEditChangeFactory
 {
-    private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.messages"; //$NON-NLS-1$
+    public static final JsonWorkspaceEditChangeFactory INSTANCE =
+        new JsonWorkspaceEditChangeFactory();
 
-    public static String EclipseLanguageClient_Apply_edit_job;
-    public static String EclipseLanguageClient_Message_title;
-
-    static
+    private JsonWorkspaceEditChangeFactory()
     {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
-
-    private Messages()
-    {
+        super(JsonCore.WORKSPACE);
     }
 }

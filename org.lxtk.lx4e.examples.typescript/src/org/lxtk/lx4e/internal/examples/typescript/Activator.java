@@ -31,6 +31,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.lxtk.TextDocument;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
+import org.lxtk.lx4e.util.ResourceUtil;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.SafeRun;
 import org.lxtk.util.connect.Connectable;
@@ -167,7 +168,8 @@ public class Activator
     {
         if (document instanceof EclipseTextDocument)
         {
-            IFile file = ((EclipseTextDocument)document).getCorrespondingFile();
+            IFile file = ResourceUtil.getFile(
+                ((EclipseTextDocument)document).getCorrespondingElement());
             if (file != null)
                 return file.getProject();
         }

@@ -10,25 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.ui;
-
-import org.eclipse.osgi.util.NLS;
-
-class Messages
-    extends NLS
-{
-    private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.messages"; //$NON-NLS-1$
-
-    public static String EclipseLanguageClient_Apply_edit_job;
-    public static String EclipseLanguageClient_Message_title;
-
-    static
-    {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
-
-    private Messages()
-    {
-    }
-}
+/**
+ * TODO JavaDoc
+ */
+package org.lxtk.lx4e.refactoring;

@@ -16,22 +16,41 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
+import org.eclipse.lsp4j.ApplyWorkspaceEditResponse;
+import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
+import org.eclipse.lsp4j.WorkspaceClientCapabilities;
+import org.eclipse.lsp4j.WorkspaceEditCapabilities;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
+import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
+import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.Feature;
+import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.util.Log;
 
 /**
@@ -42,18 +61,100 @@ import org.lxtk.util.Log;
 public class EclipseLanguageClient<S extends LanguageServer>
     extends AbstractLanguageClient<S>
 {
+    private final WorkspaceEditChangeFactory workspaceEditChangeFactory;
+
     /**
      * TODO JavaDoc
      *
      * @param log not <code>null</code>
      * @param diagnosticRequestor not <code>null</code>
+     * @param workspaceEditChangeFactory not <code>null</code>
      * @param features not <code>null</code>
      */
     public EclipseLanguageClient(Log log,
         BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor,
+        WorkspaceEditChangeFactory workspaceEditChangeFactory,
         Collection<Feature<? super S>> features)
     {
         super(log, diagnosticRequestor, features);
+        this.workspaceEditChangeFactory = Objects.requireNonNull(
+            workspaceEditChangeFactory);
+    }
+
+    @Override
+    public void fillClientCapabilities(ClientCapabilities capabilities)
+    {
+        WorkspaceEditCapabilities workspaceEdit =
+            new WorkspaceEditCapabilities();
+        workspaceEdit.setDocumentChanges(true);
+        // TODO Support resource operations
+//        workspaceEdit.setResourceOperations(Arrays.asList(
+//            ResourceOperationKind.Create, ResourceOperationKind.Delete,
+//            ResourceOperationKind.Rename));
+
+        WorkspaceClientCapabilities workspace =
+            new WorkspaceClientCapabilities();
+        workspace.setApplyEdit(true);
+        workspace.setWorkspaceEdit(workspaceEdit);
+
+        capabilities.setWorkspace(workspace);
+        super.fillClientCapabilities(capabilities);
+    }
+
+    @Override
+    public CompletableFuture<ApplyWorkspaceEditResponse> applyEdit(
+        ApplyWorkspaceEditParams params)
+    {
+        WorkspaceEditRefactoring refactoring = new WorkspaceEditRefactoring(
+            Optional.ofNullable(params.getLabel()).orElse(""), //$NON-NLS-1$
+            workspaceEditChangeFactory);
+        refactoring.setWorkspaceEdit(params.getEdit());
+
+        PerformRefactoringOperation operation = new PerformRefactoringOperation(
+            refactoring, CheckConditionsOperation.ALL_CONDITIONS);
+
+        CompletableFuture<ApplyWorkspaceEditResponse> future =
+            new CompletableFuture<>();
+        WorkspaceJob job = new WorkspaceJob(Optional.ofNullable(
+            params.getLabel()).orElse(
+                Messages.EclipseLanguageClient_Apply_edit_job))
+        {
+            @Override
+            public IStatus runInWorkspace(IProgressMonitor monitor)
+                throws CoreException
+            {
+                try
+                {
+                    operation.run(monitor);
+
+                    RefactoringStatus status = operation.getConditionStatus();
+                    if (status != null && !status.hasFatalError())
+                        status = operation.getValidationStatus();
+
+                    ApplyWorkspaceEditResponse response =
+                        new ApplyWorkspaceEditResponse();
+                    response.setApplied(status != null
+                        && !status.hasFatalError());
+                    // TODO Set ApplyWorkspaceEditResponse.failureReason when it becomes available in LSP4J
+
+                    future.complete(response);
+                    return Status.OK_STATUS;
+                }
+                catch (OperationCanceledException e)
+                {
+                    future.cancel(false);
+                    throw e;
+                }
+                catch (Throwable e)
+                {
+                    future.completeExceptionally(e);
+                    throw e;
+                }
+            }
+        };
+        job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+        job.schedule();
+        return future;
     }
 
     @Override

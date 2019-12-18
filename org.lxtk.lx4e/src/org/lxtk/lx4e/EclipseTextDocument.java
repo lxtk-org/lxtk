@@ -12,13 +12,12 @@
  *******************************************************************************/
 package org.lxtk.lx4e;
 
-import java.io.File;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.handly.buffer.IBuffer;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -41,8 +40,9 @@ public final class EclipseTextDocument
 {
     private final URI uri;
     private final String languageId;
+    private final IBuffer buffer;
     private final IDocument document;
-    private final IFile file;
+    private final Object element;
     private final AtomicReference<EclipseTextDocumentChangeEvent> lastChange =
         new AtomicReference<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChange =
@@ -77,20 +77,35 @@ public final class EclipseTextDocument
      *
      * @param uri not <code>null</code>
      * @param languageId not <code>null</code>
-     * @param document not <code>null</code>
-     * @param file may be <code>null</code>
+     * @param buffer not <code>null</code>
+     * @param element may be <code>null</code>
      */
-    public EclipseTextDocument(URI uri, String languageId, IDocument document,
-        IFile file)
+    public EclipseTextDocument(URI uri, String languageId, IBuffer buffer,
+        Object element)
     {
         this.uri = Objects.requireNonNull(uri);
         this.languageId = Objects.requireNonNull(languageId);
-        this.document = Objects.requireNonNull(document);
-        this.file = file;
+        this.buffer = Objects.requireNonNull(buffer);
+        this.element = element;
+        document = buffer.getDocument();
         document.addDocumentListener(listener);
         lastChange.compareAndSet(null, new EclipseTextDocumentChangeEvent(
             new TextDocumentSnapshot(this, 0, document.get()),
             Collections.emptyList(), getModificationStamp()));
+        buffer.addRef();
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the underlying {@link IBuffer} (never <code>null</code>).
+     *  It is the client responsibility to {@link IBuffer#release() release}
+     *  the returned buffer after it is no longer needed
+     */
+    public IBuffer getBuffer()
+    {
+        buffer.addRef();
+        return buffer;
     }
 
     /**
@@ -106,11 +121,11 @@ public final class EclipseTextDocument
     /**
      * TODO JavaDoc
      *
-     * @return the corresponding {@link File}, or <code>null</code> if none
+     * @return the corresponding element, or <code>null</code> if none
      */
-    public IFile getCorrespondingFile()
+    public Object getCorrespondingElement()
     {
-        return file;
+        return element;
     }
 
     /**
@@ -130,6 +145,7 @@ public final class EclipseTextDocument
     @Override
     public void dispose()
     {
+        buffer.release();
         document.removeDocumentListener(listener);
         onDidChange.dispose();
     }

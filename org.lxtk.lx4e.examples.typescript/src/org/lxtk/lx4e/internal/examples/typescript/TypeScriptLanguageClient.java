@@ -122,7 +122,8 @@ public class TypeScriptLanguageClient
         features.add(new HoverFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new ReferencesFeature(TypeScriptCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
-            diagnosticRequestor, features)
+            diagnosticRequestor, TypeScriptWorkspaceEditChangeFactory.INSTANCE,
+            features)
         {
             @Override
             public void fillInitializeParams(InitializeParams params)
