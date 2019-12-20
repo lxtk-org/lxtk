@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.lxtk.util.SafeRun;
 import org.lxtk.util.connect.Connectable;
@@ -85,22 +86,23 @@ public class Activator
                         String errorMessage = languageClient.getErrorMessage();
                         if (errorMessage != null)
                         {
-                            getWorkbench().getDisplay().asyncExec(() ->
-                            {
-                                if (!shutUp)
+                            PlatformUI.getWorkbench().getDisplay().asyncExec(
+                                () ->
                                 {
-                                    shutUp = true;
+                                    if (!shutUp)
+                                    {
+                                        shutUp = true;
 
-                                    Shell shell = null;
-                                    IWorkbenchWindow window =
-                                        getWorkbench().getActiveWorkbenchWindow();
-                                    if (window != null)
-                                        shell = window.getShell();
-                                    MessageDialog.openError(shell,
-                                        "JSON Language Client",
-                                        "Unable to connect to the JSON language server. The dependent language services will be disabled. See the Error Log for details");
-                                }
-                            });
+                                        Shell shell = null;
+                                        IWorkbenchWindow window =
+                                            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                                        if (window != null)
+                                            shell = window.getShell();
+                                        MessageDialog.openError(shell,
+                                            "JSON Language Client",
+                                            "Unable to connect to the JSON language server. The dependent language services will be disabled. See the Error Log for details");
+                                    }
+                                });
                         }
                     }
                 });

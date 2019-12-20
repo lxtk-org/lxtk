@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.lxtk.TextDocument;
 import org.lxtk.lx4e.EclipseTextDocument;
@@ -94,24 +95,25 @@ public class Activator
                         String errorMessage = languageClient.getErrorMessage();
                         if (errorMessage != null)
                         {
-                            getWorkbench().getDisplay().asyncExec(() ->
-                            {
-                                if (!shutUp)
+                            PlatformUI.getWorkbench().getDisplay().asyncExec(
+                                () ->
                                 {
-                                    shutUp = true;
+                                    if (!shutUp)
+                                    {
+                                        shutUp = true;
 
-                                    Shell shell = null;
-                                    IWorkbenchWindow window =
-                                        getWorkbench().getActiveWorkbenchWindow();
-                                    if (window != null)
-                                        shell = window.getShell();
-                                    MessageDialog.openError(shell,
-                                        "TypeScript Language Client",
-                                        MessageFormat.format(
-                                            "Unable to connect project ''{0}'' to TypeScript language server. Dependent language services will be disabled. See Error Log for details",
-                                            project.getName()));
-                                }
-                            });
+                                        Shell shell = null;
+                                        IWorkbenchWindow window =
+                                            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                                        if (window != null)
+                                            shell = window.getShell();
+                                        MessageDialog.openError(shell,
+                                            "TypeScript Language Client",
+                                            MessageFormat.format(
+                                                "Unable to connect project ''{0}'' to TypeScript language server. Dependent language services will be disabled. See Error Log for details",
+                                                project.getName()));
+                                    }
+                                });
                         }
                     }
                 });
