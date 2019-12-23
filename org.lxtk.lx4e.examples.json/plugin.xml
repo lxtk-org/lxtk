@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
+<!--
+   Copyright (c) 2019 1C-Soft LLC.
+
+   This program and the accompanying materials are made available under
+   the terms of the Eclipse Public License 2.0 which is available at
+   https://www.eclipse.org/legal/epl-2.0/
+
+   SPDX-License-Identifier: EPL-2.0
+
+   Contributors:
+       Vladimir Piskarev (1C) - initial API and implementation
+       Alexander Kozinko (1C) - TM4E-based syntax highlighting
+-->
 <plugin>
    <extension
          id="problem"
@@ -13,14 +26,32 @@
       </super>
    </extension>
    <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            id="org.lxtk.lx4e.examples.json"
+            name="JSON"
+            file-extensions="json"
+            base-type="org.eclipse.core.runtime.text"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.lxtk.lx4e.internal.examples.json.JsonPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
          point="org.eclipse.ui.editors">
       <editor
             id="org.lxtk.lx4e.examples.json.editor"
             name="JSON Editor (LXTK Example)"
-            extensions="json"
             default="false"
             class="org.lxtk.lx4e.internal.examples.json.editor.JsonEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
+         <contentTypeBinding
+               contentTypeId="org.lxtk.lx4e.examples.json">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
@@ -56,5 +87,23 @@
             commandId="org.lxtk.lx4e.examples.json.editor.quickOutline"
             class="org.lxtk.lx4e.internal.examples.json.editor.JsonOutlinePopupHandler">
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.tm4e.registry.grammars">
+      <grammar
+            scopeName="source.json"
+            path="syntaxes/json.tmLanguage.json" >
+      </grammar>
+      <scopeNameContentTypeBinding
+            contentTypeId="org.lxtk.lx4e.examples.json"
+            scopeName="source.json">
+      </scopeNameContentTypeBinding>
+   </extension>
+   <extension
+         point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="org.lxtk.lx4e.examples.json"
+            path="language-configuration.json">
+      </languageConfiguration>
    </extension>
 </plugin>

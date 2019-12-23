@@ -1,0 +1,51 @@
+{
+    "name": "JSON",
+    "scopeName": "source.json",
+    "fileTypes": [
+        "json"
+    ],
+    "uuid": "8c7e3a99-1780-4b72-9ce5-285919c0563f",
+    "patterns": [
+        {
+            "include": "#numbers"
+        },
+        {
+            "include": "#boolean"
+        },
+        {
+            "include": "#delimeter"
+        },
+        {
+            "include": "#qstring-double"
+        }
+    ],
+    "repository": {
+        "qstring-double": {
+            "name": "string.quoted.double",
+            "begin": "\"",
+            "beginCaptures": {
+                "0": {
+                    "name": "punctuation.definition.string.begin"
+                }
+            },
+            "end": "\"",
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.string.end"
+                }
+            }
+        },
+        "numbers": {
+            "name": "constant.numeric",
+            "match": "\\b((\\h{8}-(\\h{4}-){3}\\h{12})|\\d+\\.?\\d*)\\b"
+        },
+        "delimeter": {
+            "name": "keyword.control",
+            "match": "(\\:)"
+        },
+        "boolean": {
+            "name": "constant.language",
+            "match": "\\b(true|false)\\b"
+        }
+    }
+}
