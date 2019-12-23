@@ -9,6 +9,7 @@
  *
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
+ *     Alexander Kozinko (1C) - TM4E-based syntax highlight
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.json;
 
@@ -17,12 +18,16 @@ import java.net.URI;
 import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationAutoEditStrategy;
+import org.eclipse.tm4e.ui.text.TMPresentationReconciler;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
@@ -42,8 +47,8 @@ public class JsonSourceViewerConfiguration
     private final ITextEditor editor;
     private final IWorkingCopyManager workingCopyManager;
 
-    public JsonSourceViewerConfiguration(IPreferenceStore preferenceStore,
-        ITextEditor editor, IWorkingCopyManager workingCopyManager)
+    public JsonSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor,
+        IWorkingCopyManager workingCopyManager)
     {
         super(preferenceStore);
         this.editor = editor;
@@ -53,8 +58,7 @@ public class JsonSourceViewerConfiguration
     @Override
     public IReconciler getReconciler(ISourceViewer sourceViewer)
     {
-        if (editor == null || !editor.isEditable()
-            || workingCopyManager == null)
+        if (editor == null || !editor.isEditable() || workingCopyManager == null)
             return null;
 
         return new JsonReconciler(editor, workingCopyManager);
@@ -67,20 +71,29 @@ public class JsonSourceViewerConfiguration
             return null;
 
         ContentAssistant assistant = new ContentAssistant(true);
-        assistant.setContentAssistProcessor(new ContentAssistProcessor(
-            this::getLanguageOperationTarget), IDocument.DEFAULT_CONTENT_TYPE);
+        assistant.setContentAssistProcessor(new ContentAssistProcessor(this::getLanguageOperationTarget),
+            IDocument.DEFAULT_CONTENT_TYPE);
         assistant.setSorter(new CompletionProposalSorter());
-        assistant.setInformationControlCreator(
-            parent -> new DefaultInformationControl(parent, true));
+        assistant.setInformationControlCreator(parent -> new DefaultInformationControl(parent, true));
         assistant.enableColoredLabels(true);
         return assistant;
     }
 
     @Override
-    public ITextHover getTextHover(ISourceViewer sourceViewer,
-        String contentType)
+    public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
     {
         return new TextHover(this::getLanguageOperationTarget);
+    }
+
+    @Override
+    public IPresentationReconciler getPresentationReconciler(ISourceViewer viewer)
+    {
+        // Defines a TextMate Presentation reconcilier
+        TMPresentationReconciler reconciler = new TMPresentationReconciler();
+        // Set the TypeScript grammar
+        //reconciler.setGrammar(getGrammar());
+        //reconciler.setThemeId(ThemeIdConstants.Monokai);
+        return reconciler;
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()
@@ -88,9 +101,7 @@ public class JsonSourceViewerConfiguration
         if (editor == null)
             return null;
 
-        ILanguageSourceFile sourceFile =
-            JsonInputElementProvider.INSTANCE.getElement(
-                editor.getEditorInput());
+        ILanguageSourceFile sourceFile = JsonInputElementProvider.INSTANCE.getElement(editor.getEditorInput());
         if (sourceFile == null)
             return null;
 
@@ -98,7 +109,13 @@ public class JsonSourceViewerConfiguration
         if (documentUri == null)
             return null;
 
-        return new LanguageOperationTarget(documentUri, JsonCore.LANG_ID,
-            JsonCore.LANG_SERVICE);
+        return new LanguageOperationTarget(documentUri, JsonCore.LANG_ID, JsonCore.LANG_SERVICE);
     }
+
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+    {
+        return new IAutoEditStrategy[] {new LanguageConfigurationAutoEditStrategy()};
+    }
+
 }

@@ -57,4 +57,33 @@
             class="org.lxtk.lx4e.internal.examples.json.editor.JsonOutlinePopupHandler">
       </handler>
    </extension>
+   <!-- TM4E Syntax Highlight -->
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="json"
+            id="org.lxtk.lx4e.examples.json"
+            name="JSON"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.tm4e.registry.grammars">
+      <grammar
+            scopeName="source.json"
+            path="./syntaxes/json.tmLanguage.json" >
+      </grammar>      
+      <scopeNameContentTypeBinding
+            contentTypeId="org.lxtk.lx4e.examples.json"
+            scopeName="source.json">
+      </scopeNameContentTypeBinding>
+   </extension>
+   <extension
+         point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="org.lxtk.lx4e.examples.json"
+            path="./language-configuration.json">
+      </languageConfiguration>
+   </extension>
 </plugin>
