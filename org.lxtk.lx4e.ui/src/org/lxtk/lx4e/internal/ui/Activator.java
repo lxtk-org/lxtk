@@ -12,7 +12,13 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.ui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -82,6 +88,17 @@ public class Activator
     public static void logWarning(Throwable e)
     {
         logWarning(e.getMessage(), e);
+    }
+
+    public static boolean isCancellation(Throwable e)
+    {
+        if (e instanceof CompletionException || e instanceof ExecutionException
+            || e instanceof InvocationTargetException)
+        {
+            return isCancellation(e.getCause());
+        }
+        return e instanceof OperationCanceledException
+            || e instanceof CancellationException;
     }
 
     @Override

@@ -14,6 +14,7 @@ package org.lxtk.lx4e.internal.examples.typescript;
 
 import java.net.URI;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorPart;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
@@ -36,9 +37,25 @@ public class TypeScriptOperationTargetProvider
         if (editor == null)
             return null;
 
-        ILanguageSourceFile sourceFile =
+        return getOperationTarget(
             TypeScriptInputElementProvider.INSTANCE.getElement(
-                editor.getEditorInput());
+                editor.getEditorInput()));
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param file may be <code>null</code>
+     * @return the operation target, or <code>null</code> if none
+     */
+    public static LanguageOperationTarget getOperationTarget(IFile file)
+    {
+        return getOperationTarget(TypeScriptCore.createSourceFileFrom(file));
+    }
+
+    private static LanguageOperationTarget getOperationTarget(
+        ILanguageSourceFile sourceFile)
+    {
         if (sourceFile == null)
             return null;
 

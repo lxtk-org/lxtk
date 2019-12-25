@@ -30,6 +30,7 @@ import org.lxtk.DocumentUri;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
 import org.lxtk.client.BufferingDiagnosticRequestor;
+import org.lxtk.client.CodeActionFeature;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DefinitionFeature;
 import org.lxtk.client.DocumentSymbolFeature;
@@ -54,12 +55,14 @@ import org.lxtk.util.connect.StreamBasedConnection;
 public class TypeScriptLanguageClient
     extends AbstractLanguageClientController<LanguageServer>
 {
+    static final String MARKER_TYPE =
+        "org.lxtk.lx4e.examples.typescript.problem"; //$NON-NLS-1$
+
     private final Log log;
     private final List<DocumentFilter> documentSelector;
     private final String rootUri;
     private final BufferingDiagnosticRequestor diagnosticRequestor =
-        new BufferingDiagnosticRequestor(new DiagnosticMarkers(
-            "org.lxtk.lx4e.examples.typescript.problem")); //$NON-NLS-1$
+        new BufferingDiagnosticRequestor(new DiagnosticMarkers(MARKER_TYPE));
 
     /**
      * TODO JavaDoc
@@ -116,6 +119,7 @@ public class TypeScriptLanguageClient
             new ArrayList<>();
         features.add(new TextDocumentSyncFeature(TypeScriptCore.WORKSPACE));
         features.add(new ExecuteCommandFeature(TypeScriptCore.CMD_SERVICE));
+        features.add(new CodeActionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new CompletionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DefinitionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));

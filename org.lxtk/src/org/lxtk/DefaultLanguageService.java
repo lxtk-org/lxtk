@@ -14,6 +14,10 @@ package org.lxtk;
 
 import java.util.Arrays;
 
+import org.eclipse.lsp4j.CodeActionCapabilities;
+import org.eclipse.lsp4j.CodeActionKind;
+import org.eclipse.lsp4j.CodeActionKindCapabilities;
+import org.eclipse.lsp4j.CodeActionLiteralSupportCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItemCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
@@ -33,6 +37,8 @@ import org.lxtk.util.Registry;
 public class DefaultLanguageService
     implements LanguageService
 {
+    private final Registry<CodeActionProvider> codeActionProviders =
+        Registry.newInstance();
     private final Registry<CompletionProvider> completionProviders =
         Registry.newInstance();
     private final Registry<DefinitionProvider> definitionProviders =
@@ -43,6 +49,32 @@ public class DefaultLanguageService
         Registry.newInstance();
     private final Registry<ReferenceProvider> referenceProviders =
         Registry.newInstance();
+
+    @Override
+    public CodeActionCapabilities getCodeActionCapabilities()
+    {
+        CodeActionKindCapabilities codeActionKind =
+            new CodeActionKindCapabilities();
+        codeActionKind.setValueSet(Arrays.asList(CodeActionKind.QuickFix,
+            CodeActionKind.Refactor, CodeActionKind.RefactorExtract,
+            CodeActionKind.RefactorInline, CodeActionKind.RefactorRewrite,
+            CodeActionKind.Source, CodeActionKind.SourceOrganizeImports));
+
+        CodeActionLiteralSupportCapabilities codeActionLiteralSupport =
+            new CodeActionLiteralSupportCapabilities();
+        codeActionLiteralSupport.setCodeActionKind(codeActionKind);
+
+        CodeActionCapabilities codeAction = new CodeActionCapabilities();
+        codeAction.setDynamicRegistration(true);
+        codeAction.setCodeActionLiteralSupport(codeActionLiteralSupport);
+        return codeAction;
+    }
+
+    @Override
+    public Registry<CodeActionProvider> getCodeActionProviders()
+    {
+        return codeActionProviders;
+    }
 
     @Override
     public CompletionCapabilities getCompletionCapabilities()

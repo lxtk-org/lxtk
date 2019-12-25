@@ -100,4 +100,11 @@
          </command>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.lxtk.lx4e.internal.examples.typescript.TypeScriptMarkerResolutionGenerator"
+            markerType="org.lxtk.lx4e.examples.typescript.problem">
+      </markerResolutionGenerator>
+   </extension>
 </plugin>

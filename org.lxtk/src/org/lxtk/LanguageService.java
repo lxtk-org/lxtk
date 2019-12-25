@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.lxtk;
 
+import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
@@ -34,6 +35,20 @@ public interface LanguageService
     {
         return DefaultDocumentMatcher.INSTANCE;
     }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return code action capabilities (never <code>null</code>)
+     */
+    CodeActionCapabilities getCodeActionCapabilities();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the registry for code action providers (never <code>null</code>)
+     */
+    Registry<CodeActionProvider> getCodeActionProviders();
 
     /**
      * TODO JavaDoc
