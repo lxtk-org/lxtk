@@ -106,4 +106,11 @@
             path="language-configuration.json">
       </languageConfiguration>
    </extension>
+   <extension
+         point="org.eclipse.tm4e.ui.themes">
+      <themeAssociation
+            scopeName="source.json"
+            themeId="org.eclipse.tm4e.ui.themes.Light">
+      </themeAssociation>
+   </extension>
 </plugin>
