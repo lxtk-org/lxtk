@@ -16,13 +16,17 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationAutoEditStrategy;
+import org.eclipse.tm4e.ui.text.TMPresentationReconciler;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
@@ -46,6 +50,21 @@ public class TypeScriptSourceViewerConfiguration
         super(preferenceStore);
         this.editor = editor;
         this.workingCopyManager = workingCopyManager;
+    }
+
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer,
+        String contentType)
+    {
+        return new IAutoEditStrategy[] {
+            new LanguageConfigurationAutoEditStrategy() };
+    }
+
+    @Override
+    public IPresentationReconciler getPresentationReconciler(
+        ISourceViewer viewer)
+    {
+        return new TMPresentationReconciler();
     }
 
     @Override

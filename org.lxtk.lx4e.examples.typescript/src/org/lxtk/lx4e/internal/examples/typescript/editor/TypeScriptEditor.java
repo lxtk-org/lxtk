@@ -12,7 +12,15 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.typescript.editor;
 
+import static org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceConstants.EDITOR_MATCHING_BRACKETS;
+import static org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceConstants.EDITOR_MATCHING_BRACKETS_COLOR;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationCharacterPairMatcher;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.lxtk.lx4e.internal.examples.typescript.Activator;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceFileDocumentProvider;
@@ -30,12 +38,17 @@ public class TypeScriptEditor
     @Override
     protected void initializeEditor()
     {
-        super.initializeEditor();
+        IPreferenceStore preferenceStore = new ChainedPreferenceStore(
+            new IPreferenceStore[] {
+                Activator.getDefault().getPreferenceStore(),
+                EditorsUI.getPreferenceStore() });
+        setPreferenceStore(preferenceStore);
+
         TypeScriptSourceFileDocumentProvider documentProvider =
             Activator.getDefault().getDocumentProvider();
         setDocumentProvider(documentProvider);
         setSourceViewerConfiguration(new TypeScriptSourceViewerConfiguration(
-            getPreferenceStore(), this, documentProvider));
+            preferenceStore, this, documentProvider));
         setEditorContextMenuId("#ExampleTypeScriptEditorContext"); //$NON-NLS-1$
         setRulerContextMenuId("#ExampleTypeScriptRulerContext"); //$NON-NLS-1$
     }
@@ -45,6 +58,17 @@ public class TypeScriptEditor
     {
         setKeyBindingScopes(new String[] {
             "org.lxtk.lx4e.examples.typescript.editor.scope" }); //$NON-NLS-1$
+    }
+
+    @Override
+    protected void configureSourceViewerDecorationSupport(
+        SourceViewerDecorationSupport decorationSupport)
+    {
+        decorationSupport.setCharacterPairMatcher(
+            new LanguageConfigurationCharacterPairMatcher());
+        decorationSupport.setMatchingCharacterPainterPreferenceKeys(
+            EDITOR_MATCHING_BRACKETS, EDITOR_MATCHING_BRACKETS_COLOR);
+        super.configureSourceViewerDecorationSupport(decorationSupport);
     }
 
     @Override
@@ -59,10 +83,7 @@ public class TypeScriptEditor
         return super.getAdapter(adapter);
     }
 
-    /**
-     * Informs the editor that its outline page has been closed.
-     */
-    public void outlinePageClosed()
+    void outlinePageClosed()
     {
         if (outlinePage != null)
         {

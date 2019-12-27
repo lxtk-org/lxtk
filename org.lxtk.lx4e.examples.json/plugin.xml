@@ -29,7 +29,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             id="org.lxtk.lx4e.examples.json"
-            name="JSON"
+            name="JSON (LXTK Example)"
             file-extensions="json"
             base-type="org.eclipse.core.runtime.text"
             priority="normal">

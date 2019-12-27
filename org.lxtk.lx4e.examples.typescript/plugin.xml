@@ -13,14 +13,57 @@
       </super>
    </extension>
    <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            id="org.lxtk.lx4e.examples.typescript"
+            name="TypeScript (LXTK Example)"
+            file-extensions="ts, js"
+            base-type="org.eclipse.core.runtime.text"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.tm4e.registry.grammars">
+      <grammar
+            scopeName="source.ts"
+            path="syntaxes/TypeScript.tmLanguage.json" >
+      </grammar>
+      <scopeNameContentTypeBinding
+            contentTypeId="org.lxtk.lx4e.examples.typescript"
+            scopeName="source.ts">
+      </scopeNameContentTypeBinding>
+   </extension>
+   <extension
+         point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="org.lxtk.lx4e.examples.typescript"
+            path="language-configuration.json">
+      </languageConfiguration>
+   </extension>
+   <extension
+         point="org.eclipse.tm4e.ui.themes">
+      <themeAssociation
+            scopeName="source.ts"
+            themeId="org.eclipse.tm4e.ui.themes.Light">
+      </themeAssociation>
+   </extension>
+   <extension
          point="org.eclipse.ui.editors">
       <editor
             id="org.lxtk.lx4e.examples.typescript.editor"
             name="TypeScript Editor (LXTK Example)"
-            extensions="ts, js"
             default="false"
             class="org.lxtk.lx4e.internal.examples.typescript.editor.TypeScriptEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
+         <contentTypeBinding
+               contentTypeId="org.lxtk.lx4e.examples.typescript">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
