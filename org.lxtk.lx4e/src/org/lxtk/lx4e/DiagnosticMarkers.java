@@ -101,13 +101,26 @@ public class DiagnosticMarkers
     @Override
     public void accept(URI uri, Collection<Diagnostic> diagnostics)
     {
-        deleteMarkers(uri);
-        if (diagnostics.isEmpty())
-            return;
-        IFile[] files = workspace.getRoot().findFilesForLocationURI(uri);
-        for (IFile file : files)
-            if (file.exists())
-                createMarkers(file, uri, diagnostics);
+        try
+        {
+            workspace.run(monitor ->
+            {
+                deleteMarkers(uri);
+                if (diagnostics.isEmpty())
+                    return;
+                IFile[] files = workspace.getRoot().findFilesForLocationURI(
+                    uri);
+                for (IFile file : files)
+                {
+                    if (file.exists())
+                        createMarkers(file, uri, diagnostics);
+                }
+            }, null, IWorkspace.AVOID_UPDATE, null);
+        }
+        catch (CoreException e)
+        {
+            Activator.logError(e);
+        }
     }
 
     @Override
