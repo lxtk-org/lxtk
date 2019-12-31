@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
@@ -105,9 +104,10 @@ public class EclipseLanguageClient<S extends LanguageServer>
     public CompletableFuture<ApplyWorkspaceEditResponse> applyEdit(
         ApplyWorkspaceEditParams params)
     {
+        String label = getEditLabel(params);
+
         WorkspaceEditRefactoring refactoring = new WorkspaceEditRefactoring(
-            Optional.ofNullable(params.getLabel()).orElse(""), //$NON-NLS-1$
-            workspaceEditChangeFactory);
+            label, workspaceEditChangeFactory);
         refactoring.setWorkspaceEdit(params.getEdit());
 
         PerformRefactoringOperation operation = new PerformRefactoringOperation(
@@ -115,9 +115,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
 
         CompletableFuture<ApplyWorkspaceEditResponse> future =
             new CompletableFuture<>();
-        WorkspaceJob job = new WorkspaceJob(Optional.ofNullable(
-            params.getLabel()).orElse(
-                Messages.EclipseLanguageClient_Apply_edit_job))
+        WorkspaceJob job = new WorkspaceJob(label)
         {
             @Override
             public IStatus runInWorkspace(IProgressMonitor monitor)
@@ -155,6 +153,20 @@ public class EclipseLanguageClient<S extends LanguageServer>
         job.setRule(ResourcesPlugin.getWorkspace().getRoot());
         job.schedule();
         return future;
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param params never <code>null</code>
+     * @return the corresponding label (not <code>null</code>)
+     */
+    protected String getEditLabel(ApplyWorkspaceEditParams params)
+    {
+        String label = params.getLabel();
+        if (label == null || label.isEmpty())
+            label = Messages.EclipseLanguageClient_Edit_label;
+        return label;
     }
 
     @Override

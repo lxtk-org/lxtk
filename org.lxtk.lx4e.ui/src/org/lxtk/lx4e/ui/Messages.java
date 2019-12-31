@@ -19,7 +19,7 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.messages"; //$NON-NLS-1$
 
-    public static String EclipseLanguageClient_Apply_edit_job;
+    public static String EclipseLanguageClient_Edit_label;
     public static String EclipseLanguageClient_Message_title;
 
     static
