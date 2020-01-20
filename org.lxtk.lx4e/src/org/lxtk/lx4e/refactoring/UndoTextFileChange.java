@@ -73,15 +73,16 @@ class UndoTextFileChange
             if (exists(uri, uriHandler))
             {
                 result.addFatalError(MessageFormat.format(
-                    Messages.UndoTextFileChange_File_should_not_exist, toDisplayString(uri,
-                        uriHandler)));
+                    Messages.UndoTextFileChange_File_should_not_exist,
+                    toDisplayString(uri, uriHandler)));
             }
             return result; // let the delete/move undo change handle the rest
         }
         else if (!exists(uri, uriHandler))
         {
             result.addFatalError(MessageFormat.format(
-                Messages.UndoTextFileChange_File_should_exist, toDisplayString(uri, uriHandler)));
+                Messages.UndoTextFileChange_File_should_exist, toDisplayString(
+                    uri, uriHandler)));
             return result;
         }
 
@@ -93,8 +94,8 @@ class UndoTextFileChange
             if (!undoChange.getBase().isEqualTo(buffer.getSnapshot()))
             {
                 result.addFatalError(MessageFormat.format(
-                    Messages.UndoTextFileChange_Cannot_undo_stale_change, toDisplayString(uri,
-                        uriHandler)));
+                    Messages.UndoTextFileChange_Cannot_undo_stale_change,
+                    toDisplayString(uri, uriHandler)));
             }
         }
         return result;
@@ -117,7 +118,8 @@ class UndoTextFileChange
             catch (StaleSnapshotException e)
             {
                 throw new CoreException(Activator.createErrorStatus(
-                    MessageFormat.format(Messages.UndoTextFileChange_Cannot_undo_stale_change,
+                    MessageFormat.format(
+                        Messages.UndoTextFileChange_Cannot_undo_stale_change,
                         toDisplayString(uri, uriHandler)), e));
             }
 
