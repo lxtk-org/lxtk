@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -130,7 +130,7 @@ public final class TextFileChange
 
         try (IBuffer buffer = getBuffer(uri, uriHandler))
         {
-            if (!buffer.getSnapshot().isEqualTo(base))
+            if (!base.isEqualTo(buffer.getSnapshot()))
             {
                 result.addFatalError(MessageFormat.format(
                     Messages.TextFileChange_Cannot_apply_stale_change,
