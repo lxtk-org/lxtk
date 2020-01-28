@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -93,7 +93,7 @@ class UndoTextFileChange
         {
             if (!undoChange.getBase().isEqualTo(buffer.getSnapshot()))
             {
-                result.addFatalError(MessageFormat.format(
+                result.addError(MessageFormat.format(
                     Messages.UndoTextFileChange_Cannot_undo_stale_change,
                     toDisplayString(uri, uriHandler)));
             }
