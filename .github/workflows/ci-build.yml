@@ -16,3 +16,11 @@ jobs:
     - name: Build with Maven
       working-directory: ./releng
       run: mvn clean verify -Dtycho.localArtifacts=ignore -B -V
+    - name: Publish repository
+      uses: actions/upload-artifact@v1
+      if: success()
+      with:
+          name: repository
+          path: repository/target/repository
+      
+
