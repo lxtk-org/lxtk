@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,6 +23,8 @@ import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
+import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationAutoEditStrategy;
@@ -80,7 +82,7 @@ public class TypeScriptSourceViewerConfiguration
     @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
     {
-        if (editor == null)
+        if (editor == null || !editor.isEditable())
             return null;
 
         ContentAssistant assistant = new ContentAssistant(true);
@@ -90,6 +92,19 @@ public class TypeScriptSourceViewerConfiguration
         assistant.setInformationControlCreator(
             parent -> new DefaultInformationControl(parent, true));
         assistant.enableColoredLabels(true);
+        return assistant;
+    }
+
+    @Override
+    public IQuickAssistAssistant getQuickAssistAssistant(
+        ISourceViewer sourceViewer)
+    {
+        if (editor == null || !editor.isEditable())
+            return null;
+
+        QuickAssistAssistant assistant = new QuickAssistAssistant();
+        assistant.setQuickAssistProcessor(new TypeScriptQuickAssistProcessor(
+            this::getLanguageOperationTarget));
         return assistant;
     }
 

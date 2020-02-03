@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.codeaction;
 
-import java.net.URI;
-import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,34 +24,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
 import org.eclipse.lsp4j.CodeActionKind;
-import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
-import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
-import org.eclipse.ui.statushandlers.StatusManager;
-import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
-import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DiagnosticMarkers;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
-import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 
 import com.google.gson.Gson;
 
@@ -76,11 +59,7 @@ public abstract class AbstractMarkerResolutionGenerator
         LanguageOperationTarget target = getLanguageOperationTarget(marker);
         if (target == null)
             return false;
-        LanguageService languageService = target.getLanguageService();
-        return languageService.getDocumentMatcher().getFirstMatch(
-            languageService.getCodeActionProviders(),
-            CodeActionProvider::getDocumentSelector, target.getDocumentUri(),
-            target.getLanguageId()) != null;
+        return CodeActions.hasCodeActionProvider(target);
     }
 
     @Override
@@ -93,21 +72,10 @@ public abstract class AbstractMarkerResolutionGenerator
         LanguageOperationTarget target = getLanguageOperationTarget(marker);
         if (target == null)
             return NO_RESOLUTIONS;
-        URI documentUri = target.getDocumentUri();
-        LanguageService languageService = target.getLanguageService();
-        CodeActionProvider provider =
-            languageService.getDocumentMatcher().getBestMatch(
-                languageService.getCodeActionProviders(),
-                CodeActionProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
-        if (provider == null)
-            return NO_RESOLUTIONS;
         CompletableFuture<List<Either<Command, CodeAction>>> future =
-            provider.getCodeActions(new CodeActionParams(
-                DocumentUri.toTextDocumentIdentifier(documentUri),
-                diagnostic.getRange(), new CodeActionContext(
-                    Collections.singletonList(diagnostic),
-                    Collections.singletonList(CodeActionKind.QuickFix))));
+            CodeActions.getCodeActions(target, diagnostic.getRange(),
+                new CodeActionContext(Collections.singletonList(diagnostic),
+                    Collections.singletonList(CodeActionKind.QuickFix)));
         List<Either<Command, CodeAction>> result = null;
         try
         {
@@ -248,19 +216,7 @@ public abstract class AbstractMarkerResolutionGenerator
         @Override
         public void run(IMarker marker)
         {
-            getCommandService().executeCommand(command.getCommand(),
-                command.getArguments()).exceptionally(e ->
-                {
-                    if (!Activator.isCancellation(e))
-                    {
-                        StatusManager.getManager().handle(
-                            Activator.createErrorStatus(MessageFormat.format(
-                                Messages.AbstractMarkerResolutionGenerator_Resolution_error,
-                                getLabel()), e), StatusManager.LOG
-                                    | StatusManager.SHOW);
-                    }
-                    return null;
-                });
+            CodeActions.execute(command, getLabel(), getCommandService());
         }
     }
 
@@ -291,63 +247,8 @@ public abstract class AbstractMarkerResolutionGenerator
         @Override
         public void run(IMarker marker)
         {
-            CompletableFuture<?> future = new CompletableFuture<>();
-            WorkspaceEdit edit = codeAction.getEdit();
-            if (edit == null)
-                future.complete(null);
-            else
-            {
-                WorkspaceEditRefactoring refactoring =
-                    new WorkspaceEditRefactoring(getLabel(),
-                        getWorkspaceEditChangeFactory());
-                refactoring.setWorkspaceEdit(edit);
-
-                PerformRefactoringOperation operation =
-                    new PerformRefactoringOperation(refactoring,
-                        CheckConditionsOperation.ALL_CONDITIONS);
-
-                WorkspaceJob job = new WorkspaceJob(getLabel())
-                {
-                    @Override
-                    public IStatus runInWorkspace(IProgressMonitor monitor)
-                        throws CoreException
-                    {
-                        try
-                        {
-                            operation.run(monitor);
-                            future.complete(null);
-                            return Status.OK_STATUS;
-                        }
-                        catch (Throwable e)
-                        {
-                            future.completeExceptionally(e);
-                            throw e;
-                        }
-                    }
-                };
-                job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-                job.schedule();
-            }
-            future.thenRun(() ->
-            {
-                Command command = codeAction.getCommand();
-                if (command != null)
-                {
-                    getCommandService().executeCommand(command.getCommand(),
-                        command.getArguments());
-                }
-            }).exceptionally(e ->
-            {
-                if (!Activator.isCancellation(e))
-                {
-                    StatusManager.getManager().handle(
-                        Activator.createErrorStatus(MessageFormat.format(
-                            Messages.AbstractMarkerResolutionGenerator_Resolution_error,
-                            getLabel()), e), StatusManager.LOG
-                                | StatusManager.SHOW);
-                }
-                return null;
-            });
+            CodeActions.execute(codeAction, getLabel(),
+                getWorkspaceEditChangeFactory(), getCommandService());
         }
     }
 }

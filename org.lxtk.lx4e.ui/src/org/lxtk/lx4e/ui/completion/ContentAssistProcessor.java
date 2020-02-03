@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -79,6 +79,7 @@ public class ContentAssistProcessor
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
         int offset)
     {
+        errorMessage = null;
         LanguageOperationTarget target = targetSupplier.get();
         if (target == null)
             return null;
@@ -153,6 +154,7 @@ public class ContentAssistProcessor
     public IContextInformation[] computeContextInformation(ITextViewer viewer,
         int offset)
     {
+        errorMessage = null;
         return null;
     }
 

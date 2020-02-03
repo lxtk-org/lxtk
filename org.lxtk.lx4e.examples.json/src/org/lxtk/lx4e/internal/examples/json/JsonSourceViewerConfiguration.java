@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -83,7 +83,7 @@ public class JsonSourceViewerConfiguration
     @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
     {
-        if (editor == null)
+        if (editor == null || !editor.isEditable())
             return null;
 
         ContentAssistant assistant = new ContentAssistant(true);
