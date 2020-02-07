@@ -142,6 +142,17 @@
                style="push">
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:#ExampleTypeScriptEditorContext?endof=group.edit">
+         <menu
+               id="org.lxtk.lx4e.examples.typescript.editor.codeActions.menu"
+               label="Code Actions">
+            <dynamic
+                  class="org.lxtk.lx4e.internal.examples.typescript.TypeScriptCodeActionMenu"
+                  id="org.lxtk.lx4e.examples.typescript.editor.codeActions.items">
+            </dynamic>
+         </menu>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.ide.markerResolution">
