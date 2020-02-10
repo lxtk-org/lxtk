@@ -23,33 +23,26 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.services.IServiceLocator;
-import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.ui.DefaultEditorHelper;
 
 /**
  * TODO JavaDoc
@@ -82,22 +75,15 @@ public abstract class AbstractCodeActionMenu
         LanguageOperationTarget target = getLanguageOperationTarget();
         if (target == null)
             return noItems();
-        InvocationContext ctx = getInvocationContext();
-        if (ctx == null)
+
+        Range range = getSelectedTextRange();
+        if (range == null)
             return noItems();
-        Range range;
-        try
-        {
-            range = DocumentUtil.toRange(ctx.document, ctx.offset, ctx.length);
-        }
-        catch (BadLocationException e)
-        {
-            Activator.logError(e);
-            return noItems();
-        }
+
         CompletableFuture<List<Either<Command, CodeAction>>> future =
             CodeActions.getCodeActions(target, range, new CodeActionContext(
                 Collections.emptyList(), getCodeActionKinds()));
+
         List<Either<Command, CodeAction>> result = null;
         try
         {
@@ -116,6 +102,7 @@ public abstract class AbstractCodeActionMenu
         }
         if (result == null || result.isEmpty())
             return noItems();
+
         List<IContributionItem> items = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
         {
@@ -133,44 +120,15 @@ public abstract class AbstractCodeActionMenu
     /**
      * TODO JavaDoc
      *
-     * @return the current {@link InvocationContext},
-     *  or <code>null</code> if none
+     * @return the selected text range, or <code>null</code> if none
      */
-    protected InvocationContext getInvocationContext()
+    protected Range getSelectedTextRange()
     {
-        ITextEditor editor = Adapters.adapt(getActivePart(), ITextEditor.class,
-            false);
-        if (editor == null)
+        IWorkbenchPart part = getActivePart();
+        if (!(part instanceof IEditorPart))
             return null;
-
-        IDocumentProvider documentProvider = editor.getDocumentProvider();
-        if (documentProvider == null)
-            return null;
-
-        IDocument document = documentProvider.getDocument(
-            editor.getEditorInput());
-        if (document == null)
-            return null;
-
-        ISelectionProvider selectionProvider = editor.getSelectionProvider();
-        if (selectionProvider == null)
-            return null;
-
-        ISelection selection = selectionProvider.getSelection();
-        if (selection.isEmpty() || !(selection instanceof ITextSelection))
-            return null;
-
-        ITextSelection textSelection = (ITextSelection)selection;
-
-        int offset = textSelection.getOffset();
-        if (offset < 0)
-            return null;
-
-        int length = textSelection.getLength();
-        if (length < 0)
-            return null;
-
-        return new InvocationContext(document, offset, length);
+        return DefaultEditorHelper.INSTANCE.getSelectedTextRange(
+            (IEditorPart)part);
     }
 
     /**
@@ -265,33 +223,6 @@ public abstract class AbstractCodeActionMenu
     {
         return new IContributionItem[] { new ActionContributionItem(
             new NoActionsAction()) };
-    }
-
-    /**
-     * TODO JavaDoc
-     */
-    protected static final class InvocationContext
-    {
-        final IDocument document;
-        final int offset, length;
-
-        /**
-         * TODO JavaDoc
-         *
-         * @param document not <code>null</code>
-         * @param offset 0-based
-         * @param length non-negative
-         */
-        public InvocationContext(IDocument document, int offset, int length)
-        {
-            this.document = Objects.requireNonNull(document);
-            if (offset < 0)
-                throw new IllegalArgumentException();
-            this.offset = offset;
-            if (length < 0)
-                throw new IllegalArgumentException();
-            this.length = length;
-        }
     }
 
     /**
