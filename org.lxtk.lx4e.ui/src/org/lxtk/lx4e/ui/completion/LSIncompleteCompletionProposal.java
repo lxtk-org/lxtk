@@ -498,7 +498,7 @@ class LSIncompleteCompletionProposal
                         }
                         insertText = insertText.substring(0, currentSnippetOffsetInInsertText) + defaultProposal + insertText.substring(currentSnippetOffsetInInsertText + offsetInSnippet);
                         LinkedPosition position = null;
-                        if (!snippetProposals.isEmpty()) {
+                        if (isChoice && !snippetProposals.isEmpty()) {
                             int replacementOffset = insertionOffset + currentSnippetOffsetInInsertText;
                             ICompletionProposal[] proposals = snippetProposals.stream().map(string ->
                             new CompletionProposal(string, replacementOffset, defaultProposal.length(), replacementOffset + string.length())
