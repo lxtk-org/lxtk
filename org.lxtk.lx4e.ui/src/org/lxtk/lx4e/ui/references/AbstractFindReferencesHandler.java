@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -88,7 +88,7 @@ public abstract class AbstractFindReferencesHandler
         {
             return null;
         }
-        LanguageOperationTarget target = getOperationTarget(editor);
+        LanguageOperationTarget target = getLanguageOperationTarget(editor);
         if (target == null)
             return null;
         return createSearchQuery(target, position, wordAtPosition);
@@ -99,9 +99,10 @@ public abstract class AbstractFindReferencesHandler
      * TODO JavaDoc
      *
      * @param editor never <code>null</code>
-     * @return the operation target, or <code>null</code> if none
+     * @return the corresponding {@link LanguageOperationTarget},
+     *  or <code>null</code> if none
      */
-    protected abstract LanguageOperationTarget getOperationTarget(
+    protected abstract LanguageOperationTarget getLanguageOperationTarget(
         IEditorPart editor);
 
     /**
