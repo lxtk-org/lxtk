@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,7 +18,7 @@ class Messages
     extends NLS
 {
     private static final String BUNDLE_NAME =
-        "org.lxtk.eclipse.model.impl.messages"; //$NON-NLS-1$
+        "org.lxtk.lx4e.model.impl.messages"; //$NON-NLS-1$
 
     public static String LanguageSourceFile_No_working_copy_URI;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,7 +18,7 @@ class Messages
     extends NLS
 {
     private static final String BUNDLE_NAME =
-        "org.lxtk.eclipse.ui.completion.messages"; //$NON-NLS-1$
+        "org.lxtk.lx4e.ui.completion.messages"; //$NON-NLS-1$
 
     public static String ContentAssistProcessor_Request_timed_out;
     public static String LSIncompleteCompletionProposal_Tooltip_affordance_string;
