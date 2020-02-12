@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -113,6 +113,10 @@ public final class CompletionFeature
                 public CompletableFuture<CompletionItem> resolveCompletionItem(
                     CompletionItem item)
                 {
+                    if (!Boolean.TRUE.equals(
+                        castedOptions.getResolveProvider()))
+                        throw new UnsupportedOperationException();
+
                     return getLanguageServer().getTextDocumentService().resolveCompletionItem(
                         item);
                 }

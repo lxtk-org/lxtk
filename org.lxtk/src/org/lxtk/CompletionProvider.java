@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -44,6 +44,9 @@ public interface CompletionProvider
      *
      * @param item not <code>null</code>
      * @return result future (never <code>null</code>)
+     * @throws UnsupportedOperationException iff {@link
+     *  CompletionRegistrationOptions#getResolveProvider() resolveProvider}
+     *  is not available
      */
     CompletableFuture<CompletionItem> resolveCompletionItem(
         CompletionItem item);
