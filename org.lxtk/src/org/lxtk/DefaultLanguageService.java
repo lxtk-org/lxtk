@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -27,6 +27,7 @@ import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.ReferencesCapabilities;
+import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.SymbolKindCapabilities;
 import org.lxtk.util.Registry;
@@ -48,6 +49,8 @@ public class DefaultLanguageService
     private final Registry<HoverProvider> hoverProviders =
         Registry.newInstance();
     private final Registry<ReferenceProvider> referenceProviders =
+        Registry.newInstance();
+    private final Registry<RenameProvider> renameProviders =
         Registry.newInstance();
 
     @Override
@@ -170,5 +173,20 @@ public class DefaultLanguageService
     public Registry<ReferenceProvider> getReferenceProviders()
     {
         return referenceProviders;
+    }
+
+    @Override
+    public RenameCapabilities getRenameCapabilities()
+    {
+        RenameCapabilities rename = new RenameCapabilities();
+        rename.setDynamicRegistration(true);
+        rename.setPrepareSupport(true);
+        return rename;
+    }
+
+    @Override
+    public Registry<RenameProvider> getRenameProviders()
+    {
+        return renameProviders;
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -115,6 +115,7 @@ public class WorkspaceEditChangeFactory
         RefactoringStatus status, IProgressMonitor pm) throws CoreException
     {
         CompositeChange change = new CompositeChange(name);
+        change.markAsSynthetic();
         List<Either<TextDocumentEdit, ResourceOperation>> documentChanges =
             workspaceEdit.getDocumentChanges();
         if (documentChanges != null)
@@ -215,7 +216,8 @@ public class WorkspaceEditChangeFactory
             throw Activator.toCoreException(e);
         }
 
-        TextFileChange textChange = new TextFileChange("", uri, uriHandler); //$NON-NLS-1$
+        TextFileChange textChange = new TextFileChange(
+            UriHandlers.toDisplayString(uri, uriHandler), uri, uriHandler);
         textChange.setEdit(edit);
         textChange.setBase(snapshot);
         change.add(textChange);

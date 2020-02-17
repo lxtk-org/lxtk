@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,6 +18,7 @@ import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
+import org.eclipse.lsp4j.RenameCapabilities;
 import org.lxtk.util.Registry;
 
 /**
@@ -119,4 +120,18 @@ public interface LanguageService
      * @return the registry for reference providers (never <code>null</code>)
      */
     Registry<ReferenceProvider> getReferenceProviders();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return rename capabilities (never <code>null</code>)
+     */
+    RenameCapabilities getRenameCapabilities();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the registry for rename providers (never <code>null</code>)
+     */
+    Registry<RenameProvider> getRenameProviders();
 }

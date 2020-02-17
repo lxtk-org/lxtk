@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,10 +15,12 @@ package org.lxtk.lx4e;
 import java.net.URI;
 import java.util.Objects;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
 import org.lxtk.TextDocument;
 import org.lxtk.Workspace;
+import org.lxtk.lx4e.util.ResourceUtil;
 
 /**
  * TODO JavaDoc
@@ -67,6 +69,10 @@ public class TextDocumentUriHandler
     @Override
     public String toDisplayString(URI uri)
     {
+        IResource resource = ResourceUtil.getResource(getCorrespondingElement(
+            uri));
+        if (resource != null)
+            return resource.getFullPath().makeRelative().toString();
         return null;
     }
 }

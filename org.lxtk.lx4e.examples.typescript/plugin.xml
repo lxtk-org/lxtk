@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
+<!--
+   Copyright (c) 2019, 2020 1C-Soft LLC.
+
+   This program and the accompanying materials are made available under
+   the terms of the Eclipse Public License 2.0 which is available at
+   https://www.eclipse.org/legal/epl-2.0/
+
+   SPDX-License-Identifier: EPL-2.0
+
+   Contributors:
+       Vladimir Piskarev (1C) - initial API and implementation
+-->
 <plugin>
    <extension
          id="problem"
@@ -81,13 +93,22 @@
             id="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
             categoryId="org.eclipse.ui.category.navigate"
             name="Quick Outline"
-            description="Show the quick outline for the editor input">
+            description="Show the quick outline for the editor input"
+            defaultHandler="org.lxtk.lx4e.internal.examples.typescript.editor.TypeScriptOutlinePopupHandler">
       </command>
       <command
             id="org.lxtk.lx4e.examples.typescript.editor.findReferences"
             categoryId="org.eclipse.search.ui.category.search"
             name="Find References"
-            description="Find references to the selected symbol">
+            description="Find references to the selected symbol"
+            defaultHandler="org.lxtk.lx4e.internal.examples.typescript.editor.FindReferencesHandler">
+      </command>
+      <command
+            id="org.lxtk.lx4e.examples.typescript.editor.rename"
+            categoryId="org.eclipse.ltk.ui.category.refactoring"
+            name="Rename"
+            description="Rename the selected symbol"
+            defaultHandler="org.lxtk.lx4e.internal.examples.typescript.editor.RenameHandler">
       </command>
    </extension>
    <extension
@@ -110,17 +131,23 @@
             contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
-            class="org.lxtk.lx4e.internal.examples.typescript.editor.TypeScriptOutlinePopupHandler">
-      </handler>
-      <handler
-            commandId="org.lxtk.lx4e.examples.typescript.editor.findReferences"
-            class="org.lxtk.lx4e.internal.examples.typescript.editor.FindReferencesHandler">
-      </handler>
+      <key
+            sequence="M2+M3+R"
+            commandId="org.lxtk.lx4e.examples.typescript.editor.rename"
+            contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            platform="carbon"
+            sequence="M2+M3+R"
+            commandId=""
+            contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            platform="carbon"
+            sequence="COMMAND+ALT+R"
+            commandId="org.lxtk.lx4e.examples.typescript.editor.rename"
+            contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -144,6 +171,14 @@
       </menuContribution>
       <menuContribution
             locationURI="popup:#ExampleTypeScriptEditorContext?endof=group.edit">
+         <menu
+               id="org.lxtk.lx4e.examples.typescript.editor.refactoring.menu"
+               label="Refactoring">
+            <command
+                  commandId="org.lxtk.lx4e.examples.typescript.editor.rename"
+                  style="push">
+            </command>
+         </menu>
          <menu
                id="org.lxtk.lx4e.examples.typescript.editor.codeActions.menu"
                label="Code Actions">

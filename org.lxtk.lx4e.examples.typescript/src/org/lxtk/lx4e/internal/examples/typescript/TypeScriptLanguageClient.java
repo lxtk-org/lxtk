@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -38,6 +38,7 @@ import org.lxtk.client.ExecuteCommandFeature;
 import org.lxtk.client.Feature;
 import org.lxtk.client.HoverFeature;
 import org.lxtk.client.ReferencesFeature;
+import org.lxtk.client.RenameFeature;
 import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
@@ -125,6 +126,7 @@ public class TypeScriptLanguageClient
         features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new HoverFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new ReferencesFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new RenameFeature(TypeScriptCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
             diagnosticRequestor, TypeScriptWorkspaceEditChangeFactory.INSTANCE,
             features)

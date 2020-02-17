@@ -32,4 +32,5 @@ Export-Package: org.lxtk.lx4e.internal.ui;x-internal:=true,
  org.lxtk.lx4e.ui.completion,
  org.lxtk.lx4e.ui.hover,
  org.lxtk.lx4e.ui.hyperlinks,
+ org.lxtk.lx4e.ui.refactoring.rename,
  org.lxtk.lx4e.ui.references
