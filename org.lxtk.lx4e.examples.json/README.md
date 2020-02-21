@@ -2,8 +2,8 @@ LXTK Eclipse Integration Example: JSON Editor
 =============================================
 
 This example demonstrates a simple JSON editor based on the [VSCode JSON language server][1].
-The server is started when the first JSON file is opened. Note that this example
-does not support external files (files outside the Eclipse workspace). Initially,
+The server is started when the first JSON file is opened. This example supports
+files in the Eclipse workspace as well as files outside the workspace. Initially,
 the server knows the JSON schema for `package.json` files; other schemas can be
 specified in JSON files using a `$schema` property.
 

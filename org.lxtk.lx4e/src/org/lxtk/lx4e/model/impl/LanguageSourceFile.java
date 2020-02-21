@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -28,6 +28,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -74,7 +76,7 @@ public abstract class LanguageSourceFile
     private static final Property<URI> WORKING_COPY_URI = Property.get(
         LanguageSourceFile.class.getName() + ".workingCopyUri", URI.class); //$NON-NLS-1$
 
-    private final IFile file;
+    private final FileWrapper fileWrapper;
     private final String languageId;
 
     /**
@@ -90,8 +92,58 @@ public abstract class LanguageSourceFile
     public LanguageSourceFile(LanguageElement parent, IFile file,
         String languageId)
     {
-        super(parent, file.getName());
-        this.file = file;
+        this(parent, FileWrapper.forFile(file), languageId);
+    }
+
+    /**
+     * Constructs a handle for a source file with the given parent element and
+     * the given file system location URI. The URI must be suitable to passing to
+     * <code>EFS.getStore(URI)</code>. This constructor is intended to be used
+     * for source files that have an underlying {@link IFileStore} outside
+     * the workspace.
+     *
+     * @param parent the parent of the element,
+     *  or <code>null</code> if the element has no parent
+     * @param locationUri a file system location URI (not <code>null</code>)
+     * @param languageId the language identifier (not <code>null</code>)
+     */
+    /*
+     * Note: We use URI rather than IFileStore as the second argument type
+     * to avoid introducing a compile-time dependency on org.eclipse.core.filesystem
+     * in subclasses that do not otherwise depend on it. For the same reason,
+     * we chose not to override getFileStore_(), although a more efficient
+     * implementation could have been provided.
+     */
+    public LanguageSourceFile(LanguageElement parent, URI locationUri,
+        String languageId)
+    {
+        this(parent, FileWrapper.forLocationUri(locationUri), languageId);
+    }
+
+    /**
+     * Constructs a handle for a source file with the given parent element and
+     * the given name. This constructor is intended to be used for source files
+     * that have no underlying file object.
+     *
+     * @param parent the parent of the element,
+     *  or <code>null</code> if the element has no parent
+     * @param name the name of the element, or <code>null</code>
+     *  if the element has no name
+     * @param languageId the language identifier (not <code>null</code>)
+     */
+    public LanguageSourceFile(LanguageElement parent, String name,
+        String languageId)
+    {
+        super(parent, name);
+        this.fileWrapper = FileWrapper.NULL;
+        this.languageId = Objects.requireNonNull(languageId);
+    }
+
+    private LanguageSourceFile(LanguageElement parent, FileWrapper fileWrapper,
+        String languageId)
+    {
+        super(parent, fileWrapper.getName());
+        this.fileWrapper = fileWrapper;
         this.languageId = Objects.requireNonNull(languageId);
     }
 
@@ -111,6 +163,30 @@ public abstract class LanguageSourceFile
         int result = super.hashCode();
         result = prime * result + languageId.hashCode();
         return result;
+    }
+
+    @Override
+    public Object getFileObject_()
+    {
+        return fileWrapper.getFileObject();
+    }
+
+    @Override
+    public IResource getResource_()
+    {
+        return getFile_();
+    }
+
+    @Override
+    public IFile getFile_()
+    {
+        return fileWrapper.getFile();
+    }
+
+    @Override
+    public URI getLocationUri_()
+    {
+        return fileWrapper.getLocationUri();
     }
 
     @Override
@@ -152,12 +228,6 @@ public abstract class LanguageSourceFile
         throws CoreException
     {
         return (ILanguageSymbol[])getChildren_(EMPTY_CONTEXT, monitor);
-    }
-
-    @Override
-    public IResource getResource_()
-    {
-        return file;
     }
 
     @Override
@@ -205,7 +275,17 @@ public abstract class LanguageSourceFile
     @Override
     public void toStringName_(StringBuilder builder, IContext context)
     {
-        builder.append(file.getFullPath());
+        IFile file = getFile_();
+        if (file != null)
+            builder.append(file.getFullPath());
+        else
+        {
+            IFileStore fileStore = getFileStore_();
+            if (fileStore != null)
+                builder.append(fileStore);
+            else
+                super.toStringName_(builder, context);
+        }
     }
 
     @Override
@@ -213,6 +293,8 @@ public abstract class LanguageSourceFile
     {
         if (adapter == IResource.class || adapter == IFile.class)
             return adapter.cast(getFile_());
+        if (adapter == IFileStore.class)
+            return adapter.cast(getFileStore_());
         return super.getAdapter(adapter);
     }
 
@@ -295,6 +377,136 @@ public abstract class LanguageSourceFile
                 symbols.add(item.getRight());
         }
         return symbols;
+    }
+
+    private static interface FileWrapper
+    {
+        String getName();
+
+        Object getFileObject();
+
+        IFile getFile();
+
+        URI getLocationUri();
+
+        FileWrapper NULL = new FileWrapper()
+        {
+            @Override
+            public String getName()
+            {
+                return null;
+            }
+
+            @Override
+            public Object getFileObject()
+            {
+                return null;
+            }
+
+            @Override
+            public IFile getFile()
+            {
+                return null;
+            }
+
+            @Override
+            public URI getLocationUri()
+            {
+                return null;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "NULL"; //$NON-NLS-1$
+            }
+        };
+
+        static FileWrapper forFile(IFile file)
+        {
+            return new FileWrapper()
+            {
+                @Override
+                public String getName()
+                {
+                    return file.getName();
+                }
+
+                @Override
+                public Object getFileObject()
+                {
+                    return file;
+                }
+
+                @Override
+                public IFile getFile()
+                {
+                    return file;
+                }
+
+                @Override
+                public URI getLocationUri()
+                {
+                    return file.getLocationURI();
+                }
+
+                @Override
+                public String toString()
+                {
+                    return file.getFullPath().toString();
+                }
+            };
+        }
+
+        static FileWrapper forFileStore(IFileStore fileStore)
+        {
+            return new FileWrapper()
+            {
+                @Override
+                public String getName()
+                {
+                    return fileStore.getName();
+                }
+
+                @Override
+                public Object getFileObject()
+                {
+                    return fileStore;
+                }
+
+                @Override
+                public IFile getFile()
+                {
+                    return null;
+                }
+
+                @Override
+                public URI getLocationUri()
+                {
+                    return fileStore.toURI();
+                }
+
+                @Override
+                public String toString()
+                {
+                    return fileStore.toString();
+                }
+            };
+        }
+
+        static FileWrapper forLocationUri(URI uri)
+        {
+            IFileStore fileStore;
+            try
+            {
+                fileStore = EFS.getStore(uri);
+            }
+            catch (CoreException e)
+            {
+                throw new IllegalArgumentException(e);
+            }
+            return forFileStore(fileStore);
+        }
     }
 
     private class LanguageWorkingCopyCallback

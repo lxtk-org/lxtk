@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,8 +12,10 @@
  *******************************************************************************/
 package org.lxtk.lx4e.examples.json;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.handly.model.IElementChangeListener;
 import org.lxtk.DefaultWorkspace;
 import org.lxtk.LanguageService;
@@ -34,7 +36,9 @@ public class JsonCore
     public static final LanguageService LANG_SERVICE =
         new EclipseLanguageService();
 
-    public static final String LANG_ID = "json"; //$NON-NLS-1$
+    private static final String JSON = "json"; //$NON-NLS-1$
+
+    public static final String LANG_ID = JSON;
 
     /**
      * Returns the element corresponding to the given resource,
@@ -68,8 +72,27 @@ public class JsonCore
     {
         if (file == null)
             return null;
-        if ("json".equals(file.getFileExtension())) //$NON-NLS-1$
+        if (JSON.equals(file.getFileExtension()))
             return new JsonSourceFile(null, file);
+        return null;
+    }
+
+    /**
+     * Returns the source file element corresponding to the given file store,
+     * or <code>null</code> if unable to associate the given file store with a
+     * source file element.
+     *
+     * @param fileStore the given file store (may be <code>null</code>)
+     * @return the source file element corresponding to the given file store,
+     *  or <code>null</code> if unable to associate the given file store with a
+     *  source file element
+     */
+    public static ILanguageSourceFile createSourceFileFrom(IFileStore fileStore)
+    {
+        if (fileStore == null)
+            return null;
+        if (JSON.equals(new Path(fileStore.getName()).getFileExtension()))
+            return new JsonSourceFile(null, fileStore);
         return null;
     }
 

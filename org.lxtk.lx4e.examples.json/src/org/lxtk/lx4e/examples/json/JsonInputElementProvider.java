@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.lxtk.lx4e.examples.json;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.handly.ui.IInputElementProvider;
 import org.eclipse.ui.IEditorInput;
@@ -34,8 +35,13 @@ public class JsonInputElementProvider
     {
         if (editorInput == null)
             return null;
+
         IFile file = editorInput.getAdapter(IFile.class);
-        return JsonCore.createSourceFileFrom(file);
+        if (file != null)
+            return JsonCore.createSourceFileFrom(file);
+
+        IFileStore fileStore = editorInput.getAdapter(IFileStore.class);
+        return JsonCore.createSourceFileFrom(fileStore);
     }
 
     private JsonInputElementProvider()
