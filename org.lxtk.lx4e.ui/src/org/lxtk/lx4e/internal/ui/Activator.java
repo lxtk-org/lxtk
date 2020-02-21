@@ -74,12 +74,12 @@ public class Activator
 
     public static void logError(String msg, Throwable e)
     {
-        plugin.getLog().log(createErrorStatus(msg, e));
+        plugin.getLog().error(msg, e);
     }
 
     public static void logWarning(String msg, Throwable e)
     {
-        plugin.getLog().log(createWarningStatus(msg, e));
+        plugin.getLog().warn(msg, e);
     }
 
     public static void logError(Throwable e)

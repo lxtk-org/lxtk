@@ -59,7 +59,7 @@ public class Activator
 
     public static void logError(String msg, Throwable e)
     {
-        plugin.getLog().log(createErrorStatus(msg, e));
+        plugin.getLog().error(msg, e);
     }
 
     public static void logError(Throwable e)
