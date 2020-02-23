@@ -216,8 +216,8 @@ public class WorkspaceEditChangeFactory
             throw Activator.toCoreException(e);
         }
 
-        TextFileChange textChange = new TextFileChange(
-            UriHandlers.toDisplayString(uri, uriHandler), uri, uriHandler);
+        TextFileChange textChange = new TextFileChange(toDisplayString(uri,
+            uriHandler), uri, uriHandler);
         textChange.setEdit(edit);
         textChange.setBase(snapshot);
         change.add(textChange);

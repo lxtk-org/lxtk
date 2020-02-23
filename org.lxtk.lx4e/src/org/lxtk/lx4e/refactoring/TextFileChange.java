@@ -144,7 +144,7 @@ public final class TextFileChange
     public Change perform(IProgressMonitor pm) throws CoreException
     {
         SubMonitor subMonitor = SubMonitor.convert(pm, 1);
-        try (IBuffer buffer = uriHandler.getBuffer(uri))
+        try (IBuffer buffer = getBuffer(uri, uriHandler))
         {
             BufferChangeWithExcludes change = new BufferChangeWithExcludes(
                 getEdit());
