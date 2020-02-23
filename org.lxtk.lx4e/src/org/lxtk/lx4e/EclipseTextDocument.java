@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,6 +23,7 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentListener;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.lxtk.TextDocument;
@@ -116,6 +117,17 @@ public final class EclipseTextDocument
     public IDocument getUnderlyingDocument()
     {
         return document;
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the underlying {@link IAnnotationModel}, or <code>null</code>
+     *  if none
+     */
+    public IAnnotationModel getAnnotationModel()
+    {
+        return buffer.getAnnotationModel();
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -35,6 +35,8 @@ import org.lxtk.client.HoverFeature;
 import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
+import org.lxtk.lx4e.DefaultDiagnosticRequestor;
+import org.lxtk.lx4e.DiagnosticAnnotations;
 import org.lxtk.lx4e.DiagnosticMarkers;
 import org.lxtk.lx4e.EclipseLog;
 import org.lxtk.lx4e.examples.json.JsonCore;
@@ -60,8 +62,9 @@ public class JsonLanguageClient
             null));
 
     private final BufferingDiagnosticRequestor diagnosticRequestor =
-        new BufferingDiagnosticRequestor(new DiagnosticMarkers(
-            "org.lxtk.lx4e.examples.json.problem")); //$NON-NLS-1$
+        new BufferingDiagnosticRequestor(new DefaultDiagnosticRequestor(
+            new DiagnosticMarkers("org.lxtk.lx4e.examples.json.problem"), //$NON-NLS-1$
+            new DiagnosticAnnotations(JsonCore.WORKSPACE)));
 
     @Override
     public void dispose()
