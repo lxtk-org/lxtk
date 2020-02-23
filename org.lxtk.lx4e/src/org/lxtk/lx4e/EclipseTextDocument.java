@@ -72,6 +72,7 @@ public final class EclipseTextDocument
             }
         }
     };
+    private boolean isDisposed;
 
     /**
      * TODO JavaDoc
@@ -103,8 +104,9 @@ public final class EclipseTextDocument
      *  It is the client responsibility to {@link IBuffer#release() release}
      *  the returned buffer after it is no longer needed
      */
-    public IBuffer getBuffer()
+    public synchronized IBuffer getBuffer()
     {
+        checkNotDisposed();
         buffer.addRef();
         return buffer;
     }
@@ -125,8 +127,11 @@ public final class EclipseTextDocument
      * @return the underlying {@link IAnnotationModel}, or <code>null</code>
      *  if none
      */
-    public IAnnotationModel getAnnotationModel()
+    public synchronized IAnnotationModel getAnnotationModel()
     {
+        if (isDisposed)
+            return null;
+
         return buffer.getAnnotationModel();
     }
 
@@ -155,8 +160,12 @@ public final class EclipseTextDocument
     }
 
     @Override
-    public void dispose()
+    public synchronized void dispose()
     {
+        if (isDisposed)
+            return;
+
+        isDisposed = true;
         buffer.release();
         document.removeDocumentListener(listener);
         onDidChange.dispose();
@@ -221,5 +230,12 @@ public final class EclipseTextDocument
             throw new AssertionError();
         return new EclipseTextDocumentChangeEvent(snapshot,
             Collections.singletonList(event), modificationStamp);
+    }
+
+    private void checkNotDisposed()
+    {
+        if (isDisposed)
+            throw new IllegalStateException("The document has been disposed: " //$NON-NLS-1$
+                + uri);
     }
 }
