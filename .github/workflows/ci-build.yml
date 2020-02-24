@@ -3,16 +3,52 @@ name: lxtk CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  build-latest-target:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build with Maven
+
+    - name: Cache maven repo
+      uses: actions/cache@v1
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-latest-${{ hashFiles('**/pom.xml') }}-${{ hashFiles('targets/latest/latest.target') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-latest-
+
+    - name: Build with Maven (latest target)
       working-directory: ./releng
       run: mvn clean verify -Dtycho.localArtifacts=ignore -B -V
+
+  build-base-target:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Cache maven repo
+      uses: actions/cache@v1
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-base-${{ hashFiles('**/pom.xml') }}-${{ hashFiles('targets/base/base.target') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-base-
+
+    - name: Build with Maven (base target)
+      working-directory: ./releng
+      run: mvn clean verify -Dtycho.localArtifacts=ignore -Dtarget=base -B -V
