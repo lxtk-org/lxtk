@@ -34,6 +34,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
+import org.lxtk.lx4e.ui.hover.BestMatchHover;
 import org.lxtk.lx4e.ui.hover.TextHover;
 import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
 
@@ -132,7 +133,8 @@ public class TypeScriptSourceViewerConfiguration
     public ITextHover getTextHover(ISourceViewer sourceViewer,
         String contentType)
     {
-        return new TextHover(this::getLanguageOperationTarget);
+        return new BestMatchHover(super.getTextHover(sourceViewer, contentType),
+            new TextHover(this::getLanguageOperationTarget));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

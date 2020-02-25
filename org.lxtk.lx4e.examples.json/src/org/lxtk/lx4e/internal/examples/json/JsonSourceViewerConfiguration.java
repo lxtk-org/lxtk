@@ -36,6 +36,7 @@ import org.lxtk.lx4e.examples.json.JsonInputElementProvider;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
+import org.lxtk.lx4e.ui.hover.BestMatchHover;
 import org.lxtk.lx4e.ui.hover.TextHover;
 
 /**
@@ -100,7 +101,8 @@ public class JsonSourceViewerConfiguration
     public ITextHover getTextHover(ISourceViewer sourceViewer,
         String contentType)
     {
-        return new TextHover(this::getLanguageOperationTarget);
+        return new BestMatchHover(super.getTextHover(sourceViewer, contentType),
+            new TextHover(this::getLanguageOperationTarget));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

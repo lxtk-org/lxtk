@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -72,7 +72,8 @@ public class TextHover
     @Override
     public IRegion getHoverRegion(ITextViewer textViewer, int offset)
     {
-        return findWord(textViewer.getDocument(), offset);
+        return DefaultWordFinder.INSTANCE.findWord(textViewer.getDocument(),
+            offset);
     }
 
     @Override
@@ -202,18 +203,6 @@ public class TextHover
     protected IInformationControlCreator newHoverControlCreator()
     {
         return new FocusableInformationControlCreator();
-    }
-
-    /**
-     * TODO JavaDoc
-     *
-     * @param document never <code>null</code>
-     * @param offset 0-based
-     * @return the corresponding word region, or <code>null</code> if none
-     */
-    protected IRegion findWord(IDocument document, int offset)
-    {
-        return DefaultWordFinder.INSTANCE.findWord(document, offset);
     }
 
     /**
