@@ -28,6 +28,7 @@ import java.util.function.BiConsumer;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -220,21 +221,36 @@ public class DiagnosticAnnotations
     private static void replaceAnnotations(IAnnotationModel annotationModel,
         List<Annotation> toRemove, Map<Annotation, Position> toAdd)
     {
-        if (annotationModel instanceof IAnnotationModelExtension)
+        synchronized (getLockObject(annotationModel))
         {
-            ((IAnnotationModelExtension)annotationModel).replaceAnnotations(
-                toRemove.toArray(new Annotation[toRemove.size()]), toAdd);
+            if (annotationModel instanceof IAnnotationModelExtension)
+            {
+                ((IAnnotationModelExtension)annotationModel).replaceAnnotations(
+                    toRemove.toArray(new Annotation[toRemove.size()]), toAdd);
+            }
+            else
+            {
+                for (Annotation annotation : toRemove)
+                {
+                    annotationModel.removeAnnotation(annotation);
+                }
+                for (Map.Entry<Annotation, Position> entry : toAdd.entrySet())
+                {
+                    annotationModel.addAnnotation(entry.getKey(),
+                        entry.getValue());
+                }
+            }
         }
-        else
+    }
+
+    private static Object getLockObject(IAnnotationModel annotationModel)
+    {
+        if (annotationModel instanceof ISynchronizable)
         {
-            for (Annotation annotation : toRemove)
-            {
-                annotationModel.removeAnnotation(annotation);
-            }
-            for (Map.Entry<Annotation, Position> entry : toAdd.entrySet())
-            {
-                annotationModel.addAnnotation(entry.getKey(), entry.getValue());
-            }
+            Object lock = ((ISynchronizable)annotationModel).getLockObject();
+            if (lock != null)
+                return lock;
         }
+        return annotationModel;
     }
 }
