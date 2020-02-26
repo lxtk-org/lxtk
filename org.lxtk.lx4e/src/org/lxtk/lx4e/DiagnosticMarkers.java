@@ -16,10 +16,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
@@ -79,7 +77,7 @@ public class DiagnosticMarkers
      *
      * @see #getMarkers()
      */
-    protected Map<URI, Set<IMarker>> markers;
+    protected Map<URI, Collection<IMarker>> markers;
 
     private final IWorkspace workspace = ResourcesPlugin.getWorkspace();
     private final IResourceChangeListener moveProcessor = new MoveProcessor();
@@ -155,7 +153,7 @@ public class DiagnosticMarkers
      */
     public void deleteMarkers(URI uri)
     {
-        Set<IMarker> markers = getMarkers().remove(uri);
+        Collection<IMarker> markers = getMarkers().remove(uri);
         if (markers != null)
         {
             try
@@ -196,8 +194,8 @@ public class DiagnosticMarkers
     private void doCreateMarkers(IFile file, URI uri,
         Collection<Diagnostic> diagnostics)
     {
-        Set<IMarker> markers = getMarkers().computeIfAbsent(uri,
-            k -> new HashSet<>());
+        Collection<IMarker> markers = getMarkers().computeIfAbsent(uri,
+            k -> new ArrayList<>());
         for (Diagnostic diagnostic : diagnostics)
         {
             try
@@ -286,7 +284,7 @@ public class DiagnosticMarkers
      *
      * @return the markers map (never <code>null</code>)
      */
-    protected Map<URI, Set<IMarker>> getMarkers()
+    protected Map<URI, Collection<IMarker>> getMarkers()
     {
         if (markers == null)
             markers = new HashMap<>();
