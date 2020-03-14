@@ -51,7 +51,8 @@ import com.google.gson.Gson;
  * This implementation assumes that the given marker type is <b>not</b> persistent.
  * <p>
  * </p>
- * This implementation is <b>not</b> thread-safe.
+ * An instance of this class is <b>not</b> safe for concurrent access by
+ * multiple threads.
  * </p>
  */
 public class DiagnosticMarkers

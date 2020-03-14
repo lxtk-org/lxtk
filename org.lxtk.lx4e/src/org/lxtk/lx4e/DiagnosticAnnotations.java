@@ -18,11 +18,10 @@ import static java.util.Collections.emptyMap;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -42,10 +41,21 @@ import org.lxtk.util.Disposable;
 /**
  * TODO JavaDoc
  */
+/*
+ * Implementation note: methods are synchronized to avoid a race between a thread
+ * calling public API methods and a task calling removeAnnotations(TextDocument)
+ * scheduled from the 'onDidRemoveTextDocument' event handler.
+ */
 public class DiagnosticAnnotations
     implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
 {
-    protected final Workspace workspace;
+    private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
+
+    private final Map<TextDocument, Map<IAnnotationModel, Collection<Annotation>>> info =
+        new IdentityHashMap<>();
+    private final Workspace workspace;
+    private final Disposable subscription;
+    private boolean disposed;
 
     /**
      * TODO JavaDoc
@@ -55,40 +65,110 @@ public class DiagnosticAnnotations
     public DiagnosticAnnotations(Workspace workspace)
     {
         this.workspace = Objects.requireNonNull(workspace);
+        this.subscription = workspace.onDidRemoveTextDocument().subscribe(
+            textDocument -> CompletableFuture.runAsync(() -> removeAnnotations(
+                textDocument)));
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the underlying {@link Workspace} (never <code>null</code>)
+     */
+    public final Workspace getWorkspace()
+    {
+        return workspace;
     }
 
     @Override
-    public void accept(URI uri, Collection<Diagnostic> diagnostics)
+    public final synchronized void accept(URI uri,
+        Collection<Diagnostic> diagnostics)
     {
-        IAnnotationModel annotationModel = getAnnotationModel(uri);
+        if (disposed)
+            return;
+
+        TextDocument textDocument = workspace.getTextDocument(uri);
+        if (textDocument == null)
+            return;
+
+        IAnnotationModel annotationModel = getAnnotationModel(textDocument);
+
+        Collection<Annotation> toRemove = null;
+        Map<IAnnotationModel, Collection<Annotation>> annotations = info.get(
+            textDocument);
+        if (annotations != null)
+        {
+            for (Map.Entry<IAnnotationModel, Collection<Annotation>> entry : annotations.entrySet())
+            {
+                if (entry.getKey() == annotationModel)
+                    toRemove = entry.getValue();
+                else
+                {
+                    try
+                    {
+                        replaceAnnotations(entry.getKey(), entry.getValue(),
+                            null);
+                    }
+                    catch (Throwable e)
+                    {
+                        Activator.logError(e);
+                    }
+                }
+            }
+            annotations.clear();
+        }
+
         if (annotationModel == null)
             return;
 
-        Map<Annotation, Position> toAdd = emptyMap();
+        Map<Annotation, Position> toAdd = null;
         if (diagnostics != null && !diagnostics.isEmpty())
         {
-            IDocument document = getDocument(uri);
+            IDocument document = getUnderlyingDocument(textDocument);
             if (document != null)
+            {
                 toAdd = toDiagnosticAnnotations(diagnostics, document);
+                if (!toAdd.isEmpty())
+                    addAnnotationInfo(textDocument, annotationModel,
+                        toAdd.keySet());
+            }
         }
 
-        replaceAnnotations(annotationModel, getDiagnosticAnnotations(
-            annotationModel), toAdd);
+        replaceAnnotations(annotationModel, toRemove, toAdd);
     }
 
     @Override
-    public void dispose()
+    public final synchronized void dispose()
     {
+        if (disposed)
+            return;
+
         clear();
+        subscription.dispose();
+        disposed = true;
     }
 
     /**
      * TODO JavaDoc
      */
-    public void clear()
+    public final synchronized void clear()
     {
-        workspace.getTextDocuments().forEach(textDocument -> removeAnnotations(
-            textDocument.getUri()));
+        if (info.isEmpty())
+            return;
+
+        info.values().forEach(annotations -> annotations.forEach((
+            annotationModel, toRemove) ->
+        {
+            try
+            {
+                replaceAnnotations(annotationModel, toRemove, null);
+            }
+            catch (Throwable e)
+            {
+                Activator.logError(e);
+            }
+        }));
+        info.clear();
     }
 
     /**
@@ -96,14 +176,35 @@ public class DiagnosticAnnotations
      *
      * @param uri may be <code>null</code>
      */
-    public void removeAnnotations(URI uri)
+    public final synchronized void removeAnnotations(URI uri)
     {
-        IAnnotationModel annotationModel = getAnnotationModel(uri);
-        if (annotationModel == null)
+        if (disposed)
             return;
 
-        replaceAnnotations(annotationModel, getDiagnosticAnnotations(
-            annotationModel), emptyMap());
+        TextDocument textDocument = workspace.getTextDocument(uri);
+        if (textDocument == null)
+            return;
+
+        removeAnnotations(textDocument);
+    }
+
+    private synchronized void removeAnnotations(TextDocument textDocument)
+    {
+        Map<IAnnotationModel, Collection<Annotation>> annotations = info.remove(
+            textDocument);
+        if (annotations == null)
+            return;
+        annotations.forEach((annotationModel, toRemove) ->
+        {
+            try
+            {
+                replaceAnnotations(annotationModel, toRemove, null);
+            }
+            catch (Throwable e)
+            {
+                Activator.logError(e);
+            }
+        });
     }
 
     /**
@@ -112,33 +213,45 @@ public class DiagnosticAnnotations
      * @param uri not <code>null</code>
      * @param diagnostics not <code>null</code>
      */
-    public void addAnnotations(URI uri, Collection<Diagnostic> diagnostics)
+    public final synchronized void addAnnotations(URI uri,
+        Collection<Diagnostic> diagnostics)
     {
         Objects.requireNonNull(uri);
         Objects.requireNonNull(diagnostics);
 
-        IAnnotationModel annotationModel = getAnnotationModel(uri);
+        if (disposed)
+            return;
+
+        TextDocument textDocument = workspace.getTextDocument(uri);
+        if (textDocument == null)
+            return;
+
+        IAnnotationModel annotationModel = getAnnotationModel(textDocument);
         if (annotationModel == null)
             return;
 
-        IDocument document = getDocument(uri);
+        IDocument document = getUnderlyingDocument(textDocument);
         if (document == null)
             return;
 
-        replaceAnnotations(annotationModel, emptyList(),
-            toDiagnosticAnnotations(diagnostics, document));
+        Map<Annotation, Position> toAdd = toDiagnosticAnnotations(diagnostics,
+            document);
+        if (toAdd.isEmpty())
+            return;
+
+        addAnnotationInfo(textDocument, annotationModel, toAdd.keySet());
+        replaceAnnotations(annotationModel, null, toAdd);
     }
 
     /**
      * TODO JavaDoc
      *
-     * @param uri may be <code>null</code>, in which case <code>null</code>
+     * @param textDocument may be <code>null</code>, in which case <code>null</code>
      *  is returned
-     * @return the corresponding annotation model, or <code>null</code> if none
+     * @return the underlying {@link IAnnotationModel}, or <code>null</code> if none
      */
-    protected IAnnotationModel getAnnotationModel(URI uri)
+    protected IAnnotationModel getAnnotationModel(TextDocument textDocument)
     {
-        TextDocument textDocument = workspace.getTextDocument(uri);
         if (textDocument instanceof EclipseTextDocument)
             return ((EclipseTextDocument)textDocument).getAnnotationModel();
         return null;
@@ -147,27 +260,15 @@ public class DiagnosticAnnotations
     /**
      * TODO JavaDoc
      *
-     * @param uri may be <code>null</code>, in which case <code>null</code>
+     * @param textDocument may be <code>null</code>, in which case <code>null</code>
      *  is returned
-     * @return the corresponding document, or <code>null</code> if none
+     * @return the underlying {@link IDocument}, or <code>null</code> if none
      */
-    protected IDocument getDocument(URI uri)
+    protected IDocument getUnderlyingDocument(TextDocument textDocument)
     {
-        TextDocument textDocument = workspace.getTextDocument(uri);
         if (textDocument instanceof EclipseTextDocument)
             return ((EclipseTextDocument)textDocument).getUnderlyingDocument();
         return null;
-    }
-
-    /**
-     * TODO JavaDoc
-     *
-     * @param annotation never <code>null</code>
-     * @return whether the given annotation is a diagnostic annotation
-     */
-    protected boolean isDiagnosticAnnotation(Annotation annotation)
-    {
-        return annotation instanceof IDiagnosticAnnotation;
     }
 
     /**
@@ -181,25 +282,11 @@ public class DiagnosticAnnotations
         return new DiagnosticAnnotation(diagnostic);
     }
 
-    private List<Annotation> getDiagnosticAnnotations(
-        IAnnotationModel annotationModel)
-    {
-        List<Annotation> result = new ArrayList<>();
-        Iterator<Annotation> it = annotationModel.getAnnotationIterator();
-        while (it.hasNext())
-        {
-            Annotation annotation = it.next();
-            if (isDiagnosticAnnotation(annotation))
-                result.add(annotation);
-        }
-        return result;
-    }
-
     private Map<Annotation, Position> toDiagnosticAnnotations(
         Collection<Diagnostic> diagnostics, IDocument document)
     {
-        Map<Annotation, Position> result = new HashMap<>((int)Math.ceil(
-            diagnostics.size() / 0.75), 0.75f);
+        Map<Annotation, Position> result = new IdentityHashMap<>(
+            diagnostics.size());
         for (Diagnostic diagnostic : diagnostics)
         {
             IRegion r;
@@ -218,15 +305,37 @@ public class DiagnosticAnnotations
         return result;
     }
 
-    private static void replaceAnnotations(IAnnotationModel annotationModel,
-        List<Annotation> toRemove, Map<Annotation, Position> toAdd)
+    private void addAnnotationInfo(TextDocument textDocument,
+        IAnnotationModel annotationModel, Collection<Annotation> toAdd)
     {
+        Map<IAnnotationModel, Collection<Annotation>> annotationsMap =
+            info.computeIfAbsent(textDocument, k -> new IdentityHashMap<>(2));
+        Collection<Annotation> annotations = annotationsMap.get(
+            annotationModel);
+        if (annotations != null)
+            annotations.addAll(toAdd);
+        else
+        {
+            annotations = new ArrayList<>(toAdd);
+            annotationsMap.put(annotationModel, annotations);
+        }
+    }
+
+    private static void replaceAnnotations(IAnnotationModel annotationModel,
+        Collection<Annotation> toRemove, Map<Annotation, Position> toAdd)
+    {
+        if (toRemove == null)
+            toRemove = emptyList();
+        if (toAdd == null)
+            toAdd = emptyMap();
+        if (toRemove.isEmpty() && toAdd.isEmpty())
+            return;
         synchronized (getLockObject(annotationModel))
         {
             if (annotationModel instanceof IAnnotationModelExtension)
             {
                 ((IAnnotationModelExtension)annotationModel).replaceAnnotations(
-                    toRemove.toArray(new Annotation[toRemove.size()]), toAdd);
+                    toRemove.toArray(NO_ANNOTATIONS), toAdd);
             }
             else
             {

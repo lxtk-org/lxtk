@@ -24,6 +24,10 @@ import org.lxtk.util.Disposable;
 
 /**
  * TODO JavaDoc
+ * </p>
+ * An instance of this class is <b>not</b> safe for concurrent access by
+ * multiple threads.
+ * </p>
  */
 public final class DefaultDiagnosticRequestor
     implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
@@ -51,7 +55,7 @@ public final class DefaultDiagnosticRequestor
         diagnosticMarkers.accept(uri, diagnostics);
 
         TextDocument textDocument =
-            diagnosticAnnotations.workspace.getTextDocument(uri);
+            diagnosticAnnotations.getWorkspace().getTextDocument(uri);
         if (textDocument instanceof EclipseTextDocument
             && ResourceUtil.getResource(
                 ((EclipseTextDocument)textDocument).getCorrespondingElement()) == null)
