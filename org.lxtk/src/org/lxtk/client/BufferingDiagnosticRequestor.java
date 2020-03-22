@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import org.eclipse.lsp4j.Diagnostic;
@@ -63,6 +64,13 @@ public final class BufferingDiagnosticRequestor
                 executor.execute(() -> ((Disposable)delegate).dispose());
 
             executor.shutdown();
+            try
+            {
+                executor.awaitTermination(5, TimeUnit.SECONDS);
+            }
+            catch (InterruptedException e)
+            {
+            }
         }
         else if (delegate instanceof Disposable)
             ((Disposable)delegate).dispose();
