@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -58,9 +58,13 @@ public final class BufferingDiagnosticRequestor
         }
 
         if (executor != null)
-            executor.shutdown();
+        {
+            if (delegate instanceof Disposable)
+                executor.execute(() -> ((Disposable)delegate).dispose());
 
-        if (delegate instanceof Disposable)
+            executor.shutdown();
+        }
+        else if (delegate instanceof Disposable)
             ((Disposable)delegate).dispose();
     }
 
@@ -73,6 +77,10 @@ public final class BufferingDiagnosticRequestor
         if (executor == null)
             executor = Executors.newSingleThreadExecutor();
 
-        executor.execute(() -> delegate.accept(uri, diagnostics));
+        executor.execute(() ->
+        {
+            if (!executor.isShutdown())
+                delegate.accept(uri, diagnostics);
+        });
     }
 }
