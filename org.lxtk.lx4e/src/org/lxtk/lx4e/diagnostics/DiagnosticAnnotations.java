@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
+package org.lxtk.lx4e.diagnostics;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -35,6 +35,8 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.lsp4j.Diagnostic;
 import org.lxtk.TextDocument;
 import org.lxtk.Workspace;
+import org.lxtk.lx4e.DocumentUtil;
+import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.util.Disposable;
 

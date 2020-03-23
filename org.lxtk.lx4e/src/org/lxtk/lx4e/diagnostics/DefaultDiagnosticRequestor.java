@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
+package org.lxtk.lx4e.diagnostics;
 
 import java.net.URI;
 import java.util.Collection;
@@ -19,6 +19,7 @@ import java.util.function.BiConsumer;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.lxtk.TextDocument;
+import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.util.ResourceUtil;
 import org.lxtk.util.Disposable;
 

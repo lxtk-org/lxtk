@@ -10,21 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
-
-import org.eclipse.jface.text.quickassist.IQuickFixableAnnotation;
-import org.eclipse.lsp4j.Diagnostic;
-
 /**
  * TODO JavaDoc
  */
-public interface IDiagnosticAnnotation
-    extends IQuickFixableAnnotation
-{
-    /**
-     * TODO JavaDoc
-     *
-     * @return the associated diagnostic object (never <code>null</code>)
-     */
-    Diagnostic getDiagnostic();
-}
+package org.lxtk.lx4e.diagnostics;

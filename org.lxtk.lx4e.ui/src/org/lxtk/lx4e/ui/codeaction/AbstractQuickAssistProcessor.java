@@ -49,9 +49,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.SimpleMarkerAnnotation;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.DiagnosticMarkers;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.IDiagnosticAnnotation;
+import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
+import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 

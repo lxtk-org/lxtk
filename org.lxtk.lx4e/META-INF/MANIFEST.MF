@@ -22,6 +22,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.lxtk;bundle-version="[0.1.0,0.2.0)",
  com.google.gson;bundle-version="[2.8.2,3.0.0)"
 Export-Package: org.lxtk.lx4e,
+ org.lxtk.lx4e.diagnostics,
  org.lxtk.lx4e.internal;x-internal:=true,
  org.lxtk.lx4e.model,
  org.lxtk.lx4e.model.impl,

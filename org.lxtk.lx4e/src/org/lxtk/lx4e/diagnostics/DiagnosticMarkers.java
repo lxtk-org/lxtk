@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
+package org.lxtk.lx4e.diagnostics;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.util.Disposable;
 

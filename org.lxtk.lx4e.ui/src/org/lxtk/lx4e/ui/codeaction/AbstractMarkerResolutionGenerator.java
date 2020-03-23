@@ -34,7 +34,7 @@ import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.DiagnosticMarkers;
+import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 
