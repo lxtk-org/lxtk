@@ -12,8 +12,7 @@
  *******************************************************************************/
 package org.lxtk.lx4e.diagnostics;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import static org.lxtk.lx4e.internal.util.AnnotationUtil.replaceAnnotations;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -27,11 +26,9 @@ import java.util.function.BiConsumer;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.lsp4j.Diagnostic;
 import org.lxtk.TextDocument;
 import org.lxtk.Workspace;
@@ -51,8 +48,6 @@ import org.lxtk.util.Disposable;
 public class DiagnosticAnnotations
     implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
 {
-    private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
-
     private final Map<TextDocument, Map<IAnnotationModel, Collection<Annotation>>> info =
         new IdentityHashMap<>();
     private final Workspace workspace;
@@ -321,47 +316,5 @@ public class DiagnosticAnnotations
             annotations = new ArrayList<>(toAdd);
             annotationsMap.put(annotationModel, annotations);
         }
-    }
-
-    private static void replaceAnnotations(IAnnotationModel annotationModel,
-        Collection<Annotation> toRemove, Map<Annotation, Position> toAdd)
-    {
-        if (toRemove == null)
-            toRemove = emptyList();
-        if (toAdd == null)
-            toAdd = emptyMap();
-        if (toRemove.isEmpty() && toAdd.isEmpty())
-            return;
-        synchronized (getLockObject(annotationModel))
-        {
-            if (annotationModel instanceof IAnnotationModelExtension)
-            {
-                ((IAnnotationModelExtension)annotationModel).replaceAnnotations(
-                    toRemove.toArray(NO_ANNOTATIONS), toAdd);
-            }
-            else
-            {
-                for (Annotation annotation : toRemove)
-                {
-                    annotationModel.removeAnnotation(annotation);
-                }
-                for (Map.Entry<Annotation, Position> entry : toAdd.entrySet())
-                {
-                    annotationModel.addAnnotation(entry.getKey(),
-                        entry.getValue());
-                }
-            }
-        }
-    }
-
-    private static Object getLockObject(IAnnotationModel annotationModel)
-    {
-        if (annotationModel instanceof ISynchronizable)
-        {
-            Object lock = ((ISynchronizable)annotationModel).getLockObject();
-            if (lock != null)
-                return lock;
-        }
-        return annotationModel;
     }
 }

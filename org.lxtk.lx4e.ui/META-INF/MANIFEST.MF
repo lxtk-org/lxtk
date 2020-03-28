@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
-Bundle-SymbolicName: org.lxtk.lx4e.ui
+Bundle-SymbolicName: org.lxtk.lx4e.ui;singleton:=true
 Automatic-Module-Name: org.lxtk.lx4e.ui
 Bundle-Version: 0.1.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
@@ -30,6 +30,7 @@ Export-Package: org.lxtk.lx4e.internal.ui;x-internal:=true,
  org.lxtk.lx4e.ui,
  org.lxtk.lx4e.ui.codeaction,
  org.lxtk.lx4e.ui.completion,
+ org.lxtk.lx4e.ui.highlight,
  org.lxtk.lx4e.ui.hover,
  org.lxtk.lx4e.ui.hyperlinks,
  org.lxtk.lx4e.ui.refactoring.rename,

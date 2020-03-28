@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+   Copyright (c) 2020 1C-Soft LLC.
+
+   This program and the accompanying materials are made available under
+   the terms of the Eclipse Public License 2.0 which is available at
+   https://www.eclipse.org/legal/epl-2.0/
+
+   SPDX-License-Identifier: EPL-2.0
+
+   Contributors:
+       Vladimir Piskarev (1C) - initial API and implementation
+-->
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            name="org.lxtk.lx4e.ui.highlight.textOccurrence">
+      </type>
+      <type
+            name="org.lxtk.lx4e.ui.highlight.readOccurrence">
+      </type>
+      <type
+            name="org.lxtk.lx4e.ui.highlight.writeOccurrence">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.lxtk.lx4e.ui.highlight.textOccurrence"
+            label="%OccurrenceAnnotation.label"
+            icon="/icons/full/obj16/search_obj.png"
+            textPreferenceKey="lxtkOccurrenceIndication"
+            textPreferenceValue="false"
+            highlightPreferenceKey="lxtkOccurrenceHighlighting"
+            highlightPreferenceValue="true"
+            contributesToHeader="false"
+            overviewRulerPreferenceKey="lxtkOccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            verticalRulerPreferenceKey="lxtkOccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false"
+            colorPreferenceKey="lxtkOccurrenceIndicationColor"
+            colorPreferenceValue="212,212,212"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarActionKey="showLxtkOccurrenceInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="true"
+            isGoToNextNavigationTargetKey="isLxtkOccurrenceGoToNextNavigationTarget"
+	        isGoToNextNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="isLxtkOccurrenceGoToPreviousNavigationTarget"
+	        isGoToPreviousNavigationTarget="false"
+            textStylePreferenceKey="lxtkOccurrenceTextStyle"
+            textStylePreferenceValue="NONE">
+      </specification>
+      <specification
+            annotationType="org.lxtk.lx4e.ui.highlight.readOccurrence"
+            label="%ReadOccurrenceAnnotation.label"
+            icon="/icons/full/obj16/search_obj.png"
+            textPreferenceKey="lxtkReadOccurrenceIndication"
+            textPreferenceValue="false"
+            highlightPreferenceKey="lxtkReadOccurrenceHighlighting"
+            highlightPreferenceValue="true"
+            contributesToHeader="false"
+            overviewRulerPreferenceKey="lxtkReadOccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            verticalRulerPreferenceKey="lxtkReadOccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false"
+            colorPreferenceKey="lxtkReadOccurrenceIndicationColor"
+            colorPreferenceValue="212,212,212"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarActionKey="showLxtkReadOccurrenceInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="true"
+            isGoToNextNavigationTargetKey="isLxtkReadOccurrenceGoToNextNavigationTarget"
+	        isGoToNextNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="isLxtkReadOccurrenceGoToPreviousNavigationTarget"
+	        isGoToPreviousNavigationTarget="false"
+            textStylePreferenceKey="lxtkReadOccurrenceTextStyle"
+            textStylePreferenceValue="NONE">
+      </specification>
+      <specification
+            annotationType="org.lxtk.lx4e.ui.highlight.writeOccurrence"
+            label="%WriteOccurrenceAnnotation.label"
+            icon="/icons/full/obj16/search_obj.png"
+            textPreferenceKey="lxtkWriteOccurrenceIndication"
+            textPreferenceValue="false"
+            highlightPreferenceKey="lxtkWriteOccurrenceHighlighting"
+            highlightPreferenceValue="true"
+            contributesToHeader="false"
+            overviewRulerPreferenceKey="lxtkWriteOccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            verticalRulerPreferenceKey="lxtkWriteOccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false"
+            colorPreferenceKey="lxtkWriteOccurrenceIndicationColor"
+            colorPreferenceValue="240,216,168"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarActionKey="showLxtkWriteOccurrenceInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="true"
+            isGoToNextNavigationTargetKey="isLxtkWriteOccurrenceGoToNextNavigationTarget"
+	        isGoToNextNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="isLxtkWriteOccurrenceGoToPreviousNavigationTarget"
+	        isGoToPreviousNavigationTarget="false"
+            textStylePreferenceKey="lxtkWriteOccurrenceTextStyle"
+            textStylePreferenceValue="NONE">
+      </specification>
+   </extension>
+</plugin>

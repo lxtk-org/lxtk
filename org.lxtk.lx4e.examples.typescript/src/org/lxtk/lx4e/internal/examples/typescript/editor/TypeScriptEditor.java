@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,15 +16,19 @@ import static org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceCon
 import static org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceConstants.EDITOR_MATCHING_BRACKETS_COLOR;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationCharacterPairMatcher;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.internal.examples.typescript.Activator;
+import org.lxtk.lx4e.internal.examples.typescript.TypeScriptOperationTargetProvider;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceFileDocumentProvider;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceViewerConfiguration;
+import org.lxtk.lx4e.ui.highlight.Highlighter;
 
 /**
  * TODO JavaDoc
@@ -33,6 +37,7 @@ public class TypeScriptEditor
     extends AbstractDecoratedTextEditor
 {
     private IContentOutlinePage outlinePage;
+    private Highlighter highlighter;
     private final Object reconcilerLock = new Object();
 
     @Override
@@ -72,6 +77,26 @@ public class TypeScriptEditor
     }
 
     @Override
+    public void createPartControl(Composite parent)
+    {
+        super.createPartControl(parent);
+        highlighter = new Highlighter(getSourceViewer(), getSelectionProvider(),
+            this::getLanguageOperationTarget);
+        highlighter.install();
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (highlighter != null)
+        {
+            highlighter.uninstall();
+            highlighter = null;
+        }
+        super.dispose();
+    }
+
+    @Override
     public <T> T getAdapter(Class<T> adapter)
     {
         if (adapter == IContentOutlinePage.class)
@@ -95,5 +120,10 @@ public class TypeScriptEditor
     public Object getReconcilerLock()
     {
         return reconcilerLock;
+    }
+
+    private LanguageOperationTarget getLanguageOperationTarget()
+    {
+        return TypeScriptOperationTargetProvider.getOperationTarget(this);
     }
 }

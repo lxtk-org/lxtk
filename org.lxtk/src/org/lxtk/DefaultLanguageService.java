@@ -23,6 +23,7 @@ import org.eclipse.lsp4j.CompletionItemCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
+import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
@@ -43,6 +44,8 @@ public class DefaultLanguageService
     private final Registry<CompletionProvider> completionProviders =
         Registry.newInstance();
     private final Registry<DefinitionProvider> definitionProviders =
+        Registry.newInstance();
+    private final Registry<DocumentHighlightProvider> documentHighlightProviders =
         Registry.newInstance();
     private final Registry<DocumentSymbolProvider> documentSymbolProviders =
         Registry.newInstance();
@@ -123,6 +126,21 @@ public class DefaultLanguageService
     public Registry<DefinitionProvider> getDefinitionProviders()
     {
         return definitionProviders;
+    }
+
+    @Override
+    public DocumentHighlightCapabilities getDocumentHighlightCapabilities()
+    {
+        DocumentHighlightCapabilities documentHighlight =
+            new DocumentHighlightCapabilities();
+        documentHighlight.setDynamicRegistration(true);
+        return documentHighlight;
+    }
+
+    @Override
+    public Registry<DocumentHighlightProvider> getDocumentHighlightProviders()
+    {
+        return documentHighlightProviders;
     }
 
     @Override

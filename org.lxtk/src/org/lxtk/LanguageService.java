@@ -15,6 +15,7 @@ package org.lxtk;
 import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
+import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
@@ -78,6 +79,20 @@ public interface LanguageService
      * @return the registry for definition providers (never <code>null</code>)
      */
     Registry<DefinitionProvider> getDefinitionProviders();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return document highlight capabilities (never <code>null</code>)
+     */
+    DocumentHighlightCapabilities getDocumentHighlightCapabilities();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the registry for document highlight providers (never <code>null</code>)
+     */
+    Registry<DocumentHighlightProvider> getDocumentHighlightProviders();
 
     /**
      * TODO JavaDoc
