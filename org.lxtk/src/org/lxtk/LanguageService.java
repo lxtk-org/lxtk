@@ -20,6 +20,7 @@ import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
+import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.lxtk.util.Registry;
 
 /**
@@ -149,4 +150,18 @@ public interface LanguageService
      * @return the registry for rename providers (never <code>null</code>)
      */
     Registry<RenameProvider> getRenameProviders();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return signature help capabilities (never <code>null</code>)
+     */
+    SignatureHelpCapabilities getSignatureHelpCapabilities();
+
+    /**
+     * TODO JavaDoc
+     *
+     * @return the registry for signature help providers (never <code>null</code>)
+     */
+    Registry<SignatureHelpProvider> getSignatureHelpProviders();
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2019 Red Hat Inc. and others.
+ * Copyright (c) 2016, 2020 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -23,7 +23,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.DocumentUtil;
@@ -107,6 +106,6 @@ class LSCompletionProposal extends LSIncompleteCompletionProposal
 
     @Override
     public int getContextInformationPosition() {
-        return SWT.RIGHT;
+        return -1;
     }
 }

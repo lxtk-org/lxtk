@@ -27,8 +27,11 @@ import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
+import org.eclipse.lsp4j.ParameterInformationCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
+import org.eclipse.lsp4j.SignatureHelpCapabilities;
+import org.eclipse.lsp4j.SignatureInformationCapabilities;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.SymbolKindCapabilities;
 import org.lxtk.util.Registry;
@@ -54,6 +57,8 @@ public class DefaultLanguageService
     private final Registry<ReferenceProvider> referenceProviders =
         Registry.newInstance();
     private final Registry<RenameProvider> renameProviders =
+        Registry.newInstance();
+    private final Registry<SignatureHelpProvider> signatureHelpProviders =
         Registry.newInstance();
 
     @Override
@@ -206,5 +211,31 @@ public class DefaultLanguageService
     public Registry<RenameProvider> getRenameProviders()
     {
         return renameProviders;
+    }
+
+    @Override
+    public SignatureHelpCapabilities getSignatureHelpCapabilities()
+    {
+        ParameterInformationCapabilities parameterInformation =
+            new ParameterInformationCapabilities();
+        parameterInformation.setLabelOffsetSupport(true);
+
+        SignatureInformationCapabilities signatureInformation =
+            new SignatureInformationCapabilities();
+        signatureInformation.setDocumentationFormat(Arrays.asList(
+            MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
+        signatureInformation.setParameterInformation(parameterInformation);
+
+        SignatureHelpCapabilities signatureHelp =
+            new SignatureHelpCapabilities();
+        signatureHelp.setDynamicRegistration(true);
+        signatureHelp.setSignatureInformation(signatureInformation);
+        return signatureHelp;
+    }
+
+    @Override
+    public Registry<SignatureHelpProvider> getSignatureHelpProviders()
+    {
+        return signatureHelpProviders;
     }
 }
