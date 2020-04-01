@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,18 +15,18 @@ package org.lxtk.util;
 import java.util.function.Consumer;
 
 /**
- * TODO JavaDoc
+ * Represents an event stream that clients can subscribe to.
  *
  * @param <T> event type
  */
 public interface EventStream<T>
 {
     /**
-     * TODO JavaDoc
+     * Subscribes the given event consumer to this stream.
      *
      * @param consumer not <code>null</code>
      * @return a disposable to unsubscribe the consumer
      *  (never <code>null</code>)
      */
-    Disposable subscribe(Consumer<T> consumer);
+    Disposable subscribe(Consumer<? super T> consumer);
 }
