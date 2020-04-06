@@ -29,4 +29,5 @@ Export-Package: org.lxtk.lx4e,
  org.lxtk.lx4e.model.impl,
  org.lxtk.lx4e.refactoring,
  org.lxtk.lx4e.refactoring.rename,
+ org.lxtk.lx4e.uris,
  org.lxtk.lx4e.util

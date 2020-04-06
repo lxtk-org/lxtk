@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
+package org.lxtk.lx4e.uris;
 
 import java.net.URI;
 

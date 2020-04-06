@@ -12,9 +12,9 @@
  *******************************************************************************/
 package org.lxtk.lx4e.refactoring;
 
-import static org.lxtk.lx4e.UriHandlers.exists;
-import static org.lxtk.lx4e.UriHandlers.getBuffer;
-import static org.lxtk.lx4e.UriHandlers.toDisplayString;
+import static org.lxtk.lx4e.uris.UriHandlers.exists;
+import static org.lxtk.lx4e.uris.UriHandlers.getBuffer;
+import static org.lxtk.lx4e.uris.UriHandlers.toDisplayString;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -29,8 +29,8 @@ import org.eclipse.handly.buffer.IBufferChange;
 import org.eclipse.handly.snapshot.StaleSnapshotException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.lxtk.lx4e.IUriHandler;
 import org.lxtk.lx4e.internal.Activator;
+import org.lxtk.lx4e.uris.IUriHandler;
 
 class UndoTextFileChange
     extends Change

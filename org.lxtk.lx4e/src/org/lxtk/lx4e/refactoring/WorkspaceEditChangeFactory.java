@@ -13,8 +13,9 @@
 package org.lxtk.lx4e.refactoring;
 
 import static org.eclipse.ltk.core.refactoring.RefactoringStatus.createFatalErrorStatus;
-import static org.lxtk.lx4e.UriHandlers.getBuffer;
-import static org.lxtk.lx4e.UriHandlers.toDisplayString;
+import static org.lxtk.lx4e.uris.UriHandlers.compose;
+import static org.lxtk.lx4e.uris.UriHandlers.getBuffer;
+import static org.lxtk.lx4e.uris.UriHandlers.toDisplayString;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -50,12 +51,11 @@ import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.Workspace;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.EfsUriHandler;
-import org.lxtk.lx4e.IUriHandler;
-import org.lxtk.lx4e.ResourceUriHandler;
-import org.lxtk.lx4e.TextDocumentUriHandler;
-import org.lxtk.lx4e.UriHandlers;
 import org.lxtk.lx4e.internal.Activator;
+import org.lxtk.lx4e.uris.EfsUriHandler;
+import org.lxtk.lx4e.uris.IUriHandler;
+import org.lxtk.lx4e.uris.ResourceUriHandler;
+import org.lxtk.lx4e.uris.TextDocumentUriHandler;
 
 /**
  * TODO JavaDoc
@@ -78,8 +78,8 @@ public class WorkspaceEditChangeFactory
      */
     public WorkspaceEditChangeFactory(Workspace workspace)
     {
-        this(workspace, UriHandlers.compose(new TextDocumentUriHandler(
-            workspace), new ResourceUriHandler(), new EfsUriHandler()));
+        this(workspace, compose(new TextDocumentUriHandler(workspace),
+            new ResourceUriHandler(), new EfsUriHandler()));
     }
 
     /**
