@@ -25,7 +25,7 @@ import org.lxtk.lx4e.util.DefaultWordFinder;
 /**
  * Tries the given hovers in sequence, and uses the first one that fits.
  */
-public class BestMatchHover
+public class FirstMatchHover
     implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
     private final ITextHover[] hovers;
@@ -36,7 +36,7 @@ public class BestMatchHover
      *
      * @param hovers the hovers to combine (not <code>null</code>)
      */
-    public BestMatchHover(ITextHover... hovers)
+    public FirstMatchHover(ITextHover... hovers)
     {
         this.hovers = Objects.requireNonNull(hovers);
     }
