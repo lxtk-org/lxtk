@@ -58,7 +58,7 @@ public interface ILanguageSymbol
      * @return the symbol for which this symbol is an immediate member symbol,
      *  or <code>null</code> if none
      */
-    ILanguageSymbol getDeclaringSymbol();
+    ILanguageSymbol getContainingSymbol();
 
     /**
      * Returns the immediate member symbol with the given name and the given

@@ -79,7 +79,7 @@ public class LanguageSymbol
     }
 
     @Override
-    public ILanguageSymbol getDeclaringSymbol()
+    public ILanguageSymbol getContainingSymbol()
     {
         IElement parent = getParent_();
         if (parent instanceof ILanguageSymbol)
