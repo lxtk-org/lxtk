@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.uris;
+package org.lxtk.lx4e;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
 import org.lxtk.TextDocument;
 import org.lxtk.Workspace;
-import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 /**

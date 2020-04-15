@@ -12,8 +12,8 @@
  *******************************************************************************/
 package org.lxtk.lx4e.refactoring;
 
-import static org.lxtk.lx4e.uris.UriHandlers.getBuffer;
-import static org.lxtk.lx4e.uris.UriHandlers.toDisplayString;
+import static org.lxtk.lx4e.UriHandlers.getBuffer;
+import static org.lxtk.lx4e.UriHandlers.toDisplayString;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -42,8 +42,8 @@ import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextEditBasedChangeGroup;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.UndoEdit;
+import org.lxtk.lx4e.IUriHandler;
 import org.lxtk.lx4e.internal.Activator;
-import org.lxtk.lx4e.uris.IUriHandler;
 
 /**
  * A special {@link TextChange} that operates on the file denoted by a given URI.
