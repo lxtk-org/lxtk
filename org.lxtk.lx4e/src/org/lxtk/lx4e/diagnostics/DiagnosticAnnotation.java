@@ -20,7 +20,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.lsp4j.Diagnostic;
 
 /**
- * TODO JavaDoc
+ * Default implementation of {@link IDiagnosticAnnotation}.
  */
 public class DiagnosticAnnotation
     extends Annotation
@@ -30,7 +30,7 @@ public class DiagnosticAnnotation
     private boolean isQuickFixable, isQuickFixableStateSet;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param diagnostic not <code>null</code>
      */

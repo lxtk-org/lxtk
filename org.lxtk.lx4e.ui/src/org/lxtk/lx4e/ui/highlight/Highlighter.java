@@ -57,7 +57,7 @@ import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.util.EclipseFuture;
 
 /**
- * TODO JavaDoc
+ * Highlights document ranges computed using a {@link DocumentHighlightProvider}.
  */
 public class Highlighter
 {
@@ -74,11 +74,14 @@ public class Highlighter
     private boolean sticky = true;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param viewer not <code>null</code>
-     * @param selectionProvider not <code>null</code>
-     * @param targetSupplier not <code>null</code>
+     * @param viewer the target source viewer for this highlighter
+     *  (not <code>null</code>)
+     * @param selectionProvider the selection provider for this highlighter
+     *  (not <code>null</code>)
+     * @param targetSupplier the {@link LanguageOperationTarget} supplier
+     *  for this highlighter (not <code>null</code>)
      */
     public Highlighter(ISourceViewer viewer,
         ISelectionProvider selectionProvider,
@@ -90,7 +93,8 @@ public class Highlighter
     }
 
     /**
-     * TODO JavaDoc
+     * Installs this highlighter by registering the necessary listeners
+     * and scheduling a highlighting job for the current selection.
      */
     public final void install()
     {
@@ -106,7 +110,8 @@ public class Highlighter
     }
 
     /**
-     * TODO JavaDoc
+     * Unistalls this highlighter by unregistering all listeners and removing
+     * highlighting.
      */
     public final void uninstall()
     {
@@ -126,7 +131,7 @@ public class Highlighter
     }
 
     /**
-     * TODO JavaDoc
+     * Checks whether this highlighter is currently installed.
      *
      * @return <code>true</code> if this highlighter is currently installed,
      *  and <code>false</code> otherwise
@@ -137,11 +142,12 @@ public class Highlighter
     }
 
     /**
-     * TODO JavaDoc
+     * Checks whether this highlighter is currently in <i>sticky mode</i>.
+     * In sticky mode, highlighting stays even if there is no valid symbol
+     * at the current caret position.
      *
-     * @return <code>true</code> if this highlighter is currently in "sticky mode",
-     *  and <code>false</code> otherwise. In sticky mode, the highlight annotations
-     *  stay even if there's no valid symbol at the current caret position
+     * @return <code>true</code> if this highlighter is currently in sticky mode,
+     *  and <code>false</code> otherwise
      * @see #setSticky(boolean)
      */
     public final boolean isSticky()
@@ -150,9 +156,9 @@ public class Highlighter
     }
 
     /**
-     * TODO JavaDoc
+     * Turns the sticky mode on or off.
      *
-     * @param sticky <code>true</code> to turn "sticky mode" on;
+     * @param sticky <code>true</code> to turn sticky mode on;
      *  <code>false</code> to turn it off
      * @see #isSticky()
      */
@@ -162,10 +168,11 @@ public class Highlighter
     }
 
     /**
-     * TODO JavaDoc
+     * Creates and returns an annotation representing the given {@link
+     * DocumentHighlight}.
      *
      * @param highlight never <code>null</code>
-     * @return the highlight annotation (not <code>null</code>)
+     * @return the created annotation (not <code>null</code>)
      */
     protected Annotation createAnnotation(DocumentHighlight highlight)
     {

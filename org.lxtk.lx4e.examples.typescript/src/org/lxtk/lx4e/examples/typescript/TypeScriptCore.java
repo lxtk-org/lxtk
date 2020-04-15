@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -27,18 +27,30 @@ import org.lxtk.lx4e.model.ILanguageElement;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 
 /**
- * TODO JavaDoc
+ * Facade to the TypeScript Model.
  */
 public class TypeScriptCore
 {
+    /**
+     * TypeScript Workspace.
+     */
     public static final Workspace WORKSPACE = new DefaultWorkspace();
 
+    /**
+     * TypeScript Command Service.
+     */
     public static final CommandService CMD_SERVICE =
         new DefaultCommandService();
 
+    /**
+     * TypeScript Language Service.
+     */
     public static final LanguageService LANG_SERVICE =
         new EclipseLanguageService();
 
+    /**
+     * TypeScript language identifier.
+     */
     public static final String LANG_ID = "typescript"; //$NON-NLS-1$
 
     /**

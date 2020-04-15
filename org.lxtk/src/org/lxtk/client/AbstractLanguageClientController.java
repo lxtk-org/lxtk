@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -35,7 +35,11 @@ import org.lxtk.util.SafeRun;
 import org.lxtk.util.connect.AbstractConnectable;
 
 /**
- * TODO JavaDoc
+ * Provides API and partial implementation for controlling a language client
+ * talking to a language server according to the Language Server Protocol.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  *
  * @param <S> server interface type
  */
@@ -46,9 +50,13 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
         Duration.ofSeconds(180)).thenReset()::check; // like in VS Code
 
     /**
-     * TODO JavaDoc
+     * Sets the auto-reconnect policy. In case the current connection to the
+     * server gets closed unexpectedly, the client will check the auto-reconnect
+     * policy to decide whether to {@link #reconnect()} or {@link #disconnect()}
+     * itself.
      *
      * @param policy not <code>null</code>
+     * @see Policy
      */
     protected final void setAutoReconnect(BooleanSupplier policy)
     {
@@ -56,10 +64,11 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Checks the auto-reconnect policy.
      *
      * @return <code>true</code> if auto-reconnect is enabled,
      *  and <code>false</code> otherwise
+     * @see #setAutoReconnect(BooleanSupplier)
      */
     protected final boolean isAutoReconnect()
     {
@@ -67,7 +76,7 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for the 'initialize' request.
      *
      * @return initialize timeout (a positive duration)
      */
@@ -77,7 +86,7 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for the 'shutdown' request.
      *
      * @return shutdown timeout (a positive duration)
      */
@@ -87,39 +96,45 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the document selector that will be passed to
+     * the {@link Feature#initialize} method.
      *
      * @return a document selector (may be <code>null</code>)
      */
     protected abstract List<DocumentFilter> getDocumentSelector();
 
     /**
-     * TODO JavaDoc
+     * Returns the server interface class (remote service interface).
      *
      * @return server interface class (never <code>null</code>)
      */
     protected abstract Class<S> getServerInterface();
 
     /**
-     * TODO JavaDoc
+     * Returns a language client (local service) object. This method is called
+     * each time a connection is created. The returned object will automatically
+     * be {@link AbstractLanguageClient#dispose() disposed} when the connection
+     * gets closed.
      *
      * @return language client (never <code>null</code>)
      */
     protected abstract AbstractLanguageClient<S> getLanguageClient();
 
     /**
-     * TODO JavaDoc
+     * Returns a {@link JsonRpcConnectionFactory} for creating a connection
+     * to the language server.
      *
      * @return connection factory (never <code>null</code>)
      */
     protected abstract JsonRpcConnectionFactory<S> getConnectionFactory();
 
     /**
-     * TODO JavaDoc
+     * Returns a new instance of {@link ConnectionInitializer} for the given
+     * connection between the language client and server.
      *
-     * @param client not <code>null</code>
-     * @param connection not <code>null</code>
-     * @return a new connection initializer (never <code>null</code>)
+     * @param client never <code>null</code>
+     * @param connection never <code>null</code>
+     * @return a new connection initializer (not <code>null</code>)
      */
     protected ConnectionInitializer newConnectionInitializer(
         AbstractLanguageClient<S> client, JsonRpcConnection<S> connection)
@@ -129,7 +144,7 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Computes the {@link InitializeParams} for the language client.
      *
      * @param client not <code>null</code>
      * @return initialize params (never <code>null</code>)

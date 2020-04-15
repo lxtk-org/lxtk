@@ -44,7 +44,8 @@ import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.lx4e.util.EclipseFuture;
 
 /**
- * TODO JavaDoc
+ * Default implementation of a rename refactoring that uses a {@link
+ * RenameProvider} to compute the rename edits.
  */
 public class RenameRefactoring
     extends WorkspaceEditRefactoring
@@ -58,13 +59,16 @@ public class RenameRefactoring
     private String newName, currentName;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param name the refactoring's name (not <code>null</code>)
-     * @param target not <code>null</code>
-     * @param document not <code>null</code>
-     * @param offset 0-based
-     * @param changeFactory not <code>null</code>
+     * @param name the name of the refactoring (not <code>null</code>)
+     * @param target the {@link LanguageOperationTarget} for the refactoring
+     *  (not <code>null</code>)
+     * @param document the target {@link IDocument} for the refactoring
+     *  (not <code>null</code>)
+     * @param offset the target document offset for the refactoring (0-based)
+     * @param changeFactory the {@link WorkspaceEditChangeFactory}
+     *  for the refactoring (not <code>null</code>)
      */
     public RenameRefactoring(String name, LanguageOperationTarget target,
         IDocument document, int offset,
@@ -79,9 +83,9 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link LanguageOperationTarget} for this refactoring.
      *
-     * @return the refactoring's {@link LanguageOperationTarget}
+     * @return the <code>LanguageOperationTarget</code> for the refactoring
      *  (never <code>null</code>)
      */
     public final LanguageOperationTarget getLanguageOperationTarget()
@@ -90,7 +94,7 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the target {@link IDocument} for this refactoring.
      *
      * @return the target document for the refactoring (never <code>null</code>)
      */
@@ -100,7 +104,7 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the target document offset for this refactoring.
      *
      * @return the target document offset for the refactoring (0-based)
      */
@@ -110,9 +114,9 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Sets the new name of the document symbol to be renamed.
      *
-     * @param newName the new name of the symbol to be renamed
+     * @param newName the new name of the document symbol to be renamed
      *  (not <code>null</code>)
      */
     public void setNewName(String newName)
@@ -121,10 +125,11 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the new name of the document symbol to be renamed.
      *
-     * @return the new name of the symbol to be renamed,
-     *  or <code>null</code> if not set
+     * @return the new name of the document symbol to be renamed,
+     *  or <code>null</code> if it has not been set
+     * @see #setNewName(String)
      */
     public String getNewName()
     {
@@ -132,7 +137,8 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Checks whether the {@link #getNewName() new name} is valid
+     * for the document symbol to be renamed.
      *
      * @return a refactoring status (never <code>null</code>)
      */
@@ -154,9 +160,9 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Sets the current name of the document symbol to be renamed.
      *
-     * @param name the current name of the symbol to be renamed,
+     * @param name the current name of the document symbol to be renamed,
      *  or <code>null</code> if unknown
      */
     public void setCurrentName(String name)
@@ -165,9 +171,9 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the current name of the document symbol to be renamed.
      *
-     * @return the current name of the symbol to be renamed,
+     * @return the current name of the document symbol to be renamed,
      *  or <code>null</code> if unknown
      */
     public String getCurrentName()
@@ -191,9 +197,9 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the proposed new name of the document symbol to be renamed.
      *
-     * @return the proposed new name of the symbol to be renamed,
+     * @return the proposed new name of the document symbol to be renamed,
      *  or <code>null</code> if none
      */
     public String getProposedNewName()
@@ -205,12 +211,12 @@ public class RenameRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Checks whether this refactoring is applicable.
      * <p>
-     * This check should be fast.
+     * Implementation note: This check should be fast.
      * </p>
      *
-     * @return <code>true</code> if this refactoring is applicable to the target,
+     * @return <code>true</code> if the refactoring is applicable,
      *  and <code>false</code> otherwise
      */
     public boolean isApplicable()

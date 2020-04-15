@@ -26,7 +26,7 @@ import org.lxtk.lx4e.ui.refactoring.rename.AbstractRenameHandler;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
- * TODO JavaDoc
+ * A handler that starts a {@link RenameRefactoring} for TypeScript.
  */
 public class RenameHandler
     extends AbstractRenameHandler

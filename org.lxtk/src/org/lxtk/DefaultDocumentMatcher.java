@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,16 +19,18 @@ import java.nio.file.FileSystems;
 import org.eclipse.lsp4j.DocumentFilter;
 
 /**
- * TODO JavaDoc
+ * Default implementation of the {@link DocumentMatcher} interface. Thread-safe.
+ *
+ * @noinstantiate This class is not intended to be instantiated by clients.
+ *  Use the provided {@link #INSTANCE}.
  */
 public final class DefaultDocumentMatcher
     implements DocumentMatcher
 {
     /**
-     * The sole instance of the default document matcher.
+     * The default instance of the document matcher.
      */
-    public static final DocumentMatcher INSTANCE =
-        new DefaultDocumentMatcher();
+    public static final DocumentMatcher INSTANCE = new DefaultDocumentMatcher();
 
     private static final String ASTERISK = "*"; //$NON-NLS-1$
     private static final FileSystem FS = FileSystems.getDefault();

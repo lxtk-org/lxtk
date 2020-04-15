@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 /**
- * TODO JavaDoc
+ * Default implementation of the {@link Disposable2} interface that clients
+ * can extend.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public class DisposableObject
     implements Disposable2

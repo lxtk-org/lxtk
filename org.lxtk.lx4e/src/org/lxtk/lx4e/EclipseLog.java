@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -22,7 +22,7 @@ import org.lxtk.util.Log;
 import org.osgi.framework.Bundle;
 
 /**
- * TODO JavaDoc
+ * Implements a {@link Log} that delegates to the {@link ILog} of a given Eclipse bundle.
  */
 public final class EclipseLog
     implements Log
@@ -32,9 +32,10 @@ public final class EclipseLog
     private final String name;
 
     /**
-     * TODO JavaDoc
+     * Shortcut to <code>new EclipseLog(bundle, null)</code>.
      *
-     * @param bundle not <code>null</code>
+     * @param bundle a {@link Bundle} (not <code>null</code>)
+     * @see #EclipseLog(Bundle, String)
      */
     public EclipseLog(Bundle bundle)
     {
@@ -42,10 +43,10 @@ public final class EclipseLog
     }
 
     /**
-     * TODO JavaDoc
+     * Constructs an {@link EclipseLog} for the given bundle.
      *
-     * @param bundle not <code>null</code>
-     * @param name may be <code>null</code>
+     * @param bundle a {@link Bundle} (not <code>null</code>)
+     * @param name optional name for the log (may be <code>null</code>)
      */
     public EclipseLog(Bundle bundle, String name)
     {

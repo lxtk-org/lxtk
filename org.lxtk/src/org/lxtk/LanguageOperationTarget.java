@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,8 @@ import java.net.URI;
 import java.util.Objects;
 
 /**
- * TODO JavaDoc
+ * A triple (3-tuple) of a document URI, a language identifier,
+ * and a {@link LanguageService}.
  */
 public final class LanguageOperationTarget
 {
@@ -25,7 +26,7 @@ public final class LanguageOperationTarget
     private final LanguageService languageService;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param documentUri not <code>null</code>
      * @param languageId not <code>null</code>
@@ -40,7 +41,7 @@ public final class LanguageOperationTarget
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the document URI.
      *
      * @return the document URI (never <code>null</code>)
      */
@@ -50,9 +51,9 @@ public final class LanguageOperationTarget
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the language identifier.
      *
-     * @return the language id (never <code>null</code>)
+     * @return the language identifier (never <code>null</code>)
      */
     public String getLanguageId()
     {
@@ -60,7 +61,7 @@ public final class LanguageOperationTarget
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the language service.
      *
      * @return the language service (never <code>null</code>)
      */

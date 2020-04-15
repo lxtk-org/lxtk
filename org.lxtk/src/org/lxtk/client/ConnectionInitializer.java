@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -37,39 +37,40 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.jsonrpc.JsonRpcConnection;
 
 /**
- * TODO JavaDoc
+ * Performs initialization of a given LSP client/server connection.
  */
 public class ConnectionInitializer
 {
     private static final long MONITOR_PERIOD = 500;
     /**
-     * TODO JavaDoc
+     * The given client (never <code>null</code>).
      */
     protected final LanguageClient client;
     /**
-     * TODO JavaDoc
+     * The given client/server connection (never <code>null</code>).
      */
     protected final JsonRpcConnection<? extends LanguageServer> connection;
     /**
-     * TODO JavaDoc
+     * The given supplier of initialize params (never <code>null</code>).
      */
     protected final Supplier<InitializeParams> params;
     /**
-     * TODO JavaDoc
+     * The given initialization timeout (a positive duration).
      */
     protected Duration timeout;
     /**
-     * TODO JavaDoc
+     * The initialize request future.
      */
     protected Future<InitializeResult> future;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param client not <code>null</code>
-     * @param connection not <code>null</code>
-     * @param params not <code>null</code>
-     * @param timeout a positive duration
+     * @param client a {@link LanguageClient} (not <code>null</code>)
+     * @param connection a {@link JsonRpcConnection} to the language server
+     *  (not <code>null</code>)
+     * @param params a supplier of the initialize params (not <code>null</code>)
+     * @param timeout initialization timeout (a positive duration)
      */
     public ConnectionInitializer(LanguageClient client,
         JsonRpcConnection<? extends LanguageServer> connection,
@@ -84,7 +85,7 @@ public class ConnectionInitializer
     }
 
     /**
-     * TODO JavaDoc
+     * Initializes the given client/server connection.
      *
      * @return initialize result (never <code>null</code>)
      */
@@ -110,7 +111,7 @@ public class ConnectionInitializer
     }
 
     /**
-     * TODO JavaDoc
+     * Sends the initialize request.
      */
     protected void sendInitializeRequest()
     {
@@ -119,7 +120,7 @@ public class ConnectionInitializer
     }
 
     /**
-     * TODO JavaDoc
+     * Waits until the initialize result is ready or an exception is thrown.
      *
      * @return initialize result (never <code>null</code>)
      * @throws InterruptedException if the current thread was interrupted
@@ -152,9 +153,10 @@ public class ConnectionInitializer
     }
 
     /**
-     * TODO JavaDoc
+     * Called in case {@link #getInitializeResult()} threw
+     * an {@link InterruptedException}.
      *
-     * @param e not <code>null</code>
+     * @param e the thrown exception (never <code>null</code>)
      * @return initialize result (never <code>null</code>)
      */
     protected InitializeResult interrupted(InterruptedException e)
@@ -164,9 +166,10 @@ public class ConnectionInitializer
     }
 
     /**
-     * TODO JavaDoc
+     * Called in case {@link #getInitializeResult()} threw
+     * a {@link TimeoutException}.
      *
-     * @param e not <code>null</code>
+     * @param e the thrown exception (never <code>null</code>)
      * @return initialize result (never <code>null</code>)
      */
     protected InitializeResult timedOut(TimeoutException e)
@@ -177,9 +180,10 @@ public class ConnectionInitializer
     }
 
     /**
-     * TODO JavaDoc
+     * Called in case {@link #getInitializeResult()} threw
+     * an {@link ExecutionException}.
      *
-     * @param e not <code>null</code>
+     * @param e the thrown exception (never <code>null</code>)
      * @return initialize result (never <code>null</code>)
      */
     protected InitializeResult failed(ExecutionException e)
@@ -194,9 +198,10 @@ public class ConnectionInitializer
     }
 
     /**
-     * TODO JavaDoc
+     * Determines whether a failed initialize request should be retried.
      *
-     * @param e not <code>null</code>
+     * @param e the {@link ExecutionException} describing the cause of the
+     *  failure (never <code>null</code>)
      * @return <code>true</code> if the initialize request should be retried,
      *  and <code>false</code> otherwise
      */

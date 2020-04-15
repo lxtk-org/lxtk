@@ -24,15 +24,19 @@ import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 /**
- * TODO JavaDoc
+ * Default implementation of a {@link IUriHandler} that maps URIs to
+ * text documents in a given {@link Workspace}.
  */
 public class TextDocumentUriHandler
     implements IUriHandler
 {
+    /**
+     * The associated {@link Workspace} (never <code>null</code>).
+     */
     protected final Workspace workspace;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param workspace not <code>null</code>
      */

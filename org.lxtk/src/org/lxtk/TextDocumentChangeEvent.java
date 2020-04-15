@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,7 +18,7 @@ import java.util.Objects;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 
 /**
- * TODO JavaDoc
+ * An event describing a change of a {@link TextDocument}.
  */
 public class TextDocumentChangeEvent
 {
@@ -26,10 +26,11 @@ public class TextDocumentChangeEvent
     private final List<TextDocumentContentChangeEvent> contentChanges;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param snapshot not <code>null</code>
-     * @param contentChanges not <code>null</code>
+     * @param snapshot the current snapshot of the changed document
+     *  (not <code>null</code>)
+     * @param contentChanges the actual content changes (not <code>null</code>)
      */
     public TextDocumentChangeEvent(TextDocumentSnapshot snapshot,
         List<TextDocumentContentChangeEvent> contentChanges)
@@ -39,7 +40,7 @@ public class TextDocumentChangeEvent
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the changed document.
      *
      * @return the changed document (never <code>null</code>)
      */
@@ -49,7 +50,8 @@ public class TextDocumentChangeEvent
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the snapshot of the document at the time when this event
+     * was sent.
      *
      * @return the snapshot of the document at the time when this event
      *  was sent (never <code>null</code>)
@@ -60,7 +62,7 @@ public class TextDocumentChangeEvent
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the actual content changes.
      *
      * @return the actual content changes (never <code>null</code>,
      *  may be empty). Clients <b>must not</b> modify the returned list

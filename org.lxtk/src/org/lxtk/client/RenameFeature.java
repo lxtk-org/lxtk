@@ -36,7 +36,11 @@ import org.lxtk.RenameProvider;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * Participates in a given {@link LanguageService} by implementing and
+ * dynamically contributing {@link RenameProvider}s according to LSP.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public class RenameFeature
     extends LanguageFeature
@@ -45,7 +49,7 @@ public class RenameFeature
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param languageService not <code>null</code>
      */

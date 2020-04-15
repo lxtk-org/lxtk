@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,11 +16,14 @@ import org.lxtk.lx4e.examples.json.JsonCore;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 
 /**
- * TODO JavaDoc
+ * JSON-specific extension of {@link WorkspaceEditChangeFactory}.
  */
 public class JsonWorkspaceEditChangeFactory
     extends WorkspaceEditChangeFactory
 {
+    /**
+     * The sole instance of the {@link JsonWorkspaceEditChangeFactory}.
+     */
     public static final JsonWorkspaceEditChangeFactory INSTANCE =
         new JsonWorkspaceEditChangeFactory();
 

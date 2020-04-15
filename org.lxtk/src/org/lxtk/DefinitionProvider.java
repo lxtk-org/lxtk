@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -21,13 +21,17 @@ import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
- * TODO JavaDoc
+ * Provides definition locations for the symbol denoted by a given
+ * text document position.
+ *
+ * @see LanguageService
  */
 public interface DefinitionProvider
     extends LanguageFeatureProvider
 {
     /**
-     * TODO JavaDoc
+     * Computes definition locations for the symbol denoted by the given
+     * text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

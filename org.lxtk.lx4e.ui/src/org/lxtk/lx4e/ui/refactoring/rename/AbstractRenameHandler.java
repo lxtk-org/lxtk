@@ -30,7 +30,7 @@ import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.EditorHelper;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of a handler that starts a {@link RenameRefactoring}.
  */
 public abstract class AbstractRenameHandler
     extends AbstractHandler
@@ -74,10 +74,11 @@ public abstract class AbstractRenameHandler
     }
 
     /**
-     * TODO JavaDoc
+     * Given a context object, creates and returns the corresponding
+     * {@link RenameRefactoring}.
      *
      * @param context may be <code>null</code>
-     * @return a {@link RenameRefactoring}, or <code>null</code>
+     * @return the created refactoring object, or <code>null</code>
      *  if the refactoring is not available
      */
     protected RenameRefactoring createRefactoring(Object context)
@@ -99,12 +100,14 @@ public abstract class AbstractRenameHandler
     }
 
     /**
-     * TODO JavaDoc
+     * Creates and returns a {@link RenameRefactoring} with the given parameters.
      *
-     * @param target never <code>null</code>
-     * @param document never <code>null</code>
-     * @param offset 0-based
-     * @return a {@link RenameRefactoring}, or <code>null</code>
+     * @param target the {@link LanguageOperationTarget} for the refactoring
+     *  (not <code>null</code>)
+     * @param document the target {@link IDocument} for the refactoring
+     *  (not <code>null</code>)
+     * @param offset the target document offset for the refactoring (0-based)
+     * @return the created refactoring object, or <code>null</code>
      *  if the refactoring is not available
      */
     protected RenameRefactoring createRefactoring(
@@ -116,26 +119,27 @@ public abstract class AbstractRenameHandler
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the corresponding {@link LanguageOperationTarget}
+     * for the given editor.
      *
      * @param editor never <code>null</code>
-     * @return the corresponding {@link LanguageOperationTarget},
+     * @return the corresponding <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
     protected abstract LanguageOperationTarget getLanguageOperationTarget(
         IEditorPart editor);
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link WorkspaceEditChangeFactory} for the refactoring.
      *
-     * @return a {@link WorkspaceEditChangeFactory} (not <code>null</code>)
+     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
      */
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link EditorHelper} for this handler.
      *
-     * @return an editor helper (not <code>null</code>)
+     * @return the editor helper (not <code>null</code>)
      */
     protected EditorHelper getEditorHelper()
     {

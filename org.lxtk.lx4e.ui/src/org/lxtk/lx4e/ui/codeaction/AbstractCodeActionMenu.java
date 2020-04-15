@@ -38,6 +38,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.services.IServiceLocator;
+import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.internal.ui.Activator;
@@ -45,7 +46,8 @@ import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of a menu consisting of a dynamic list of
+ * code actions computed using a {@link CodeActionProvider}.
  */
 public abstract class AbstractCodeActionMenu
     extends CompoundContributionItem
@@ -60,9 +62,10 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the service locator for this contribution.
      *
      * @return the service locator
+     * @see #initialize(IServiceLocator)
      */
     protected final IServiceLocator getServiceLocator()
     {
@@ -118,7 +121,7 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the currently selected text range.
      *
      * @return the selected text range, or <code>null</code> if none
      */
@@ -132,7 +135,7 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the active workbench part.
      *
      * @return the active workbench part, or <code>null</code> if none
      */
@@ -148,29 +151,29 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the current {@link LanguageOperationTarget}.
      *
-     * @return the current {@link LanguageOperationTarget},
+     * @return the current <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
     protected abstract LanguageOperationTarget getLanguageOperationTarget();
 
     /**
-     * TODO JavaDoc
+     * Returns the command service for this menu.
      *
      * @return the command service (not <code>null</code>)
      */
     protected abstract CommandService getCommandService();
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link WorkspaceEditChangeFactory} for this menu.
      *
-     * @return a {@link WorkspaceEditChangeFactory} (not <code>null</code>)
+     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
      */
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
-     * TODO JavaDoc
+     * Returns the kinds of code actions to request.
      *
      * @return the kinds of code actions to request,
      *  or <code>null</code> for all possible kinds
@@ -178,10 +181,10 @@ public abstract class AbstractCodeActionMenu
     protected abstract List<String> getCodeActionKinds();
 
     /**
-     * TODO JavaDoc
+     * Returns an {@link IAction} that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
-     * @return an action based on the command, or <code>null</code> if none
+     * @return the requested action, or <code>null</code> if none
      */
     protected IAction getAction(Command command)
     {
@@ -189,10 +192,10 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * Returns an {@link IAction} that executes the given {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
-     * @return an action based on the code action, or <code>null</code> if none
+     * @return the requested action, or <code>null</code> if none
      */
     protected IAction getAction(CodeAction codeAction)
     {
@@ -200,9 +203,9 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the text to be set for the "no actions available" item.
      *
-     * @return a label for the "no actions available" item (not <code>null</code>)
+     * @return the requested text (not <code>null</code>)
      */
     protected String getNoActionsText()
     {
@@ -210,7 +213,7 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing code actions.
      *
      * @return a positive duration
      */
@@ -226,15 +229,18 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * An action that executes a given {@link Command}.
      */
     protected class CommandAction
         extends Action
     {
+        /**
+         * The associated {@link Command} object (never <code>null</code>).
+         */
         protected final Command command;
 
         /**
-         * TODO JavaDoc
+         * Constructor.
          *
          * @param command not <code>null</code>
          */
@@ -252,15 +258,18 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
-     * TODO JavaDoc
+     * An action that executes a given {@link CodeAction}.
      */
     protected class CodeActionAction
         extends Action
     {
+        /**
+         * The associated {@link CodeAction} object (never <code>null</code>).
+         */
         protected final CodeAction codeAction;
 
         /**
-         * TODO JavaDoc
+         * Constructor.
          *
          * @param codeAction not <code>null</code>
          */

@@ -51,7 +51,8 @@ import org.lxtk.lx4e.util.DefaultWordFinder;
 import org.lxtk.lx4e.util.Markdown;
 
 /**
- * TODO JavaDoc
+ * Default implementation of a text hover that computes hover information using
+ * a {@link HoverProvider}.
  */
 public class TextHover
     implements ITextHover, ITextHoverExtension, ITextHoverExtension2
@@ -60,9 +61,10 @@ public class TextHover
     private IInformationControlCreator hoverControlCreator;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param targetSupplier not <code>null</code>
+     * @param targetSupplier the {@link LanguageOperationTarget} supplier
+     *  for this hover (not <code>null</code>)
      */
     public TextHover(Supplier<LanguageOperationTarget> targetSupplier)
     {
@@ -173,10 +175,10 @@ public class TextHover
     }
 
     /**
-     * TODO JavaDoc
+     * Converts the given {@link MarkupContent} to a hover information object.
      *
      * @param markupContent never <code>null</code>
-     * @return the hover popup display information, or <code>null</code> if none
+     * @return the corresponding hover information, or <code>null</code> if none
      */
     protected Object toHoverInfo(MarkupContent markupContent)
     {
@@ -196,7 +198,7 @@ public class TextHover
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a new instance of the hover control creator.
      *
      * @return a new hover control creator (not <code>null</code>)
      */
@@ -206,7 +208,7 @@ public class TextHover
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing hover information.
      *
      * @return a positive duration
      */

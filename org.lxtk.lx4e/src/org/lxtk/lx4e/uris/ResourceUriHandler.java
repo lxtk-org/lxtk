@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,7 +24,8 @@ import org.eclipse.handly.buffer.TextFileBuffer;
 import org.lxtk.lx4e.internal.Activator;
 
 /**
- * TODO JavaDoc
+ * Default implementation of a {@link IUriHandler} that maps URIs to
+ * Eclipse workspace resources.
  */
 public class ResourceUriHandler
     implements IUriHandler
@@ -76,6 +77,13 @@ public class ResourceUriHandler
         return null;
     }
 
+    /**
+     * Returns an {@link IFile} corresponding to the given URI.
+     *
+     * @param uri never <code>null</code>
+     * @return the corresponding <code>IFile</code>,
+     *  or <code>null</code> if none
+     */
     protected IFile getFile(URI uri)
     {
         return getNonLinkedOne(
@@ -83,6 +91,13 @@ public class ResourceUriHandler
                 uri));
     }
 
+    /**
+     * Returns an {@link IContainer} corresponding to the given URI.
+     *
+     * @param uri never <code>null</code>
+     * @return the corresponding <code>IContainer</code>,
+     *  or <code>null</code> if none
+     */
     protected IContainer getContainer(URI uri)
     {
         return getNonLinkedOne(

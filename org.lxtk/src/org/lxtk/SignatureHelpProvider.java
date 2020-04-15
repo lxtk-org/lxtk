@@ -19,7 +19,9 @@ import org.eclipse.lsp4j.SignatureHelpRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
 /**
- * TODO JavaDoc
+ * Provides signature information for a given text document position.
+ *
+ * @see LanguageService
  */
 public interface SignatureHelpProvider
     extends LanguageFeatureProvider
@@ -28,7 +30,7 @@ public interface SignatureHelpProvider
     SignatureHelpRegistrationOptions getRegistrationOptions();
 
     /**
-     * TODO JavaDoc
+     * Computes signature information for the given text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

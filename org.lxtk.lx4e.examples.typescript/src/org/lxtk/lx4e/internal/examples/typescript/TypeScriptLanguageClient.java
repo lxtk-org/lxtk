@@ -53,7 +53,7 @@ import org.lxtk.util.connect.StdioConnection;
 import org.lxtk.util.connect.StreamBasedConnection;
 
 /**
- * TODO JavaDoc
+ * Represents a TypeScript language client.
  */
 public class TypeScriptLanguageClient
     extends AbstractLanguageClientController<LanguageServer>
@@ -68,7 +68,8 @@ public class TypeScriptLanguageClient
         new BufferingDiagnosticRequestor(new DiagnosticMarkers(MARKER_TYPE));
 
     /**
-     * TODO JavaDoc
+     * Creates a new TypeScript language client with the given {@link IProject}
+     * as the client's root folder.
      *
      * @param project not <code>null</code>
      * @throws IllegalStateException if the project's {@link IProject#getLocation()

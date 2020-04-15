@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,14 +19,16 @@ import org.lxtk.util.Disposable;
 import org.lxtk.util.EventStream;
 
 /**
- * TODO JavaDoc
+ * Provides support for document management.
+ *
+ * @see DefaultWorkspace
  */
 public interface Workspace
 {
     /**
-     * TODO JavaDoc
+     * Returns the default document matcher for this workspace.
      *
-     * @return a document matcher (never <code>null</code>)
+     * @return the default document matcher (never <code>null</code>)
      */
     default DocumentMatcher getDocumentMatcher()
     {
@@ -34,10 +36,10 @@ public interface Workspace
     }
 
     /**
-     * TODO JavaDoc
+     * Adds a text document to this workspace.
      * <p>
      * If the workspace already contains a document with an equivalent URI,
-     * an exception will be thrown.
+     * a runtime exception is thrown.
      * </p>
      *
      * @param document not <code>null</code>
@@ -47,30 +49,38 @@ public interface Workspace
     Disposable addTextDocument(TextDocument document);
 
     /**
-     * TODO JavaDoc
+     * Returns all text documents currently contained in this workspace.
      * <p>
      * This method must not try to obtain any kind of lock that might conflict
      * with any locks held while firing didAddTextDocument, didRemoveTextDocument,
      * or didChangeTextDocument events.
      * </p>
      *
-     * @return all text documents currently known to the workspace
-     *  (never <code>null</code>, may be empty)
+     * @return all text documents currently contained in the workspace
+     *  (never <code>null</code>, may be empty). Clients <b>must not</b>
+     *  modify the returned collection
      */
     Collection<TextDocument> getTextDocuments();
 
     /**
-     * TODO JavaDoc
+     * Returns the text document in this workspace that has the URI equivalent
+     * to the given URI.
+     * <p>
+     * This method must not try to obtain any kind of lock that might conflict
+     * with any locks held while firing didAddTextDocument, didRemoveTextDocument,
+     * or didChangeTextDocument events.
+     * </p>
      *
      * @param uri may be <code>null</code>, in which case <code>null</code>
-     *  will be returned
+     *  is returned
      * @return the corresponding text document in the workspace,
      *  or <code>null</code> if none
      */
     TextDocument getTextDocument(URI uri);
 
     /**
-     * TODO JavaDoc
+     * Returns an event emitter firing when a text document is added
+     * to this workspace.
      *
      * @return an event emitter firing when a text document is added
      *  (never <code>null</code>)
@@ -78,7 +88,8 @@ public interface Workspace
     EventStream<TextDocument> onDidAddTextDocument();
 
     /**
-     * TODO JavaDoc
+     * Returns an event emitter firing when a text document is removed
+     * from this workspace.
      *
      * @return an event emitter firing when a text document is removed
      *  (never <code>null</code>)
@@ -86,10 +97,11 @@ public interface Workspace
     EventStream<TextDocument> onDidRemoveTextDocument();
 
     /**
-     * TODO JavaDoc
+     * Returns an event emitter firing when the content of a text document
+     * in this workspace changes.
      *
-     * @return an event emitter firing when the content of a text document changes
-     *  (never <code>null</code>)
+     * @return an event emitter firing when the content of a text document
+     *  changes (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onDidChangeTextDocument();
 }

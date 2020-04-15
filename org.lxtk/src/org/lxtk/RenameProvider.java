@@ -23,7 +23,10 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
- * TODO JavaDoc
+ * Provides the {@link WorkspaceEdit} for renaming the symbol denoted by
+ * a given text document position.
+ *
+ * @see LanguageService
  */
 public interface RenameProvider
     extends LanguageFeatureProvider
@@ -32,7 +35,7 @@ public interface RenameProvider
     RenameOptions getRegistrationOptions();
 
     /**
-     * TODO JavaDoc
+     * Computes the workspace edit for the given {@link RenameParams}.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
@@ -40,12 +43,13 @@ public interface RenameProvider
     CompletableFuture<WorkspaceEdit> getRenameEdits(RenameParams params);
 
     /**
-     * TODO JavaDoc
+     * Prepares rename of the symbol denoted by the given text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
-     * @throws UnsupportedOperationException iff {@link
-     *  RenameOptions#getPrepareProvider() prepareProvider} is not available
+     * @throws UnsupportedOperationException if no support for rename preparation
+     *  is available
+     * @see RenameOptions#getPrepareProvider()
      */
     CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(
         TextDocumentPositionParams params);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -29,12 +29,13 @@ import org.eclipse.text.undo.DocumentUndoManagerRegistry;
 import org.eclipse.text.undo.IDocumentUndoManager;
 
 /**
- * TODO JavaDoc
+ * Provides static utility methods that bridge the gap between Eclipse documents
+ * and document-related structures of LSP.
  */
 public class DocumentUtil
 {
     /**
-     * TODO JavaDoc
+     * Returns the LSP position corresponding to the given document offset.
      *
      * @param document not <code>null</code>
      * @param offset a zero-based offset in the document
@@ -52,13 +53,13 @@ public class DocumentUtil
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the document offset corresponding to the given LSP position.
      *
      * @param document not <code>null</code>
-     * @param position a position in the document (not <code>null</code>)
+     * @param position an LSP position in the document (not <code>null</code>)
      * @return the corresponding offset (zero-based)
-     * @throws BadLocationException if the line number of the specified position
-     *  is invalid in the document
+     * @throws BadLocationException if the the specified position is invalid
+     *  in the document
      */
     public static int toOffset(IDocument document, Position position)
         throws BadLocationException
@@ -71,7 +72,7 @@ public class DocumentUtil
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the LSP range corresponding to the given document offset and length.
      *
      * @param document not <code>null</code>
      * @param offset the offset of the range
@@ -89,10 +90,10 @@ public class DocumentUtil
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the document region corresponding to the given LSP range.
      *
      * @param document not <code>null</code>
-     * @param range a range in the document (not <code>null</code>)
+     * @param range an LSP range in the document (not <code>null</code>)
      * @return the corresponding {@link IRegion} (never <code>null</code>)
      * @throws BadLocationException if the specified range is invalid
      *  in the document
@@ -106,10 +107,11 @@ public class DocumentUtil
     }
 
     /**
-     * TODO JavaDoc
+     * Applies the given LSP text edit to the given document.
      *
      * @param document not <code>null</code>
-     * @param edit a text edit to apply to the document (not <code>null</code>)
+     * @param edit an LSP text edit to apply to the document
+     *  (not <code>null</code>)
      * @throws BadLocationException if the specified edit range is invalid
      *  in the document
      */
@@ -121,10 +123,11 @@ public class DocumentUtil
     }
 
     /**
-     * Applies the given sequence of text edits as a single document modification.
+     * Applies the given sequence of LSP text edits to the given document
+     * as a single document modification.
      *
      * @param document not <code>null</code>
-     * @param edits text edits to apply to the document (not <code>null</code>,
+     * @param edits LSP text edits to apply to the document (not <code>null</code>,
      *  may be empty, must not contain <code>null</code>s)
      * @throws MalformedTreeException if an edit overlaps with one of its siblings
      * @throws BadLocationException if an edit's range is invalid in the document
@@ -155,10 +158,11 @@ public class DocumentUtil
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the multi-text edit corresponding to the given sequence
+     * of LSP text edits for the given document.
      *
      * @param document not <code>null</code>
-     * @param edits text edits for the document (not <code>null</code>,
+     * @param edits LSP text edits for the document (not <code>null</code>,
      *  may be empty, must not contain <code>null</code>s)
      * @return the created {@link MultiTextEdit} (never <code>null</code>)
      * @throws MalformedTreeException if an edit overlaps with one of its siblings

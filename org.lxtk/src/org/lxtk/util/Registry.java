@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * TODO JavaDoc
+ * Represents a registry of elements.
  *
  * @param <E> element type
  */
@@ -25,32 +25,37 @@ public interface Registry<E>
     extends Iterable<E>
 {
     /**
-     * TODO JavaDoc
+     * Adds the given element to this registry.
      *
-     * @param e element to add (not <code>null</code>)
+     * @param e the element to add (not <code>null</code>)
      * @return a disposable to remove the added element (never <code>null</code>)
      */
     Disposable add(E e);
 
     /**
-     * TODO JavaDoc
+     * Returns an event emitter firing when an element is added
+     * to this registry.
      *
      * @return an event emitter firing when an element is added
      */
     EventStream<E> onDidAdd();
 
     /**
-     * TODO JavaDoc
+     * Returns an event emitter firing when an element is removed
+     * from this registry.
      *
      * @return an event emitter firing when an element is removed
      */
     EventStream<E> onDidRemove();
 
     /**
-     * TODO JavaDoc
+     * Returns a new instance of default implementation of {@link Registry}.
+     * <p>
+     * The returned instance is safe for use by multiple concurrent threads.
+     * </p>
      *
      * @param <E> element type
-     * @return a new instance of a default registry implementation
+     * @return a new instance of default implementation of <code>Registry</code>
      *  (never <code>null</code>)
      */
     static <E> Registry<E> newInstance()

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -13,13 +13,18 @@
 package org.lxtk.lx4e.util;
 
 /**
- * TODO JavaDoc
- */
+ * The default {@link WordFinder}.
+  *
+ * @noextend This class is not intended to be subclassed by clients.
+ *  Extend {@link WordFinder} if you need to specialize the default behavior.
+ * @noinstantiate This class is not intended to be instantiated by clients.
+ *  Use the provided {@link #INSTANCE}.
+*/
 public class DefaultWordFinder
     extends WordFinder
 {
     /**
-     * TODO JavaDoc
+     * The default instance of the word finder.
      */
     public static final WordFinder INSTANCE = new DefaultWordFinder();
 

@@ -22,16 +22,18 @@ import org.lxtk.lx4e.model.impl.LanguageElement;
 import org.lxtk.lx4e.model.impl.LanguageSourceFile;
 
 /**
- * TODO JavaDoc
+ * Represents a JSON source file.
  */
 public class JsonSourceFile
     extends LanguageSourceFile
 {
     /**
-     * TODO JavaDoc
+     * Constructs a handle for a JSON source file with the given parent element
+     * and the given workspace file.
      *
-     * @param parent may be <code>null</code>
-     * @param file not <code>null</code>
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param file the underlying workspace file (not <code>null</code>)
      */
     public JsonSourceFile(LanguageElement parent, IFile file)
     {
@@ -39,7 +41,8 @@ public class JsonSourceFile
     }
 
     /**
-     * TODO JavaDoc
+     * Constructs a handle for an external JSON source file with the given
+     * parent element and the given file store.
      *
      * @param parent may be <code>null</code>
      * @param fileStore not <code>null</code>

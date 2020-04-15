@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -21,7 +21,7 @@ import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentSnapshot;
 
 /**
- * TODO JavaDoc
+ * Eclipse-specific extension of {@link TextDocumentChangeEvent}.
  */
 public final class EclipseTextDocumentChangeEvent
     extends TextDocumentChangeEvent
@@ -37,9 +37,9 @@ public final class EclipseTextDocumentChangeEvent
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the underlying {@link IDocument}.
      *
-     * @return the underlying {@link IDocument} (never <code>null</code>)
+     * @return the underlying <code>IDocument</code> (never <code>null</code>)
      */
     public IDocument getUnderlyingDocument()
     {
@@ -47,10 +47,11 @@ public final class EclipseTextDocumentChangeEvent
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the modification stamp of the underlying {@link IDocument} at the
+     * time when this event was sent.
      *
-     * @return the modification stamp of the underlying {@link IDocument} at the
-     *  time when this event was sent or <code>UNKNOWN_MODIFICATION_STAMP</code>
+     * @return the modification stamp of the underlying <code>IDocument</code>
+     *  at the time when this event was sent or <code>UNKNOWN_MODIFICATION_STAMP</code>
      * @see IDocumentExtension4#getModificationStamp()
      */
     public long getModificationStamp()

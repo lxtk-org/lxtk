@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2019 IBM Corporation and others.
+ * Copyright (c) 2000, 2020 IBM Corporation and others.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -21,20 +21,26 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 
 /**
- * TODO JavaDoc
+ * Finds the <i>word</i> at a given document offset.
+ * <p>
+ * This class provides a default behavior that searches for <i>Unicode identifiers</i>.
+ * Clients can use the {@link DefaultWordFinder#INSTANCE default} instance of the
+ * word finder or may subclass this class if they need to specialize the default
+ * behavior.
+ * </p>
+ * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public class WordFinder
 {
     /**
-     * TODO JavaDoc
-     *
+     * Constructor.
      */
     protected WordFinder()
     {
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the region of the word enclosing the given document offset.
      *
      * @param document not <code>null</code>
      * @param offset 0-based
@@ -53,7 +59,7 @@ public class WordFinder
             while (pos >= 0 && pos < document.getLength())
             {
                 c = document.getChar(pos);
-                if (!isIdentifierPart(c))
+                if (!isWordPart(c))
                     break;
                 --pos;
             }
@@ -66,7 +72,7 @@ public class WordFinder
             while (pos < length)
             {
                 c = document.getChar(pos);
-                if (!isIdentifierPart(c))
+                if (!isWordPart(c))
                     break;
                 ++pos;
             }
@@ -90,7 +96,14 @@ public class WordFinder
         return null;
     }
 
-    protected boolean isIdentifierPart(char ch)
+    /**
+     * Determines whether the given character may be part of a word.
+     *
+     * @param ch a character
+     * @return <code>true</code> if the given character may be part of a word,
+     *  and <code>false</code> otherwise
+     */
+    protected boolean isWordPart(char ch)
     {
         return Character.isUnicodeIdentifierPart(ch);
     }

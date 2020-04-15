@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,7 +15,7 @@ package org.lxtk;
 import java.util.Objects;
 
 /**
- * TODO JavaDoc
+ * A snapshot of a {@link TextDocument}. Thread-safe.
  */
 public final class TextDocumentSnapshot
 {
@@ -24,11 +24,11 @@ public final class TextDocumentSnapshot
     private final String text;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param document not <code>null</code>
-     * @param version not negative
-     * @param text not <code>null</code>
+     * @param document the snapshot's document (not <code>null</code>)
+     * @param version the snapshot's version (non-negative)
+     * @param text the snapshot's text (not <code>null</code>)
      */
     public TextDocumentSnapshot(TextDocument document, int version, String text)
     {
@@ -40,7 +40,7 @@ public final class TextDocumentSnapshot
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the snapshot's document.
      *
      * @return the snapshot's document (never <code>null</code>)
      */
@@ -50,7 +50,7 @@ public final class TextDocumentSnapshot
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the snapshot's version.
      *
      * @return the snapshot's version (non-negative)
      */
@@ -60,7 +60,7 @@ public final class TextDocumentSnapshot
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the snapshot's text.
      *
      * @return the snapshot's text (never <code>null</code>)
      */

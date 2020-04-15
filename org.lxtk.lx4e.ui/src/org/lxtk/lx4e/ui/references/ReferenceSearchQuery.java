@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -35,6 +35,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.ReferenceContext;
 import org.eclipse.lsp4j.ReferenceParams;
+import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.text.AbstractTextSearchResult;
 import org.eclipse.search.ui.text.Match;
 import org.lxtk.DocumentUri;
@@ -50,7 +51,9 @@ import org.lxtk.lx4e.util.EclipseFuture;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 /**
- * TODO JavaDoc
+ * Default implementation of an {@link ISearchQuery} that uses a {@link
+ * ReferenceProvider} to find references to the symbol denoted by a
+ * given text document position.
  */
 @SuppressWarnings("restriction")
 public class ReferenceSearchQuery
@@ -64,13 +67,14 @@ public class ReferenceSearchQuery
     private final String fileName;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param target not <code>null</code>
-     * @param position not <code>null</code>
+     * @param target the {@link LanguageOperationTarget} for this search query
+     *  (not <code>null</code>)
+     * @param position the target text document position (not <code>null</code>)
      * @param wordAtPosition not <code>null</code>, not empty
-     * @param workspace not <code>null</code>
-     * @param includeDeclaration include the declaration of the symbol
+     * @param workspace a {@link Workspace} (not <code>null</code>)
+     * @param includeDeclaration whether to include the declaration of the symbol
      *  denoted by the given text document position
      */
     public ReferenceSearchQuery(LanguageOperationTarget target,

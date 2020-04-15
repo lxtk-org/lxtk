@@ -19,13 +19,15 @@ import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
 /**
- * TODO JavaDoc
+ * Provides {@link DocumentHighlight}s for a given text document position.
+ *
+ * @see LanguageService
  */
 public interface DocumentHighlightProvider
     extends LanguageFeatureProvider
 {
     /**
-     * TODO JavaDoc
+     * Computes document highlights for the given text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

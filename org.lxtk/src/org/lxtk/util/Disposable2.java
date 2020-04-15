@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,13 +15,17 @@ package org.lxtk.util;
 import java.util.concurrent.CompletionStage;
 
 /**
- * TODO JavaDoc
+ * Extends the {@link Disposable} interface with methods to determine
+ * whether the object got disposed and to perform an action when the object
+ * gets disposed.
+ *
+ * @see DisposableObject
  */
 public interface Disposable2
     extends Disposable
 {
     /**
-     * TODO JavaDoc
+     * Checks whether this object got disposed.
      *
      * @return <code>true</code> if the object got disposed,
      *  and <code>false</code> otherwise
@@ -32,7 +36,7 @@ public interface Disposable2
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a stage that completes when this object gets disposed.
      *
      * @return a stage that completes when the object gets disposed
      *  (never <code>null</code>)

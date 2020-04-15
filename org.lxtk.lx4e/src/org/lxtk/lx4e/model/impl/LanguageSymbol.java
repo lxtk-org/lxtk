@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -37,10 +37,10 @@ public class LanguageSymbol
 
     /**
      * Constructs a handle for a symbol with the given parent element,
-     * the given simple name, and the given kind.
+     * name, and kind.
      *
      * @param parent the parent of the symbol (not <code>null</code>)
-     * @param name the simple name of the symbol (not <code>null</code>)
+     * @param name the name of the symbol (not <code>null</code>)
      * @param kind the kind of the symbol (not <code>null</code>)
      */
     public LanguageSymbol(LanguageElement parent, String name, SymbolKind kind)
@@ -79,7 +79,7 @@ public class LanguageSymbol
     }
 
     @Override
-    public final ILanguageSymbol getDeclaringSymbol()
+    public ILanguageSymbol getDeclaringSymbol()
     {
         IElement parent = getParent_();
         if (parent instanceof ILanguageSymbol)
@@ -94,7 +94,7 @@ public class LanguageSymbol
     }
 
     @Override
-    public final ILanguageSymbol[] getSymbols(IProgressMonitor monitor)
+    public ILanguageSymbol[] getSymbols(IProgressMonitor monitor)
         throws CoreException
     {
         return (ILanguageSymbol[])getChildren_(EMPTY_CONTEXT, monitor);

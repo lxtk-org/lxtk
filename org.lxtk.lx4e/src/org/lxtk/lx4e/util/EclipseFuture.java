@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -25,7 +25,8 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 
 /**
- * TODO JavaDoc
+ * A {@link Future} that supports progress reporting and cancellation via
+ * {@link IProgressMonitor}.
  *
  * @param <T> result type 
  */
@@ -36,17 +37,17 @@ public class EclipseFuture<T>
     private final long monitorPeriod;
 
     /**
-     * TODO JavaDoc
+     * Returns an {@link EclipseFuture} based on the given future.
      *
-     * @param <V> future result type
+     * @param <T> future result type
      * @param future not <code>null</code>
-     * @return an {@link EclipseFuture} based on the given future
+     * @return an <code>EclipseFuture</code> based on the given future
      *  (never <code>null</code>)
      */
-    public static <V> EclipseFuture<V> of(Future<V> future)
+    public static <T> EclipseFuture<T> of(Future<T> future)
     {
         if (future instanceof EclipseFuture)
-            return (EclipseFuture<V>)future;
+            return (EclipseFuture<T>)future;
         return new EclipseFuture<>(future, 50);
     }
 
@@ -57,11 +58,12 @@ public class EclipseFuture<T>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns an {@link EclipseFuture} that is based on this future
+     * and has the given monitor period.
      *
      * @param value a positive duration
-     * @return an {@link EclipseFuture} based on this future,
-     *  with the given monitor period
+     * @return an <code>EclipseFuture</code> that is based on this future
+     *  and has the given monitor period
      */
     public EclipseFuture<T> withMonitorPeriod(Duration value)
     {
@@ -102,11 +104,13 @@ public class EclipseFuture<T>
     }
 
     /**
-     * TODO JavaDoc
+     * Waits if necessary for the computation to complete, using the given
+     * monitor to report progress and respond to cancellation, and returns
+     * the computed result.
      *
      * @param monitor a progress monitor, or <code>null</code>
      *  if progress reporting is not desired. The caller must not rely on
-     *  {@link IProgressMonitor#done()} having been called by this method
+     *  {@link IProgressMonitor#done()} having been called by the receiver
      * @return the computed result
      * @throws OperationCanceledException if the computation was cancelled
      *  or if cancellation has been requested via the progress monitor
@@ -142,12 +146,14 @@ public class EclipseFuture<T>
     }
 
     /**
-     * TODO JavaDoc
+     * Waits if necessary for at most the given time for the computation
+     * to complete, using the given monitor to report progress and respond
+     * to cancellation, and returns the computed result, if available.
      *
      * @param timeout the maximum time to wait, a positive duration
      * @param monitor a progress monitor, or <code>null</code>
      *  if progress reporting is not desired. The caller must not rely on
-     *  {@link IProgressMonitor#done()} having been called by this method
+     *  {@link IProgressMonitor#done()} having been called by the receiver
      * @return the computed result
      * @throws OperationCanceledException if the computation was cancelled
      *  or if cancellation has been requested via the progress monitor

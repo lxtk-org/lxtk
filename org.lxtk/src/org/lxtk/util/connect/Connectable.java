@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,12 @@ import org.lxtk.util.Disposable;
 import org.lxtk.util.EventStream;
 
 /**
- * TODO JavaDoc
+ * Interface for connecting, disconnecting, and monitoring the connection state
+ * of <i>connectable</i> objects.
+ * <p>
+ * Rather than implementing this interface directly, clients should extend
+ * {@link AbstractConnectable}.
+ * </p>
  *
  * @noimplement This interface is not intended to be implemented by clients.
  * @noextend This interface is not intended to be extended by clients.
@@ -25,9 +30,9 @@ public interface Connectable
     extends Disposable
 {
     /**
-     * If the connection state is DISCONNECTED or DISCONNECTING,
-     * changes it to CONNECTING and starts creating a new connection.
-     * Otherwise, does nothing.
+     * If the connection state is <code>DISCONNECTED</code> or
+     * <code>DISCONNECTING</code>, changes it to <code>CONNECTING</code>
+     * and starts creating a new connection. Otherwise, does nothing.
      * <p>
      * This method need not block the calling thread until the connection
      * is created.
@@ -36,9 +41,9 @@ public interface Connectable
     void connect();
 
     /**
-     * If the connection state is CONNECTED or CONNECTING, changes it
-     * to DISCONNECTING and starts closing the current connection.
-     * Otherwise, does nothing.
+     * If the connection state is <code>CONNECTED</code> or <code>CONNECTING</code>,
+     * changes it to <code>DISCONNECTING</code> and starts closing the current
+     * connection. Otherwise, does nothing.
      * <p>
      * This method need not block the calling thread until the connection
      * is closed.
@@ -47,51 +52,57 @@ public interface Connectable
     void disconnect();
 
     /**
-     * TODO JavaDoc
-     *
+     * Reconnects this object by closing the current connection, if any,
+     * and creating a new one. Typical implementation is
+     * <code>disconnect(); connect()</code>.
+     * <p>
+     * This method need not block the calling thread until the current connection
+     * is closed and a new one is created.
+     * </p>
      */
     void reconnect();
 
     /**
      * Returns a message that describes an unrecoverable connection error,
-     * which caused this instance to disconnect.
+     * which caused this object to disconnect.
      *
      * @return the error message, or <code>null</code>
      */
     String getErrorMessage();
 
     /**
-     * TODO JavaDoc
+     * Returns the current connection state for this object.
      *
      * @return the connection state (never <code>null</code>)
      */
     ConnectionState getConnectionState();
 
     /**
-     * TODO JavaDoc
+     * An enumeration of connection states.
      */
     enum ConnectionState
     {
         /**
-         * TODO JavaDoc
+         * The connection is being created.
          */
         CONNECTING,
         /**
-         * TODO JavaDoc
+         * The connection has been created.
          */
         CONNECTED,
         /**
-         * TODO JavaDoc
+         * The connection is being closed.
          */
         DISCONNECTING,
         /**
-         * TODO JavaDoc
+         * The connection is closed.
          */
         DISCONNECTED
     }
 
     /**
-     * TODO JavaDoc
+     * Returns an event emitter firing when the connection state changes
+     * for this object.
      *
      * @return an event emitter firing when the connection state changes
      *  (never <code>null</code>)

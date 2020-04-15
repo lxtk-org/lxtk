@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -27,7 +27,10 @@ import org.lxtk.util.UriUtil;
 import org.lxtk.util.UriUtil.Normalization;
 
 /**
- * TODO JavaDoc
+ * Default implementation of the {@link Workspace} interface.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public class DefaultWorkspace
     implements Workspace
@@ -97,7 +100,7 @@ public class DefaultWorkspace
     }
 
     /**
-     * TODO JavaDoc
+     * Normalizes the given URI.
      *
      * @param uri never <code>null</code>
      * @return the normalized URI (not <code>null</code>)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,22 +16,23 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * TODO JavaDoc
+ * Interface for message logging.
  */
 public interface Log
 {
     /**
-     * TODO JavaDoc
+     * Logs an error message.
      *
      * @param message not <code>null</code>
      */
     void error(String message);
 
     /**
-     * TODO JavaDoc
+     * Logs an error message, with associated <code>Throwable</code>.
      *
      * @param message not <code>null</code>
-     * @param thrown not <code>null</code>
+     * @param thrown the <code>Throwable</code> associated with the message
+     *  (not <code>null</code>)
      */
     default void error(String message, Throwable thrown)
     {
@@ -39,17 +40,18 @@ public interface Log
     }
 
     /**
-     * TODO JavaDoc
+     * Logs a warning message.
      *
      * @param message not <code>null</code>
      */
     void warning(String message);
 
     /**
-     * TODO JavaDoc
+     * Logs a warning message, with associated <code>Throwable</code>.
      *
      * @param message not <code>null</code>
-     * @param thrown not <code>null</code>
+     * @param thrown the <code>Throwable</code> associated with the message
+     *  (not <code>null</code>)
      */
     default void warning(String message, Throwable thrown)
     {
@@ -57,17 +59,18 @@ public interface Log
     }
 
     /**
-     * TODO JavaDoc
+     * Logs an info message.
      *
      * @param message not <code>null</code>
      */
     void info(String message);
 
     /**
-     * TODO JavaDoc
+     * Logs an info message, with associated <code>Throwable</code>.
      *
      * @param message not <code>null</code>
-     * @param thrown not <code>null</code>
+     * @param thrown the <code>Throwable</code> associated with the message
+     *  (not <code>null</code>)
      */
     default void info(String message, Throwable thrown)
     {
@@ -75,10 +78,11 @@ public interface Log
     }
 
     /**
-     * TODO JavaDoc
+     * Formats a message, with associated <code>Throwable</code>.
      *
      * @param message not <code>null</code>
-     * @param thrown not <code>null</code>
+     * @param thrown the <code>Throwable</code> associated with the message
+     *  (not <code>null</code>)
      * @return a formatted message (never <code>null</code>)
      */
     static String format(String message, Throwable thrown)

@@ -22,7 +22,9 @@ import org.eclipse.lsp4j.CompletionRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
- * TODO JavaDoc
+ * Provides {@link CompletionItem}s for a given text document position.
+ *
+ * @see LanguageService
  */
 public interface CompletionProvider
     extends LanguageFeatureProvider
@@ -31,7 +33,7 @@ public interface CompletionProvider
     CompletionRegistrationOptions getRegistrationOptions();
 
     /**
-     * TODO JavaDoc
+     * Computes completion items for the given {@link CompletionParams}.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
@@ -40,13 +42,13 @@ public interface CompletionProvider
         CompletionParams params);
 
     /**
-     * TODO JavaDoc
+     * Resolves additional information for the given completion item.
      *
      * @param item not <code>null</code>
      * @return result future (never <code>null</code>)
-     * @throws UnsupportedOperationException iff {@link
-     *  CompletionRegistrationOptions#getResolveProvider() resolveProvider}
-     *  is not available
+     * @throws UnsupportedOperationException if no support for resolving
+     *  additional information for a completion item is available
+     * @see CompletionRegistrationOptions#getResolveProvider()
      */
     CompletableFuture<CompletionItem> resolveCompletionItem(
         CompletionItem item);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,7 @@ import org.eclipse.handly.ui.quickoutline.OutlinePopup;
 import org.eclipse.handly.ui.quickoutline.OutlinePopupHandler;
 
 /**
- * TODO JavaDoc
+ * A handler that opens the JSON outline popup.
  */
 public class JsonOutlinePopupHandler
     extends OutlinePopupHandler

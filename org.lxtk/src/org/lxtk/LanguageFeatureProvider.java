@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,23 +18,26 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 
 /**
- * TODO JavaDoc
+ * Common interface for language feature providers.
+ *
+ * @see LanguageService
  */
 public interface LanguageFeatureProvider
 {
     /**
-     * TODO JavaDoc
+     * Returns registration options for this provider.
      *
      * @return registration options (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object.
+     *  Clients <b>must not</b> modify the returned object
      */
     TextDocumentRegistrationOptions getRegistrationOptions();
 
     /**
-     * TODO JavaDoc
+     * Returns the document selector for this provider.
+     * Shortcut to <code>getRegistrationOptions().getDocumentSelector()</code>.
      *
-     * @return the document selector (may be <code>null</code>).
-     *  Clients <b>must not</b> modify the returned list or any of its elements.
+     * @return the document selector, or <code>null</code> if none.
+     *  Clients <b>must not</b> modify the returned list or any of its elements
      */
     default List<DocumentFilter> getDocumentSelector()
     {

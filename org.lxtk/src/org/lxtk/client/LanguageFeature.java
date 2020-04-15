@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -25,6 +25,7 @@ import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.lxtk.LanguageFeatureProvider;
 import org.lxtk.LanguageService;
 import org.lxtk.util.Disposable;
 
@@ -36,7 +37,7 @@ abstract class LanguageFeature
     private Map<String, Disposable> registrations;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param languageService not <code>null</code>
      */
@@ -46,7 +47,7 @@ abstract class LanguageFeature
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the language service for this feature.
      *
      * @return the language service (never <code>null</code>)
      */
@@ -63,7 +64,7 @@ abstract class LanguageFeature
     }
 
     /**
-     * TODO JavaDoc
+     * Fills the text document client capabilities this feature implements.
      *
      * @param capabilities never <code>null</code>
      */
@@ -80,9 +81,12 @@ abstract class LanguageFeature
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the language server for this feature.
      *
      * @return the language server (never <code>null</code>)
+     * @throws IllegalStateException if this feature has not been {@link
+     *  Feature#initialize(LanguageServer, ServerCapabilities, List)
+     *  initialized}
      */
     protected final LanguageServer getLanguageServer()
     {
@@ -92,7 +96,7 @@ abstract class LanguageFeature
     }
 
     /**
-     * TODO JavaDoc
+     * Initialization callback.
      *
      * @param capabilities not <code>null</code>
      * @param documentSelector a default document selector, or <code>null</code>
@@ -126,7 +130,7 @@ abstract class LanguageFeature
     }
 
     /**
-     * TODO JavaDoc
+     * Contributes a {@link LanguageFeatureProvider} to the language service.
      *
      * @param method one of the methods supported by the feature
      *  (never <code>null</code>)

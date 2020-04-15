@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -21,7 +21,9 @@ import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
- * TODO JavaDoc
+ * Provides {@link CodeAction}s for a given text document range.
+ *
+ * @see LanguageService
  */
 public interface CodeActionProvider
     extends LanguageFeatureProvider
@@ -30,7 +32,7 @@ public interface CodeActionProvider
     //CodeActionRegistrationOptions getRegistrationOptions();
 
     /**
-     * TODO JavaDoc
+     * Computes code actions for the given {@link CodeActionParams}.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -32,7 +32,11 @@ import org.lxtk.LanguageService;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * Participates in a given {@link LanguageService} by implementing and
+ * dynamically contributing {@link DocumentSymbolProvider}s according to LSP.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public final class DocumentSymbolFeature
     extends LanguageFeature
@@ -41,7 +45,7 @@ public final class DocumentSymbolFeature
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param languageService not <code>null</code>
      */

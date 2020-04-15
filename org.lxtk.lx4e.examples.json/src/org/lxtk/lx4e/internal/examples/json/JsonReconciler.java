@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,7 +23,7 @@ import org.lxtk.util.Registry;
 import org.lxtk.util.SafeRun;
 
 /**
- * TODO JavaDoc
+ * Reconciler for a JSON-specific text editor.
  */
 public class JsonReconciler
     extends EditorWorkingCopyReconciler
@@ -31,7 +31,7 @@ public class JsonReconciler
     private Runnable uninstallRunnable;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param editor not <code>null</code>
      * @param workingCopyManager not <code>null</code>

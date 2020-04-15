@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,7 +23,8 @@ import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 /**
- * TODO JavaDoc
+ * A refactoring that performs the workspace transformation described by
+ * a given {@link WorkspaceEdit}.
  */
 public class WorkspaceEditRefactoring
     extends Refactoring
@@ -34,10 +35,11 @@ public class WorkspaceEditRefactoring
     private Change change;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param name not <code>null</code>
-     * @param changeFactory not <code>null</code>
+     * @param name the name of the refactoring (not <code>null</code>)
+     * @param changeFactory the {@link WorkspaceEditChangeFactory}
+     *  for the refactoring (not <code>null</code>)
      */
     public WorkspaceEditRefactoring(String name,
         WorkspaceEditChangeFactory changeFactory)
@@ -47,7 +49,8 @@ public class WorkspaceEditRefactoring
     }
 
     /**
-     * TODO JavaDoc
+     * Sets the {@link WorkspaceEdit} that describes the workspace transformation
+     * that will be performed by this refactoring.
      *
      * @param workspaceEdit not <code>null</code>
      */

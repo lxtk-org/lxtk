@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,7 +18,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 /**
- * TODO JavaDoc
+ * A partial implementation of {@link IHyperlink}.
  */
 public abstract class AbstractHyperlink
     implements IHyperlink
@@ -27,10 +27,10 @@ public abstract class AbstractHyperlink
     private final String text;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param region not <code>null</code>
-     * @param text may be <code>null</code>
+     * @param region the hyperlink region (not <code>null</code>)
+     * @param text optional text for this hyperlink (may be <code>null</code>)
      */
     public AbstractHyperlink(IRegion region, String text)
     {

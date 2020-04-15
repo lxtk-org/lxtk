@@ -22,7 +22,7 @@ import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.codeaction.AbstractCodeActionMenu;
 
 /**
- * TODO JavaDoc
+ * TypeScript-specific extension of {@link AbstractCodeActionMenu}.
  */
 public class TypeScriptCodeActionMenu
     extends AbstractCodeActionMenu

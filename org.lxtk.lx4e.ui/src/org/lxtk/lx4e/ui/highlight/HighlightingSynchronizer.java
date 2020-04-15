@@ -27,7 +27,7 @@ public class HighlightingSynchronizer
     private final boolean wasInstalled;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param highlighter not <code>null</code>
      */

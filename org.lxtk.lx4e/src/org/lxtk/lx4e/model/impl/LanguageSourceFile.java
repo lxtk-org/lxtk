@@ -80,13 +80,12 @@ public abstract class LanguageSourceFile
     private final String languageId;
 
     /**
-     * Constructs a handle for a source file with the given parent element
-     * and the given underlying workspace file.
+     * Constructs a handle for a source file with the given parent element,
+     * workspace file, and language.
      *
-     * @param parent the parent of the element,
-     *  or <code>null</code> if the element has no parent
-     * @param file the workspace file underlying the element
-     *  (not <code>null</code>)
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param file the underlying workspace file (not <code>null</code>)
      * @param languageId the language identifier (not <code>null</code>)
      */
     public LanguageSourceFile(LanguageElement parent, IFile file,
@@ -96,15 +95,15 @@ public abstract class LanguageSourceFile
     }
 
     /**
-     * Constructs a handle for a source file with the given parent element and
-     * the given file system location URI. The URI must be suitable to passing to
-     * <code>EFS.getStore(URI)</code>. This constructor is intended to be used
-     * for source files that have an underlying {@link IFileStore} outside
-     * the workspace.
+     * Constructs a handle for a source file with the given parent element,
+     * file system location URI, and language. The URI must be suitable to
+     * passing to <code>EFS.getStore(URI)</code>. This constructor is intended
+     * to be used for source files that have an underlying {@link IFileStore}
+     * outside the workspace.
      *
-     * @param parent the parent of the element,
-     *  or <code>null</code> if the element has no parent
-     * @param locationUri a file system location URI (not <code>null</code>)
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param locationUri the file system location URI (not <code>null</code>)
      * @param languageId the language identifier (not <code>null</code>)
      */
     /*
@@ -121,14 +120,14 @@ public abstract class LanguageSourceFile
     }
 
     /**
-     * Constructs a handle for a source file with the given parent element and
-     * the given name. This constructor is intended to be used for source files
+     * Constructs a handle for a source file with the given parent element, name,
+     * and language. This constructor is intended to be used for source files
      * that have no underlying file object.
      *
-     * @param parent the parent of the element,
-     *  or <code>null</code> if the element has no parent
-     * @param name the name of the element, or <code>null</code>
-     *  if the element has no name
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param name the name of the source file, or <code>null</code>
+     *  if the source file has no name
      * @param languageId the language identifier (not <code>null</code>)
      */
     public LanguageSourceFile(LanguageElement parent, String name,
@@ -299,21 +298,21 @@ public abstract class LanguageSourceFile
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link Workspace} associated with this source file.
      *
-     * @return a {@link Workspace} (not <code>null</code>)
+     * @return the associated <code>Workspace</code> (not <code>null</code>)
      */
     protected abstract Workspace getWorkspace();
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link LanguageService} associated with this source file.
      *
-     * @return a {@link LanguageService} (not <code>null</code>)
+     * @return the associated <code>LanguageService</code> (not <code>null</code>)
      */
     protected abstract LanguageService getLanguageService();
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing document symbols.
      *
      * @return a positive duration
      */

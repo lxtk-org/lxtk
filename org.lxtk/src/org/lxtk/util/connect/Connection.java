@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,13 +19,13 @@ import java.util.concurrent.Executor;
 import org.lxtk.util.Disposable2;
 
 /**
- * TODO JavaDoc
+ * Common interface for connections.
  */
 public interface Connection
     extends Disposable2
 {
     /**
-     * TODO JavaDoc
+     * Checks whether this connection got closed.
      *
      * @return <code>true</code> if the connection got closed,
      *  and <code>false</code> otherwise
@@ -33,7 +33,8 @@ public interface Connection
     boolean isClosed();
 
     /**
-     * TODO JavaDoc
+     * Returns a stage that completes when this connection gets closed.
+     * The given executor is used to run a connection monitor.
      *
      * @param executor not <code>null</code>
      * @return a stage that completes when the connection gets closed

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,29 +23,34 @@ import java.util.function.Function;
 import org.eclipse.lsp4j.DocumentFilter;
 
 /**
- * TODO JavaDoc
+ * Computes the match between a document selector and a document. The document
+ * is represented by URI and language identifier. The document selector is
+ * represented by a collection of {@link DocumentFilter}s.
  */
 public interface DocumentMatcher
 {
     /**
-     * TODO JavaDoc
+     * Computes the match between the given {@link DocumentFilter}
+     * and a document with the given URI and language identifier.
      *
      * @param filter not <code>null</code>
      * @param documentUri not <code>null</code>
      * @param documentLanguageId not <code>null</code>
-     * @return a match score; positive if the document matches,
+     * @return the computed match score; positive if the document matches,
      *  and 0 if the document does not match
      */
     int match(DocumentFilter filter, URI documentUri,
         String documentLanguageId);
 
     /**
-     * TODO JavaDoc
+     * Computes the match between the given document selector and a document
+     * with the given URI and language identifier.
      *
-     * @param selector may be <code>null</code>, in which case 0 will be returned
+     * @param selector may be <code>null</code> or empty,
+     *  in which case 0 is returned
      * @param documentUri not <code>null</code>
      * @param documentLanguageId not <code>null</code>
-     * @return a match score; positive if the document matches,
+     * @return the computed match score; positive if the document matches,
      *  and 0 if the document does not match
      */
     default int match(Iterable<DocumentFilter> selector, URI documentUri,
@@ -65,7 +70,8 @@ public interface DocumentMatcher
     }
 
     /**
-     * TODO JavaDoc
+     * Determines whether there is a match between the given {@link DocumentFilter}
+     * and a document with the given URI and language identifier.
      *
      * @param filter not <code>null</code>
      * @param documentUri not <code>null</code>
@@ -80,10 +86,11 @@ public interface DocumentMatcher
     }
 
     /**
-     * TODO JavaDoc
+     * Determines whether there is a match between the given document selector
+     * and a document with the given URI and language identifier.
      *
-     * @param selector may be <code>null</code>, in which case <code>false</code>
-     *  will be returned
+     * @param selector may be <code>null</code> or empty,
+     *  in which case <code>false</code> is returned
      * @param documentUri not <code>null</code>
      * @param documentLanguageId not <code>null</code>
      * @return <code>true</code> if the document matches,
@@ -104,7 +111,9 @@ public interface DocumentMatcher
     }
 
     /**
-     * TODO JavaDoc
+     * Given a collection of candidate elements and a function for computing
+     * the corresponding document selectors, returns the first element that
+     * matches a document with the given URI and language identifier.
      *
      * @param <T> element type
      * @param candidates not <code>null</code>
@@ -130,11 +139,10 @@ public interface DocumentMatcher
     }
 
     /**
-     * TODO JavaDoc
-     * <p>
-     * If two or more elements match with the maximum match score,
-     * the first of them will be returned.
-     * </p>
+     * Given a collection of candidate elements and a function for computing
+     * the corresponding document selectors, returns the element that has the
+     * best match with a document with the given URI and language identifier.
+     * If two or more elements are the best match, the first of them is returned.
      *
      * @param <T> element type
      * @param candidates not <code>null</code>
@@ -164,7 +172,10 @@ public interface DocumentMatcher
     }
 
     /**
-     * TODO JavaDoc
+     * Given a collection of candidate elements and a function for computing
+     * the corresponding document selectors, returns all elements that match
+     * a document with the given URI and language identifier. The elements
+     * are returned in their original order.
      *
      * @param <T> element type
      * @param candidates not <code>null</code>
@@ -190,7 +201,10 @@ public interface DocumentMatcher
     }
 
     /**
-     * TODO JavaDoc
+     * Given a collection of candidate elements and a function for computing
+     * the corresponding document selectors, returns all elements that match
+     * a document with the given URI and language identifier, grouped by
+     * their match score, in descending order.
      *
      * @param <T> element type
      * @param candidates not <code>null</code>

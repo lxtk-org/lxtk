@@ -34,7 +34,8 @@ import org.lxtk.lx4e.ui.EditorHelper;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of a handler that creates and runs a {@link
+ * ReferenceSearchQuery}.
  */
 public abstract class AbstractFindReferencesHandler
     extends AbstractHandler
@@ -96,28 +97,31 @@ public abstract class AbstractFindReferencesHandler
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the corresponding {@link LanguageOperationTarget}
+     * for the given editor.
      *
      * @param editor never <code>null</code>
-     * @return the corresponding {@link LanguageOperationTarget},
+     * @return the corresponding <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
     protected abstract LanguageOperationTarget getLanguageOperationTarget(
         IEditorPart editor);
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link Workspace} for this handler.
      *
      * @return the workspace (not <code>null</code>)
      */
     protected abstract Workspace getWorkspace();
 
     /**
-     * TODO JavaDoc
+     * Creates and returns a {@link ReferenceSearchQuery} with the given
+     * parameters.
      *
-     * @param target never <code>null</code>
-     * @param position never <code>null</code>
-     * @param wordAtPosition may be <code>null</code>
+     * @param target the {@link LanguageOperationTarget} for the search query
+     *  (never <code>null</code>)
+     * @param position the target text document position (never <code>null</code>)
+     * @param wordAtPosition never <code>null</code>, never empty
      * @return the created search query (not <code>null</code>)
      */
     protected ReferenceSearchQuery createSearchQuery(
@@ -129,9 +133,9 @@ public abstract class AbstractFindReferencesHandler
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link EditorHelper} for this handler.
      *
-     * @return an editor helper (not <code>null</code>)
+     * @return the editor helper (not <code>null</code>)
      */
     protected EditorHelper getEditorHelper()
     {
@@ -139,7 +143,7 @@ public abstract class AbstractFindReferencesHandler
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the region of the word enclosing the given document offset.
      *
      * @param document never <code>null</code>
      * @param offset 0-based

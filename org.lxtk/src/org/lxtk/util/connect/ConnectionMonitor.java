@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,8 @@ import java.time.Duration;
 import java.util.Objects;
 
 /**
- * TODO JavaDoc
+ * A connection monitor is a {@link Runnable} that runs until a given connection
+ * is closed, periodically checking the connection state.
  */
 public final class ConnectionMonitor
     implements Runnable
@@ -25,7 +26,7 @@ public final class ConnectionMonitor
     private long sleepDuration = 100; // ms
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param connection not <code>null</code>
      */
@@ -35,7 +36,8 @@ public final class ConnectionMonitor
     }
 
     /**
-     * TODO JavaDoc
+     * Sets the sleep duration for this monitor. This is only necessary in case
+     * a default value (100 ms) is not appropriate.
      *
      * @param sleepDuration a positive duration
      */

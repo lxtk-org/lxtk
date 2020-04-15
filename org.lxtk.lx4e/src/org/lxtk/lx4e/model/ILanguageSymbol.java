@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -38,48 +38,48 @@ public interface ILanguageSymbol
     /**
      * Returns the kind of this symbol. This is a handle-only method.
      *
-     * @return the kind of this symbol (never <code>null</code>)
+     * @return the symbol kind (never <code>null</code>)
      */
     SymbolKind getKind();
 
     /**
-     * Returns the source file in which this symbol is declared,
+     * Returns the source file that is an ancestor of this symbol,
      * or <code>null</code> if none. This is a handle-only method.
      *
-     * @return the source file in which this symbol is declared,
+     * @return the source file that is an ancestor of this symbol,
      *  or <code>null</code> if none
      */
     ILanguageSourceFile getSourceFile();
 
     /**
-     * Returns the symbol in which this symbol is declared, or <code>null</code>
-     * if none (e.g., a top-level symbol). This is a handle-only method.
+     * Returns the symbol for which this symbol is an immediate member symbol
+     * or <code>null</code> if none. This is a handle-only method.
      *
-     * @return the symbol in which this symbol is declared,
+     * @return the symbol for which this symbol is an immediate member symbol,
      *  or <code>null</code> if none
      */
     ILanguageSymbol getDeclaringSymbol();
 
     /**
-     * Returns the member symbol declared in this symbol with the given simple
-     * name and the given kind. This is a handle-only method. The returned
-     * symbol may or may not exist.
+     * Returns the immediate member symbol with the given name and the given
+     * kind. This is a handle-only method. The returned symbol may or may not
+     * exist.
      *
-     * @param name the simple name of the requested symbol (not <code>null</code>)
+     * @param name the name of the requested symbol (not <code>null</code>)
      * @param kind the kind of the requested symbol (not <code>null</code>)
      * @return a handle onto the corresponding symbol (never <code>null</code>).
-     *  The symbol may or may not exist.
+     *  The symbol may or may not exist
      */
     ILanguageSymbol getSymbol(String name, SymbolKind kind);
 
     /**
-     * Returns the immediate member symbols declared by this symbol.
+     * Returns the immediate member symbols of this symbol.
      *
      * @param monitor a progress monitor, or <code>null</code>
      *  if progress reporting is not desired. The caller must not rely on
      *  {@link IProgressMonitor#done()} having been called by the receiver
-     * @return the immediate member symbols declared by this symbol (never
-     *  <code>null</code>). Clients <b>must not</b> modify the returned array.
+     * @return the immediate member symbols of this symbol (never
+     *  <code>null</code>). Clients <b>must not</b> modify the returned array
      * @throws CoreException if this symbol does not exist or if an
      *  exception occurs while accessing its corresponding resource
      */

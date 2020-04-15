@@ -52,7 +52,9 @@ import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.LSPImages;
 
 /**
- * TODO JavaDoc
+ * Default implementation of an {@link IContentAssistProcessor} that
+ * computes completion proposals using a {@link CompletionProvider} and
+ * context information using a {@link SignatureHelpProvider}.
  */
 // Implementation limits:
 // - Snippet support is ad hoc (inherited from LSP4E)
@@ -73,9 +75,10 @@ public class ContentAssistProcessor
     private String errorMessage;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param targetSupplier not <code>null</code>
+     * @param targetSupplier the {@link LanguageOperationTarget} supplier
+     *  for this processor (not <code>null</code>)
      */
     public ContentAssistProcessor(
         Supplier<LanguageOperationTarget> targetSupplier)
@@ -262,7 +265,7 @@ public class ContentAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the image that corresponds to the given completion item.
      *
      * @param item never <code>null</code>
      * @return the corresponding image, or <code>null</code> if none
@@ -273,10 +276,11 @@ public class ContentAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Converts the given {@link SignatureInformation} to
+     * an {@link IContextInformation} object.
      *
      * @param signature never <code>null</code>
-     * @return a context information for the given signature,
+     * @return the corresponding context information,
      *  or <code>null</code> if none
      */
     protected IContextInformation toContextInformation(
@@ -287,7 +291,7 @@ public class ContentAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing completion proposals.
      *
      * @return a positive duration
      */
@@ -297,7 +301,7 @@ public class ContentAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing context information.
      *
      * @return a positive duration
      */

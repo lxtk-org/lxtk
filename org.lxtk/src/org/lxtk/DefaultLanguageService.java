@@ -37,8 +37,11 @@ import org.eclipse.lsp4j.SymbolKindCapabilities;
 import org.lxtk.util.Registry;
 
 /**
- * TODO JavaDoc
- */
+ * Default implementation of the {@link LanguageService} interface.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
+*/
 public class DefaultLanguageService
     implements LanguageService
 {

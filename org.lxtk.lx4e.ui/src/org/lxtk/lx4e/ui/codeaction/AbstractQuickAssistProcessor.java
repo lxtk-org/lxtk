@@ -47,6 +47,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.SimpleMarkerAnnotation;
+import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.DocumentUtil;
@@ -58,7 +59,8 @@ import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import com.google.gson.Gson;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of an {@link IQuickAssistProcessor} that computes
+ * quick fixes and quick assists using a {@link CodeActionProvider}.
  */
 public abstract class AbstractQuickAssistProcessor
     implements IQuickAssistProcessor
@@ -159,32 +161,33 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the current {@link LanguageOperationTarget}.
      *
-     * @return the corresponding {@link LanguageOperationTarget},
+     * @return the current <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
     protected abstract LanguageOperationTarget getLanguageOperationTarget();
 
     /**
-     * TODO JavaDoc
+     * Returns the command service for this processor.
      *
      * @return the command service (not <code>null</code>)
      */
     protected abstract CommandService getCommandService();
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link WorkspaceEditChangeFactory} for this processor.
      *
-     * @return a {@link WorkspaceEditChangeFactory} (not <code>null</code>)
+     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
      */
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link CodeActionContext} corresponding to the given
+     * {@link IQuickAssistInvocationContext}.
      *
      * @param invocationContext never <code>null</code>
-     * @return the corresponding {@link CodeActionContext} (not <code>null</code>)
+     * @return the corresponding <code>CodeActionContext</code> (not <code>null</code>)
      */
     protected CodeActionContext getCodeActionContext(
         IQuickAssistInvocationContext invocationContext)
@@ -193,7 +196,8 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Given an {@link IQuickAssistInvocationContext}, returns a list
+     * of the corresponding {@link Diagnostic}s.
      *
      * @param invocationContext never <code>null</code>
      * @return the corresponding diagnostics (not <code>null</code>)
@@ -237,10 +241,11 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Checks whether the given annotation represents a diagnostic.
      *
      * @param annotation never <code>null</code>
-     * @return whether the given annotation is a diagnostic annotation
+     * @return <code>true</code> if the given annotation is a diagnostic
+     *  annotation, and <code>false</code> otherwise
      */
     protected boolean isDiagnosticAnnotation(Annotation annotation)
     {
@@ -255,10 +260,10 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the diagnostic represented by the given annotation.
      *
      * @param annotation never <code>null</code>
-     * @return the corresponding diagnostic or <code>null</code> if none
+     * @return the requested diagnostic, or <code>null</code> if none
      */
     protected Diagnostic getDiagnostic(Annotation annotation)
     {
@@ -274,11 +279,11 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the diagnostic contained in the given marker attribute.
      *
      * @param marker never <code>null</code>
      * @param diagnosticAttributeName never <code>null</code>
-     * @return the diagnostic, or <code>null</code> if none
+     * @return the requested diagnostic, or <code>null</code> if none
      */
     protected Diagnostic getDiagnostic(IMarker marker,
         String diagnosticAttributeName)
@@ -292,10 +297,10 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Creates and returns a proposal that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
-     * @return a completion proposal based on the command (not <code>null</code>)
+     * @return the created proposal (not <code>null</code>)
      */
     protected ICompletionProposal newProposal(Command command)
     {
@@ -303,10 +308,10 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Creates and returns a proposal that executes the given {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
-     * @return a completion proposal based on the code action (not <code>null</code>)
+     * @return the created proposal (not <code>null</code>)
      */
     protected ICompletionProposal newProposal(CodeAction codeAction)
     {
@@ -314,7 +319,7 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing proposals.
      *
      * @return a positive duration
      */
@@ -324,15 +329,18 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * A proposal that executes a given {@link Command}.
      */
     protected class CommandProposal
         implements ICompletionProposal
     {
+        /**
+         * The associated {@link Command} object (never <code>null</code>).
+         */
         protected final Command command;
 
         /**
-         * TODO JavaDoc
+         * Constructor.
          *
          * @param command not <code>null</code>
          */
@@ -380,15 +388,18 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * TODO JavaDoc
+     * A proposal that executes a given {@link CodeAction}.
      */
     protected class CodeActionProposal
         implements ICompletionProposal
     {
+        /**
+         * The associated {@link CodeAction} object (never <code>null</code>).
+         */
         protected final CodeAction codeAction;
 
         /**
-         * TODO JavaDoc
+         * Constructor.
          *
          * @param codeAction not <code>null</code>
          */

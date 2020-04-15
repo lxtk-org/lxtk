@@ -24,10 +24,10 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * A requestor of LSP diagnostics that invokes a given delegate asynchronously,
+ * in a dedicated working thread.
  * <p>
- * This implementation is thread-safe. The underlying delegate need not be
- * thread-safe.
+ * This implementation is thread-safe. The delegate need not be thread-safe.
  * </p>
  */
 public final class BufferingDiagnosticRequestor
@@ -38,7 +38,7 @@ public final class BufferingDiagnosticRequestor
     private boolean disposed;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param delegate not <code>null</code>
      */

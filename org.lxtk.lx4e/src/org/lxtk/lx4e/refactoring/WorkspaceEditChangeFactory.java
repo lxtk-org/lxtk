@@ -58,21 +58,22 @@ import org.lxtk.lx4e.uris.ResourceUriHandler;
 import org.lxtk.lx4e.uris.TextDocumentUriHandler;
 
 /**
- * TODO JavaDoc
+ * Creates a {@link Change} object for a given {@link WorkspaceEdit}.
  */
 public class WorkspaceEditChangeFactory
 {
     /**
-     * The given {@link Workspace} (not <code>null</code>)
+     * The associated {@link Workspace} (never <code>null</code>).
      */
     protected final Workspace workspace;
     /**
-     * The given {@link IUriHandler} (not <code>null</code>)
+     * The associated {@link IUriHandler} (never <code>null</code>).
      */
     protected final IUriHandler uriHandler;
 
     /**
-     * TODO JavaDoc
+     * Creates a new factory instance with the given {@link Workspace} and a
+     * default {@link IUriHandler}.
      *
      * @param workspace not <code>null</code>
      */
@@ -83,7 +84,8 @@ public class WorkspaceEditChangeFactory
     }
 
     /**
-     * TODO JavaDoc
+     * Creates a new factory instance with the given {@link Workspace}
+     * and the given {@link IUriHandler}.
      *
      * @param workspace not <code>null</code>
      * @param uriHandler not <code>null</code>
@@ -96,7 +98,8 @@ public class WorkspaceEditChangeFactory
     }
 
     /**
-     * TODO JavaDoc
+     * Creates a {@link Change} object that performs the workspace transformation
+     * described by the given {@link WorkspaceEdit}.
      *
      * @param name the human readable name of the change. Will
      *  be used to display the change in the user interface
@@ -108,7 +111,7 @@ public class WorkspaceEditChangeFactory
      *  if progress reporting is not desired. The caller must not rely on
      *  {@link IProgressMonitor#done()} having been called by the receiver
      * @return the created change (never <code>null</code>)
-     * @throws CoreException if an error occurred while creating the change
+     * @throws CoreException if this method could not create a change
      * @throws OperationCanceledException if this method is canceled
      */
     public Change createChange(String name, WorkspaceEdit workspaceEdit,
@@ -162,13 +165,15 @@ public class WorkspaceEditChangeFactory
     }
 
     /**
-     * TODO JavaDoc
+     * Adds a {@link Change} for the given {@link TextDocumentEdit}
+     * to the given {@link CompositeChange}.
      *
-     * @param change never <code>null</code>
-     * @param textDocumentEdit never <code>null</code>
+     * @param change a <code>CompositeChange</code> (never <code>null</code>)
+     * @param textDocumentEdit a <code>TextDocumentEdit</code> (never <code>null</code>)
      * @return a {@link RefactoringStatus}. May be <code>null</code>, which
      *  indicates an OK status
-     * @throws CoreException
+     * @throws CoreException if an error condition is detected that makes it
+     *  impossible for the factory to create a change
      */
     protected RefactoringStatus addTextChange(CompositeChange change,
         TextDocumentEdit textDocumentEdit) throws CoreException
@@ -225,13 +230,15 @@ public class WorkspaceEditChangeFactory
     }
 
     /**
-     * TODO JavaDoc
+     * Adds a {@link Change} for the given {@link ResourceOperation}
+     * to the given {@link CompositeChange}.
      *
-     * @param change never <code>null</code>
-     * @param operation never <code>null</code>
+     * @param change a <code>CompositeChange</code> (never <code>null</code>)
+     * @param operation a <code>ResourceOperation</code> (never <code>null</code>)
      * @return a {@link RefactoringStatus}. May be <code>null</code>, which
      *  indicates an OK status
-     * @throws CoreException
+     * @throws CoreException if an error condition is detected that makes it
+     *  impossible for the factory to create a change
      */
     protected RefactoringStatus addResourceChange(CompositeChange change,
         ResourceOperation operation) throws CoreException

@@ -23,18 +23,18 @@ import org.eclipse.jface.text.ITextViewer;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
- * TODO JavaDoc
+ * Tries the given hovers in sequence, and uses the first one that fits.
  */
 public class BestMatchHover
     implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
     private final ITextHover[] hovers;
-    private ITextHover bestHover;
+    private ITextHover currentHover;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param hovers not <code>null</code>
+     * @param hovers the hovers to combine (not <code>null</code>)
      */
     public BestMatchHover(ITextHover... hovers)
     {
@@ -51,7 +51,7 @@ public class BestMatchHover
     @Override
     public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion)
     {
-        bestHover = null;
+        currentHover = null;
         for (ITextHover hover : hovers)
         {
             if (hover == null)
@@ -61,7 +61,7 @@ public class BestMatchHover
             String hoverInfo = hover.getHoverInfo(textViewer, hoverRegion);
             if (hoverInfo != null && !hoverInfo.trim().isEmpty())
             {
-                bestHover = hover;
+                currentHover = hover;
                 return hoverInfo;
             }
         }
@@ -71,7 +71,7 @@ public class BestMatchHover
     @Override
     public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
     {
-        bestHover = null;
+        currentHover = null;
         for (ITextHover hover : hovers)
         {
             if (hover == null)
@@ -83,7 +83,7 @@ public class BestMatchHover
                     textViewer, hoverRegion);
                 if (hoverInfo != null)
                 {
-                    bestHover = hover;
+                    currentHover = hover;
                     return hoverInfo;
                 }
             }
@@ -93,7 +93,7 @@ public class BestMatchHover
                 String hoverInfo = hover.getHoverInfo(textViewer, hoverRegion);
                 if (hoverInfo != null && !hoverInfo.trim().isEmpty())
                 {
-                    bestHover = hover;
+                    currentHover = hover;
                     return hoverInfo;
                 }
             }
@@ -104,8 +104,8 @@ public class BestMatchHover
     @Override
     public IInformationControlCreator getHoverControlCreator()
     {
-        if (bestHover instanceof ITextHoverExtension)
-            return ((ITextHoverExtension)bestHover).getHoverControlCreator();
+        if (currentHover instanceof ITextHoverExtension)
+            return ((ITextHoverExtension)currentHover).getHoverControlCreator();
 
         return null;
     }

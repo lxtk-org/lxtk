@@ -39,7 +39,7 @@ import org.lxtk.lx4e.ui.hover.TextHover;
 import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
 
 /**
- * TODO JavaDoc
+ * Configuration for a source viewer which shows TypeScript code.
  */
 public class TypeScriptSourceViewerConfiguration
     extends TextSourceViewerConfiguration

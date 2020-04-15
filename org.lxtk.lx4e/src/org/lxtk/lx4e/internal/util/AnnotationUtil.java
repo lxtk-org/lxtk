@@ -25,18 +25,21 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 
 /**
- * TODO JavaDoc
+ * Provides static utility methods for manipulating annotations.
  */
 public class AnnotationUtil
 {
     private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
 
     /**
-     * TODO JavaDoc
+     * Adds and removes annotations to/from the given annotation model
+     * in a single step.
      *
      * @param annotationModel not <code>null</code>
-     * @param toRemove may be <code>null</code> or empty
-     * @param toAdd may be <code>null</code> or empty
+     * @param toRemove the annotations to be removed (may be <code>null</code>
+     *  or empty)
+     * @param toAdd the annotations which will be added (may be <code>null</code>
+     *  or empty)
      */
     public static void replaceAnnotations(IAnnotationModel annotationModel,
         Collection<Annotation> toRemove, Map<Annotation, Position> toAdd)

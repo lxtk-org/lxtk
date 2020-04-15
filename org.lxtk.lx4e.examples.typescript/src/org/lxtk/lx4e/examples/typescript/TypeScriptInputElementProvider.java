@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.IEditorInput;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 
 /**
- * TODO JavaDoc
+ * TypeScript-specific implementation of {@link IInputElementProvider}.
  */
 public class TypeScriptInputElementProvider
     implements IInputElementProvider

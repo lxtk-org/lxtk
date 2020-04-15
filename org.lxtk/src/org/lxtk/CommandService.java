@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,42 +19,46 @@ import java.util.concurrent.CompletableFuture;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * Provides support for command management. A command is a {@link CommandHandler}
+ * with a unique identifier.
+ *
+ * @see DefaultCommandService
  */
 public interface CommandService
 {
     /**
-     * TODO JavaDoc
+     * Adds a new command.
      * <p>
-     * If a command with the given id is already registered,
-     * an exception will be thrown.
+     * If a command with the given identifier is already present,
+     * a runtime exception is thrown.
      * </p>
      *
-     * @param command a unique command id (not <code>null</code>)
+     * @param command a unique command identifier (not <code>null</code>)
      * @param handler a command handler (not <code>null</code>)
      * @return a disposable to remove the added command (never <code>null</code>)
      */
     Disposable addCommand(String command, CommandHandler handler);
 
     /**
-     * TODO JavaDoc
+     * Executes the given command using the given arguments.
      * <p>
-     * If a command with the given id is not registered,
-     * an exception will be thrown.
+     * If a command with the given identifier is not present,
+     * a runtime exception is thrown.
      * </p>
      *
-     * @param command the command to execute (not <code>null</code>)
-     * @param arguments may be <code>null</code>
+     * @param command the command identifier (not <code>null</code>)
+     * @param arguments the command arguments (may be <code>null</code> or empty)
      * @return result future (never <code>null</code>)
      */
     CompletableFuture<Object> executeCommand(String command,
         List<Object> arguments);
 
     /**
-     * TODO JavaDoc
+     * Returns all commands currently known to this service.
      *
      * @return all commands currently known to the service
-     *  (never <code>null</code>, may be empty)
+     * (never <code>null</code>, may be empty). Clients
+     * <b>must not</b> modify the returned set
      */
     Set<String> getCommands();
 }

@@ -22,9 +22,6 @@ import org.eclipse.jface.text.IInformationControlExtension4;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.EditorsUI;
 
-/**
- * TODO JavaDoc
- */
 @SuppressWarnings("restriction")
 public class FocusableInformationControlCreator
     extends AbstractReusableInformationControlCreator

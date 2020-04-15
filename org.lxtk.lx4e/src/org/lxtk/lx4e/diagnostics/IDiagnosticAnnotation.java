@@ -16,13 +16,13 @@ import org.eclipse.jface.text.quickassist.IQuickFixableAnnotation;
 import org.eclipse.lsp4j.Diagnostic;
 
 /**
- * TODO JavaDoc
+ * Interface of annotations that represent LSP diagnostics.
  */
 public interface IDiagnosticAnnotation
     extends IQuickFixableAnnotation
 {
     /**
-     * TODO JavaDoc
+     * Returns the associated diagnostic object.
      *
      * @return the associated diagnostic object (never <code>null</code>)
      */

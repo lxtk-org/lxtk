@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,13 +19,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 class ServerCapabilitiesUtil
 {
-    /**
-     * TODO JavaDoc
-     *
-     * @param capabilities not <code>null</code>
-     * @return text document sync kind (never <code>null</code>)
-     */
-    public static TextDocumentSyncKind getTextDocumentSyncKind(
+    static TextDocumentSyncKind getTextDocumentSyncKind(
         ServerCapabilities capabilities)
     {
         Either<TextDocumentSyncKind, TextDocumentSyncOptions> either =

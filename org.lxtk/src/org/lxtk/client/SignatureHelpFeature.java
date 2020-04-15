@@ -32,7 +32,11 @@ import org.lxtk.SignatureHelpProvider;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * Participates in a given {@link LanguageService} by implementing and
+ * dynamically contributing {@link SignatureHelpProvider}s according to LSP.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public final class SignatureHelpFeature
     extends LanguageFeature
@@ -41,7 +45,7 @@ public final class SignatureHelpFeature
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param languageService not <code>null</code>
      */

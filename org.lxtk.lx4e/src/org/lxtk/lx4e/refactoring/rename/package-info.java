@@ -11,6 +11,7 @@
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
 /**
- * TODO JavaDoc
+ * Provides support for implementing LXTK-based rename refactoring in Eclipse
+ * (Core).
  */
 package org.lxtk.lx4e.refactoring.rename;

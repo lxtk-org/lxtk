@@ -18,9 +18,10 @@ import org.lxtk.Workspace;
 import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptOperationTargetProvider;
 import org.lxtk.lx4e.ui.references.AbstractFindReferencesHandler;
+import org.lxtk.lx4e.ui.references.ReferenceSearchQuery;
 
 /**
- * TODO JavaDoc
+ * A handler that creates and runs a {@link ReferenceSearchQuery} for TypeScript.
  */
 public class FindReferencesHandler
     extends AbstractFindReferencesHandler

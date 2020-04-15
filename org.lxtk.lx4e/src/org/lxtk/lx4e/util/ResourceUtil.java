@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,15 +17,16 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Adapters;
 
 /**
- * TODO JavaDoc
+ * Provides static utility methods related to Eclipse workspace resources.
  */
 public class ResourceUtil
 {
     /**
      * Returns the resource corresponding to the given model element,
-     * or <code>null</code> if there is no applicable resource.
+     * or <code>null</code> if there is no corresponding resource.
      *
-     * @param element the model element, or <code>null</code>
+     * @param element a model element (may be <code>null</code>, in which case
+     *  <code>null</code> is returned)
      * @return the corresponding {@link IResource}, or <code>null</code> if none
      */
     public static IResource getResource(Object element)
@@ -35,9 +36,10 @@ public class ResourceUtil
 
     /**
      * Returns the file corresponding to the given model element,
-     * or <code>null</code> if there is no applicable file.
+     * or <code>null</code> if there is no corresponding file.
      *
-     * @param element the model element, or <code>null</code>
+     * @param element a model element (may be <code>null</code>, in which case
+     *  <code>null</code> is returned)
      * @return the corresponding {@link IFile}, or <code>null</code> if none
      */
     public static IFile getFile(Object element)

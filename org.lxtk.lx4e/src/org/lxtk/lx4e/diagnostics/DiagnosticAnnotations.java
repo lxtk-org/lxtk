@@ -38,7 +38,8 @@ import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * Manages annotations representing LSP diagnostics for text documents in
+ * a given {@link Workspace}.
  */
 /*
  * Implementation note: methods are synchronized to avoid a race between a thread
@@ -55,7 +56,7 @@ public class DiagnosticAnnotations
     private boolean disposed;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param workspace not <code>null</code>
      */
@@ -68,9 +69,9 @@ public class DiagnosticAnnotations
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the associated {@link Workspace}.
      *
-     * @return the underlying {@link Workspace} (never <code>null</code>)
+     * @return the associated <code>Workspace</code> (never <code>null</code>)
      */
     public final Workspace getWorkspace()
     {
@@ -146,7 +147,7 @@ public class DiagnosticAnnotations
     }
 
     /**
-     * TODO JavaDoc
+     * Removes all annotations currently managed by this object.
      */
     public final synchronized void clear()
     {
@@ -169,7 +170,7 @@ public class DiagnosticAnnotations
     }
 
     /**
-     * TODO JavaDoc
+     * Removes the annotations currently managed by this object for the given URI.
      *
      * @param uri may be <code>null</code>
      */
@@ -205,7 +206,7 @@ public class DiagnosticAnnotations
     }
 
     /**
-     * TODO JavaDoc
+     * Adds annotations representing the given diagnostics for the given URI.
      *
      * @param uri not <code>null</code>
      * @param diagnostics not <code>null</code>
@@ -241,11 +242,13 @@ public class DiagnosticAnnotations
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the underlying {@link IAnnotationModel} for the given {@link
+     * TextDocument}.
      *
      * @param textDocument may be <code>null</code>, in which case <code>null</code>
      *  is returned
-     * @return the underlying {@link IAnnotationModel}, or <code>null</code> if none
+     * @return the underlying <code>IAnnotationModel</code>, or <code>null</code>
+     *  if none
      */
     protected IAnnotationModel getAnnotationModel(TextDocument textDocument)
     {
@@ -255,11 +258,11 @@ public class DiagnosticAnnotations
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the underlying {@link IDocument} for the given {@link TextDocument}.
      *
      * @param textDocument may be <code>null</code>, in which case <code>null</code>
      *  is returned
-     * @return the underlying {@link IDocument}, or <code>null</code> if none
+     * @return the underlying <code>IDocument</code>, or <code>null</code> if none
      */
     protected IDocument getUnderlyingDocument(TextDocument textDocument)
     {
@@ -269,10 +272,10 @@ public class DiagnosticAnnotations
     }
 
     /**
-     * TODO JavaDoc
+     * Creates and returns an annotation that represents the given diagnostic.
      *
      * @param diagnostic never <code>null</code>
-     * @return the diagnostic annotation (not <code>null</code>)
+     * @return the created annotation (not <code>null</code>)
      */
     protected Annotation createAnnotation(Diagnostic diagnostic)
     {

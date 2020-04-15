@@ -11,6 +11,7 @@
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
 /**
- * TODO JavaDoc
+ * Provides Eclipse-specific support for determining information about resources
+ * denoted by URIs in LXTK.
  */
 package org.lxtk.lx4e.uris;

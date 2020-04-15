@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,16 +23,18 @@ import org.lxtk.lx4e.model.impl.LanguageElement;
 import org.lxtk.lx4e.model.impl.LanguageSourceFile;
 
 /**
- * TODO JavaDoc
+ * Represents a TypeScript source file.
  */
 public class TypeScriptSourceFile
     extends LanguageSourceFile
 {
     /**
-     * TODO JavaDoc
+     * Constructs a handle for a TypeScript source file with the given
+     * parent element and the given workspace file.
      *
-     * @param parent may be <code>null</code>
-     * @param file not <code>null</code>
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param file the underlying workspace file (not <code>null</code>)
      */
     public TypeScriptSourceFile(LanguageElement parent, IFile file)
     {

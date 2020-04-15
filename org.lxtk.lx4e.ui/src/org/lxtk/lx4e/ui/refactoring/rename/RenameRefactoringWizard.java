@@ -24,13 +24,13 @@ import org.eclipse.swt.widgets.Text;
 import org.lxtk.lx4e.refactoring.rename.RenameRefactoring;
 
 /**
- * TODO JavaDoc
+ * Refactoring wizard for {@link RenameRefactoring}.
  */
 public final class RenameRefactoringWizard
     extends RefactoringWizard
 {
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param refactoring not <code>null</code>
      */

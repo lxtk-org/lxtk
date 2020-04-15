@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -21,13 +21,7 @@ import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 
 class ClientCapabilitiesUtil
 {
-    /**
-     * TODO JavaDoc
-     *
-     * @param capabilities not <code>null</code>
-     * @return a {@link TextDocumentClientCapabilities} (never <code>null</code>)
-     */
-    public static TextDocumentClientCapabilities getOrCreateTextDocument(
+    static TextDocumentClientCapabilities getOrCreateTextDocument(
         ClientCapabilities capabilities)
     {
         return Optional.ofNullable(capabilities.getTextDocument()).orElseGet(
@@ -40,13 +34,7 @@ class ClientCapabilitiesUtil
             });
     }
 
-    /**
-     * TODO JavaDoc
-     *
-     * @param capabilities not <code>null</code>
-     * @return a {@link SynchronizationCapabilities} (never <code>null</code>)
-     */
-    public static SynchronizationCapabilities getOrCreateSynchronization(
+    static SynchronizationCapabilities getOrCreateSynchronization(
         TextDocumentClientCapabilities capabilities)
     {
         return Optional.ofNullable(capabilities.getSynchronization()).orElseGet(
@@ -59,13 +47,7 @@ class ClientCapabilitiesUtil
             });
     }
 
-    /**
-     * TODO JavaDoc
-     *
-     * @param capabilities not <code>null</code>
-     * @return a {@link WorkspaceClientCapabilities} (never <code>null</code>)
-     */
-    public static WorkspaceClientCapabilities getOrCreateWorkspace(
+    static WorkspaceClientCapabilities getOrCreateWorkspace(
         ClientCapabilities capabilities)
     {
         return Optional.ofNullable(capabilities.getWorkspace()).orElseGet(() ->

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -35,7 +35,11 @@ import org.lxtk.CommandService;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * Participates in a given {@link CommandService} by implementing and
+ * dynamically contributing commands according to the LSP.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public final class ExecuteCommandFeature
     implements DynamicFeature<LanguageServer>
@@ -48,7 +52,7 @@ public final class ExecuteCommandFeature
     private Map<String, Disposable> registrations;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param commandService not <code>null</code>
      */

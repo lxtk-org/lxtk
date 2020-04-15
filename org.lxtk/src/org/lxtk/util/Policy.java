@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO JavaDoc
+ * Represents a policy that can be checked.
  */
 public interface Policy
 {
     /**
-     * TODO JavaDoc
+     * Checks whether this policy is satisfied.
      *
      * @return <code>true</code> if this policy is satisfied,
      *  and <code>false</code> otherwise
@@ -30,7 +30,7 @@ public interface Policy
     boolean check();
 
     /**
-     * TODO JavaDoc
+     * Returns a policy that is always satisfied.
      *
      * @return a policy that is always satisfied
      */
@@ -40,7 +40,7 @@ public interface Policy
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a policy that is never satisfied.
      *
      * @return a policy that is never satisfied
      */
@@ -50,7 +50,8 @@ public interface Policy
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a policy that is satisfied up to but not including
+     * the given number of checks.
      *
      * @param maxCount a positive integer
      * @return a policy that is satisfied up to but not including
@@ -65,7 +66,8 @@ public interface Policy
     }
 
     /**
-     * TODO JavaDoc
+     * A policy that is satisfied up to but not including
+     * a given number of checks.
      */
     public static class UpTo
         implements Policy
@@ -79,7 +81,10 @@ public interface Policy
         }
 
         /**
-         * TODO JavaDoc
+         * Returns a policy that is satisfied up to but not including
+         * the number of checks specified for this policy or when
+         * the last sequence of the specified number of checks is performed
+         * in the amount of time that is greater than the given duration.
          *
          * @param duration a positive duration (not <code>null</code>)
          * @return a policy that is satisfied up to but not including
@@ -96,7 +101,10 @@ public interface Policy
         }
 
         /**
-         * TODO JavaDoc
+         * Returns a policy that is satisfied up to but not including
+         * the number of checks specified for this policy and is
+         * automatically {@link #reset() reset} once the specified number
+         * of checks is reached.
          *
          * @return a policy that is satisfied up to but not including
          *  the number of checks specified for this policy and is
@@ -129,8 +137,7 @@ public interface Policy
         }
 
         /**
-         * TODO JavaDoc
-         *
+         * Resets this policy object.
          */
         public void reset()
         {
@@ -139,7 +146,9 @@ public interface Policy
     }
 
     /**
-     * TODO JavaDoc
+     * A policy that is satisfied up to but not including a given number of checks
+     * or when the last sequence of the given number of checks is performed
+     * in the amount of time that is greater than a given duration.
      */
     public static class UpToIn
         implements Policy
@@ -156,7 +165,13 @@ public interface Policy
         }
 
         /**
-         * TODO JavaDoc
+         * Returns a policy that is satisfied up to but not including
+         * the number of checks specified for this policy or when
+         * the last sequence of the specified number of checks is performed
+         * in the amount of time that is greater than the duration
+         * specified for this policy and is automatically {@link #reset()
+         * reset} once the specified number of checks is reached in the
+         * specified duration.
          *
          * @return a policy that is satisfied up to but not including
          *  the number of checks specified for this policy or when
@@ -195,8 +210,7 @@ public interface Policy
         }
 
         /**
-         * TODO JavaDoc
-         *
+         * Resets this policy object.
          */
         public void reset()
         {

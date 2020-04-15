@@ -32,6 +32,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
+import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
@@ -41,7 +42,10 @@ import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import com.google.gson.Gson;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of an {@link IMarkerResolutionGenerator2} that computes
+ * resolutions for a diagnostic marker using a {@link CodeActionProvider}.
+ *
+ * @see DiagnosticMarkers
  */
 public abstract class AbstractMarkerResolutionGenerator
     implements IMarkerResolutionGenerator2
@@ -106,34 +110,36 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the corresponding {@link LanguageOperationTarget}
+     * for the given marker.
      *
      * @param marker never <code>null</code>
-     * @return the corresponding {@link LanguageOperationTarget},
+     * @return the corresponding <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
     protected abstract LanguageOperationTarget getLanguageOperationTarget(
         IMarker marker);
 
     /**
-     * TODO JavaDoc
+     * Returns the command service for this generator.
      *
      * @return the command service (not <code>null</code>)
      */
     protected abstract CommandService getCommandService();
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link WorkspaceEditChangeFactory} for this generator.
      *
-     * @return a {@link WorkspaceEditChangeFactory} (not <code>null</code>)
+     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
      */
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
-     * TODO JavaDoc
+     * Creates and returns a marker resolution that executes the given
+     * {@link Command}.
      *
      * @param command never <code>null</code>
-     * @return a marker resolution based on the command (not <code>null</code>)
+     * @return the created resolution (not <code>null</code>)
      */
     protected IMarkerResolution newMarkerResolution(Command command)
     {
@@ -141,10 +147,11 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * TODO JavaDoc
+     * Creates and returns a marker resolution that executes the given
+     * {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
-     * @return a marker resolution based on the code action (not <code>null</code>)
+     * @return the created resolution (not <code>null</code>)
      */
     protected IMarkerResolution newMarkerResolution(CodeAction codeAction)
     {
@@ -152,7 +159,7 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the name of the marker attribute that contains a diagnostic.
      *
      * @return the diagnostic attribute name (not <code>null</code>)
      */
@@ -162,11 +169,11 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the diagnostic contained in the given marker attribute.
      *
      * @param marker never <code>null</code>
      * @param diagnosticAttributeName never <code>null</code>
-     * @return the diagnostic, or <code>null</code> if none
+     * @return the requested diagnostic, or <code>null</code> if none
      */
     protected Diagnostic getDiagnostic(IMarker marker,
         String diagnosticAttributeName)
@@ -180,7 +187,7 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing resolutions.
      *
      * @return a positive duration
      */
@@ -190,15 +197,18 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * TODO JavaDoc
+     * A marker resolution that executes a given {@link Command}.
      */
     protected class CommandMarkerResolution
         implements IMarkerResolution
     {
+        /**
+         * The associated {@link Command} object (never <code>null</code>).
+         */
         protected final Command command;
 
         /**
-         * TODO JavaDoc
+         * Constructor.
          *
          * @param command not <code>null</code>
          */
@@ -221,15 +231,18 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * TODO JavaDoc
+     * A marker resolution that executes a given {@link CodeAction}.
      */
     protected class CodeActionMarkerResolution
         implements IMarkerResolution
     {
+        /**
+         * The associated {@link CodeAction} object (never <code>null</code>).
+         */
         protected final CodeAction codeAction;
 
         /**
-         * TODO JavaDoc
+         * Constructor.
          *
          * @param codeAction not <code>null</code>
          */

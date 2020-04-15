@@ -27,17 +27,29 @@ import org.lxtk.lx4e.model.ILanguageElement;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 
 /**
- * TODO JavaDoc
+ * Facade to the JSON Model.
  */
 public class JsonCore
 {
+    /**
+     * JSON Workspace.
+     */
     public static final Workspace WORKSPACE = new DefaultWorkspace();
 
+    /**
+     * JSON Language Service.
+     */
     public static final LanguageService LANG_SERVICE =
         new EclipseLanguageService();
 
+    /**
+     * JSON file extension.
+     */
     private static final String JSON = "json"; //$NON-NLS-1$
 
+    /**
+     * JSON language identifier.
+     */
     public static final String LANG_ID = JSON;
 
     /**

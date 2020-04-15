@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -11,6 +11,11 @@
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
 /**
- * TODO JavaDoc
+ * Provides API and implementation for LXTK Core Services, such as
+ * Language Service and Workspace.
+ * <p>
+ * <b>Note:</b> Unless stated otherwise, implementations of the interfaces
+ * defined in this package are expected to be thread-safe.
+ * </p>
  */
 package org.lxtk;

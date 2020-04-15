@@ -24,15 +24,17 @@ import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.lxtk.util.Registry;
 
 /**
- * TODO JavaDoc
+ * Provides support for participating in language-specific editing features,
+ * like code completion, code actions, rename, etc.
+ *
+ * @see DefaultLanguageService
  */
 public interface LanguageService
 {
     /**
-     * Returns a document matcher. The returned document matcher is functionally
-     * identical to the one returned by {@link Workspace#getDocumentMatcher()}.
+     * Returns the default document matcher for this service.
      *
-     * @return a document matcher (never <code>null</code>)
+     * @return the default document matcher (never <code>null</code>)
      */
     default DocumentMatcher getDocumentMatcher()
     {
@@ -40,128 +42,137 @@ public interface LanguageService
     }
 
     /**
-     * TODO JavaDoc
+     * Returns code action capabilities provided by this service.
      *
-     * @return code action capabilities (never <code>null</code>)
+     * @return code action capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     CodeActionCapabilities getCodeActionCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of code action providers for this service.
      *
-     * @return the registry for code action providers (never <code>null</code>)
+     * @return the registry of code action providers (never <code>null</code>)
      */
     Registry<CodeActionProvider> getCodeActionProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns completion capabilities provided by this service.
      *
-     * @return completion capabilities (never <code>null</code>)
+     * @return completion capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     CompletionCapabilities getCompletionCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of completion providers for this service.
      *
-     * @return the registry for completion providers (never <code>null</code>)
+     * @return the registry of completion providers (never <code>null</code>)
      */
     Registry<CompletionProvider> getCompletionProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns definition capabilities provided by this service.
      *
-     * @return definition capabilities (never <code>null</code>)
+     * @return definition capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     DefinitionCapabilities getDefinitionCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of definition providers for this service.
      *
-     * @return the registry for definition providers (never <code>null</code>)
+     * @return the registry of definition providers (never <code>null</code>)
      */
     Registry<DefinitionProvider> getDefinitionProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns document highlight capabilities provided by this service.
      *
-     * @return document highlight capabilities (never <code>null</code>)
+     * @return document highlight capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     DocumentHighlightCapabilities getDocumentHighlightCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of document highlight providers for this service.
      *
-     * @return the registry for document highlight providers (never <code>null</code>)
+     * @return the registry of document highlight providers (never <code>null</code>)
      */
     Registry<DocumentHighlightProvider> getDocumentHighlightProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns document symbol capabilities provided by this service.
      *
-     * @return document symbol capabilities (never <code>null</code>)
+     * @return document symbol capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     DocumentSymbolCapabilities getDocumentSymbolCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of document symbol providers for this service.
      *
-     * @return the registry for document symbol providers (never <code>null</code>)
+     * @return the registry of document symbol providers (never <code>null</code>)
      */
     Registry<DocumentSymbolProvider> getDocumentSymbolProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns hover capabilities provided by this service.
      *
-     * @return hover capabilities (never <code>null</code>)
+     * @return hover capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     HoverCapabilities getHoverCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of hover providers for this service.
      *
-     * @return the registry for hover providers (never <code>null</code>)
+     * @return the registry of hover providers (never <code>null</code>)
      */
     Registry<HoverProvider> getHoverProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns references capabilities provided by this service.
      *
-     * @return references capabilities (never <code>null</code>)
+     * @return references capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     ReferencesCapabilities getReferencesCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of reference providers for this service.
      *
-     * @return the registry for reference providers (never <code>null</code>)
+     * @return the registry of reference providers (never <code>null</code>)
      */
     Registry<ReferenceProvider> getReferenceProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns rename capabilities provided by this service.
      *
-     * @return rename capabilities (never <code>null</code>)
+     * @return rename capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     RenameCapabilities getRenameCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of rename providers for this service.
      *
-     * @return the registry for rename providers (never <code>null</code>)
+     * @return the registry of rename providers (never <code>null</code>)
      */
     Registry<RenameProvider> getRenameProviders();
 
     /**
-     * TODO JavaDoc
+     * Returns signature help capabilities provided by this service.
      *
-     * @return signature help capabilities (never <code>null</code>)
+     * @return signature help capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
      */
     SignatureHelpCapabilities getSignatureHelpCapabilities();
 
     /**
-     * TODO JavaDoc
+     * Returns the registry of signature help providers for this service.
      *
-     * @return the registry for signature help providers (never <code>null</code>)
+     * @return the registry of signature help providers (never <code>null</code>)
      */
     Registry<SignatureHelpProvider> getSignatureHelpProviders();
 }

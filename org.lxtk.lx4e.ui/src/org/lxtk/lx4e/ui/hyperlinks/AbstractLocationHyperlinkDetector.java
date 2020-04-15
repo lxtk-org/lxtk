@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -38,7 +38,9 @@ import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of a hyperlink detector that computes a list
+ * of {@link Location}s corresponding to a given document range and creates
+ * hyperlinks for each of the computed locations.
  */
 public abstract class AbstractLocationHyperlinkDetector
     extends AbstractHyperlinkDetector
@@ -149,7 +151,8 @@ public abstract class AbstractLocationHyperlinkDetector
     }
 
     /**
-     * TODO JavaDoc
+     * Requests location information for the given {@link LanguageOperationTarget}
+     * and the given {@link Position}.
      *
      * @param target never <code>null</code>
      * @param position never <code>null</code>
@@ -159,19 +162,21 @@ public abstract class AbstractLocationHyperlinkDetector
         LanguageOperationTarget target, Position position);
 
     /**
-     * TODO JavaDoc
+     * Creates and returns a hyperlink that covers the given region and
+     * opens the given location.
      *
-     * @param region never <code>null</code>
-     * @param location never <code>null</code>
+     * @param region the hyperlink region (never <code>null</code>)
+     * @param location the target location for the hyperlink
+     *  (never <code>null</code>)
      * @param index 0-based index in the list of two or more hyperlinks,
      *  or -1 if there is only one hyperlink
-     * @return a hyperlink (not <code>null</code>)
+     * @return the created hyperlink (not <code>null</code>)
      */
     protected abstract IHyperlink createHyperlink(IRegion region,
         Location location, int index);
 
     /**
-     * TODO JavaDoc
+     * Returns the region of the word enclosing the given document offset.
      *
      * @param document never <code>null</code>
      * @param offset 0-based
@@ -183,7 +188,7 @@ public abstract class AbstractLocationHyperlinkDetector
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the timeout for computing hyperlinks.
      *
      * @return a positive duration
      */

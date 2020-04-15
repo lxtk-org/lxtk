@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,46 +18,49 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
 
 /**
- * TODO JavaDoc
+ * Provides information about resources denoted by URIs.
+ *
+ * @see UriHandlers
  */
 public interface IUriHandler
 {
     /**
-     * TODO JavaDoc
+     * Returns an element corresponding to the given URI.
      *
      * @param uri not <code>null</code>
-     * @return a model element corresponding to the given URI,
-     *  or <code>null</code> if none
+     * @return the corresponding element, or <code>null</code> if none
      */
     Object getCorrespondingElement(URI uri);
 
     /**
-     * TODO JavaDoc
+     * Checks whether the given URI corresponds to an existing resource.
      *
      * @param uri not <code>null</code>
-     * @return whether the given URI has contents, or <code>null</code>
-     *  if unknown
+     * @return <ul><li><code>true</code> if the corresponding resource exists;</li>
+     *  <li><code>false</code> if the corresponding resource does not exist;</li>
+     *  <li><code>null</code> if there is no corresponding resource</li></ul>
      */
     Boolean exists(URI uri);
 
     /**
-     * TODO JavaDoc
+     * Returns a buffer that contains text contents of the resource denoted by
+     * the given URI.
      *
      * @param uri not <code>null</code>
-     * @return a buffer for the given URI, or <code>null</code> if none.
+     * @return the corresponding buffer, or <code>null</code> if none.
      *  It is the client responsibility to {@link IBuffer#release() release}
      *  the returned buffer after it is no longer needed
-     * @throws CoreException
+     * @throws CoreException if an exception occurs while accessing the contents
+     *  of the corresponding resource
      */
     IBuffer getBuffer(URI uri) throws CoreException;
 
     /**
-     * TODO JavaDoc
+     * Returns a string that identifies the resource denoted by the given URI
+     * in a form suitable for displaying to the user, e.g., in message dialogs.
      *
      * @param uri not <code>null</code>
-     * @return a specialized representation for the given URI suitable for human
-     *  consumption, or <code>null</code> if no specialized representation is
-     *  available
+     * @return the corresponding string, or <code>null</code> if none
      */
     String toDisplayString(URI uri);
 }

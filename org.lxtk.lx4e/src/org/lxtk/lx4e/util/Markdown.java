@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,18 +19,18 @@ import org.eclipse.mylyn.wikitext.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.parser.builder.HtmlDocumentBuilder;
 
 /**
- * TODO JavaDoc
+ * Provides static methods for processing Markdown syntax.
  */
 public class Markdown
 {
     /**
-     * TODO JavaDoc
+     * Converts a content in Markdown to HTML.
      *
-     * @param markdown the content to parse (not <code>null</code>)
-     * @param asDocument indicates if the resulting HTML should be emitted as
+     * @param markdown the content to convert (not <code>null</code>)
+     * @param asDocument whether the resulting HTML should be emitted as
      *  a document. If <code>false</code>, the <code>html</code> and <code>body</code>
      *  tags are not included in the output
-     * @return the HTML document text (never <code>null</code>)
+     * @return the resulting HTML (never <code>null</code>)
      */
     public static String toHtml(String markdown, boolean asDocument)
     {

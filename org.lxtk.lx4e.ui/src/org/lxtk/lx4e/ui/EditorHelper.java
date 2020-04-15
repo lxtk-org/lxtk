@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -33,29 +33,40 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.lx4e.DocumentUtil;
 
 /**
- * TODO JavaDoc
+ * Provides utility methods related to editors.
+ * <p>
+ * The implementations of the methods in this class strive to provide a
+ * reasonable default behavior and work fine for most cases. Clients can use
+ * the {@link DefaultEditorHelper#INSTANCE default} instance of the editor
+ * helper or may subclass this class if they need to specialize the default
+ * behavior.
+ * </p>
+ * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public class EditorHelper
 {
     /**
-     * TODO JavaDoc
+     * Constructor.
      */
     protected EditorHelper()
     {
     }
 
     /**
-     * TODO JavaDoc
+     * Opens an editor for the given URI.
+     * <p>
+     * If the given page already has an open editor for the given URI,
+     * that editor is brought to front; otherwise, a new editor is opened.
+     * </p>
      *
      * @param page not <code>null</code>
      * @param uri not <code>null</code>
-     * @param activate
      * @return an open editor or <code>null</code> if an external editor
      *  was opened
-     * @throws PartInitException
+     * @throws PartInitException if the editor could not be initialized
      */
-    public IEditorPart openEditor(IWorkbenchPage page, URI uri,
-        boolean activate) throws PartInitException
+    public IEditorPart openEditor(IWorkbenchPage page, URI uri)
+        throws PartInitException
     {
         if (page == null)
             throw new IllegalArgumentException();
@@ -75,7 +86,7 @@ public class EditorHelper
     }
 
     /**
-     * TODO JavaDoc
+     * Selects the given text range in the given editor on a best effort basis.
      *
      * @param editor not <code>null</code>
      * @param range not <code>null</code>
@@ -108,7 +119,7 @@ public class EditorHelper
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the text range selected in the given editor.
      *
      * @param editor may be <code>null</code>
      * @return the selected text range, or <code>null</code> if none
@@ -138,7 +149,7 @@ public class EditorHelper
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the current selection in the given text editor.
      *
      * @param editor may be <code>null</code>
      * @return the current text selection, or <code>null</code> if none or empty
@@ -166,10 +177,10 @@ public class EditorHelper
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link IDocument} for the given text editor.
      *
      * @param editor may be <code>null</code>
-     * @return the edited document, or <code>null</code> if none
+     * @return the editor's document, or <code>null</code> if none
      */
     public IDocument getDocument(ITextEditor editor)
     {
@@ -180,7 +191,10 @@ public class EditorHelper
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a text editor corresponding to the given object.
+     * <p>
+     * Default implementation uses the Platform's adapter mechanism.
+     * </p>
      *
      * @param context may be <code>null</code>
      * @return the corresponding text editor, or <code>null</code> if none

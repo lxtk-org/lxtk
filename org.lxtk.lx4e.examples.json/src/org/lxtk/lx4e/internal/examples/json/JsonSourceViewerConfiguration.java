@@ -40,7 +40,7 @@ import org.lxtk.lx4e.ui.hover.BestMatchHover;
 import org.lxtk.lx4e.ui.hover.TextHover;
 
 /**
- * TODO JavaDoc
+ * Configuration for a source viewer which shows JSON code.
  */
 public class JsonSourceViewerConfiguration
     extends TextSourceViewerConfiguration

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -22,15 +22,15 @@ import org.eclipse.handly.buffer.IBuffer;
 import org.lxtk.lx4e.internal.Activator;
 
 /**
- * TODO JavaDoc
+ * Provides static methods for operating on {@link IUriHandler}s.
  */
 public class UriHandlers
 {
     /**
-     * TODO JavaDoc
+     * Returns an URI handler composed of the given handlers.
      *
-     * @param handlers not <code>null</code>, must not contain <code>null</code>
-     * @return a composed {@link IUriHandler} (never <code>null</code>)
+     * @param handlers not <code>null</code>, must not contain <code>null</code>s
+     * @return the composed handler (never <code>null</code>)
      */
     public static IUriHandler compose(IUriHandler... handlers)
     {
@@ -38,10 +38,10 @@ public class UriHandlers
     }
 
     /**
-     * TODO JavaDoc
+     * Returns an URI handler composed of the given handlers.
      *
-     * @param handlers not <code>null</code>, must not contain <code>null</code>
-     * @return a composed {@link IUriHandler} (never <code>null</code>)
+     * @param handlers not <code>null</code>, must not contain <code>null</code>s
+     * @return the composed handler (never <code>null</code>)
      */
     public static IUriHandler compose(Iterable<? extends IUriHandler> handlers)
     {
@@ -98,11 +98,18 @@ public class UriHandlers
     }
 
     /**
-     * TODO JavaDoc
+     * Checks whether the given URI corresponds to an existing resource.
+     * <p>
+     * Asks the given handler to provide the result by calling {@link
+     * IUriHandler#exists(URI)}. If the handler returns <code>null</code>,
+     * <code>false</code> is returned.
+     * </p>
      *
      * @param uri not <code>null</code>
      * @param uriHandler not <code>null</code>
-     * @return whether the given URI has contents
+     * @return <code>true</code> if the corresponding resource exists, and
+     *  <code>false</code> if the corresponding resource does not exist or
+     *  if there is no corresponding resource
      */
     public static boolean exists(URI uri, IUriHandler uriHandler)
     {
@@ -110,14 +117,22 @@ public class UriHandlers
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a buffer that contains text contents of the resource denoted by
+     * the given URI.
+     * <p>
+     * Asks the given handler to provide the result by calling {@link
+     * IUriHandler#getBuffer(URI)}. If the handler returns <code>null</code>,
+     * a {@link CoreException} is thrown.
+     * </p>
      *
      * @param uri not <code>null</code>
      * @param uriHandler not <code>null</code>
-     * @return a buffer for the given URI (never <code>null</code>).
+     * @return the corresponding buffer (never <code>null</code>).
      *  It is the client responsibility to {@link IBuffer#release() release}
      *  the returned buffer after it is no longer needed
-     * @throws CoreException
+     * @throws CoreException if there is no corresponding buffer or if an
+     *  exception occurs while accessing the contents of the corresponding
+     *  resource
      */
     public static IBuffer getBuffer(URI uri, IUriHandler uriHandler)
         throws CoreException
@@ -131,12 +146,17 @@ public class UriHandlers
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a string that identifies the resource denoted by the given URI
+     * in a form suitable for displaying to the user, e.g., in message dialogs.
+     * <p>
+     * Asks the given handler to provide the result by calling {@link
+     * IUriHandler#toDisplayString(URI)}. If the handler returns <code>null</code>,
+     * a generic representation of the given URI is returned.
+     * </p>
      *
      * @param uri not <code>null</code>
      * @param uriHandler not <code>null</code>
-     * @return a string representation of the given URI in a form suitable for
-     *  human consumption (never <code>null</code>)
+     * @return the corresponding string (never <code>null</code>)
      */
     public static String toDisplayString(URI uri, IUriHandler uriHandler)
     {

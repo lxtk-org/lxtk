@@ -24,11 +24,15 @@ import org.lxtk.lx4e.util.ResourceUtil;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
- * </p>
+ * A requestor of LSP diagnostics that delegates processing to a given {@link
+ * DiagnosticMarkers} and a given {@link DiagnosticAnnotations}. Calls to the
+ * <code>accept</code> method are forwarded to the <code>DiagnosticAnnotations</code>
+ * only if the given URI has no corresponding resource in the Eclipse workspace.
+ * <p>
  * An instance of this class is <b>not</b> safe for concurrent access by
  * multiple threads.
  * </p>
+ * @see org.lxtk.client.BufferingDiagnosticRequestor
  */
 public final class DefaultDiagnosticRequestor
     implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
@@ -37,7 +41,7 @@ public final class DefaultDiagnosticRequestor
     private final DiagnosticAnnotations diagnosticAnnotations;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param diagnosticMarkers not <code>null</code>
      * @param diagnosticAnnotations not <code>null</code>

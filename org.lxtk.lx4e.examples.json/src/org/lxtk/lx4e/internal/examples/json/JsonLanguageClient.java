@@ -49,7 +49,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
- * TODO JavaDoc
+ * Represents a JSON language client.
  */
 public class JsonLanguageClient
     extends AbstractLanguageClientController<LanguageServer>

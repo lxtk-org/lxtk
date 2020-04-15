@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,7 +19,8 @@ import java.util.Objects;
 import org.lxtk.util.DisposableObject;
 
 /**
- * TODO JavaDoc
+ * Implements {@link StreamBasedConnection} over the standard input and output
+ * of a process.
  */
 public final class StdioConnection
     extends DisposableObject
@@ -28,10 +29,11 @@ public final class StdioConnection
     private final Process process;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      * <p>
-     * This class will not destroy the given process on connection dispose.
-     * If necessary, that can be done in a dispose handler.
+     * <b>Note:</b> When the connection is disposed, it will not destroy the
+     * process. If necessary, clients can destroy the process in a {@link #onDispose()
+     * dispose handler}.
      * </p>
      *
      * @param process not <code>null</code>

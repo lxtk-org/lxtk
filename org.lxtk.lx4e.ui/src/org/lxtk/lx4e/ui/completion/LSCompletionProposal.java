@@ -100,7 +100,6 @@ class LSCompletionProposal extends LSIncompleteCompletionProposal
 
     @Override
     public char[] getTriggerCharacters() {
-        // TODO Auto-generated method stub
         return null;
     }
 

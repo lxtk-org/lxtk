@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -38,6 +38,7 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceEditCapabilities;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
 import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
@@ -53,7 +54,7 @@ import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.util.Log;
 
 /**
- * TODO JavaDoc
+ * Default implementation of an Eclipse-based {@link LanguageClient}.
  *
  * @param <S> server interface type
  */
@@ -63,12 +64,16 @@ public class EclipseLanguageClient<S extends LanguageServer>
     private final WorkspaceEditChangeFactory workspaceEditChangeFactory;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param log not <code>null</code>
-     * @param diagnosticRequestor not <code>null</code>
-     * @param workspaceEditChangeFactory not <code>null</code>
-     * @param features not <code>null</code>
+     * @param log the client's log (not <code>null</code>)
+     * @param diagnosticRequestor the client's diagnostic requestor
+     *  (not <code>null</code>)
+     * @param workspaceEditChangeFactory the {@link WorkspaceEditChangeFactory}
+     *  for the client (not <code>null</code>)
+     * @param features the client's features (not <code>null</code>).
+     *  Subsequent modifications of the given collection will have no effect
+     *  on the constructed instance
      */
     public EclipseLanguageClient(Log log,
         BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor,
@@ -156,10 +161,13 @@ public class EclipseLanguageClient<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the workspace edit label. This label is presented in the
+     * user interface, e.g., on an undo stack. If no label is present
+     * in the given {@link ApplyWorkspaceEditParams}, a generic label
+     * is returned.
      *
      * @param params never <code>null</code>
-     * @return the corresponding label (not <code>null</code>)
+     * @return the workspace edit label (not <code>null</code>)
      */
     protected String getEditLabel(ApplyWorkspaceEditParams params)
     {
@@ -207,10 +215,14 @@ public class EclipseLanguageClient<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the message title. This title is presented in the user interface,
+     * e.g., in a message dialog.
+     * <p>
+     * Default implementation returns a generic title.
+     * </p>
      *
      * @param params never <code>null</code>
-     * @return the corresponding title (may be <code>null</code>)
+     * @return the message title (may be <code>null</code>)
      */
     protected String getMessageTitle(MessageParams params)
     {

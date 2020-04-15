@@ -31,7 +31,7 @@ import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceViewerConfigur
 import org.lxtk.lx4e.ui.highlight.Highlighter;
 
 /**
- * TODO JavaDoc
+ * TypeScript-specific text editor.
  */
 public class TypeScriptEditor
     extends AbstractDecoratedTextEditor

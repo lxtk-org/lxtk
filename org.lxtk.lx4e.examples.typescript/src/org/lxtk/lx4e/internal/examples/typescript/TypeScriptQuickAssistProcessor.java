@@ -22,7 +22,7 @@ import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.codeaction.AbstractQuickAssistProcessor;
 
 /**
- * TODO JavaDoc
+ * TypeScript-specific extension of {@link AbstractQuickAssistProcessor}.
  */
 public class TypeScriptQuickAssistProcessor
     extends AbstractQuickAssistProcessor
@@ -30,7 +30,7 @@ public class TypeScriptQuickAssistProcessor
     private final Supplier<LanguageOperationTarget> targetSupplier;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param targetSupplier not <code>null</code>
      */

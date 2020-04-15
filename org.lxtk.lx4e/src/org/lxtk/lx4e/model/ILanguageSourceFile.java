@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -36,7 +36,7 @@ public interface ILanguageSourceFile
      * <code>null</code> and does not change over the lifetime of the working copy.
      * </p>
      *
-     * @return the document URI (may be <code>null</code>)
+     * @return the corresponding document URI (may be <code>null</code>)
      */
     URI getDocumentUri();
 
@@ -44,7 +44,7 @@ public interface ILanguageSourceFile
      * Returns a string uniquely identifying the language corresponding to
      * this source file. This is a handle-only method.
      *
-     * @return the language identifier (never <code>null</code>)
+     * @return the corresponding language identifier (never <code>null</code>)
      */
     String getLanguageId();
 
@@ -93,25 +93,24 @@ public interface ILanguageSourceFile
     void releaseWorkingCopy();
 
     /**
-     * Returns the top-level symbol declared in this source file
-     * with the given simple name and the given kind. This is a
-     * handle-only method. The symbol may or may not exist.
+     * Returns the top-level symbol with the given name and the given kind.
+     * This is a handle-only method. The symbol may or may not exist.
      *
-     * @param name the simple name of the requested symbol (not <code>null</code>)
+     * @param name the name of the requested symbol (not <code>null</code>)
      * @param kind the kind of the requested symbol (not <code>null</code>)
      * @return a handle onto the corresponding symbol (never <code>null</code>).
-     *  The symbol may or may not exist.
+     *  The symbol may or may not exist
      */
     ILanguageSymbol getSymbol(String name, SymbolKind kind);
 
     /**
-     * Returns the top-level symbols declared in this source file.
+     * Returns the top-level symbols of this source file.
      *
      * @param monitor a progress monitor, or <code>null</code>
      *  if progress reporting is not desired. The caller must not rely on
      *  {@link IProgressMonitor#done()} having been called by the receiver
      * @return the top-level symbols of this source file (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned array.
+     *  Clients <b>must not</b> modify the returned array
      * @throws CoreException if this source file does not exist or if an
      *  exception occurs while accessing its corresponding resource
      */

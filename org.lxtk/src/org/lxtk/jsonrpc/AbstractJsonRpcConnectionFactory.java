@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -25,7 +25,8 @@ import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
 import org.lxtk.util.connect.StreamBasedConnection;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of a {@link JsonRpcConnectionFactory} that creates
+ * JSON-RPC connections on top of {@link StreamBasedConnection}s.
  *
  * @param <T> remote interface type
  */
@@ -92,7 +93,7 @@ public abstract class AbstractJsonRpcConnectionFactory<T>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a new {@link Launcher}.
      *
      * @param localService the object that receives method calls from the remote service
      *  (not <code>null</code>)
@@ -118,7 +119,8 @@ public abstract class AbstractJsonRpcConnectionFactory<T>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a new {@link StreamBasedConnection}. The returned connection
+     * will be used for creating a JSON-RPC connection.
      *
      * @return a new stream-based connection (never <code>null</code>)
      */

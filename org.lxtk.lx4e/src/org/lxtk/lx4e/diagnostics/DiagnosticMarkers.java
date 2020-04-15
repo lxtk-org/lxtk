@@ -47,11 +47,11 @@ import org.lxtk.util.Disposable;
 import com.google.gson.Gson;
 
 /**
- * TODO JavaDoc
+ * Manages resource markers representing LSP diagnostics.
  * <p>
  * This implementation assumes that the given marker type is <b>not</b> persistent.
- * <p>
  * </p>
+ * <p>
  * An instance of this class is <b>not</b> safe for concurrent access by
  * multiple threads.
  * </p>
@@ -87,9 +87,10 @@ public class DiagnosticMarkers
     private Gson gson;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param markerType not <code>null</code>
+     * @param markerType the marker type for markers created and managed
+     *  by this object (not <code>null</code>)
      */
     public DiagnosticMarkers(String markerType)
     {
@@ -131,7 +132,7 @@ public class DiagnosticMarkers
     }
 
     /**
-     * TODO JavaDoc
+     * Deletes all markers currently managed by this object.
      */
     public void clear()
     {
@@ -149,7 +150,7 @@ public class DiagnosticMarkers
     }
 
     /**
-     * TODO JavaDoc
+     * Deletes the markers currently managed by this object for the given URI.
      *
      * @param uri not <code>null</code>
      */
@@ -170,7 +171,8 @@ public class DiagnosticMarkers
     }
 
     /**
-     * TODO JavaDoc
+     * Creates markers on the given {@link IFile} that represent the given
+     * diagnostics for the given URI.
      *
      * @param file not <code>null</code>
      * @param uri not <code>null</code>
@@ -234,7 +236,8 @@ public class DiagnosticMarkers
     }
 
     /**
-     * TODO JavaDoc
+     * Fills attributes of a marker representing the given diagnostic for
+     * the given URI on the given file.
      *
      * @param attributes never <code>null</code>
      * @param file never <code>null</code>
@@ -282,7 +285,7 @@ public class DiagnosticMarkers
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the markers map, creating it if necessary.
      *
      * @return the markers map (never <code>null</code>)
      */

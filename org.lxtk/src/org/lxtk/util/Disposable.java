@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,18 +15,26 @@ package org.lxtk.util;
 import java.util.Arrays;
 
 /**
- * TODO JavaDoc
+ * Represents an object that needs to be explicitly disposed
+ * after it is no longer used.
+ *
+ * @see Disposable2
  */
 public interface Disposable
 {
     /**
-     * TODO JavaDoc
-     *
+     * Disposes this object.
      */
     void dispose();
 
     /**
-     * TODO JavaDoc
+     * Disposes all of the given objects.
+     * <p>
+     * If an exception is thrown while disposing an object, it is remembered
+     * and re-thrown after the other objects are disposed. Any subsequent
+     * exceptions are added to the list of suppressed exceptions of the
+     * original exception.
+     * </p>
      *
      * @param disposables not <code>null</code>, may contain <code>null</code>s
      */
@@ -36,7 +44,13 @@ public interface Disposable
     }
 
     /**
-     * TODO JavaDoc
+     * Disposes all of the given objects.
+     * <p>
+     * If an exception is thrown while disposing an object, it is remembered
+     * and re-thrown after the other objects are disposed. Any subsequent
+     * exceptions are added to the list of suppressed exceptions of the
+     * original exception.
+     * </p>
      *
      * @param disposables not <code>null</code>, may contain <code>null</code>s
      */

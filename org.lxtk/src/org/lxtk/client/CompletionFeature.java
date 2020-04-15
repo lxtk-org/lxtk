@@ -34,7 +34,11 @@ import org.lxtk.LanguageService;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * Participates in a given {@link LanguageService} by implementing and
+ * dynamically contributing {@link CompletionProvider}s according to LSP.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public final class CompletionFeature
     extends LanguageFeature
@@ -43,7 +47,7 @@ public final class CompletionFeature
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param languageService not <code>null</code>
      */

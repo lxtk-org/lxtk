@@ -27,7 +27,7 @@ import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.EditorHelper;
 
 /**
- * TODO JavaDoc
+ * A hyperlink that opens a given {@link Location}.
  */
 public class LocationHyperlink
     extends AbstractHyperlink
@@ -35,11 +35,12 @@ public class LocationHyperlink
     private final Location location;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param region not <code>null</code>
-     * @param text may be <code>null</code>
-     * @param location not <code>null</code>
+     * @param region the hyperlink region (not <code>null</code>)
+     * @param text optional text for this hyperlink (may be <code>null</code>)
+     * @param location the target location for this hyperlink
+     *  (not <code>null</code>)
      */
     public LocationHyperlink(IRegion region, String text, Location location)
     {
@@ -48,7 +49,7 @@ public class LocationHyperlink
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the target location for this hyperlink.
      *
      * @return the target location (never <code>null</code>)
      */
@@ -68,7 +69,7 @@ public class LocationHyperlink
         try
         {
             editor = editorHelper.openEditor(page, DocumentUri.convert(
-                location.getUri()), true);
+                location.getUri()));
         }
         catch (PartInitException e)
         {
@@ -79,9 +80,9 @@ public class LocationHyperlink
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the {@link EditorHelper} for this hyperlink.
      *
-     * @return an editor helper (not <code>null</code>)
+     * @return the editor helper (not <code>null</code>)
      */
     protected EditorHelper getEditorHelper()
     {

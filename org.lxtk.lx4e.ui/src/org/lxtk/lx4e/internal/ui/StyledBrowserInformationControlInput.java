@@ -25,9 +25,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.osgi.framework.Bundle;
 
-/**
- * TODO JavaDoc
- */
 @SuppressWarnings("restriction")
 public abstract class StyledBrowserInformationControlInput
     extends BrowserInformationControlInput

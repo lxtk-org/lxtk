@@ -34,7 +34,10 @@ import org.lxtk.util.EventEmitter;
 import org.lxtk.util.EventStream;
 
 /**
- * TODO JavaDoc
+ * Implements {@link TextDocument} on top of a given {@link IBuffer}.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public final class EclipseTextDocument
     implements TextDocument, Disposable
@@ -75,12 +78,16 @@ public final class EclipseTextDocument
     private boolean isDisposed;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
+     * <p>
+     * <b>Note:</b> The constructed instance obtains an independent ownership
+     * of the given buffer and must be explicitly disposed to release the buffer.
+     * </p>
      *
-     * @param uri not <code>null</code>
-     * @param languageId not <code>null</code>
-     * @param buffer not <code>null</code>
-     * @param element may be <code>null</code>
+     * @param uri the document's URI (not <code>null</code>)
+     * @param languageId the document's language (not <code>null</code>)
+     * @param buffer the underlying {@link IBuffer} (not <code>null</code>)
+     * @param element the corresponding element (may be <code>null</code>)
      */
     public EclipseTextDocument(URI uri, String languageId, IBuffer buffer,
         Object element)
@@ -98,11 +105,11 @@ public final class EclipseTextDocument
     }
 
     /**
-     * TODO JavaDoc
+     * Spawns a new independent ownership of the underlying {@link IBuffer}
+     * and returns the buffer. It is the client responsibility to {@link
+     * IBuffer#release() release} the returned buffer after it is no longer needed.
      *
-     * @return the underlying {@link IBuffer} (never <code>null</code>).
-     *  It is the client responsibility to {@link IBuffer#release() release}
-     *  the returned buffer after it is no longer needed
+     * @return the underlying <code>IBuffer</code> (never <code>null</code>).
      */
     public synchronized IBuffer getBuffer()
     {
@@ -112,9 +119,9 @@ public final class EclipseTextDocument
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the underlying {@link IDocument}.
      *
-     * @return the underlying {@link IDocument} (never <code>null</code>)
+     * @return the underlying <code>IDocument</code> (never <code>null</code>)
      */
     public IDocument getUnderlyingDocument()
     {
@@ -122,10 +129,10 @@ public final class EclipseTextDocument
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the underlying {@link IAnnotationModel}.
      *
-     * @return the underlying {@link IAnnotationModel}, or <code>null</code>
-     *  if none
+     * @return the underlying <code>IAnnotationModel</code>,
+     *  or <code>null</code> if none
      */
     public synchronized IAnnotationModel getAnnotationModel()
     {
@@ -136,7 +143,7 @@ public final class EclipseTextDocument
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the corresponding element.
      *
      * @return the corresponding element, or <code>null</code> if none
      */
@@ -146,9 +153,9 @@ public final class EclipseTextDocument
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the modification stamp of the underlying {@link IDocument}.
      *
-     * @return the modification stamp of the underlying {@link IDocument}
+     * @return the modification stamp of the underlying <code>IDocument</code>
      *  or <code>UNKNOWN_MODIFICATION_STAMP</code>
      * @see IDocumentExtension4#getModificationStamp()
      */

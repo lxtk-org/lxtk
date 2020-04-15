@@ -19,7 +19,7 @@ import org.eclipse.ui.IEditorInput;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 
 /**
- * TODO JavaDoc
+ * JSON-specific implementation of {@link IInputElementProvider}.
  */
 public class JsonInputElementProvider
     implements IInputElementProvider

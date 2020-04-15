@@ -15,11 +15,11 @@ package org.lxtk.util;
 import java.util.function.Consumer;
 
 /**
- * Represents an event stream that clients can subscribe to.
+ * Represents a stream of events that clients can subscribe to.
  *
- * @param <T> event type
+ * @param <E> event type
  */
-public interface EventStream<T>
+public interface EventStream<E>
 {
     /**
      * Subscribes the given event consumer to this stream.
@@ -28,5 +28,5 @@ public interface EventStream<T>
      * @return a disposable to unsubscribe the consumer
      *  (never <code>null</code>)
      */
-    Disposable subscribe(Consumer<? super T> consumer);
+    Disposable subscribe(Consumer<? super E> consumer);
 }

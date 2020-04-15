@@ -46,7 +46,7 @@ import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.uris.IUriHandler;
 
 /**
- * TODO JavaDoc
+ * A special {@link TextChange} that operates on the file denoted by a given URI.
  */
 public final class TextFileChange
     extends TextChange
@@ -58,11 +58,12 @@ public final class TextFileChange
     private IBuffer buffer;
 
     /**
-     * TODO JavaDoc
+     * Creates a new text file change with the given name, target file URI,
+     * and URI handler.
      *
-     * @param name not <code>null</code>
-     * @param uri not <code>null</code>
-     * @param uriHandler not <code>null</code>
+     * @param name the name of the text change (not <code>null</code>)
+     * @param uri the URI of the target file (not <code>null</code>)
+     * @param uriHandler an {@link IUriHandler} (not <code>null</code>)
      */
     public TextFileChange(String name, URI uri, IUriHandler uriHandler)
     {

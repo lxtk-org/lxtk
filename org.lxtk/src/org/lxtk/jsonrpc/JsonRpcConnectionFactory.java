@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,14 +18,14 @@ import java.util.function.Function;
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
 
 /**
- * TODO JavaDoc
+ * Interface for creating JSON-RPC connections.
  *
  * @param <T> remote interface type
  */
 public interface JsonRpcConnectionFactory<T>
 {
     /**
-     * TODO JavaDoc
+     * Returns a new JSON-RPC connection.
      *
      * @param localService the object that receives method calls from the
      *  remote service (not <code>null</code>)

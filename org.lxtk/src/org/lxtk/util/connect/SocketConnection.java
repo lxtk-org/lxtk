@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -22,7 +22,7 @@ import java.util.Objects;
 import org.lxtk.util.DisposableObject;
 
 /**
- * TODO JavaDoc
+ * Implements {@link StreamBasedConnection} over a socket.
  */
 public final class SocketConnection
     extends DisposableObject
@@ -31,10 +31,11 @@ public final class SocketConnection
     private final Socket socket;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      * <p>
-     * This class will not close the given socket on connection dispose.
-     * If necessary, that can be done in a dispose handler.
+     * <b>Note:</b> When the connection is disposed, it will not close the socket.
+     * If necessary, clients can close the socket in a {@link #onDispose()
+     * dispose handler}.
      * </p>
      *
      * @param socket not <code>null</code>

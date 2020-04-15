@@ -19,17 +19,20 @@ import java.util.function.Consumer;
 
 /**
  * Default implementation of the {@link EventStream} interface.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  *
- * @param <T> event type
+ * @param <E> event type
  */
-public class EventEmitter<T>
-    implements EventStream<T>, Disposable
+public class EventEmitter<E>
+    implements EventStream<E>, Disposable
 {
-    private final Set<Consumer<? super T>> consumers =
+    private final Set<Consumer<? super E>> consumers =
         new CopyOnWriteArraySet<>();
 
     @Override
-    public Disposable subscribe(Consumer<? super T> consumer)
+    public Disposable subscribe(Consumer<? super E> consumer)
     {
         consumers.add(consumer);
         return () -> consumers.remove(consumer);
@@ -40,7 +43,7 @@ public class EventEmitter<T>
      *
      * @param event not <code>null</code>
      */
-    public void fire(T event)
+    public void fire(E event)
     {
         fire(event, null);
     }
@@ -53,10 +56,10 @@ public class EventEmitter<T>
      * @param exceptionHandler may be <code>null</code>, in which case
      *  any exception thrown by an event consumer is suppressed
      */
-    public void fire(T event, Consumer<Throwable> exceptionHandler)
+    public void fire(E event, Consumer<Throwable> exceptionHandler)
     {
         Objects.requireNonNull(event);
-        for (Consumer<? super T> consumer : consumers)
+        for (Consumer<? super E> consumer : consumers)
         {
             try
             {

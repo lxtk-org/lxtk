@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -43,7 +43,8 @@ import org.lxtk.util.Disposable;
 import org.lxtk.util.Log;
 
 /**
- * TODO JavaDoc
+ * Partial implementation of a {@link LanguageClient} that is also a composite
+ * {@link Feature}.
  *
  * @param <S> server interface type
 */
@@ -58,11 +59,14 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private List<DocumentFilter> documentSelector;
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
-     * @param log not <code>null</code>
-     * @param diagnosticRequestor not <code>null</code>
-     * @param features not <code>null</code>
+     * @param log the client's log (not <code>null</code>)
+     * @param diagnosticRequestor the client's diagnostic requestor
+     *  (not <code>null</code>)
+     * @param features the client's features (not <code>null</code>).
+     *  Subsequent modifications of the given collection will have no effect
+     *  on the constructed instance
      */
     public AbstractLanguageClient(Log log,
         BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor,
@@ -194,9 +198,9 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     /**
-     * TODO JavaDoc
+     * Returns the log associated with this client.
      *
-     * @return a log (never <code>null</code>)
+     * @return the client's log (never <code>null</code>)
      */
     protected final Log log()
     {

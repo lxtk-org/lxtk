@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,7 @@ import org.eclipse.lsp4j.jsonrpc.Endpoint;
 import org.lxtk.util.connect.Connection;
 
 /**
- * TODO JavaDoc
+ * Represents a JSON-RPC connection.
  *
  * @param <T> remote interface type
  */
@@ -24,7 +24,8 @@ public interface JsonRpcConnection<T>
     extends Connection
 {
     /**
-     * TODO JavaDoc
+     * Returns a proxy instance that implements the remote service interface
+     * for this connection.
      *
      * @return a proxy instance that implements the remote service interface
      *  (never <code>null</code>)
@@ -32,7 +33,7 @@ public interface JsonRpcConnection<T>
     T getRemoteProxy();
 
     /**
-     * TODO JavaDoc
+     * Returns the remote endpoint for this connection.
      *
      * @return the remote endpoint (never <code>null</code>)
      */

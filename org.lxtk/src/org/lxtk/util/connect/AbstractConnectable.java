@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,8 +24,11 @@ import org.lxtk.util.EventStream;
 import org.lxtk.util.Log;
 
 /**
- * TODO JavaDoc
- */
+ * The root class of all {@link Connectable} objects.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
+*/
 public abstract class AbstractConnectable
     implements Connectable
 {
@@ -115,9 +118,10 @@ public abstract class AbstractConnectable
     }
 
     /**
-     * TODO JavaDoc
+     * Disconnects this object with an optional error message.
      *
      * @param errorMessage if present, describes the error that caused this call
+     *  (may be <code>null</code>)
      */
     protected final synchronized void disconnect(String errorMessage)
     {
@@ -199,53 +203,59 @@ public abstract class AbstractConnectable
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a new instance of {@link ConnectionTask}.
      *
      * @return a new connection task (never <code>null</code>)
      */
     protected abstract ConnectionTask newConnectionTask();
 
     /**
-     * TODO JavaDoc
+     * Returns the log associated with this object.
      *
-     * @return a log (never <code>null</code>)
+     * @return the log (never <code>null</code>)
      */
     protected abstract Log log();
 
     /**
-     * TODO JavaDoc
+     * Encapsulates the details of creating a connection and closing it.
      */
     protected static abstract class ConnectionTask
     {
         /**
-         * TODO JavaDoc
+         * Creates a connection.
          * <p>
          * This method may not be called more than once. A successful call
          * to this method must eventually be followed by a call to the
-         * disconnect() method.
+         * {@link #disconnect()} method.
          * </p>
-         * @see #disconnect()
          */
         public abstract void connect();
 
         /**
-         * TODO JavaDoc
+         * Closes the current connection, if any.
+         * <p></p>
          * <ul>
          * <li>This method may not be called more than once.</li>
-         * <li>This method may not be called before the connect() method.</li>
-         * <li>This method must be called if the connect() method was called
-         * successfully (i.e., did not throw an exception).</li>
-         * <li>This method may be called even if the connect() method was not
-         * called.</li>
-         * <li>This method will not be called if the connect() method threw
-         * an exception.</li>
+         * <li>This method may not be called before the {@link #connect()} method.</li>
+         * <li>This method must be called if the <code>connect()</code> method
+         * was called successfully (i.e., did not throw an exception).</li>
+         * <li>This method may not be called if the <code>connect()</code>
+         * method threw an exception.</li>
+         * <li>This method may be called even if the <code>connect()</code>
+         * method was not called.</li>
          * </ul>
          */
         public abstract void disconnect();
     }
 
     /**
-     * TODO JavaDoc
+     * Partial implementation of a {@link Runnable} that is intended to be run
+     * when the connection created by a given {@link ConnectionTask} gets closed.
+     * In case the current connection got closed unexpectedly, the handler calls
+     * {@link ConnectionCloseHandler#shouldReconnect() shouldReconnect()} and,
+     * depending on the result, either {@link AbstractConnectable#reconnect()
+     * reconnect}s or {@link AbstractConnectable#disconnect() disconnect}s
+     * the connectable object.
      */
     protected abstract class ConnectionCloseHandler
         implements Runnable
@@ -253,7 +263,7 @@ public abstract class AbstractConnectable
         private final ConnectionTask task;
 
         /**
-         * TODO JavaDoc
+         * Constructor.
          *
          * @param task not <code>null</code>
          */
@@ -263,7 +273,7 @@ public abstract class AbstractConnectable
         }
 
         @Override
-        public void run()
+        public final void run()
         {
             synchronized (AbstractConnectable.this)
             {

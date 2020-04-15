@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -47,7 +47,11 @@ import org.lxtk.Workspace;
 import org.lxtk.util.Disposable;
 
 /**
- * TODO JavaDoc
+ * A language client feature that can dynamically synchronize text documents
+ * contained in a given {@link Workspace} to the language server.
+ * <p>
+ * This implementation is thread-safe.
+ * </p>
  */
 public final class TextDocumentSyncFeature
     implements DynamicFeature<LanguageServer>
@@ -66,7 +70,7 @@ public final class TextDocumentSyncFeature
         new HashMap<>();
 
     /**
-     * TODO JavaDoc
+     * Constructor.
      *
      * @param workspace not <code>null</code>
      */

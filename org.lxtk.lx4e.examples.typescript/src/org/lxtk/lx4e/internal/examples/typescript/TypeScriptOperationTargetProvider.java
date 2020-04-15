@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -22,12 +22,14 @@ import org.lxtk.lx4e.examples.typescript.TypeScriptInputElementProvider;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 
 /**
- * TODO JavaDoc
+ * Provides TypeScript-specific operation targets.
+ *
+ * @see LanguageOperationTarget
  */
 public class TypeScriptOperationTargetProvider
 {
     /**
-     * TODO JavaDoc
+     * Returns a TypeScript-specific operation target for the given editor.
      *
      * @param editor may be <code>null</code>
      * @return the operation target, or <code>null</code> if none
@@ -43,7 +45,7 @@ public class TypeScriptOperationTargetProvider
     }
 
     /**
-     * TODO JavaDoc
+     * Returns a TypeScript-specific operation target for the given file.
      *
      * @param file may be <code>null</code>
      * @return the operation target, or <code>null</code> if none

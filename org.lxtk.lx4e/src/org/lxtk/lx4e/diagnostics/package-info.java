@@ -11,6 +11,7 @@
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
 /**
- * TODO JavaDoc
+ * Provides support for representing LSP diagnostics as Eclipse markers and
+ * annotations.
  */
 package org.lxtk.lx4e.diagnostics;

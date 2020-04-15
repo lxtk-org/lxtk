@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,7 +19,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * TODO JavaDoc
+ * Provides static methods for running a task with support for rollback.
+ * <p>
+ * While the task is running, it can add <i>rollback tasks</i> to its {@link
+ * Rollback} object. Then, if an exception is thrown by the running task, the
+ * rollback tasks added so far are executed in reverse order. Unless a rollback
+ * {@link Rollback#setLogger(Consumer) logger} has been set by the failed task,
+ * a default logger is set, which adds any exception thrown by a rollback task
+ * to the list of suppressed exceptions of the original exception.
+ * </p>
  */
 public class SafeRun
 {
@@ -28,7 +36,7 @@ public class SafeRun
     }
 
     /**
-     * TODO JavaDoc
+     * Runs a task with support for rollback.
      *
      * @param task not <code>null</code>
      */
@@ -42,7 +50,7 @@ public class SafeRun
     }
 
     /**
-     * TODO JavaDoc
+     * Runs a computation task with support for rollback.
      *
      * @param <T> result type
      * @param task not <code>null</code>
@@ -66,7 +74,11 @@ public class SafeRun
     }
 
     /**
-     * TODO JavaDoc
+     * Contains a list of rollback tasks that are executed in reverse order
+     * when the rollback is run. After a rollback runs, it {@link #reset()
+     * resets} itself. If an exception is thrown while executing a rollback task,
+     * the exception is passed to the rollback {@link #getLogger() logger}.
+     * If no logger is set, the exception is suppressed.
      */
     public final static class Rollback
         implements Runnable
@@ -75,7 +87,7 @@ public class SafeRun
         private Consumer<Throwable> logger;
 
         /**
-         * TODO JavaDoc
+         * Sets the rollback logger.
          *
          * @param logger may be <code>null</code>
          */
@@ -85,9 +97,10 @@ public class SafeRun
         }
 
         /**
-         * TODO JavaDoc
+         * Returns the rollback logger.
          *
          * @return the rollback logger (may be <code>null</code>)
+         * @see #setLogger(Consumer)
          */
         public Consumer<Throwable> getLogger()
         {
@@ -95,7 +108,7 @@ public class SafeRun
         }
 
         /**
-         * TODO JavaDoc
+         * Adds a rollback task.
          *
          * @param task a rollback task (not <code>null</code>)
          */
@@ -105,8 +118,7 @@ public class SafeRun
         }
 
         /**
-         * TODO JavaDoc
-         *
+         * Resets this instance, clearing the list of rollback tasks.
          */
         public void reset()
         {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,7 @@ import org.eclipse.handly.model.IElementDeltaConstants;
 import org.eclipse.handly.model.IElementDeltaExtension;
 
 /**
- * A language element delta describes changes in language element between two
+ * A language element delta describes changes in a language element between two
  * discrete points in time.  Given a delta, clients can access the element that
  * has changed, and any children that have changed.
  */
@@ -54,7 +54,7 @@ public interface ILanguageElementDelta
      * traversing the delta to a particular descendant.
      * </p>
      *
-     * @param element the element to search delta for (may be <code>null</code>)
+     * @param element the element to search the delta for (may be <code>null</code>)
      * @return the delta for the given element, or <code>null</code> if none
      */
     ILanguageElementDelta findDelta(ILanguageElement element);

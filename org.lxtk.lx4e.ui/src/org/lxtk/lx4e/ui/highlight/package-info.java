@@ -11,6 +11,6 @@
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
 /**
- * TODO JavaDoc
+ * Provides support for implementing LXTK-based document highlighting in Eclipse.
  */
 package org.lxtk.lx4e.ui.highlight;
