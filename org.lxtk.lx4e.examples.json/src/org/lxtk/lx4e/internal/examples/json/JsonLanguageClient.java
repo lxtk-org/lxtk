@@ -27,7 +27,7 @@ import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
-import org.lxtk.client.BufferingDiagnosticRequestor;
+import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.Feature;
@@ -36,7 +36,7 @@ import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
 import org.lxtk.lx4e.EclipseLog;
-import org.lxtk.lx4e.diagnostics.DefaultDiagnosticRequestor;
+import org.lxtk.lx4e.diagnostics.DefaultDiagnosticConsumer;
 import org.lxtk.lx4e.diagnostics.DiagnosticAnnotations;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.examples.json.JsonCore;
@@ -61,15 +61,15 @@ public class JsonLanguageClient
         Collections.singletonList(new DocumentFilter(JsonCore.LANG_ID, null,
             null));
 
-    private final BufferingDiagnosticRequestor diagnosticRequestor =
-        new BufferingDiagnosticRequestor(new DefaultDiagnosticRequestor(
+    private final BufferingDiagnosticConsumer diagnosticConsumer =
+        new BufferingDiagnosticConsumer(new DefaultDiagnosticConsumer(
             new DiagnosticMarkers("org.lxtk.lx4e.examples.json.problem"), //$NON-NLS-1$
             new DiagnosticAnnotations(JsonCore.WORKSPACE)));
 
     @Override
     public void dispose()
     {
-        diagnosticRequestor.dispose();
+        diagnosticConsumer.dispose();
         super.dispose();
     }
 
@@ -101,7 +101,7 @@ public class JsonLanguageClient
         features.add(new CompletionFeature(JsonCore.LANG_SERVICE));
         features.add(new HoverFeature(JsonCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
-            diagnosticRequestor, JsonWorkspaceEditChangeFactory.INSTANCE,
+            diagnosticConsumer, JsonWorkspaceEditChangeFactory.INSTANCE,
             features)
         {
             @Override

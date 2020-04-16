@@ -29,7 +29,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentUri;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
-import org.lxtk.client.BufferingDiagnosticRequestor;
+import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CodeActionFeature;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DefinitionFeature;
@@ -64,8 +64,8 @@ public class TypeScriptLanguageClient
     private final Log log;
     private final List<DocumentFilter> documentSelector;
     private final String rootUri;
-    private final BufferingDiagnosticRequestor diagnosticRequestor =
-        new BufferingDiagnosticRequestor(new DiagnosticMarkers(MARKER_TYPE));
+    private final BufferingDiagnosticConsumer diagnosticConsumer =
+        new BufferingDiagnosticConsumer(new DiagnosticMarkers(MARKER_TYPE));
 
     /**
      * Creates a new TypeScript language client with the given {@link IProject}
@@ -94,7 +94,7 @@ public class TypeScriptLanguageClient
     @Override
     public void dispose()
     {
-        diagnosticRequestor.dispose();
+        diagnosticConsumer.dispose();
         super.dispose();
     }
 
@@ -133,7 +133,7 @@ public class TypeScriptLanguageClient
         features.add(new RenameFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new SignatureHelpFeature(TypeScriptCore.LANG_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(),
-            diagnosticRequestor, TypeScriptWorkspaceEditChangeFactory.INSTANCE,
+            diagnosticConsumer, TypeScriptWorkspaceEditChangeFactory.INSTANCE,
             features)
         {
             @Override

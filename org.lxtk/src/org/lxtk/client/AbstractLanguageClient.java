@@ -52,7 +52,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     implements LanguageClient, Feature<S>
 {
     private final Log log;
-    private final BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor;
+    private final BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures =
         new HashMap<>();
@@ -62,18 +62,18 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
      * Constructor.
      *
      * @param log the client's log (not <code>null</code>)
-     * @param diagnosticRequestor the client's diagnostic requestor
+     * @param diagnosticConsumer the client's diagnostic consumer
      *  (not <code>null</code>)
      * @param features the client's features (not <code>null</code>).
      *  Subsequent modifications of the given collection will have no effect
      *  on the constructed instance
      */
     public AbstractLanguageClient(Log log,
-        BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor,
+        BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer,
         Collection<Feature<? super S>> features)
     {
         this.log = Objects.requireNonNull(log);
-        this.diagnosticRequestor = Objects.requireNonNull(diagnosticRequestor);
+        this.diagnosticConsumer = Objects.requireNonNull(diagnosticConsumer);
         featureSet = new LinkedHashSet<>(features);
         for (Feature<? super S> feature : featureSet)
         {
@@ -171,7 +171,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams params)
     {
-        diagnosticRequestor.accept(DocumentUri.convert(params.getUri()),
+        diagnosticConsumer.accept(DocumentUri.convert(params.getUri()),
             params.getDiagnostics());
     }
 

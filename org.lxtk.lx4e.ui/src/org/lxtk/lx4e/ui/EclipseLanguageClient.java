@@ -67,7 +67,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
      * Constructor.
      *
      * @param log the client's log (not <code>null</code>)
-     * @param diagnosticRequestor the client's diagnostic requestor
+     * @param diagnosticConsumer the client's diagnostic consumer
      *  (not <code>null</code>)
      * @param workspaceEditChangeFactory the {@link WorkspaceEditChangeFactory}
      *  for the client (not <code>null</code>)
@@ -76,11 +76,11 @@ public class EclipseLanguageClient<S extends LanguageServer>
      *  on the constructed instance
      */
     public EclipseLanguageClient(Log log,
-        BiConsumer<URI, Collection<Diagnostic>> diagnosticRequestor,
+        BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer,
         WorkspaceEditChangeFactory workspaceEditChangeFactory,
         Collection<Feature<? super S>> features)
     {
-        super(log, diagnosticRequestor, features);
+        super(log, diagnosticConsumer, features);
         this.workspaceEditChangeFactory = Objects.requireNonNull(
             workspaceEditChangeFactory);
     }

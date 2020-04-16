@@ -24,13 +24,13 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.lxtk.util.Disposable;
 
 /**
- * A requestor of LSP diagnostics that invokes a given delegate asynchronously,
+ * A consumer of LSP diagnostics that invokes a given delegate asynchronously,
  * in a dedicated working thread.
  * <p>
  * This implementation is thread-safe. The delegate need not be thread-safe.
  * </p>
  */
-public final class BufferingDiagnosticRequestor
+public final class BufferingDiagnosticConsumer
     implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
 {
     private final BiConsumer<URI, Collection<Diagnostic>> delegate;
@@ -42,7 +42,7 @@ public final class BufferingDiagnosticRequestor
      *
      * @param delegate not <code>null</code>
      */
-    public BufferingDiagnosticRequestor(
+    public BufferingDiagnosticConsumer(
         BiConsumer<URI, Collection<Diagnostic>> delegate)
     {
         this.delegate = Objects.requireNonNull(delegate);
