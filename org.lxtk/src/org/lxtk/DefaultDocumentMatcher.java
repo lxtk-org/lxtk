@@ -13,8 +13,8 @@
 package org.lxtk;
 
 import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.eclipse.lsp4j.DocumentFilter;
 
@@ -33,7 +33,6 @@ public final class DefaultDocumentMatcher
     public static final DocumentMatcher INSTANCE = new DefaultDocumentMatcher();
 
     private static final String ASTERISK = "*"; //$NON-NLS-1$
-    private static final FileSystem FS = FileSystems.getDefault();
 
     @Override
     public int match(DocumentFilter filter, URI documentUri,
@@ -67,7 +66,7 @@ public final class DefaultDocumentMatcher
 
         if (pattern != null)
         {
-            if (matchGlobPattern(pattern, documentUri.getPath()))
+            if (matchGlobPattern(pattern, documentUri))
                 result = 10;
             else
                 return 0;
@@ -76,10 +75,11 @@ public final class DefaultDocumentMatcher
         return result;
     }
 
-    private static boolean matchGlobPattern(String pattern, String path)
+    private static boolean matchGlobPattern(String pattern, URI uri)
     {
-        return FS.getPathMatcher("glob:" + pattern).matches( //$NON-NLS-1$
-            FS.getPath(path));
+        Path path = Paths.get(uri);
+        return path.getFileSystem().getPathMatcher("glob:" //$NON-NLS-1$
+            + pattern).matches(path);
     }
 
     private DefaultDocumentMatcher()
