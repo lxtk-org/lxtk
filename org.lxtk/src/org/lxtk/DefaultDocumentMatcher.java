@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.lxtk;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -67,7 +68,7 @@ public final class DefaultDocumentMatcher
 
         if (pattern != null)
         {
-            if (matchGlobPattern(pattern, documentUri.getPath()))
+            if (matchGlobPattern(pattern, new File(documentUri).getPath()))
                 result = 10;
             else
                 return 0;
