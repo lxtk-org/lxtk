@@ -28,30 +28,34 @@
     <lxtk.version.service>0</lxtk.version.service>
     <lxtk.version>${lxtk.version.major}.${lxtk.version.minor}.${lxtk.version.service}.${buildQualifier}</lxtk.version>
     <ant-optional.version>1.5.3-1</ant-optional.version>
-    <ant-xalan2.version>1.10.6</ant-xalan2.version>
+    <ant-xalan2.version>1.10.7</ant-xalan2.version>
   </properties>
   <build>
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-p2-publisher-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-publish-osgi-ee</id>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-repository-plugin</artifactId>
         <executions>
           <execution>
-            <id>assemble-repository</id>
-            <phase>package</phase>
-            <goals>
-              <goal>assemble-repository</goal>
-            </goals>
+            <id>default-assemble-repository</id>
             <configuration>
               <repositoryName>LXTK ${lxtk.version.major}.${lxtk.version.minor}.${lxtk.version.service}</repositoryName>
             </configuration>
           </execution>
           <execution>
-            <id>archive-repository</id>
-            <phase>package</phase>
-            <goals>
-              <goal>archive-repository</goal>
-            </goals>
+            <id>default-archive-repository</id>
             <configuration>
               <finalName>lxtk-repository-${lxtk.version}</finalName>
             </configuration>
