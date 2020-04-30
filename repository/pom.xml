@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.lxtk</groupId>
     <artifactId>releng</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
     <relativePath>../releng</relativePath>
   </parent>
   <artifactId>repository</artifactId>
@@ -25,7 +25,7 @@
   <properties>
     <lxtk.version.major>0</lxtk.version.major>
     <lxtk.version.minor>1</lxtk.version.minor>
-    <lxtk.version.service>0</lxtk.version.service>
+    <lxtk.version.service>1</lxtk.version.service>
     <lxtk.version>${lxtk.version.major}.${lxtk.version.minor}.${lxtk.version.service}.${buildQualifier}</lxtk.version>
     <ant-optional.version>1.5.3-1</ant-optional.version>
     <ant-xalan2.version>1.10.6</ant-xalan2.version>
