@@ -33,14 +33,17 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.RegistrationParams;
 import org.eclipse.lsp4j.ServerCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.UnregistrationParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentUri;
+import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.Log;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * Partial implementation of a {@link LanguageClient} that is also a composite
@@ -51,6 +54,8 @@ import org.lxtk.util.Log;
 public abstract class AbstractLanguageClient<S extends LanguageServer>
     implements LanguageClient, Feature<S>
 {
+    private static final String DOCUMENT_SELECTOR = "documentSelector"; //$NON-NLS-1$
+
     private final Log log;
     private final BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
@@ -137,12 +142,20 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
                         "No feature implementation is found for method " //$NON-NLS-1$
                             + registration.getMethod());
                 Object registerOptions = registration.getRegisterOptions();
-                if (registerOptions instanceof TextDocumentRegistrationOptions)
+                if (registerOptions instanceof JsonObject)
                 {
-                    TextDocumentRegistrationOptions options =
-                        (TextDocumentRegistrationOptions)registerOptions;
-                    if (options.getDocumentSelector() == null)
-                        options.setDocumentSelector(documentSelector);
+                    JsonObject rO = ((JsonObject)registerOptions);
+                    if (rO.has(DOCUMENT_SELECTOR))
+                    {
+                        JsonElement dS = rO.get(DOCUMENT_SELECTOR);
+                        if (dS.isJsonNull() && documentSelector != null)
+                        {
+                            rO.remove(DOCUMENT_SELECTOR);
+                            rO.add(DOCUMENT_SELECTOR,
+                                DefaultGson.INSTANCE.toJsonTree(
+                                    documentSelector));
+                        }
+                    }
                 }
                 feature.register(registration);
             }

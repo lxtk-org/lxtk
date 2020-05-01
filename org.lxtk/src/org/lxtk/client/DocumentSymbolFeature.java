@@ -39,7 +39,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class DocumentSymbolFeature
-    extends LanguageFeature
+    extends LanguageFeature<TextDocumentRegistrationOptions>
 {
     private static final String METHOD = "textDocument/documentSymbol"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -81,6 +81,12 @@ public final class DocumentSymbolFeature
 
         register(new Registration(UUID.randomUUID().toString(), METHOD,
             new TextDocumentRegistrationOptions(documentSelector)));
+    }
+
+    @Override
+    protected Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    {
+        return TextDocumentRegistrationOptions.class;
     }
 
     @Override

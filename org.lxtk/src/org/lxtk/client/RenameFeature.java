@@ -28,7 +28,6 @@ import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageService;
@@ -43,7 +42,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public class RenameFeature
-    extends LanguageFeature
+    extends LanguageFeature<RenameOptions>
 {
     private static final String METHOD = "textDocument/rename"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -106,17 +105,22 @@ public class RenameFeature
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+    protected Class<RenameOptions> getRegistrationOptionsClass()
     {
-        RenameOptions renameOptions = (RenameOptions)options;
+        return RenameOptions.class;
+    }
+
+    @Override
+    protected Disposable registerLanguageFeatureProvider(String method,
+        RenameOptions options)
+    {
         return getLanguageService().getRenameProviders().add(
             new RenameProvider()
             {
                 @Override
                 public RenameOptions getRegistrationOptions()
                 {
-                    return renameOptions;
+                    return options;
                 }
 
                 @Override
@@ -131,8 +135,7 @@ public class RenameFeature
                 public CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(
                     TextDocumentPositionParams params)
                 {
-                    if (!Boolean.TRUE.equals(
-                        renameOptions.getPrepareProvider()))
+                    if (!Boolean.TRUE.equals(options.getPrepareProvider()))
                         throw new UnsupportedOperationException();
 
                     return getLanguageServer().getTextDocumentService().prepareRename(

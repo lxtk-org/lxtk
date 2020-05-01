@@ -26,7 +26,6 @@ import org.eclipse.lsp4j.SignatureHelpOptions;
 import org.eclipse.lsp4j.SignatureHelpRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.lxtk.LanguageService;
 import org.lxtk.SignatureHelpProvider;
 import org.lxtk.util.Disposable;
@@ -39,7 +38,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class SignatureHelpFeature
-    extends LanguageFeature
+    extends LanguageFeature<SignatureHelpRegistrationOptions>
 {
     private static final String METHOD = "textDocument/signatureHelp"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -90,18 +89,22 @@ public final class SignatureHelpFeature
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+    protected Class<SignatureHelpRegistrationOptions> getRegistrationOptionsClass()
     {
-        SignatureHelpRegistrationOptions castedOptions =
-            (SignatureHelpRegistrationOptions)options;
+        return SignatureHelpRegistrationOptions.class;
+    }
+
+    @Override
+    protected Disposable registerLanguageFeatureProvider(String method,
+        SignatureHelpRegistrationOptions options)
+    {
         return getLanguageService().getSignatureHelpProviders().add(
             new SignatureHelpProvider()
             {
                 @Override
                 public SignatureHelpRegistrationOptions getRegistrationOptions()
                 {
-                    return castedOptions;
+                    return options;
                 }
 
                 @Override

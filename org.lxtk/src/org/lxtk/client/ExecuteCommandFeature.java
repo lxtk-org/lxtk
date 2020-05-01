@@ -32,7 +32,10 @@ import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.CommandService;
+import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
+
+import com.google.gson.JsonElement;
 
 /**
  * Participates in a given {@link CommandService} by implementing and
@@ -100,8 +103,11 @@ public final class ExecuteCommandFeature
         if (!getMethods().contains(registration.getMethod()))
             throw new IllegalArgumentException();
 
-        ExecuteCommandRegistrationOptions options =
-            (ExecuteCommandRegistrationOptions)registration.getRegisterOptions();
+        Object rO = registration.getRegisterOptions();
+        ExecuteCommandRegistrationOptions options = rO instanceof JsonElement
+            ? DefaultGson.INSTANCE.fromJson((JsonElement)rO,
+                ExecuteCommandRegistrationOptions.class)
+            : (ExecuteCommandRegistrationOptions)rO;
         if (options == null)
             return;
 

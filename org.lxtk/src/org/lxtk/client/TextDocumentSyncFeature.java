@@ -44,7 +44,10 @@ import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.Workspace;
+import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
+
+import com.google.gson.JsonElement;
 
 /**
  * A language client feature that can dynamically synchronize text documents
@@ -126,16 +129,16 @@ public final class TextDocumentSyncFeature
         if (!METHODS.contains(registration.getMethod()))
             throw new IllegalArgumentException();
 
+        Class<? extends TextDocumentRegistrationOptions> optionsClass =
+            DID_CHANGE.equals(registration.getMethod())
+                ? TextDocumentChangeRegistrationOptions.class
+                : TextDocumentRegistrationOptions.class;
+        Object rO = registration.getRegisterOptions();
         TextDocumentRegistrationOptions registrationOptions =
-            (TextDocumentRegistrationOptions)registration.getRegisterOptions();
-        if (registrationOptions == null)
-            return;
-
-        if (DID_CHANGE.equals(registration.getMethod())
-            && !(registrationOptions instanceof TextDocumentChangeRegistrationOptions))
-            throw new IllegalArgumentException();
-
-        if (registrationOptions.getDocumentSelector() == null)
+            rO instanceof JsonElement ? DefaultGson.INSTANCE.fromJson(
+                (JsonElement)rO, optionsClass) : optionsClass.cast(rO);
+        if (registrationOptions == null
+            || registrationOptions.getDocumentSelector() == null)
             return;
 
         if (registrations == null)

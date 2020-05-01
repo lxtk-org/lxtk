@@ -27,7 +27,6 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.CompletionProvider;
 import org.lxtk.LanguageService;
@@ -41,7 +40,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class CompletionFeature
-    extends LanguageFeature
+    extends LanguageFeature<CompletionRegistrationOptions>
 {
     private static final String METHOD = "textDocument/completion"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -91,18 +90,22 @@ public final class CompletionFeature
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+    protected Class<CompletionRegistrationOptions> getRegistrationOptionsClass()
     {
-        CompletionRegistrationOptions castedOptions =
-            (CompletionRegistrationOptions)options;
+        return CompletionRegistrationOptions.class;
+    }
+
+    @Override
+    protected Disposable registerLanguageFeatureProvider(String method,
+        CompletionRegistrationOptions options)
+    {
         return getLanguageService().getCompletionProviders().add(
             new CompletionProvider()
             {
                 @Override
                 public CompletionRegistrationOptions getRegistrationOptions()
                 {
-                    return castedOptions;
+                    return options;
                 }
 
                 @Override
@@ -117,8 +120,7 @@ public final class CompletionFeature
                 public CompletableFuture<CompletionItem> resolveCompletionItem(
                     CompletionItem item)
                 {
-                    if (!Boolean.TRUE.equals(
-                        castedOptions.getResolveProvider()))
+                    if (!Boolean.TRUE.equals(options.getResolveProvider()))
                         throw new UnsupportedOperationException();
 
                     return getLanguageServer().getTextDocumentService().resolveCompletionItem(

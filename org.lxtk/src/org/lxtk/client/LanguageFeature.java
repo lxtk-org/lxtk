@@ -27,9 +27,12 @@ import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.LanguageFeatureProvider;
 import org.lxtk.LanguageService;
+import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
 
-abstract class LanguageFeature
+import com.google.gson.JsonElement;
+
+abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
     implements DynamicFeature<LanguageServer>
 {
     private final LanguageService languageService;
@@ -110,8 +113,10 @@ abstract class LanguageFeature
         if (!getMethods().contains(registration.getMethod()))
             throw new IllegalArgumentException();
 
-        TextDocumentRegistrationOptions options =
-            (TextDocumentRegistrationOptions)registration.getRegisterOptions();
+        Object rO = registration.getRegisterOptions();
+        Class<RO> optionsClass = getRegistrationOptionsClass();
+        RO options = rO instanceof JsonElement ? DefaultGson.INSTANCE.fromJson(
+            (JsonElement)rO, optionsClass) : optionsClass.cast(rO);
         if (options == null || options.getDocumentSelector() == null)
             return;
 
@@ -130,6 +135,13 @@ abstract class LanguageFeature
     }
 
     /**
+     * Returns the registration options class.
+     *
+     * @return the registration options class (never <code>null</code>)
+     */
+    protected abstract Class<RO> getRegistrationOptionsClass();
+
+    /**
      * Contributes a {@link LanguageFeatureProvider} to the language service.
      *
      * @param method one of the methods supported by the feature
@@ -140,7 +152,7 @@ abstract class LanguageFeature
      *  or <code>null</code> if no provider was registered
      */
     protected abstract Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options);
+        RO options);
 
     @Override
     public final synchronized void unregister(Unregistration unregistration)
