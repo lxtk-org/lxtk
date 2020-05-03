@@ -13,8 +13,6 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.json;
 
-import java.net.URI;
-
 import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -31,9 +29,6 @@ import org.eclipse.tm4e.ui.text.TMPresentationReconciler;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.examples.json.JsonCore;
-import org.lxtk.lx4e.examples.json.JsonInputElementProvider;
-import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
 import org.lxtk.lx4e.ui.hover.FirstMatchHover;
@@ -101,26 +96,12 @@ public class JsonSourceViewerConfiguration
     public ITextHover getTextHover(ISourceViewer sourceViewer,
         String contentType)
     {
-        return new FirstMatchHover(super.getTextHover(sourceViewer, contentType),
-            new TextHover(this::getLanguageOperationTarget));
+        return new FirstMatchHover(super.getTextHover(sourceViewer,
+            contentType), new TextHover(this::getLanguageOperationTarget));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()
     {
-        if (editor == null)
-            return null;
-
-        ILanguageSourceFile sourceFile =
-            JsonInputElementProvider.INSTANCE.getElement(
-                editor.getEditorInput());
-        if (sourceFile == null)
-            return null;
-
-        URI documentUri = sourceFile.getDocumentUri();
-        if (documentUri == null)
-            return null;
-
-        return new LanguageOperationTarget(documentUri, JsonCore.LANG_ID,
-            JsonCore.LANG_SERVICE);
+        return JsonOperationTargetProvider.getOperationTarget(editor);
     }
 }

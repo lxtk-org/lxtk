@@ -132,8 +132,9 @@ public class DocumentUtil
      * @throws MalformedTreeException if an edit overlaps with one of its siblings
      * @throws BadLocationException if an edit's range is invalid in the document
      */
-    public static void applyEdits(IDocument document, List<TextEdit> edits)
-        throws MalformedTreeException, BadLocationException
+    public static void applyEdits(IDocument document,
+        List<? extends TextEdit> edits) throws MalformedTreeException,
+        BadLocationException
     {
         if (edits.isEmpty())
             return;
@@ -169,7 +170,7 @@ public class DocumentUtil
      * @throws BadLocationException if an edit's range is invalid in the document
      */
     public static MultiTextEdit toMultiTextEdit(IDocument document,
-        List<TextEdit> edits) throws MalformedTreeException,
+        List<? extends TextEdit> edits) throws MalformedTreeException,
         BadLocationException
     {
         MultiTextEdit result = new MultiTextEdit();

@@ -25,9 +25,11 @@ import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.ParameterInformationCapabilities;
+import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
@@ -51,7 +53,11 @@ public class DefaultLanguageService
         Registry.newInstance();
     private final Registry<DefinitionProvider> definitionProviders =
         Registry.newInstance();
+    private final Registry<DocumentFormattingProvider> documentFormattingProviders =
+        Registry.newInstance();
     private final Registry<DocumentHighlightProvider> documentHighlightProviders =
+        Registry.newInstance();
+    private final Registry<DocumentRangeFormattingProvider> documentRangeFormattingProviders =
         Registry.newInstance();
     private final Registry<DocumentSymbolProvider> documentSymbolProviders =
         Registry.newInstance();
@@ -137,6 +143,20 @@ public class DefaultLanguageService
     }
 
     @Override
+    public FormattingCapabilities getDocumentFormattingCapabilities()
+    {
+        FormattingCapabilities formatting = new FormattingCapabilities();
+        formatting.setDynamicRegistration(true);
+        return formatting;
+    }
+
+    @Override
+    public Registry<DocumentFormattingProvider> getDocumentFormattingProviders()
+    {
+        return documentFormattingProviders;
+    }
+
+    @Override
     public DocumentHighlightCapabilities getDocumentHighlightCapabilities()
     {
         DocumentHighlightCapabilities documentHighlight =
@@ -149,6 +169,21 @@ public class DefaultLanguageService
     public Registry<DocumentHighlightProvider> getDocumentHighlightProviders()
     {
         return documentHighlightProviders;
+    }
+
+    @Override
+    public RangeFormattingCapabilities getDocumentRangeFormattingCapabilities()
+    {
+        RangeFormattingCapabilities rangeFormatting =
+            new RangeFormattingCapabilities();
+        rangeFormatting.setDynamicRegistration(true);
+        return rangeFormatting;
+    }
+
+    @Override
+    public Registry<DocumentRangeFormattingProvider> getDocumentRangeFormattingProviders()
+    {
+        return documentRangeFormattingProviders;
     }
 
     @Override

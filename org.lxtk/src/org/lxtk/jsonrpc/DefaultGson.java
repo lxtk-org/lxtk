@@ -19,12 +19,14 @@ import org.eclipse.lsp4j.jsonrpc.json.MessageJsonHandler;
 import com.google.gson.Gson;
 
 /**
- * TODO JavaDoc
+ * Provides a {@link Gson} instance with default configuration
+ * for serializing/deserializing JSON-RPC messages. The default instance
+ * can be reused freely across multiple threads.
  */
 public class DefaultGson
 {
     /**
-     * TODO JavaDoc
+     * The default instance of {@link Gson}.
      */
     public static final Gson INSTANCE = new MessageJsonHandler(
         Collections.emptyMap()).getGson();

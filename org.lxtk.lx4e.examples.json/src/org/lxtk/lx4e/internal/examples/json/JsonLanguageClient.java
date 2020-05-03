@@ -29,6 +29,8 @@ import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
 import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CompletionFeature;
+import org.lxtk.client.DocumentFormattingFeature;
+import org.lxtk.client.DocumentRangeFormattingFeature;
 import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.Feature;
 import org.lxtk.client.HoverFeature;
@@ -97,6 +99,8 @@ public class JsonLanguageClient
         Collection<Feature<? super LanguageServer>> features =
             new ArrayList<>();
         features.add(new TextDocumentSyncFeature(JsonCore.WORKSPACE));
+        features.add(new DocumentFormattingFeature(JsonCore.LANG_SERVICE));
+        features.add(new DocumentRangeFormattingFeature(JsonCore.LANG_SERVICE));
         features.add(new DocumentSymbolFeature(JsonCore.LANG_SERVICE));
         features.add(new CompletionFeature(JsonCore.LANG_SERVICE));
         features.add(new HoverFeature(JsonCore.LANG_SERVICE));
@@ -120,6 +124,9 @@ public class JsonLanguageClient
             {
                 super.initialize(server, capabilities, documentSelector);
 
+                JsonObject format = new JsonObject();
+                format.addProperty("enable", true); //$NON-NLS-1$
+
                 JsonObject schema = new JsonObject();
                 JsonArray fileMatch = new JsonArray();
                 fileMatch.add("package.json"); //$NON-NLS-1$
@@ -128,7 +135,9 @@ public class JsonLanguageClient
                     "http://json.schemastore.org/package"); //$NON-NLS-1$
                 JsonArray schemas = new JsonArray();
                 schemas.add(schema);
+
                 JsonObject jsonSettings = new JsonObject();
+                jsonSettings.add("format", format); //$NON-NLS-1$
                 jsonSettings.add("schemas", schemas); //$NON-NLS-1$
                 JsonObject settings = new JsonObject();
                 settings.add("json", jsonSettings); //$NON-NLS-1$

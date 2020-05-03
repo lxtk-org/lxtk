@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <!--
-   Copyright (c) 2019 1C-Soft LLC.
+   Copyright (c) 2019, 2020 1C-Soft LLC.
 
    This program and the accompanying materials are made available under
    the terms of the Eclipse Public License 2.0 which is available at
@@ -65,11 +65,24 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
+      <category
+            id="org.lxtk.lx4e.examples.json.category.source"
+            description="JSON Source Actions"
+            name="Source">
+      </category>
       <command
             id="org.lxtk.lx4e.examples.json.editor.quickOutline"
             categoryId="org.eclipse.ui.category.navigate"
             name="Quick Outline"
-            description="Show the quick outline for the editor input">
+            description="Show the quick outline for the editor input"
+            defaultHandler="org.lxtk.lx4e.internal.examples.json.editor.JsonOutlinePopupHandler">
+      </command>
+      <command
+            id="org.lxtk.lx4e.examples.json.editor.format"
+            categoryId="org.lxtk.lx4e.examples.json.category.source"
+            name="Format"
+            description="Format the selected text"
+            defaultHandler="org.lxtk.lx4e.internal.examples.json.editor.FormatHandler">
       </command>
    </extension>
    <extension
@@ -80,13 +93,26 @@
             contextId="org.lxtk.lx4e.examples.json.editor.scope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
+      <key
+            sequence="M1+M2+F"
+            commandId="org.lxtk.lx4e.examples.json.editor.format"
+            contextId="org.lxtk.lx4e.examples.json.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
    </extension>
    <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="org.lxtk.lx4e.examples.json.editor.quickOutline"
-            class="org.lxtk.lx4e.internal.examples.json.editor.JsonOutlinePopupHandler">
-      </handler>
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:#ExampleJsonEditorContext?endof=group.edit">
+         <menu
+               id="org.lxtk.lx4e.examples.json.editor.source.menu"
+               label="Source">
+            <command
+                  commandId="org.lxtk.lx4e.examples.json.editor.format"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.tm4e.registry.grammars">

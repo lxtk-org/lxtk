@@ -89,6 +89,11 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
+      <category
+            id="org.lxtk.lx4e.examples.typescript.category.source"
+            description="TypeScript Source Actions"
+            name="Source">
+      </category>
       <command
             id="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
             categoryId="org.eclipse.ui.category.navigate"
@@ -109,6 +114,13 @@
             name="Rename"
             description="Rename the selected symbol"
             defaultHandler="org.lxtk.lx4e.internal.examples.typescript.editor.RenameHandler">
+      </command>
+      <command
+            id="org.lxtk.lx4e.examples.typescript.editor.format"
+            categoryId="org.lxtk.lx4e.examples.typescript.category.source"
+            name="Format"
+            description="Format the selected text"
+            defaultHandler="org.lxtk.lx4e.internal.examples.typescript.editor.FormatHandler">
       </command>
    </extension>
    <extension
@@ -148,6 +160,12 @@
             commandId="org.lxtk.lx4e.examples.typescript.editor.rename"
             contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            sequence="M1+M2+F"
+            commandId="org.lxtk.lx4e.examples.typescript.editor.format"
+            contextId="org.lxtk.lx4e.examples.typescript.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -171,6 +189,14 @@
       </menuContribution>
       <menuContribution
             locationURI="popup:#ExampleTypeScriptEditorContext?endof=group.edit">
+         <menu
+               id="org.lxtk.lx4e.examples.typescript.editor.source.menu"
+               label="Source">
+            <command
+                  commandId="org.lxtk.lx4e.examples.typescript.editor.format"
+                  style="push">
+            </command>
+         </menu>
          <menu
                id="org.lxtk.lx4e.examples.typescript.editor.refactoring.menu"
                label="Refactoring">

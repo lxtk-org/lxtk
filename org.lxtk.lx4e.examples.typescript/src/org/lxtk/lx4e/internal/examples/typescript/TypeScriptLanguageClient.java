@@ -33,7 +33,9 @@ import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CodeActionFeature;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DefinitionFeature;
+import org.lxtk.client.DocumentFormattingFeature;
 import org.lxtk.client.DocumentHighlightFeature;
+import org.lxtk.client.DocumentRangeFormattingFeature;
 import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.ExecuteCommandFeature;
 import org.lxtk.client.Feature;
@@ -126,7 +128,11 @@ public class TypeScriptLanguageClient
         features.add(new CodeActionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new CompletionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DefinitionFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new DocumentFormattingFeature(
+            TypeScriptCore.LANG_SERVICE));
         features.add(new DocumentHighlightFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new DocumentRangeFormattingFeature(
+            TypeScriptCore.LANG_SERVICE));
         features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new HoverFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new ReferencesFeature(TypeScriptCore.LANG_SERVICE));

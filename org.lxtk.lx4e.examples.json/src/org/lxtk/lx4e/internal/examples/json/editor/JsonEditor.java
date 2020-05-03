@@ -49,6 +49,8 @@ public class JsonEditor
         setDocumentProvider(documentProvider);
         setSourceViewerConfiguration(new JsonSourceViewerConfiguration(
             preferenceStore, this, documentProvider));
+        setEditorContextMenuId("#ExampleJsonEditorContext"); //$NON-NLS-1$
+        setRulerContextMenuId("#ExampleJsonRulerContext"); //$NON-NLS-1$
     }
 
     @Override

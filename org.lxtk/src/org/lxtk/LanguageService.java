@@ -17,7 +17,9 @@ import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
+import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
@@ -87,6 +89,21 @@ public interface LanguageService
     Registry<DefinitionProvider> getDefinitionProviders();
 
     /**
+     * Returns document formatting capabilities provided by this service.
+     *
+     * @return document formatting capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    FormattingCapabilities getDocumentFormattingCapabilities();
+
+    /**
+     * Returns the registry of document formatting providers for this service.
+     *
+     * @return the registry of document formatting providers (never <code>null</code>)
+     */
+    Registry<DocumentFormattingProvider> getDocumentFormattingProviders();
+
+    /**
      * Returns document highlight capabilities provided by this service.
      *
      * @return document highlight capabilities (never <code>null</code>).
@@ -100,6 +117,23 @@ public interface LanguageService
      * @return the registry of document highlight providers (never <code>null</code>)
      */
     Registry<DocumentHighlightProvider> getDocumentHighlightProviders();
+
+    /**
+     * Returns document range formatting capabilities provided by this service.
+     *
+     * @return document range formatting capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    RangeFormattingCapabilities getDocumentRangeFormattingCapabilities();
+
+    /**
+     * Returns the registry of document range formatting providers
+     * for this service.
+     *
+     * @return the registry of document range formatting providers
+     *  (never <code>null</code>)
+     */
+    Registry<DocumentRangeFormattingProvider> getDocumentRangeFormattingProviders();
 
     /**
      * Returns document symbol capabilities provided by this service.
