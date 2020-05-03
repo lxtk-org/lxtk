@@ -31,8 +31,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.handly.snapshot.DocumentSnapshot;
+import org.eclipse.handly.snapshot.ISnapshot;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ISelectionValidator;
 import org.eclipse.jface.text.ITextSelection;
@@ -70,6 +73,7 @@ public class Highlighter
     private HighlightingJob job;
     private ISelection forcedSelection;
     private Collection<Annotation> annotations;
+    private ISnapshot snapshot;
     private boolean installed;
     private boolean sticky = true;
 
@@ -126,6 +130,7 @@ public class Highlighter
             job.cancel();
             job = null;
         }
+        snapshot = null;
         updateAnnotations(null);
         installed = false;
     }
@@ -291,6 +296,13 @@ public class Highlighter
         }
     }
 
+    private static ISnapshot getSnapshot(IDocument document)
+    {
+        if (!(document instanceof IDocumentExtension4))
+            return null;
+        return new DocumentSnapshot(document);
+    }
+
     private ISelectionValidator getSelectionValidator()
     {
         return selectionProvider instanceof ISelectionValidator
@@ -329,10 +341,15 @@ public class Highlighter
                     if (!isValid())
                         return;
 
+                    ISnapshot currentSnapshot = getSnapshot(
+                        viewer.getDocument());
+
                     if ((highlights == null || highlights.isEmpty())
-                        && isSticky())
+                        && isSticky() && snapshot != null && snapshot.isEqualTo(
+                            currentSnapshot))
                         return;
 
+                    snapshot = currentSnapshot;
                     updateAnnotations(highlights);
                 });
                 return Status.OK_STATUS;
