@@ -13,7 +13,6 @@
 package org.lxtk.util.connect;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 
 import org.lxtk.util.Disposable2;
@@ -40,7 +39,7 @@ public interface Connection
      * @return a stage that completes when the connection gets closed
      *  (never <code>null</code>)
      */
-    default CompletionStage<?> monitor(Executor executor)
+    default CompletableFuture<?> monitor(Executor executor)
     {
         return CompletableFuture.anyOf(onDispose().toCompletableFuture(),
             CompletableFuture.runAsync(new ConnectionMonitor(this), executor));

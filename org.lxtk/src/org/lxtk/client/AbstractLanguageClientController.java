@@ -15,6 +15,7 @@ package org.lxtk.client;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -211,15 +212,17 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
                     ExecutorService grimReaper =
                         Executors.newSingleThreadExecutor();
                     rollback.add(() -> grimReaper.shutdown());
-                    connection.monitor(grimReaper).thenRun(
-                        new ConnectionCloseHandler(this)
+                    CompletableFuture<?> connectionMonitor = connection.monitor(
+                        grimReaper);
+                    rollback.add(() -> connectionMonitor.cancel(true));
+                    connectionMonitor.thenRun(new ConnectionCloseHandler(this)
+                    {
+                        @Override
+                        protected boolean shouldReconnect()
                         {
-                            @Override
-                            protected boolean shouldReconnect()
-                            {
-                                return isAutoReconnect();
-                            }
-                        });
+                            return isAutoReconnect();
+                        }
+                    });
 
                     client.initialize(server, result.getCapabilities(),
                         getDocumentSelector());
