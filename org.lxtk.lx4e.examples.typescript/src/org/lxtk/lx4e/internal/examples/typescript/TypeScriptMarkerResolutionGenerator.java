@@ -16,9 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ui.texteditor.MarkerUtilities;
-import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.codeaction.AbstractMarkerResolutionGenerator;
 
@@ -39,12 +37,6 @@ public class TypeScriptMarkerResolutionGenerator
             return null;
         return TypeScriptOperationTargetProvider.getOperationTarget(
             (IFile)resource);
-    }
-
-    @Override
-    protected CommandService getCommandService()
-    {
-        return TypeScriptCore.CMD_SERVICE;
     }
 
     @Override

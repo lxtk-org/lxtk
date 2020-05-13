@@ -14,6 +14,7 @@ package org.lxtk.client;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -29,6 +30,7 @@ import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.CodeActionProvider;
+import org.lxtk.CommandService;
 import org.lxtk.LanguageService;
 import org.lxtk.util.Disposable;
 
@@ -45,14 +47,19 @@ public final class CodeActionFeature
     private static final String METHOD = "textDocument/codeAction"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
+    private final CommandService commandService;
+
     /**
      * Constructor.
      *
      * @param languageService not <code>null</code>
+     * @param commandService not <code>null</code>
      */
-    public CodeActionFeature(LanguageService languageService)
+    public CodeActionFeature(LanguageService languageService,
+        CommandService commandService)
     {
         super(languageService);
+        this.commandService = Objects.requireNonNull(commandService);
     }
 
     @Override
@@ -111,6 +118,12 @@ public final class CodeActionFeature
                 {
                     return getLanguageServer().getTextDocumentService().codeAction(
                         params);
+                }
+
+                @Override
+                public CommandService getCommandService()
+                {
+                    return commandService;
                 }
             });
     }

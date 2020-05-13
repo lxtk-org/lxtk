@@ -15,8 +15,6 @@ package org.lxtk.lx4e.examples.typescript;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.handly.model.IElementChangeListener;
-import org.lxtk.CommandService;
-import org.lxtk.DefaultCommandService;
 import org.lxtk.DefaultWorkspace;
 import org.lxtk.LanguageService;
 import org.lxtk.Workspace;
@@ -35,12 +33,6 @@ public class TypeScriptCore
      * TypeScript Workspace.
      */
     public static final Workspace WORKSPACE = new DefaultWorkspace();
-
-    /**
-     * TypeScript Command Service.
-     */
-    public static final CommandService CMD_SERVICE =
-        new DefaultCommandService();
 
     /**
      * TypeScript Language Service.

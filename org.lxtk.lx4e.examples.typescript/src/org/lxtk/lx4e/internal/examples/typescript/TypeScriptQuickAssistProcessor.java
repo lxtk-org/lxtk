@@ -15,9 +15,7 @@ package org.lxtk.lx4e.internal.examples.typescript;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.codeaction.AbstractQuickAssistProcessor;
 
@@ -44,12 +42,6 @@ public class TypeScriptQuickAssistProcessor
     protected LanguageOperationTarget getLanguageOperationTarget()
     {
         return targetSupplier.get();
-    }
-
-    @Override
-    protected CommandService getCommandService()
-    {
-        return TypeScriptCore.CMD_SERVICE;
     }
 
     @Override

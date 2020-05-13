@@ -15,9 +15,7 @@ package org.lxtk.lx4e.internal.examples.typescript;
 import java.util.List;
 
 import org.eclipse.ui.IEditorPart;
-import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.codeaction.AbstractCodeActionMenu;
 
@@ -32,12 +30,6 @@ public class TypeScriptCodeActionMenu
     {
         return TypeScriptOperationTargetProvider.getOperationTarget(
             (IEditorPart)getActivePart());
-    }
-
-    @Override
-    protected CommandService getCommandService()
-    {
-        return TypeScriptCore.CMD_SERVICE;
     }
 
     @Override

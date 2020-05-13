@@ -26,6 +26,8 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.lxtk.CommandService;
+import org.lxtk.DefaultCommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
@@ -68,6 +70,7 @@ public class TypeScriptLanguageClient
     private final String rootUri;
     private final BufferingDiagnosticConsumer diagnosticConsumer =
         new BufferingDiagnosticConsumer(new DiagnosticMarkers(MARKER_TYPE));
+    private final CommandService commandService = new DefaultCommandService();
 
     /**
      * Creates a new TypeScript language client with the given {@link IProject}
@@ -124,8 +127,9 @@ public class TypeScriptLanguageClient
         Collection<Feature<? super LanguageServer>> features =
             new ArrayList<>();
         features.add(new TextDocumentSyncFeature(TypeScriptCore.WORKSPACE));
-        features.add(new ExecuteCommandFeature(TypeScriptCore.CMD_SERVICE));
-        features.add(new CodeActionFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new ExecuteCommandFeature(commandService));
+        features.add(new CodeActionFeature(TypeScriptCore.LANG_SERVICE,
+            commandService));
         features.add(new CompletionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DefinitionFeature(TypeScriptCore.LANG_SERVICE));
         features.add(new DocumentFormattingFeature(

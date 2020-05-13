@@ -12,9 +12,7 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.codeaction;
 
-import java.net.URI;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -24,18 +22,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.lsp4j.CodeAction;
-import org.eclipse.lsp4j.CodeActionContext;
-import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
-import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.WorkspaceEdit;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
 import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
-import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.internal.ui.Activator;
@@ -53,20 +46,14 @@ class CodeActions
             target.getLanguageId()) != null;
     }
 
-    static CompletableFuture<List<Either<Command, CodeAction>>> getCodeActions(
-        LanguageOperationTarget target, Range range, CodeActionContext context)
+    static CodeActionProvider getCodeActionProvider(
+        LanguageOperationTarget target)
     {
-        URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
-        CodeActionProvider provider =
-            languageService.getDocumentMatcher().getBestMatch(
-                languageService.getCodeActionProviders(),
-                CodeActionProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
-        return provider == null ? CompletableFuture.completedFuture(null)
-            : provider.getCodeActions(new CodeActionParams(
-                DocumentUri.toTextDocumentIdentifier(documentUri), range,
-                context));
+        return languageService.getDocumentMatcher().getBestMatch(
+            languageService.getCodeActionProviders(),
+            CodeActionProvider::getDocumentSelector, target.getDocumentUri(),
+            target.getLanguageId());
     }
 
     static void execute(Command command, String label,
@@ -139,9 +126,8 @@ class CodeActions
             if (!Activator.isCancellation(e))
             {
                 StatusManager.getManager().handle(Activator.createErrorStatus(
-                    MessageFormat.format(
-                        Messages.CodeActions_Execution_error, label), e),
-                    StatusManager.LOG | StatusManager.SHOW);
+                    MessageFormat.format(Messages.CodeActions_Execution_error,
+                        label), e), StatusManager.LOG | StatusManager.SHOW);
             }
             return null;
         });

@@ -40,6 +40,7 @@ import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.jface.text.source.TextInvocationContext;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
+import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -49,6 +50,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.SimpleMarkerAnnotation;
 import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
+import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
@@ -99,9 +101,14 @@ public abstract class AbstractQuickAssistProcessor
             Activator.logError(e);
             return null;
         }
+        CodeActionProvider provider = CodeActions.getCodeActionProvider(target);
+        if (provider == null)
+            return null;
         CompletableFuture<List<Either<Command, CodeAction>>> future =
-            CodeActions.getCodeActions(target, range, getCodeActionContext(
-                new TextInvocationContext(viewer, offset, length)));
+            provider.getCodeActions(new CodeActionParams(
+                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+                range, getCodeActionContext(new TextInvocationContext(viewer,
+                    offset, length))));
         List<Either<Command, CodeAction>> result = null;
         try
         {
@@ -123,13 +130,14 @@ public abstract class AbstractQuickAssistProcessor
         }
         if (result == null || result.isEmpty())
             return null;
+        CommandService commandService = provider.getCommandService();
         List<ICompletionProposal> proposals = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
         {
             if (item.isLeft())
-                proposals.add(newProposal(item.getLeft()));
+                proposals.add(newProposal(item.getLeft(), commandService));
             else if (item.isRight())
-                proposals.add(newProposal(item.getRight()));
+                proposals.add(newProposal(item.getRight(), commandService));
         }
         return proposals.toArray(new ICompletionProposal[proposals.size()]);
     }
@@ -167,13 +175,6 @@ public abstract class AbstractQuickAssistProcessor
      *  or <code>null</code> if none
      */
     protected abstract LanguageOperationTarget getLanguageOperationTarget();
-
-    /**
-     * Returns the command service for this processor.
-     *
-     * @return the command service (not <code>null</code>)
-     */
-    protected abstract CommandService getCommandService();
 
     /**
      * Returns the {@link WorkspaceEditChangeFactory} for this processor.
@@ -300,22 +301,26 @@ public abstract class AbstractQuickAssistProcessor
      * Creates and returns a proposal that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
+     * @param commandService never <code>null</code>
      * @return the created proposal (not <code>null</code>)
      */
-    protected ICompletionProposal newProposal(Command command)
+    protected ICompletionProposal newProposal(Command command,
+        CommandService commandService)
     {
-        return new CommandProposal(command);
+        return new CommandProposal(command, commandService);
     }
 
     /**
      * Creates and returns a proposal that executes the given {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
+     * @param commandService never <code>null</code>
      * @return the created proposal (not <code>null</code>)
      */
-    protected ICompletionProposal newProposal(CodeAction codeAction)
+    protected ICompletionProposal newProposal(CodeAction codeAction,
+        CommandService commandService)
     {
-        return new CodeActionProposal(codeAction);
+        return new CodeActionProposal(codeAction, commandService);
     }
 
     /**
@@ -339,21 +344,24 @@ public abstract class AbstractQuickAssistProcessor
          */
         protected final Command command;
 
+        private final CommandService commandService;
+
         /**
          * Constructor.
          *
          * @param command not <code>null</code>
+         * @param commandService not <code>null</code>
          */
-        public CommandProposal(Command command)
+        public CommandProposal(Command command, CommandService commandService)
         {
             this.command = Objects.requireNonNull(command);
+            this.commandService = Objects.requireNonNull(commandService);
         }
 
         @Override
         public void apply(IDocument document)
         {
-            CodeActions.execute(command, getDisplayString(),
-                getCommandService());
+            CodeActions.execute(command, getDisplayString(), commandService);
         }
 
         @Override
@@ -398,21 +406,26 @@ public abstract class AbstractQuickAssistProcessor
          */
         protected final CodeAction codeAction;
 
+        private final CommandService commandService;
+
         /**
          * Constructor.
          *
          * @param codeAction not <code>null</code>
+         * @param commandService not <code>null</code>
          */
-        public CodeActionProposal(CodeAction codeAction)
+        public CodeActionProposal(CodeAction codeAction,
+            CommandService commandService)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
+            this.commandService = Objects.requireNonNull(commandService);
         }
 
         @Override
         public void apply(IDocument document)
         {
             CodeActions.execute(codeAction, getDisplayString(),
-                getWorkspaceEditChangeFactory(), getCommandService());
+                getWorkspaceEditChangeFactory(), commandService);
         }
 
         @Override

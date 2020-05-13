@@ -29,6 +29,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
+import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -40,6 +41,7 @@ import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.services.IServiceLocator;
 import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
+import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
@@ -83,9 +85,15 @@ public abstract class AbstractCodeActionMenu
         if (range == null)
             return noItems();
 
+        CodeActionProvider provider = CodeActions.getCodeActionProvider(target);
+        if (provider == null)
+            return noItems();
+
         CompletableFuture<List<Either<Command, CodeAction>>> future =
-            CodeActions.getCodeActions(target, range, new CodeActionContext(
-                Collections.emptyList(), getCodeActionKinds()));
+            provider.getCodeActions(new CodeActionParams(
+                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+                range, new CodeActionContext(Collections.emptyList(),
+                    getCodeActionKinds())));
 
         List<Either<Command, CodeAction>> result = null;
         try
@@ -106,14 +114,15 @@ public abstract class AbstractCodeActionMenu
         if (result == null || result.isEmpty())
             return noItems();
 
+        CommandService commandService = provider.getCommandService();
         List<IContributionItem> items = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
         {
             IAction action = null;
             if (item.isLeft())
-                action = getAction(item.getLeft());
+                action = getAction(item.getLeft(), commandService);
             else if (item.isRight())
-                action = getAction(item.getRight());
+                action = getAction(item.getRight(), commandService);
             if (action != null)
                 items.add(new ActionContributionItem(action));
         }
@@ -159,13 +168,6 @@ public abstract class AbstractCodeActionMenu
     protected abstract LanguageOperationTarget getLanguageOperationTarget();
 
     /**
-     * Returns the command service for this menu.
-     *
-     * @return the command service (not <code>null</code>)
-     */
-    protected abstract CommandService getCommandService();
-
-    /**
      * Returns the {@link WorkspaceEditChangeFactory} for this menu.
      *
      * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
@@ -184,22 +186,25 @@ public abstract class AbstractCodeActionMenu
      * Returns an {@link IAction} that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
+     * @param commandService never <code>null</code>
      * @return the requested action, or <code>null</code> if none
      */
-    protected IAction getAction(Command command)
+    protected IAction getAction(Command command, CommandService commandService)
     {
-        return new CommandAction(command);
+        return new CommandAction(command, commandService);
     }
 
     /**
      * Returns an {@link IAction} that executes the given {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
+     * @param commandService never <code>null</code>
      * @return the requested action, or <code>null</code> if none
      */
-    protected IAction getAction(CodeAction codeAction)
+    protected IAction getAction(CodeAction codeAction,
+        CommandService commandService)
     {
-        return new CodeActionAction(codeAction);
+        return new CodeActionAction(codeAction, commandService);
     }
 
     /**
@@ -239,21 +244,25 @@ public abstract class AbstractCodeActionMenu
          */
         protected final Command command;
 
+        private final CommandService commandService;
+
         /**
          * Constructor.
          *
          * @param command not <code>null</code>
+         * @param commandService not <code>null</code>
          */
-        public CommandAction(Command command)
+        public CommandAction(Command command, CommandService commandService)
         {
             this.command = Objects.requireNonNull(command);
+            this.commandService = Objects.requireNonNull(commandService);
             setText(command.getTitle());
         }
 
         @Override
         public void run()
         {
-            CodeActions.execute(command, getText(), getCommandService());
+            CodeActions.execute(command, getText(), commandService);
         }
     }
 
@@ -268,14 +277,19 @@ public abstract class AbstractCodeActionMenu
          */
         protected final CodeAction codeAction;
 
+        private final CommandService commandService;
+
         /**
          * Constructor.
          *
          * @param codeAction not <code>null</code>
+         * @param commandService not <code>null</code>
          */
-        public CodeActionAction(CodeAction codeAction)
+        public CodeActionAction(CodeAction codeAction,
+            CommandService commandService)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
+            this.commandService = Objects.requireNonNull(commandService);
             setText(codeAction.getTitle());
         }
 
@@ -283,7 +297,7 @@ public abstract class AbstractCodeActionMenu
         public void run()
         {
             CodeActions.execute(codeAction, getText(),
-                getWorkspaceEditChangeFactory(), getCommandService());
+                getWorkspaceEditChangeFactory(), commandService);
         }
     }
 
