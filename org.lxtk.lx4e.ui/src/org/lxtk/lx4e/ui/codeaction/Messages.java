@@ -22,6 +22,7 @@ class Messages
 
     public static String AbstractCodeActionMenu_noActions;
     public static String AbstractQuickAssistProcessor_Request_timed_out;
+    public static String CodeActions_Command_not_available;
     public static String CodeActions_Execution_error;
 
     static

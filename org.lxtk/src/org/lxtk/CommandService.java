@@ -41,14 +41,11 @@ public interface CommandService
 
     /**
      * Executes the given command using the given arguments.
-     * <p>
-     * If a command with the given identifier is not present,
-     * a runtime exception is thrown.
-     * </p>
      *
      * @param command the command identifier (not <code>null</code>)
      * @param arguments the command arguments (may be <code>null</code> or empty)
-     * @return result future (never <code>null</code>)
+     * @return result future, or <code>null</code> if a command with the given
+     *  identifier is not present
      */
     CompletableFuture<Object> executeCommand(String command,
         List<Object> arguments);

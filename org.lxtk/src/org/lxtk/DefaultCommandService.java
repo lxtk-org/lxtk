@@ -52,7 +52,7 @@ public class DefaultCommandService
     {
         CommandHandler handler = commands.get(command);
         if (handler == null)
-            throw new IllegalArgumentException("Command not found: " + command); //$NON-NLS-1$
+            return null;
         return handler.execute(arguments);
     }
 
