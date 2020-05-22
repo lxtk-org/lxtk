@@ -17,11 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.lsp4j.CodeAction;
@@ -38,8 +33,8 @@ import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
-import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.requests.CodeActionRequest;
 
 import com.google.gson.Gson;
 
@@ -75,36 +70,29 @@ public abstract class AbstractMarkerResolutionGenerator
             getDiagnosticAttributeName());
         if (diagnostic == null)
             return NO_RESOLUTIONS;
+
         LanguageOperationTarget target = getLanguageOperationTarget(marker);
         if (target == null)
             return NO_RESOLUTIONS;
+
         CodeActionProvider provider = CodeActions.getCodeActionProvider(target);
         if (provider == null)
             return NO_RESOLUTIONS;
-        CompletableFuture<List<Either<Command, CodeAction>>> future =
-            provider.getCodeActions(new CodeActionParams(
-                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                diagnostic.getRange(), new CodeActionContext(
-                    Collections.singletonList(diagnostic),
-                    Collections.singletonList(CodeActionKind.QuickFix))));
-        List<Either<Command, CodeAction>> result = null;
-        try
-        {
-            result = future.get(getTimeout().toMillis(), TimeUnit.MILLISECONDS);
-        }
-        catch (CancellationException | InterruptedException e)
-        {
-        }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-        }
-        catch (TimeoutException e)
-        {
-            Activator.logWarning(e);
-        }
+
+        CodeActionRequest request = newCodeActionRequest();
+        request.setProvider(provider);
+        request.setParams(new CodeActionParams(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+            diagnostic.getRange(), new CodeActionContext(
+                Collections.singletonList(diagnostic),
+                Collections.singletonList(CodeActionKind.QuickFix))));
+        request.setTimeout(getCodeActionTimeout());
+        request.setMayThrow(false);
+
+        List<Either<Command, CodeAction>> result = request.sendAndReceive();
         if (result == null || result.isEmpty())
             return NO_RESOLUTIONS;
+
         CommandService commandService = provider.getCommandService();
         List<IMarkerResolution> resolutions = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
@@ -136,6 +124,26 @@ public abstract class AbstractMarkerResolutionGenerator
      * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
      */
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
+
+    /**
+     * Returns the timeout for computing code actions.
+     *
+     * @return a positive duration
+     */
+    protected Duration getCodeActionTimeout()
+    {
+        return Duration.ofSeconds(2);
+    }
+
+    /**
+     * Returns a request for computing code actions.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected CodeActionRequest newCodeActionRequest()
+    {
+        return new CodeActionRequest();
+    }
 
     /**
      * Creates and returns a marker resolution that executes the given
@@ -191,16 +199,6 @@ public abstract class AbstractMarkerResolutionGenerator
         if (gson == null)
             gson = new Gson();
         return gson.fromJson(value, Diagnostic.class);
-    }
-
-    /**
-     * Returns the timeout for computing resolutions.
-     *
-     * @return a positive duration
-     */
-    protected Duration getTimeout()
-    {
-        return Duration.ofSeconds(2);
     }
 
     /**

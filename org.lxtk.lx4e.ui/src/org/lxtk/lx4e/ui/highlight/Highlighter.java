@@ -23,8 +23,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -57,7 +55,7 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
-import org.lxtk.lx4e.util.EclipseFuture;
+import org.lxtk.lx4e.requests.DocumentHighlightRequest;
 
 /**
  * Highlights document ranges computed using a {@link DocumentHighlightProvider}.
@@ -186,6 +184,16 @@ public class Highlighter
         return annotation;
     }
 
+    /**
+     * Returns a request for computing document highlights.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected DocumentHighlightRequest newDocumentHighlightRequest()
+    {
+        return new DocumentHighlightRequest();
+    }
+
     private void scheduleHighlighting(ISelection selection)
     {
         if (!(selection instanceof ITextSelection) || selection.isEmpty())
@@ -239,8 +247,8 @@ public class Highlighter
         IDocument document = viewer.getDocument();
         if (document == null)
             return Collections.emptyMap();
-        Map<Annotation, Position> result = new IdentityHashMap<>(
-            highlights.size());
+        Map<Annotation, Position> result =
+            new IdentityHashMap<>(highlights.size());
         for (DocumentHighlight highlight : highlights)
         {
             IRegion r;
@@ -258,9 +266,9 @@ public class Highlighter
             {
                 try
                 {
-                    annotation.setText(MessageFormat.format(getAnnotationText(
-                        highlight.getKind()), document.get(r.getOffset(),
-                            r.getLength())));
+                    annotation.setText(MessageFormat.format(
+                        getAnnotationText(highlight.getKind()),
+                        document.get(r.getOffset(), r.getLength())));
                 }
                 catch (BadLocationException e)
                 {
@@ -341,12 +349,12 @@ public class Highlighter
                     if (!isValid())
                         return;
 
-                    ISnapshot currentSnapshot = getSnapshot(
-                        viewer.getDocument());
+                    ISnapshot currentSnapshot =
+                        getSnapshot(viewer.getDocument());
 
                     if ((highlights == null || highlights.isEmpty())
-                        && isSticky() && snapshot != null && snapshot.isEqualTo(
-                            currentSnapshot))
+                        && isSticky() && snapshot != null
+                        && snapshot.isEqualTo(currentSnapshot))
                         return;
 
                     snapshot = currentSnapshot;
@@ -375,23 +383,13 @@ public class Highlighter
                     target.getLanguageId());
             if (provider == null)
                 return null;
-            CompletableFuture<List<? extends DocumentHighlight>> future =
-                provider.getDocumentHighlights(new TextDocumentPositionParams(
-                    DocumentUri.toTextDocumentIdentifier(documentUri),
-                    position));
-            List<? extends DocumentHighlight> result = null;
-            try
-            {
-                result = EclipseFuture.of(future).get(monitor);
-            }
-            catch (InterruptedException e)
-            {
-            }
-            catch (ExecutionException e)
-            {
-                Activator.logError(e);
-            }
-            return result;
+            DocumentHighlightRequest request = newDocumentHighlightRequest();
+            request.setProvider(provider);
+            request.setParams(new TextDocumentPositionParams(
+                DocumentUri.toTextDocumentIdentifier(documentUri), position));
+            request.setProgressMonitor(monitor);
+            request.setMayThrow(false);
+            return request.sendAndReceive();
         }
     }
 }

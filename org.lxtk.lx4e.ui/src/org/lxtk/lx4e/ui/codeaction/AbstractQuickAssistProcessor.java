@@ -18,11 +18,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.BadLocationException;
@@ -57,6 +52,7 @@ import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.requests.CodeActionRequest;
 
 import com.google.gson.Gson;
 
@@ -75,22 +71,29 @@ public abstract class AbstractQuickAssistProcessor
         IQuickAssistInvocationContext invocationContext)
     {
         errorMessage = null;
+
         LanguageOperationTarget target = getLanguageOperationTarget();
         if (target == null)
             return null;
+
         ISourceViewer viewer = invocationContext.getSourceViewer();
         if (viewer == null)
             return null;
+
         IDocument document = viewer.getDocument();
         if (document == null)
             return null;
+
         Point selectedRange = viewer.getSelectedRange();
+
         int offset = invocationContext.getOffset();
         if (offset < 0)
             offset = selectedRange.x;
+
         int length = invocationContext.getLength();
         if (length < 0)
             length = selectedRange.y;
+
         Range range;
         try
         {
@@ -101,35 +104,26 @@ public abstract class AbstractQuickAssistProcessor
             Activator.logError(e);
             return null;
         }
+
         CodeActionProvider provider = CodeActions.getCodeActionProvider(target);
         if (provider == null)
             return null;
-        CompletableFuture<List<Either<Command, CodeAction>>> future =
-            provider.getCodeActions(new CodeActionParams(
-                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                range, getCodeActionContext(new TextInvocationContext(viewer,
-                    offset, length))));
-        List<Either<Command, CodeAction>> result = null;
-        try
-        {
-            result = future.get(getTimeout().toMillis(), TimeUnit.MILLISECONDS);
-        }
-        catch (CancellationException | InterruptedException e)
-        {
-        }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-            errorMessage = e.getMessage();
-        }
-        catch (TimeoutException e)
-        {
-            Activator.logWarning(e);
-            errorMessage =
-                Messages.AbstractQuickAssistProcessor_Request_timed_out;
-        }
+
+        CodeActionRequest request = newCodeActionRequest();
+        request.setProvider(provider);
+        request.setParams(new CodeActionParams(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+            range, getCodeActionContext(new TextInvocationContext(viewer,
+                offset, length))));
+        request.setTimeout(getCodeActionTimeout());
+        request.setMayThrow(false);
+
+        List<Either<Command, CodeAction>> result = request.sendAndReceive();
+        errorMessage = request.getErrorMessage();
+
         if (result == null || result.isEmpty())
             return null;
+
         CommandService commandService = provider.getCommandService();
         List<ICompletionProposal> proposals = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
@@ -182,6 +176,26 @@ public abstract class AbstractQuickAssistProcessor
      * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
      */
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
+
+    /**
+     * Returns a request for computing code actions.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected CodeActionRequest newCodeActionRequest()
+    {
+        return new CodeActionRequest();
+    }
+
+    /**
+     * Returns the timeout for computing code actions.
+     *
+     * @return a positive duration
+     */
+    protected Duration getCodeActionTimeout()
+    {
+        return Duration.ofSeconds(2);
+    }
 
     /**
      * Returns the {@link CodeActionContext} corresponding to the given
@@ -321,16 +335,6 @@ public abstract class AbstractQuickAssistProcessor
         CommandService commandService)
     {
         return new CodeActionProposal(codeAction, commandService);
-    }
-
-    /**
-     * Returns the timeout for computing proposals.
-     *
-     * @return a positive duration
-     */
-    protected Duration getTimeout()
-    {
-        return Duration.ofSeconds(2);
     }
 
     /**

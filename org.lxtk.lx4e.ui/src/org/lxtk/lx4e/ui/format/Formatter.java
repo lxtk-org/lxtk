@@ -16,8 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -38,7 +37,9 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.util.EclipseFuture;
+import org.lxtk.lx4e.requests.DocumentFormattingRequest;
+import org.lxtk.lx4e.requests.DocumentRangeFormattingRequest;
+import org.lxtk.lx4e.requests.Request;
 
 /**
  * Formats a document selection using a <i>formatting provider</i> to compute
@@ -119,24 +120,27 @@ public final class Formatter
     }
 
     @Override
-    public void run(IProgressMonitor monitor) throws InvocationTargetException,
-        InterruptedException
+    public void run(IProgressMonitor monitor)
+        throws InvocationTargetException, InterruptedException
     {
-        CompletableFuture<List<? extends TextEdit>> future =
-            requestFormattingEdits();
-        if (future == null)
+        Request<List<? extends TextEdit>> request = createFormattingRequest();
+        if (request == null)
             return;
+
+        request.setProgressMonitor(monitor);
 
         List<? extends TextEdit> edits;
         try
         {
-            edits = EclipseFuture.of(future).get(monitor);
+            edits = request.sendAndReceive();
         }
         catch (OperationCanceledException e)
         {
-            throw new InterruptedException();
+            InterruptedException ie = new InterruptedException();
+            ie.initCause(e);
+            throw ie;
         }
-        catch (ExecutionException e)
+        catch (CompletionException e)
         {
             throw new InvocationTargetException(e.getCause());
         }
@@ -160,7 +164,27 @@ public final class Formatter
             throw new InvocationTargetException(exception[0]);
     }
 
-    private CompletableFuture<List<? extends TextEdit>> requestFormattingEdits()
+    /**
+     * Returns a request for computing document formatting edits.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected DocumentFormattingRequest newDocumentFormattingRequest()
+    {
+        return new DocumentFormattingRequest();
+    }
+
+    /**
+     * Returns a request for computing document range formatting edits.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected DocumentRangeFormattingRequest newDocumentRangeFormattingRequest()
+    {
+        return new DocumentRangeFormattingRequest();
+    }
+
+    private Request<List<? extends TextEdit>> createFormattingRequest()
     {
         if (options == null)
             throw new IllegalStateException(
@@ -199,12 +223,16 @@ public final class Formatter
 
             DocumentRangeFormattingParams params =
                 new DocumentRangeFormattingParams();
-            params.setTextDocument(DocumentUri.toTextDocumentIdentifier(
-                documentUri));
+            params.setTextDocument(
+                DocumentUri.toTextDocumentIdentifier(documentUri));
             params.setRange(range);
             params.setOptions(options);
-            return documentRangeFormattingProvider.getRangeFormattingEdits(
-                params);
+
+            DocumentRangeFormattingRequest request =
+                newDocumentRangeFormattingRequest();
+            request.setProvider(documentRangeFormattingProvider);
+            request.setParams(params);
+            return request;
         }
         else if (selection.getLength() <= 0)
         {
@@ -217,10 +245,15 @@ public final class Formatter
             {
                 DocumentFormattingParams params =
                     new DocumentFormattingParams();
-                params.setTextDocument(DocumentUri.toTextDocumentIdentifier(
-                    documentUri));
+                params.setTextDocument(
+                    DocumentUri.toTextDocumentIdentifier(documentUri));
                 params.setOptions(options);
-                return documentFormattingProvider.getFormattingEdits(params);
+
+                DocumentFormattingRequest request =
+                    newDocumentFormattingRequest();
+                request.setProvider(documentFormattingProvider);
+                request.setParams(params);
+                return request;
             }
         }
         return null;

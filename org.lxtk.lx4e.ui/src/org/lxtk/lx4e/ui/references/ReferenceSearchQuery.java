@@ -16,14 +16,12 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.handly.snapshot.TextFileSnapshot;
@@ -47,7 +45,7 @@ import org.lxtk.Workspace;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.internal.Activator;
-import org.lxtk.lx4e.util.EclipseFuture;
+import org.lxtk.lx4e.requests.ReferencesRequest;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 /**
@@ -107,29 +105,32 @@ public class ReferenceSearchQuery
         ReferenceProvider provider = getReferenceProvider();
         if (provider == null)
             return Status.OK_STATUS;
+
         ReferenceParams params = new ReferenceParams();
-        params.setTextDocument(DocumentUri.toTextDocumentIdentifier(
-            target.getDocumentUri()));
+        params.setTextDocument(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()));
         params.setPosition(position);
         params.setContext(new ReferenceContext(includeDeclaration));
-        CompletableFuture<List<? extends Location>> future =
-            provider.getReferences(params);
+
+        ReferencesRequest request = newReferencesRequest();
+        request.setProvider(provider);
+        request.setParams(params);
+        request.setProgressMonitor(monitor);
+
         List<? extends Location> locations;
         try
         {
-            locations = EclipseFuture.of(future).get(monitor);
+            locations = request.sendAndReceive();
         }
-        catch (InterruptedException e)
+        catch (CompletionException e)
         {
-            throw new OperationCanceledException();
+            return Activator.createErrorStatus(request.getErrorMessage(),
+                e.getCause());
         }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-            return Activator.createErrorStatus(e.getMessage(), e);
-        }
+
         if (locations == null)
             return Status.OK_STATUS;
+
         for (Location location : locations)
         {
             Match match = toMatch(location);
@@ -137,6 +138,16 @@ public class ReferenceSearchQuery
                 result.addMatch(match);
         }
         return Status.OK_STATUS;
+    }
+
+    /**
+     * Returns a request for computing references.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected ReferencesRequest newReferencesRequest()
+    {
+        return new ReferencesRequest();
     }
 
     private ReferenceProvider getReferenceProvider()
@@ -181,8 +192,8 @@ public class ReferenceSearchQuery
         {
             int lineNumber = location.getRange().getStart().getLine();
             IRegion lineRegion = document.getLineInformation(lineNumber);
-            IRegion matchRegion = DocumentUtil.toRegion(document,
-                location.getRange());
+            IRegion matchRegion =
+                DocumentUtil.toRegion(document, location.getRange());
             return new org.eclipse.search.internal.ui.text.FileMatch(file,
                 matchRegion.getOffset(), matchRegion.getLength(),
                 new org.eclipse.search.internal.ui.text.LineElement(file,
@@ -235,8 +246,8 @@ public class ReferenceSearchQuery
 
     private static String readContents(IFile file)
     {
-        TextFileSnapshot snapshot = new TextFileSnapshot(file,
-            TextFileSnapshot.Layer.FILESYSTEM);
+        TextFileSnapshot snapshot =
+            new TextFileSnapshot(file, TextFileSnapshot.Layer.FILESYSTEM);
         if (!snapshot.exists())
             return null;
         return snapshot.getContents();

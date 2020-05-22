@@ -17,11 +17,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -50,6 +45,8 @@ import org.lxtk.SignatureHelpProvider;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.LSPImages;
+import org.lxtk.lx4e.requests.CompletionRequest;
+import org.lxtk.lx4e.requests.SignatureHelpRequest;
 
 /**
  * Default implementation of an {@link IContentAssistProcessor} that
@@ -91,11 +88,14 @@ public class ContentAssistProcessor
         int offset)
     {
         errorMessage = null;
+
         LanguageOperationTarget target = targetSupplier.get();
         if (target == null)
             return null;
+
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
+
         CompletionProvider provider =
             languageService.getDocumentMatcher().getBestMatch(
                 languageService.getCompletionProviders(),
@@ -103,7 +103,9 @@ public class ContentAssistProcessor
                 target.getLanguageId());
         if (provider == null)
             return null;
+
         IDocument document = viewer.getDocument();
+
         Position position;
         try
         {
@@ -114,30 +116,21 @@ public class ContentAssistProcessor
             Activator.logError(e);
             return null;
         }
-        CompletableFuture<Either<List<CompletionItem>, CompletionList>> future =
-            provider.getCompletionItems(new CompletionParams(
-                DocumentUri.toTextDocumentIdentifier(documentUri), position));
-        Either<List<CompletionItem>, CompletionList> result = null;
-        try
-        {
-            result = future.get(getCompletionTimeout().toMillis(),
-                TimeUnit.MILLISECONDS);
-        }
-        catch (CancellationException | InterruptedException e)
-        {
-        }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-            errorMessage = e.getMessage();
-        }
-        catch (TimeoutException e)
-        {
-            Activator.logWarning(e);
-            errorMessage = Messages.ContentAssistProcessor_Request_timed_out;
-        }
+
+        CompletionRequest request = newCompletionRequest();
+        request.setProvider(provider);
+        request.setParams(new CompletionParams(
+            DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setTimeout(getCompletionTimeout());
+        request.setMayThrow(false);
+
+        Either<List<CompletionItem>, CompletionList> result =
+            request.sendAndReceive();
+        errorMessage = request.getErrorMessage();
+
         if (result == null)
             return null;
+
         List<CompletionItem> items;
         boolean isIncomplete = false;
         if (result.isLeft())
@@ -165,11 +158,14 @@ public class ContentAssistProcessor
         int offset)
     {
         errorMessage = null;
+
         LanguageOperationTarget target = targetSupplier.get();
         if (target == null)
             return NO_INFOS;
+
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
+
         SignatureHelpProvider provider =
             languageService.getDocumentMatcher().getBestMatch(
                 languageService.getSignatureHelpProviders(),
@@ -177,7 +173,9 @@ public class ContentAssistProcessor
                 target.getLanguageId());
         if (provider == null)
             return NO_INFOS;
+
         IDocument document = viewer.getDocument();
+
         Position position;
         try
         {
@@ -188,30 +186,20 @@ public class ContentAssistProcessor
             Activator.logError(e);
             return NO_INFOS;
         }
-        CompletableFuture<SignatureHelp> future = provider.getSignatureHelp(
-            new TextDocumentPositionParams(DocumentUri.toTextDocumentIdentifier(
-                documentUri), position));
-        SignatureHelp result = null;
-        try
-        {
-            result = future.get(getContextInformationTimeout().toMillis(),
-                TimeUnit.MILLISECONDS);
-        }
-        catch (CancellationException | InterruptedException e)
-        {
-        }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-            errorMessage = e.getMessage();
-        }
-        catch (TimeoutException e)
-        {
-            Activator.logWarning(e);
-            errorMessage = Messages.ContentAssistProcessor_Request_timed_out;
-        }
+
+        SignatureHelpRequest request = newSignatureHelpRequest();
+        request.setProvider(provider);
+        request.setParams(new TextDocumentPositionParams(
+            DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setTimeout(getSignatureHelpTimeout());
+        request.setMayThrow(false);
+
+        SignatureHelp result = request.sendAndReceive();
+        errorMessage = request.getErrorMessage();
+
         if (result == null)
             return NO_INFOS;
+
         List<SignatureInformation> signatures = result.getSignatures();
         int size = signatures.size();
         int activeSignature;
@@ -291,7 +279,17 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns the timeout for computing completion proposals.
+     * Returns a request for computing completion items.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected CompletionRequest newCompletionRequest()
+    {
+        return new CompletionRequest();
+    }
+
+    /**
+     * Returns the timeout for computing completion items.
      *
      * @return a positive duration
      */
@@ -301,11 +299,21 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns the timeout for computing context information.
+     * Returns a request for computing signature help.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected SignatureHelpRequest newSignatureHelpRequest()
+    {
+        return new SignatureHelpRequest();
+    }
+
+    /**
+     * Returns the timeout for computing signature help.
      *
      * @return a positive duration
      */
-    protected Duration getContextInformationTimeout()
+    protected Duration getSignatureHelpTimeout()
     {
         return Duration.ofSeconds(1);
     }

@@ -17,11 +17,6 @@ import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -47,6 +42,7 @@ import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
+import org.lxtk.lx4e.requests.HoverRequest;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 import org.lxtk.lx4e.util.Markdown;
 
@@ -93,8 +89,10 @@ public class TextHover
         LanguageOperationTarget target = targetSupplier.get();
         if (target == null)
             return null;
+
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
+
         HoverProvider provider =
             languageService.getDocumentMatcher().getBestMatch(
                 languageService.getHoverProviders(),
@@ -102,39 +100,32 @@ public class TextHover
                 target.getLanguageId());
         if (provider == null)
             return null;
+
         IDocument document = textViewer.getDocument();
+
         Position position;
         try
         {
-            position = DocumentUtil.toPosition(document,
-                hoverRegion.getOffset());
+            position =
+                DocumentUtil.toPosition(document, hoverRegion.getOffset());
         }
         catch (BadLocationException e)
         {
             Activator.logError(e);
             return null;
         }
-        CompletableFuture<Hover> future = provider.getHover(
-            new TextDocumentPositionParams(DocumentUri.toTextDocumentIdentifier(
-                documentUri), position));
-        Hover result = null;
-        try
-        {
-            result = future.get(getTimeout().toMillis(), TimeUnit.MILLISECONDS);
-        }
-        catch (CancellationException | InterruptedException e)
-        {
-        }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-        }
-        catch (TimeoutException e)
-        {
-            Activator.logWarning(e);
-        }
+
+        HoverRequest request = newHoverRequest();
+        request.setProvider(provider);
+        request.setParams(new TextDocumentPositionParams(
+            DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setTimeout(getHoverTimeout());
+        request.setMayThrow(false);
+
+        Hover result = request.sendAndReceive();
         if (result == null)
             return null;
+
         Either<List<Either<String, MarkedString>>, MarkupContent> contents =
             result.getContents();
         MarkupContent markupContent;
@@ -164,13 +155,15 @@ public class TextHover
                         builder.append("\n\n"); //$NON-NLS-1$
                 }
             }
-            markupContent = new MarkupContent(MarkupKind.MARKDOWN,
-                builder.toString());
+            markupContent =
+                new MarkupContent(MarkupKind.MARKDOWN, builder.toString());
         }
         else
             markupContent = contents.getRight();
+
         if (markupContent == null)
             return null;
+
         return toHoverInfo(markupContent);
     }
 
@@ -208,11 +201,21 @@ public class TextHover
     }
 
     /**
+     * Returns a request for computing hover information.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected HoverRequest newHoverRequest()
+    {
+        return new HoverRequest();
+    }
+
+    /**
      * Returns the timeout for computing hover information.
      *
      * @return a positive duration
      */
-    protected Duration getTimeout()
+    protected Duration getHoverTimeout()
     {
         return Duration.ofSeconds(2);
     }

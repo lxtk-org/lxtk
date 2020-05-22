@@ -90,15 +90,23 @@ public class EclipseFuture<T>
         return future.isDone();
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws CancellationException {@inheritDoc}
+     */
     @Override
     public T get() throws InterruptedException, ExecutionException
     {
         return future.get();
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws CancellationException {@inheritDoc}
+     */
     @Override
-    public T get(long timeout, TimeUnit unit) throws InterruptedException,
-        ExecutionException, TimeoutException
+    public T get(long timeout, TimeUnit unit)
+        throws InterruptedException, ExecutionException, TimeoutException
     {
         return future.get(timeout, unit);
     }
@@ -112,14 +120,15 @@ public class EclipseFuture<T>
      *  if progress reporting is not desired. The caller must not rely on
      *  {@link IProgressMonitor#done()} having been called by the receiver
      * @return the computed result
-     * @throws OperationCanceledException if the computation was cancelled
-     *  or if cancellation has been requested via the progress monitor
+     * @throws CancellationException if the computation was cancelled
+     * @throws OperationCanceledException if cancellation has been requested
+     *  via the progress monitor
      * @throws InterruptedException if the current thread was interrupted
      *  while waiting
      * @throws ExecutionException if the computation threw an exception
      */
-    public T get(IProgressMonitor monitor) throws InterruptedException,
-        ExecutionException
+    public T get(IProgressMonitor monitor)
+        throws InterruptedException, ExecutionException
     {
         SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.checkCanceled();
@@ -131,12 +140,6 @@ public class EclipseFuture<T>
             try
             {
                 return get(monitorPeriod, TimeUnit.MILLISECONDS);
-            }
-            catch (CancellationException cause)
-            {
-                OperationCanceledException e = new OperationCanceledException();
-                e.initCause(cause);
-                throw e;
             }
             catch (TimeoutException e)
             {
@@ -155,8 +158,9 @@ public class EclipseFuture<T>
      *  if progress reporting is not desired. The caller must not rely on
      *  {@link IProgressMonitor#done()} having been called by the receiver
      * @return the computed result
-     * @throws OperationCanceledException if the computation was cancelled
-     *  or if cancellation has been requested via the progress monitor
+     * @throws CancellationException if the computation was cancelled
+     * @throws OperationCanceledException if cancellation has been requested
+     *  via the progress monitor
      * @throws InterruptedException if the current thread was interrupted
      *  while waiting
      * @throws ExecutionException if the computation threw an exception
@@ -179,12 +183,6 @@ public class EclipseFuture<T>
             {
                 return get(Math.min(monitorPeriod, timeRemaining),
                     TimeUnit.MILLISECONDS);
-            }
-            catch (CancellationException cause)
-            {
-                OperationCanceledException e = new OperationCanceledException();
-                e.initCause(cause);
-                throw e;
             }
             catch (TimeoutException e)
             {

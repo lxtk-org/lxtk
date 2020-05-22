@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CompletionException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -62,7 +60,7 @@ import org.lxtk.lx4e.EclipseTextDocumentChangeEvent;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.model.ILanguageSymbol;
-import org.lxtk.lx4e.util.EclipseFuture;
+import org.lxtk.lx4e.requests.DocumentSymbolRequest;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.SafeRun;
 
@@ -233,16 +231,18 @@ public abstract class LanguageSourceFile
     public boolean becomeWorkingCopy_(IContext context,
         IProgressMonitor monitor) throws CoreException
     {
-        return ISourceFileImplSupport.super.becomeWorkingCopy_(with(of(
-            WORKING_COPY_CALLBACK, new LanguageWorkingCopyCallback()), context),
+        return ISourceFileImplSupport.super.becomeWorkingCopy_(
+            with(of(WORKING_COPY_CALLBACK, new LanguageWorkingCopyCallback()),
+                context),
             monitor);
     }
 
     @Override
     public IContext newWorkingCopyContext_(IContext context)
     {
-        return with(ISourceFileImplSupport.super.newWorkingCopyContext_(
-            context), of(WORKING_COPY_URI, getDocumentUri()));
+        return with(
+            ISourceFileImplSupport.super.newWorkingCopyContext_(context),
+            of(WORKING_COPY_URI, getDocumentUri()));
     }
 
     @Override
@@ -266,8 +266,9 @@ public abstract class LanguageSourceFile
 
         SymbolBuilder.Result input = symbolBuilder.buildSymbols(monitor);
 
-        StructureBuilder structureBuilder = new StructureBuilder(context.get(
-            NEW_ELEMENTS), new Document(input.source), input.snapshot);
+        StructureBuilder structureBuilder =
+            new StructureBuilder(context.get(NEW_ELEMENTS),
+                new Document(input.source), input.snapshot);
         structureBuilder.buildStructure(this, input.symbols);
     }
 
@@ -321,13 +322,23 @@ public abstract class LanguageSourceFile
         return Duration.ofSeconds(2);
     }
 
+    /**
+     * Returns a request for computing document symbols.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected DocumentSymbolRequest newDocumentSymbolRequest()
+    {
+        return new DocumentSymbolRequest();
+    }
+
     private List<DocumentSymbol> getDocumentSymbols(URI documentUri,
         IProgressMonitor monitor) throws CoreException
     {
         if (documentUri == null)
             return Collections.emptyList();
-        DocumentSymbolProvider provider = getDocumentSymbolProvider(
-            getLanguageService(), documentUri);
+        DocumentSymbolProvider provider =
+            getDocumentSymbolProvider(getLanguageService(), documentUri);
         if (provider == null)
             return Collections.emptyList();
         return getDocumentSymbols(provider, documentUri, monitor);
@@ -346,29 +357,27 @@ public abstract class LanguageSourceFile
         DocumentSymbolProvider provider, URI documentUri,
         IProgressMonitor monitor) throws CoreException
     {
-        CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> future =
-            provider.getDocumentSymbols(new DocumentSymbolParams(
-                DocumentUri.toTextDocumentIdentifier(documentUri)));
+        DocumentSymbolRequest request = newDocumentSymbolRequest();
+        request.setProvider(provider);
+        request.setParams(new DocumentSymbolParams(
+            DocumentUri.toTextDocumentIdentifier(documentUri)));
+        request.setTimeout(getDocumentSymbolTimeout());
+        request.setProgressMonitor(monitor);
+
         List<Either<SymbolInformation, DocumentSymbol>> result;
         try
         {
-            result = EclipseFuture.of(future).get(getDocumentSymbolTimeout(),
-                monitor);
+            result = request.sendAndReceive();
         }
-        catch (InterruptedException e)
+        catch (CompletionException e)
         {
-            throw new OperationCanceledException();
+            throw Activator.toCoreException(e.getCause(),
+                request.getErrorMessage());
         }
-        catch (ExecutionException e)
-        {
-            throw Activator.toCoreException(e);
-        }
-        catch (TimeoutException e)
-        {
-            throw Activator.toCoreException(e);
-        }
+
         if (result == null || result.isEmpty() || result.get(0).isLeft())
             return Collections.emptyList();
+
         List<DocumentSymbol> symbols = new ArrayList<>(result.size());
         for (Either<SymbolInformation, DocumentSymbol> item : result)
         {
@@ -523,8 +532,8 @@ public abstract class LanguageSourceFile
             URI uri = info.getContext().get(WORKING_COPY_URI);
             if (uri == null)
             {
-                throw new CoreException(Activator.createErrorStatus(
-                    MessageFormat.format(
+                throw new CoreException(
+                    Activator.createErrorStatus(MessageFormat.format(
                         Messages.LanguageSourceFile_No_working_copy_URI,
                         toDisplayString_(EMPTY_CONTEXT)), null));
             }
@@ -534,8 +543,8 @@ public abstract class LanguageSourceFile
                     info.getBuffer(), LanguageSourceFile.this);
                 rollback.add(document::dispose);
 
-                Disposable registration = getWorkspace().addTextDocument(
-                    document);
+                Disposable registration =
+                    getWorkspace().addTextDocument(document);
                 rollback.add(registration::dispose);
 
                 rollback.setLogger(e -> Activator.logError(e));
@@ -587,8 +596,8 @@ public abstract class LanguageSourceFile
                     context2.bind(IReconcileStrategy.RECONCILING_FORCED).to(
                         !needsReconciling);
 
-                    getWorkingCopyInfo().getReconcileStrategy().reconcile(with(
-                        context2, context), monitor);
+                    getWorkingCopyInfo().getReconcileStrategy().reconcile(
+                        with(context2, context), monitor);
 
                     DocumentSymbolInput input = symbolBuilder.getInput();
                     if (input != null)
@@ -600,6 +609,15 @@ public abstract class LanguageSourceFile
 
     private interface SymbolBuilder
     {
+        /**
+         * Computes a list of {@link DocumentSymbol}s.
+         *
+         * @param monitor a progress monitor (may be <code>null</code>)
+         * @return the computed {@link Result} (never <code>null</code>)
+         * @throws CoreException if this method fails
+         * @throws OperationCanceledException if the operation is canceled.
+         *  Cancellation can occur even if no progress monitor is provided.
+         */
         Result buildSymbols(IProgressMonitor monitor) throws CoreException;
 
         class Result
@@ -634,29 +652,23 @@ public abstract class LanguageSourceFile
             ISnapshot snapshot;
             try (ISnapshotProvider provider = getFileSnapshotProvider_())
             {
-                while (true)
+                NonExpiringSnapshot fileSnapshot;
+                try
                 {
-                    NonExpiringSnapshot fileSnapshot;
-                    try
-                    {
-                        fileSnapshot = new NonExpiringSnapshot(provider);
-                    }
-                    catch (IllegalStateException e)
-                    {
-                        Throwable cause = e.getCause();
-                        if (cause instanceof CoreException)
-                            throw (CoreException)cause;
-                        throw new CoreException(Activator.createErrorStatus(
-                            e.getMessage(), e));
-                    }
-                    symbols = getDocumentSymbols(getDocumentUri(), monitor);
-                    source = fileSnapshot.getContents();
-                    snapshot = fileSnapshot.getWrappedSnapshot();
-                    if (snapshot.isEqualTo(provider.getSnapshot()))
-                        break;
-                    if (monitor != null)
-                        throw new OperationCanceledException();
+                    fileSnapshot = new NonExpiringSnapshot(provider);
                 }
+                catch (IllegalStateException e)
+                {
+                    Throwable cause = e.getCause();
+                    if (cause instanceof CoreException)
+                        throw (CoreException)cause;
+                    throw Activator.toCoreException(e, e.getMessage());
+                }
+                symbols = getDocumentSymbols(getDocumentUri(), monitor);
+                source = fileSnapshot.getContents();
+                snapshot = fileSnapshot.getWrappedSnapshot();
+                if (!snapshot.isEqualTo(provider.getSnapshot()))
+                    throw new OperationCanceledException();
             }
             return new Result(symbols, source, snapshot);
         }
@@ -677,33 +689,30 @@ public abstract class LanguageSourceFile
         public Result buildSymbols(IProgressMonitor monitor)
             throws CoreException
         {
-            List<DocumentSymbol> documentSymbols;
-            DocumentSymbolProvider documentSymbolProvider;
-            EclipseTextDocumentChangeEvent documentChange;
-            ISnapshot documentSnapshot;
-            while (true)
-            {
-                documentChange = document.getLastChange();
-                if (documentChange.getModificationStamp() == document.getModificationStamp())
-                {
-                    documentSnapshot = new DocumentSnapshot(
-                        document.getUnderlyingDocument());
+            EclipseTextDocumentChangeEvent documentChange =
+                document.getLastChange();
 
-                    documentSymbolProvider = getDocumentSymbolProvider(
-                        getLanguageService(), document.getUri());
+            if (documentChange.getModificationStamp() != document.getModificationStamp())
+                throw new OperationCanceledException();
 
-                    documentSymbols = (documentSymbolProvider == null)
-                        ? Collections.emptyList() : getDocumentSymbols(
-                            documentSymbolProvider, document.getUri(), monitor);
+            ISnapshot documentSnapshot =
+                new DocumentSnapshot(document.getUnderlyingDocument());
 
-                    if (documentChange.getModificationStamp() == document.getModificationStamp())
-                        break;
-                }
-                if (monitor != null)
-                    throw new OperationCanceledException();
-            }
-            input = new DocumentSymbolInput(documentChange,
-                documentSymbolProvider);
+            DocumentSymbolProvider documentSymbolProvider =
+                getDocumentSymbolProvider(getLanguageService(),
+                    document.getUri());
+
+            List<DocumentSymbol> documentSymbols =
+                documentSymbolProvider == null ? Collections.emptyList()
+                    : getDocumentSymbols(documentSymbolProvider,
+                        document.getUri(), monitor);
+
+            if (documentChange.getModificationStamp() != document.getModificationStamp())
+                throw new OperationCanceledException();
+
+            input =
+                new DocumentSymbolInput(documentChange, documentSymbolProvider);
+
             return new Result(documentSymbols,
                 documentChange.getSnapshot().getText(), documentSnapshot);
         }

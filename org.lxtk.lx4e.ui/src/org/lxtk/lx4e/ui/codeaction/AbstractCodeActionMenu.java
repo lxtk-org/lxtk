@@ -17,11 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -43,8 +38,8 @@ import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 
 /**
@@ -89,28 +84,16 @@ public abstract class AbstractCodeActionMenu
         if (provider == null)
             return noItems();
 
-        CompletableFuture<List<Either<Command, CodeAction>>> future =
-            provider.getCodeActions(new CodeActionParams(
-                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                range, new CodeActionContext(Collections.emptyList(),
-                    getCodeActionKinds())));
+        CodeActionRequest request = newCodeActionRequest();
+        request.setProvider(provider);
+        request.setParams(new CodeActionParams(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+            range, new CodeActionContext(Collections.emptyList(),
+                getCodeActionKinds())));
+        request.setTimeout(getCodeActionTimeout());
+        request.setMayThrow(false);
 
-        List<Either<Command, CodeAction>> result = null;
-        try
-        {
-            result = future.get(getTimeout().toMillis(), TimeUnit.MILLISECONDS);
-        }
-        catch (CancellationException | InterruptedException e)
-        {
-        }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-        }
-        catch (TimeoutException e)
-        {
-            Activator.logWarning(e);
-        }
+        List<Either<Command, CodeAction>> result = request.sendAndReceive();
         if (result == null || result.isEmpty())
             return noItems();
 
@@ -183,6 +166,26 @@ public abstract class AbstractCodeActionMenu
     protected abstract List<String> getCodeActionKinds();
 
     /**
+     * Returns the timeout for computing code actions.
+     *
+     * @return a positive duration
+     */
+    protected Duration getCodeActionTimeout()
+    {
+        return Duration.ofSeconds(2);
+    }
+
+    /**
+     * Returns a request for computing code actions.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected CodeActionRequest newCodeActionRequest()
+    {
+        return new CodeActionRequest();
+    }
+
+    /**
      * Returns an {@link IAction} that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
@@ -215,16 +218,6 @@ public abstract class AbstractCodeActionMenu
     protected String getNoActionsText()
     {
         return Messages.AbstractCodeActionMenu_noActions;
-    }
-
-    /**
-     * Returns the timeout for computing code actions.
-     *
-     * @return a positive duration
-     */
-    protected Duration getTimeout()
-    {
-        return Duration.ofSeconds(2);
     }
 
     private IContributionItem[] noItems()

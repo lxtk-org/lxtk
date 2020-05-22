@@ -14,7 +14,6 @@ package org.lxtk.lx4e.ui.hyperlinks;
 
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -27,6 +26,8 @@ import org.lxtk.DefinitionProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
+import org.lxtk.lx4e.requests.DefinitionRequest;
+import org.lxtk.lx4e.requests.Request;
 
 /**
  * Default implementation of a hyperlink detector that computes hyperlinks
@@ -36,8 +37,9 @@ public class DefinitionHyperlinkDetector
     extends AbstractLocationHyperlinkDetector
 {
     @Override
-    protected CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> requestLocationInfo(
-        LanguageOperationTarget target, Position position)
+    protected Request<Either<List<? extends Location>,
+        List<? extends LocationLink>>> createHyperlinkRequest(
+            LanguageOperationTarget target, Position position)
     {
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
@@ -48,8 +50,12 @@ public class DefinitionHyperlinkDetector
                 target.getLanguageId());
         if (provider == null)
             return null;
-        return provider.getDefinition(new TextDocumentPositionParams(
+
+        DefinitionRequest request = newDefinitionRequest();
+        request.setProvider(provider);
+        request.setParams(new TextDocumentPositionParams(
             DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        return request;
     }
 
     @Override
@@ -60,5 +66,15 @@ public class DefinitionHyperlinkDetector
         if (++index > 0)
             text += " " + index; //$NON-NLS-1$
         return new LocationHyperlink(region, text, location);
+    }
+
+    /**
+     * Returns a request for computing definition locations.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected DefinitionRequest newDefinitionRequest()
+    {
+        return new DefinitionRequest();
     }
 }

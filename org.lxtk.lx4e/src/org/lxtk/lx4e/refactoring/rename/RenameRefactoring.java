@@ -14,11 +14,11 @@ package org.lxtk.lx4e.refactoring.rename;
 
 import java.net.URI;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -41,7 +41,8 @@ import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
-import org.lxtk.lx4e.util.EclipseFuture;
+import org.lxtk.lx4e.requests.PrepareRenameRequest;
+import org.lxtk.lx4e.requests.RenameRequest;
 
 /**
  * Default implementation of a rename refactoring that uses a {@link
@@ -239,23 +240,20 @@ public class RenameRefactoring
             renameProvider.getRegistrationOptions().getPrepareProvider()))
             return new RefactoringStatus();
 
-        CompletableFuture<Either<Range, PrepareRenameResult>> future =
-            renameProvider.prepareRename(new TextDocumentPositionParams(
-                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                getPosition()));
+        PrepareRenameRequest request = newPrepareRenameRequest();
+        request.setProvider(renameProvider);
+        request.setParams(new TextDocumentPositionParams(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+            getPosition()));
+        request.setProgressMonitor(pm);
+
         try
         {
-            prepareRenameResult = EclipseFuture.of(future).get(pm);
+            prepareRenameResult = request.sendAndReceive();
         }
-        catch (InterruptedException e)
+        catch (CompletionException e)
         {
-            OperationCanceledException oce = new OperationCanceledException();
-            oce.initCause(e);
-            throw oce;
-        }
-        catch (ExecutionException e)
-        {
-            return handleError(e.getCause());
+            return handleError(e.getCause(), request.getErrorMessage());
         }
 
         if (prepareRenameResult == null)
@@ -279,26 +277,23 @@ public class RenameRefactoring
         if (status.hasFatalError())
             return status;
 
-        CompletableFuture<WorkspaceEdit> future = renameProvider.getRenameEdits(
-            new RenameParams(DocumentUri.toTextDocumentIdentifier(
-                target.getDocumentUri()), getPosition(), getNewName()));
-
         SubMonitor monitor = SubMonitor.convert(pm, 100);
+
+        RenameRequest request = newRenameRequest();
+        request.setProvider(renameProvider);
+        request.setParams(new RenameParams(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+            getPosition(), getNewName()));
+        request.setProgressMonitor(monitor.split(70));
 
         WorkspaceEdit workspaceEdit;
         try
         {
-            workspaceEdit = EclipseFuture.of(future).get(monitor.split(70));
+            workspaceEdit = request.sendAndReceive();
         }
-        catch (InterruptedException e)
+        catch (CompletionException e)
         {
-            OperationCanceledException oce = new OperationCanceledException();
-            oce.initCause(e);
-            throw oce;
-        }
-        catch (ExecutionException e)
-        {
-            return handleError(e.getCause());
+            return handleError(e.getCause(), request.getErrorMessage());
         }
 
         if (workspaceEdit == null)
@@ -307,6 +302,26 @@ public class RenameRefactoring
 
         setWorkspaceEdit(workspaceEdit);
         return super.checkFinalConditions(monitor.split(30));
+    }
+
+    /**
+     * Returns a request for preparing rename operation.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected PrepareRenameRequest newPrepareRenameRequest()
+    {
+        return new PrepareRenameRequest();
+    }
+
+    /**
+     * Returns a request for computing rename edits.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected RenameRequest newRenameRequest()
+    {
+        return new RenameRequest();
     }
 
     private RenameProvider getRenameProvider()
@@ -333,23 +348,26 @@ public class RenameRefactoring
             }
             catch (BadLocationException e)
             {
-                throw new CoreException(Activator.createErrorStatus(
-                    e.getMessage(), e));
+                throw Activator.toCoreException(e, e.getMessage());
             }
         }
         return position;
     }
 
-    private static RefactoringStatus handleError(Throwable e)
+    private static RefactoringStatus handleError(Throwable e, String msg)
         throws CoreException
     {
-        if (e == null)
-            return new RefactoringStatus();
+        if (msg == null)
+            msg = e.getMessage();
+
+        IStatus status = Activator.createErrorStatus(msg, e);
+
         if (e instanceof ResponseErrorException)
         {
-            Activator.logError(e);
+            Activator.getDefault().getLog().log(status);
             return RefactoringStatus.createFatalErrorStatus(e.getMessage());
         }
-        throw new CoreException(Activator.createErrorStatus(e.getMessage(), e));
+
+        throw new CoreException(status);
     }
 }

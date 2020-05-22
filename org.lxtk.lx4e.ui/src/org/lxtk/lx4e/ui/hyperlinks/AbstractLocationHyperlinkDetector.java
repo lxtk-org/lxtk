@@ -15,11 +15,6 @@ package org.lxtk.lx4e.ui.hyperlinks;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -35,6 +30,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.requests.Request;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
@@ -51,11 +47,13 @@ public abstract class AbstractLocationHyperlinkDetector
     public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region,
         boolean canShowMultipleHyperlinks)
     {
-        LanguageOperationTarget target = getAdapter(
-            LanguageOperationTarget.class);
+        LanguageOperationTarget target =
+            getAdapter(LanguageOperationTarget.class);
         if (target == null)
             return null;
+
         IDocument document = textViewer.getDocument();
+
         Position position;
         try
         {
@@ -66,29 +64,21 @@ public abstract class AbstractLocationHyperlinkDetector
             Activator.logError(e);
             return null;
         }
-        CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> future =
-            requestLocationInfo(target, position);
-        if (future == null)
+
+        Request<Either<List<? extends Location>,
+            List<? extends LocationLink>>> request =
+                createHyperlinkRequest(target, position);
+        if (request == null)
             return null;
+
+        request.setTimeout(getHyperlinkTimeout());
+        request.setMayThrow(false);
+
         Either<List<? extends Location>, List<? extends LocationLink>> result =
-            null;
-        try
-        {
-            result = future.get(getTimeout().toMillis(), TimeUnit.MILLISECONDS);
-        }
-        catch (CancellationException | InterruptedException e)
-        {
-        }
-        catch (ExecutionException e)
-        {
-            Activator.logError(e);
-        }
-        catch (TimeoutException e)
-        {
-            Activator.logWarning(e);
-        }
+            request.sendAndReceive();
         if (result == null)
             return null;
+
         List<IHyperlink> hyperlinks;
         if (result.isLeft())
         {
@@ -103,8 +93,8 @@ public abstract class AbstractLocationHyperlinkDetector
             hyperlinks = new ArrayList<>(size);
             for (Location location : locations)
             {
-                hyperlinks.add(createHyperlink(hyperlinkRegion, location,
-                    index++));
+                hyperlinks.add(
+                    createHyperlink(hyperlinkRegion, location, index++));
             }
         }
         else if (result.isRight())
@@ -140,8 +130,9 @@ public abstract class AbstractLocationHyperlinkDetector
                         wordRegion = region;
                     hyperlinkRegion = wordRegion;
                 }
-                hyperlinks.add(createHyperlink(hyperlinkRegion, new Location(
-                    link.getTargetUri(), link.getTargetSelectionRange()),
+                hyperlinks.add(createHyperlink(hyperlinkRegion,
+                    new Location(link.getTargetUri(),
+                        link.getTargetSelectionRange()),
                     index++));
             }
         }
@@ -151,15 +142,16 @@ public abstract class AbstractLocationHyperlinkDetector
     }
 
     /**
-     * Requests location information for the given {@link LanguageOperationTarget}
-     * and the given {@link Position}.
+     * Creates and returns a request for computing hyperlink locations
+     * at the given document position.
      *
      * @param target never <code>null</code>
      * @param position never <code>null</code>
-     * @return result future, or <code>null</code> if no request was sent
+     * @return the created request object, or <code>null</code> if none
      */
-    protected abstract CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> requestLocationInfo(
-        LanguageOperationTarget target, Position position);
+    protected abstract Request<Either<List<? extends Location>,
+        List<? extends LocationLink>>> createHyperlinkRequest(
+            LanguageOperationTarget target, Position position);
 
     /**
      * Creates and returns a hyperlink that covers the given region and
@@ -188,11 +180,11 @@ public abstract class AbstractLocationHyperlinkDetector
     }
 
     /**
-     * Returns the timeout for computing hyperlinks.
+     * Returns the timeout for computing hyperlink locations.
      *
      * @return a positive duration
      */
-    protected Duration getTimeout()
+    protected Duration getHyperlinkTimeout()
     {
         return Duration.ofSeconds(1);
     }

@@ -218,7 +218,7 @@ public class WorkspaceEditChangeFactory
         }
         catch (MalformedTreeException | BadLocationException e)
         {
-            throw Activator.toCoreException(e);
+            throw Activator.toCoreException(e, e.getMessage());
         }
 
         TextFileChange textChange = new TextFileChange(toDisplayString(uri,

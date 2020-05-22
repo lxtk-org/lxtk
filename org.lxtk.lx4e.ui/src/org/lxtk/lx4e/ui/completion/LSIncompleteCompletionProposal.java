@@ -15,14 +15,11 @@
 package org.lxtk.lx4e.ui.completion;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -70,6 +67,7 @@ import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
+import org.lxtk.lx4e.requests.CompletionResolveRequest;
 import org.lxtk.lx4e.util.Markdown;
 
 @SuppressWarnings("javadoc")
@@ -341,25 +339,31 @@ class LSIncompleteCompletionProposal
 
     private synchronized CompletionItem resolvedCompletionItem() {
         if (resolvedItem == null) {
-            resolvedItem = item;
 
             if (Boolean.TRUE.equals(
                 provider.getRegistrationOptions().getResolveProvider())) {
-                try {
-                    resolvedItem = provider.resolveCompletionItem(item).get(500,
-                        TimeUnit.MILLISECONDS);
-                }
-                catch (CancellationException | InterruptedException e) {
-                }
-                catch (ExecutionException e) {
-                    Activator.logError(e);
-                }
-                catch (TimeoutException e) {
-                    Activator.logWarning(e);
-                }
+
+                CompletionResolveRequest request = newCompletionResolveRequest();
+                request.setProvider(provider);
+                request.setParams(item);
+                request.setDefaultResult(item);
+                request.setTimeout(getCompletionResolveTimeout());
+                request.setMayThrow(false);
+
+                resolvedItem = request.sendAndReceive();
+            } else {
+                resolvedItem = item;
             }
         }
         return resolvedItem;
+    }
+
+    protected CompletionResolveRequest newCompletionResolveRequest() {
+        return new CompletionResolveRequest();
+    }
+
+    protected Duration getCompletionResolveTimeout() {
+        return Duration.ofMillis(5000);
     }
 
     @Override
