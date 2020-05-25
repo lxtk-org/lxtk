@@ -62,11 +62,9 @@ public final class CompletionFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setCompletion(
-            getLanguageService().getCompletionCapabilities());
+        capabilities.setCompletion(getLanguageService().getCompletionCapabilities());
     }
 
     @Override
@@ -80,13 +78,11 @@ public final class CompletionFeature
         if (capability == null)
             return;
 
-        CompletionRegistrationOptions registerOptions =
-            new CompletionRegistrationOptions(capability.getTriggerCharacters(),
-                capability.getResolveProvider());
+        CompletionRegistrationOptions registerOptions = new CompletionRegistrationOptions(
+            capability.getTriggerCharacters(), capability.getResolveProvider());
         registerOptions.setDocumentSelector(documentSelector);
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            registerOptions));
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
@@ -99,33 +95,30 @@ public final class CompletionFeature
     protected Disposable registerLanguageFeatureProvider(String method,
         CompletionRegistrationOptions options)
     {
-        return getLanguageService().getCompletionProviders().add(
-            new CompletionProvider()
+        return getLanguageService().getCompletionProviders().add(new CompletionProvider()
+        {
+            @Override
+            public CompletionRegistrationOptions getRegistrationOptions()
             {
-                @Override
-                public CompletionRegistrationOptions getRegistrationOptions()
-                {
-                    return options;
-                }
+                return options;
+            }
 
-                @Override
-                public CompletableFuture<Either<List<CompletionItem>, CompletionList>> getCompletionItems(
+            @Override
+            public CompletableFuture<
+                Either<List<CompletionItem>, CompletionList>> getCompletionItems(
                     CompletionParams params)
-                {
-                    return getLanguageServer().getTextDocumentService().completion(
-                        params);
-                }
+            {
+                return getLanguageServer().getTextDocumentService().completion(params);
+            }
 
-                @Override
-                public CompletableFuture<CompletionItem> resolveCompletionItem(
-                    CompletionItem item)
-                {
-                    if (!Boolean.TRUE.equals(options.getResolveProvider()))
-                        throw new UnsupportedOperationException();
+            @Override
+            public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem item)
+            {
+                if (!Boolean.TRUE.equals(options.getResolveProvider()))
+                    throw new UnsupportedOperationException();
 
-                    return getLanguageServer().getTextDocumentService().resolveCompletionItem(
-                        item);
-                }
-            });
+                return getLanguageServer().getTextDocumentService().resolveCompletionItem(item);
+            }
+        });
     }
 }

@@ -68,8 +68,7 @@ public class LocationHyperlink
         IEditorPart editor = null;
         try
         {
-            editor = editorHelper.openEditor(page, DocumentUri.convert(
-                location.getUri()));
+            editor = editorHelper.openEditor(page, DocumentUri.convert(location.getUri()));
         }
         catch (PartInitException e)
         {
@@ -91,8 +90,7 @@ public class LocationHyperlink
 
     private static IWorkbenchPage getWorkbenchPage()
     {
-        IWorkbenchWindow window =
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (window == null)
             return null;
         return window.getActivePage();

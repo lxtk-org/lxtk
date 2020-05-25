@@ -79,8 +79,8 @@ public class WorkspaceEditChangeFactory
      */
     public WorkspaceEditChangeFactory(Workspace workspace)
     {
-        this(workspace, compose(new TextDocumentUriHandler(workspace),
-            new ResourceUriHandler(), new EfsUriHandler()));
+        this(workspace, compose(new TextDocumentUriHandler(workspace), new ResourceUriHandler(),
+            new EfsUriHandler()));
     }
 
     /**
@@ -90,8 +90,7 @@ public class WorkspaceEditChangeFactory
      * @param workspace not <code>null</code>
      * @param uriHandler not <code>null</code>
      */
-    public WorkspaceEditChangeFactory(Workspace workspace,
-        IUriHandler uriHandler)
+    public WorkspaceEditChangeFactory(Workspace workspace, IUriHandler uriHandler)
     {
         this.workspace = Objects.requireNonNull(workspace);
         this.uriHandler = Objects.requireNonNull(uriHandler);
@@ -114,8 +113,8 @@ public class WorkspaceEditChangeFactory
      * @throws CoreException if this method could not create a change
      * @throws OperationCanceledException if this method is canceled
      */
-    public Change createChange(String name, WorkspaceEdit workspaceEdit,
-        RefactoringStatus status, IProgressMonitor pm) throws CoreException
+    public Change createChange(String name, WorkspaceEdit workspaceEdit, RefactoringStatus status,
+        IProgressMonitor pm) throws CoreException
     {
         CompositeChange change = new CompositeChange(name);
         change.markAsSynthetic();
@@ -160,8 +159,7 @@ public class WorkspaceEditChangeFactory
         Entry<String, List<TextEdit>> entry) throws CoreException
     {
         return addTextChange(change, new TextDocumentEdit(
-            new VersionedTextDocumentIdentifier(entry.getKey(), null),
-            entry.getValue()));
+            new VersionedTextDocumentIdentifier(entry.getKey(), null), entry.getValue()));
     }
 
     /**
@@ -178,8 +176,7 @@ public class WorkspaceEditChangeFactory
     protected RefactoringStatus addTextChange(CompositeChange change,
         TextDocumentEdit textDocumentEdit) throws CoreException
     {
-        VersionedTextDocumentIdentifier textDocumentId =
-            textDocumentEdit.getTextDocument();
+        VersionedTextDocumentIdentifier textDocumentId = textDocumentEdit.getTextDocument();
         URI uri = DocumentUri.convert(textDocumentId.getUri());
 
         IDocument document;
@@ -187,14 +184,13 @@ public class WorkspaceEditChangeFactory
         TextDocument textDocument = workspace.getTextDocument(uri);
         if (textDocument != null)
         {
-            TextDocumentSnapshot textDocumentSnapshot =
-                textDocument.getLastChange().getSnapshot();
+            TextDocumentSnapshot textDocumentSnapshot = textDocument.getLastChange().getSnapshot();
             if (textDocumentId.getVersion() != null
                 && textDocumentId.getVersion().intValue() != textDocumentSnapshot.getVersion())
             {
-                return createFatalErrorStatus(MessageFormat.format(
-                    Messages.WorkspaceEditChangeFactory_Stale_workspace_edit,
-                    toDisplayString(uri, uriHandler)));
+                return createFatalErrorStatus(
+                    MessageFormat.format(Messages.WorkspaceEditChangeFactory_Stale_workspace_edit,
+                        toDisplayString(uri, uriHandler)));
             }
             document = new Document(textDocumentSnapshot.getText());
             snapshot = new DocumentSnapshot(document);
@@ -203,8 +199,7 @@ public class WorkspaceEditChangeFactory
         {
             try (IBuffer buffer = getBuffer(uri, uriHandler))
             {
-                NonExpiringSnapshot nonExpiringSnapshot =
-                    new NonExpiringSnapshot(buffer);
+                NonExpiringSnapshot nonExpiringSnapshot = new NonExpiringSnapshot(buffer);
                 document = new Document(nonExpiringSnapshot.getContents());
                 snapshot = nonExpiringSnapshot.getWrappedSnapshot();
             }
@@ -213,16 +208,15 @@ public class WorkspaceEditChangeFactory
         MultiTextEdit edit;
         try
         {
-            edit = DocumentUtil.toMultiTextEdit(document,
-                textDocumentEdit.getEdits());
+            edit = DocumentUtil.toMultiTextEdit(document, textDocumentEdit.getEdits());
         }
         catch (MalformedTreeException | BadLocationException e)
         {
             throw Activator.toCoreException(e, e.getMessage());
         }
 
-        TextFileChange textChange = new TextFileChange(toDisplayString(uri,
-            uriHandler), uri, uriHandler);
+        TextFileChange textChange =
+            new TextFileChange(toDisplayString(uri, uriHandler), uri, uriHandler);
         textChange.setEdit(edit);
         textChange.setBase(snapshot);
         change.add(textChange);
@@ -243,7 +237,7 @@ public class WorkspaceEditChangeFactory
     protected RefactoringStatus addResourceChange(CompositeChange change,
         ResourceOperation operation) throws CoreException
     {
-        throw new CoreException(Activator.createErrorStatus(
-            "Resource operations are currently not supported", null)); //$NON-NLS-1$
+        throw new CoreException(
+            Activator.createErrorStatus("Resource operations are currently not supported", null)); //$NON-NLS-1$
     }
 }

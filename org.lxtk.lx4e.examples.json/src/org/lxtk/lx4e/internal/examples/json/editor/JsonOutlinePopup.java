@@ -43,8 +43,7 @@ public class JsonOutlinePopup
     @Override
     protected IBaseLabelProvider getLabelProvider()
     {
-        return new DecoratingStyledCellLabelProvider(
-            new LanguageElementLabelProvider(),
+        return new DecoratingStyledCellLabelProvider(new LanguageElementLabelProvider(),
             new ProblemMarkerLabelDecorator(), null);
     }
 }

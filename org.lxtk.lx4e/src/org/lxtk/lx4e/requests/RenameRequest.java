@@ -26,8 +26,7 @@ public class RenameRequest
     extends LanguageFeatureRequest<RenameProvider, RenameParams, WorkspaceEdit>
 {
     @Override
-    protected Future<WorkspaceEdit> send(RenameProvider provider,
-        RenameParams params)
+    protected Future<WorkspaceEdit> send(RenameProvider provider, RenameParams params)
     {
         setTitle(MessageFormat.format(Messages.RenameRequest_title, params));
         return provider.getRenameEdits(params);

@@ -61,11 +61,9 @@ public final class DocumentSymbolFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setDocumentSymbol(
-            getLanguageService().getDocumentSymbolCapabilities());
+        capabilities.setDocumentSymbol(getLanguageService().getDocumentSymbolCapabilities());
     }
 
     @Override
@@ -93,22 +91,21 @@ public final class DocumentSymbolFeature
     protected Disposable registerLanguageFeatureProvider(String method,
         TextDocumentRegistrationOptions options)
     {
-        return getLanguageService().getDocumentSymbolProviders().add(
-            new DocumentSymbolProvider()
+        return getLanguageService().getDocumentSymbolProviders().add(new DocumentSymbolProvider()
+        {
+            @Override
+            public TextDocumentRegistrationOptions getRegistrationOptions()
             {
-                @Override
-                public TextDocumentRegistrationOptions getRegistrationOptions()
-                {
-                    return options;
-                }
+                return options;
+            }
 
-                @Override
-                public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> getDocumentSymbols(
+            @Override
+            public CompletableFuture<
+                List<Either<SymbolInformation, DocumentSymbol>>> getDocumentSymbols(
                     DocumentSymbolParams params)
-                {
-                    return getLanguageServer().getTextDocumentService().documentSymbol(
-                        params);
-                }
-            });
+            {
+                return getLanguageServer().getTextDocumentService().documentSymbol(params);
+            }
+        });
     }
 }

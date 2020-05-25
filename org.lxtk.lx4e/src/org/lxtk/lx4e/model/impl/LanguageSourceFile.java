@@ -71,8 +71,8 @@ public abstract class LanguageSourceFile
     extends LanguageSourceElement
     implements ILanguageSourceFile, ISourceFileImplSupport
 {
-    private static final Property<URI> WORKING_COPY_URI = Property.get(
-        LanguageSourceFile.class.getName() + ".workingCopyUri", URI.class); //$NON-NLS-1$
+    private static final Property<URI> WORKING_COPY_URI =
+        Property.get(LanguageSourceFile.class.getName() + ".workingCopyUri", URI.class); //$NON-NLS-1$
 
     private final FileWrapper fileWrapper;
     private final String languageId;
@@ -86,8 +86,7 @@ public abstract class LanguageSourceFile
      * @param file the underlying workspace file (not <code>null</code>)
      * @param languageId the language identifier (not <code>null</code>)
      */
-    public LanguageSourceFile(LanguageElement parent, IFile file,
-        String languageId)
+    public LanguageSourceFile(LanguageElement parent, IFile file, String languageId)
     {
         this(parent, FileWrapper.forFile(file), languageId);
     }
@@ -111,8 +110,7 @@ public abstract class LanguageSourceFile
      * we chose not to override getFileStore_(), although a more efficient
      * implementation could have been provided.
      */
-    public LanguageSourceFile(LanguageElement parent, URI locationUri,
-        String languageId)
+    public LanguageSourceFile(LanguageElement parent, URI locationUri, String languageId)
     {
         this(parent, FileWrapper.forLocationUri(locationUri), languageId);
     }
@@ -128,16 +126,14 @@ public abstract class LanguageSourceFile
      *  if the source file has no name
      * @param languageId the language identifier (not <code>null</code>)
      */
-    public LanguageSourceFile(LanguageElement parent, String name,
-        String languageId)
+    public LanguageSourceFile(LanguageElement parent, String name, String languageId)
     {
         super(parent, name);
         this.fileWrapper = FileWrapper.NULL;
         this.languageId = Objects.requireNonNull(languageId);
     }
 
-    private LanguageSourceFile(LanguageElement parent, FileWrapper fileWrapper,
-        String languageId)
+    private LanguageSourceFile(LanguageElement parent, FileWrapper fileWrapper, String languageId)
     {
         super(parent, fileWrapper.getName());
         this.fileWrapper = fileWrapper;
@@ -149,8 +145,7 @@ public abstract class LanguageSourceFile
     {
         if (!(obj instanceof LanguageSourceFile))
             return false;
-        return languageId.equals(((LanguageSourceFile)obj).languageId)
-            && super.equals(obj);
+        return languageId.equals(((LanguageSourceFile)obj).languageId) && super.equals(obj);
     }
 
     @Override
@@ -202,8 +197,7 @@ public abstract class LanguageSourceFile
     }
 
     @Override
-    public final void becomeWorkingCopy(IProgressMonitor monitor)
-        throws CoreException
+    public final void becomeWorkingCopy(IProgressMonitor monitor) throws CoreException
     {
         becomeWorkingCopy_(EMPTY_CONTEXT, monitor);
     }
@@ -221,40 +215,35 @@ public abstract class LanguageSourceFile
     }
 
     @Override
-    public ILanguageSymbol[] getSymbols(IProgressMonitor monitor)
-        throws CoreException
+    public ILanguageSymbol[] getSymbols(IProgressMonitor monitor) throws CoreException
     {
         return (ILanguageSymbol[])getChildren_(EMPTY_CONTEXT, monitor);
     }
 
     @Override
-    public boolean becomeWorkingCopy_(IContext context,
-        IProgressMonitor monitor) throws CoreException
+    public boolean becomeWorkingCopy_(IContext context, IProgressMonitor monitor)
+        throws CoreException
     {
         return ISourceFileImplSupport.super.becomeWorkingCopy_(
-            with(of(WORKING_COPY_CALLBACK, new LanguageWorkingCopyCallback()),
-                context),
-            monitor);
+            with(of(WORKING_COPY_CALLBACK, new LanguageWorkingCopyCallback()), context), monitor);
     }
 
     @Override
     public IContext newWorkingCopyContext_(IContext context)
     {
-        return with(
-            ISourceFileImplSupport.super.newWorkingCopyContext_(context),
+        return with(ISourceFileImplSupport.super.newWorkingCopyContext_(context),
             of(WORKING_COPY_URI, getDocumentUri()));
     }
 
     @Override
-    public void buildSourceStructure_(IContext context,
-        IProgressMonitor monitor) throws CoreException
+    public void buildSourceStructure_(IContext context, IProgressMonitor monitor)
+        throws CoreException
     {
         throw new AssertionError("This method should not be called"); //$NON-NLS-1$
     }
 
     @Override
-    public void buildStructure_(IContext context, IProgressMonitor monitor)
-        throws CoreException
+    public void buildStructure_(IContext context, IProgressMonitor monitor) throws CoreException
     {
         SymbolBuilder symbolBuilder = (SymbolBuilder)context.get(SOURCE_AST);
         if (symbolBuilder == null)
@@ -266,9 +255,8 @@ public abstract class LanguageSourceFile
 
         SymbolBuilder.Result input = symbolBuilder.buildSymbols(monitor);
 
-        StructureBuilder structureBuilder =
-            new StructureBuilder(context.get(NEW_ELEMENTS),
-                new Document(input.source), input.snapshot);
+        StructureBuilder structureBuilder = new StructureBuilder(context.get(NEW_ELEMENTS),
+            new Document(input.source), input.snapshot);
         structureBuilder.buildStructure(this, input.symbols);
     }
 
@@ -332,8 +320,8 @@ public abstract class LanguageSourceFile
         return new DocumentSymbolRequest();
     }
 
-    private List<DocumentSymbol> getDocumentSymbols(URI documentUri,
-        IProgressMonitor monitor) throws CoreException
+    private List<DocumentSymbol> getDocumentSymbols(URI documentUri, IProgressMonitor monitor)
+        throws CoreException
     {
         if (documentUri == null)
             return Collections.emptyList();
@@ -344,23 +332,21 @@ public abstract class LanguageSourceFile
         return getDocumentSymbols(provider, documentUri, monitor);
     }
 
-    private DocumentSymbolProvider getDocumentSymbolProvider(
-        LanguageService languageService, URI documentUri)
+    private DocumentSymbolProvider getDocumentSymbolProvider(LanguageService languageService,
+        URI documentUri)
     {
         return languageService.getDocumentMatcher().getBestMatch(
             languageService.getDocumentSymbolProviders(),
-            DocumentSymbolProvider::getDocumentSelector, documentUri,
-            getLanguageId());
+            DocumentSymbolProvider::getDocumentSelector, documentUri, getLanguageId());
     }
 
-    private List<DocumentSymbol> getDocumentSymbols(
-        DocumentSymbolProvider provider, URI documentUri,
-        IProgressMonitor monitor) throws CoreException
+    private List<DocumentSymbol> getDocumentSymbols(DocumentSymbolProvider provider,
+        URI documentUri, IProgressMonitor monitor) throws CoreException
     {
         DocumentSymbolRequest request = newDocumentSymbolRequest();
         request.setProvider(provider);
-        request.setParams(new DocumentSymbolParams(
-            DocumentUri.toTextDocumentIdentifier(documentUri)));
+        request.setParams(
+            new DocumentSymbolParams(DocumentUri.toTextDocumentIdentifier(documentUri)));
         request.setTimeout(getDocumentSymbolTimeout());
         request.setProgressMonitor(monitor);
 
@@ -371,8 +357,7 @@ public abstract class LanguageSourceFile
         }
         catch (CompletionException e)
         {
-            throw Activator.toCoreException(e.getCause(),
-                request.getErrorMessage());
+            throw Activator.toCoreException(e.getCause(), request.getErrorMessage());
         }
 
         if (result == null || result.isEmpty() || result.get(0).isLeft())
@@ -532,19 +517,18 @@ public abstract class LanguageSourceFile
             URI uri = info.getContext().get(WORKING_COPY_URI);
             if (uri == null)
             {
-                throw new CoreException(
-                    Activator.createErrorStatus(MessageFormat.format(
-                        Messages.LanguageSourceFile_No_working_copy_URI,
-                        toDisplayString_(EMPTY_CONTEXT)), null));
+                throw new CoreException(Activator.createErrorStatus(
+                    MessageFormat.format(Messages.LanguageSourceFile_No_working_copy_URI,
+                        toDisplayString_(EMPTY_CONTEXT)),
+                    null));
             }
             SafeRun.run(rollback ->
             {
-                document = new EclipseTextDocument(uri, getLanguageId(),
-                    info.getBuffer(), LanguageSourceFile.this);
+                document = new EclipseTextDocument(uri, getLanguageId(), info.getBuffer(),
+                    LanguageSourceFile.this);
                 rollback.add(document::dispose);
 
-                Disposable registration =
-                    getWorkspace().addTextDocument(document);
+                Disposable registration = getWorkspace().addTextDocument(document);
                 rollback.add(registration::dispose);
 
                 rollback.setLogger(e -> Activator.logError(e));
@@ -579,25 +563,21 @@ public abstract class LanguageSourceFile
         }
 
         @Override
-        public void reconcile(IContext context, IProgressMonitor monitor)
-            throws CoreException
+        public void reconcile(IContext context, IProgressMonitor monitor) throws CoreException
         {
             synchronized (reconcilingLock)
             {
                 boolean needsReconciling = needsReconciling();
                 if (needsReconciling || context.getOrDefault(FORCE_RECONCILING))
                 {
-                    DocumentSymbolBuilder symbolBuilder =
-                        new DocumentSymbolBuilder(document);
+                    DocumentSymbolBuilder symbolBuilder = new DocumentSymbolBuilder(document);
 
                     Context context2 = new Context();
-                    context2.bind(IReconcileStrategy.SOURCE_AST).to(
-                        symbolBuilder);
-                    context2.bind(IReconcileStrategy.RECONCILING_FORCED).to(
-                        !needsReconciling);
+                    context2.bind(IReconcileStrategy.SOURCE_AST).to(symbolBuilder);
+                    context2.bind(IReconcileStrategy.RECONCILING_FORCED).to(!needsReconciling);
 
-                    getWorkingCopyInfo().getReconcileStrategy().reconcile(
-                        with(context2, context), monitor);
+                    getWorkingCopyInfo().getReconcileStrategy().reconcile(with(context2, context),
+                        monitor);
 
                     DocumentSymbolInput input = symbolBuilder.getInput();
                     if (input != null)
@@ -626,8 +606,7 @@ public abstract class LanguageSourceFile
             final String source;
             final ISnapshot snapshot;
 
-            Result(List<DocumentSymbol> symbols, String source,
-                ISnapshot snapshot)
+            Result(List<DocumentSymbol> symbols, String source, ISnapshot snapshot)
             {
                 this.symbols = symbols;
                 this.source = source;
@@ -644,8 +623,7 @@ public abstract class LanguageSourceFile
         }
 
         @Override
-        public Result buildSymbols(IProgressMonitor monitor)
-            throws CoreException
+        public Result buildSymbols(IProgressMonitor monitor) throws CoreException
         {
             List<DocumentSymbol> symbols;
             String source;
@@ -686,35 +664,29 @@ public abstract class LanguageSourceFile
         }
 
         @Override
-        public Result buildSymbols(IProgressMonitor monitor)
-            throws CoreException
+        public Result buildSymbols(IProgressMonitor monitor) throws CoreException
         {
-            EclipseTextDocumentChangeEvent documentChange =
-                document.getLastChange();
+            EclipseTextDocumentChangeEvent documentChange = document.getLastChange();
 
             if (documentChange.getModificationStamp() != document.getModificationStamp())
                 throw new OperationCanceledException();
 
-            ISnapshot documentSnapshot =
-                new DocumentSnapshot(document.getUnderlyingDocument());
+            ISnapshot documentSnapshot = new DocumentSnapshot(document.getUnderlyingDocument());
 
             DocumentSymbolProvider documentSymbolProvider =
-                getDocumentSymbolProvider(getLanguageService(),
-                    document.getUri());
+                getDocumentSymbolProvider(getLanguageService(), document.getUri());
 
             List<DocumentSymbol> documentSymbols =
                 documentSymbolProvider == null ? Collections.emptyList()
-                    : getDocumentSymbols(documentSymbolProvider,
-                        document.getUri(), monitor);
+                    : getDocumentSymbols(documentSymbolProvider, document.getUri(), monitor);
 
             if (documentChange.getModificationStamp() != document.getModificationStamp())
                 throw new OperationCanceledException();
 
-            input =
-                new DocumentSymbolInput(documentChange, documentSymbolProvider);
+            input = new DocumentSymbolInput(documentChange, documentSymbolProvider);
 
-            return new Result(documentSymbols,
-                documentChange.getSnapshot().getText(), documentSnapshot);
+            return new Result(documentSymbols, documentChange.getSnapshot().getText(),
+                documentSnapshot);
         }
 
         DocumentSymbolInput getInput()
@@ -728,8 +700,7 @@ public abstract class LanguageSourceFile
         final TextDocumentChangeEvent event;
         final DocumentSymbolProvider symbolProvider;
 
-        DocumentSymbolInput(TextDocumentChangeEvent event,
-            DocumentSymbolProvider symbolProvider)
+        DocumentSymbolInput(TextDocumentChangeEvent event, DocumentSymbolProvider symbolProvider)
         {
             this.event = event;
             this.symbolProvider = symbolProvider;

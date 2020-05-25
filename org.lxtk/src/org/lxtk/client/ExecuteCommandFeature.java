@@ -73,23 +73,20 @@ public final class ExecuteCommandFeature
     @Override
     public void fillClientCapabilities(ClientCapabilities capabilities)
     {
-        ExecuteCommandCapabilities executeCommand =
-            new ExecuteCommandCapabilities();
+        ExecuteCommandCapabilities executeCommand = new ExecuteCommandCapabilities();
         executeCommand.setDynamicRegistration(true);
-        ClientCapabilitiesUtil.getOrCreateWorkspace(
-            capabilities).setExecuteCommand(executeCommand);
+        ClientCapabilitiesUtil.getOrCreateWorkspace(capabilities).setExecuteCommand(executeCommand);
 
     }
 
     @Override
-    public synchronized void initialize(LanguageServer server,
-        ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
+    public synchronized void initialize(LanguageServer server, ServerCapabilities capabilities,
+        List<DocumentFilter> documentSelector)
     {
         languageServer = server;
         registrations = new HashMap<>();
 
-        ExecuteCommandOptions options =
-            capabilities.getExecuteCommandProvider();
+        ExecuteCommandOptions options = capabilities.getExecuteCommandProvider();
         if (options == null)
             return;
 
@@ -104,10 +101,11 @@ public final class ExecuteCommandFeature
             throw new IllegalArgumentException();
 
         Object rO = registration.getRegisterOptions();
-        ExecuteCommandRegistrationOptions options = rO instanceof JsonElement
-            ? DefaultGson.INSTANCE.fromJson((JsonElement)rO,
-                ExecuteCommandRegistrationOptions.class)
-            : (ExecuteCommandRegistrationOptions)rO;
+        ExecuteCommandRegistrationOptions options =
+            rO instanceof JsonElement
+                ? DefaultGson.INSTANCE.fromJson((JsonElement)rO,
+                    ExecuteCommandRegistrationOptions.class)
+                : (ExecuteCommandRegistrationOptions)rO;
         if (options == null)
             return;
 
@@ -129,8 +127,7 @@ public final class ExecuteCommandFeature
                     new ExecuteCommandParams(command, arguments))));
         }
 
-        registrations.put(registration.getId(), () -> Disposable.disposeAll(
-            registeredCommands));
+        registrations.put(registration.getId(), () -> Disposable.disposeAll(registeredCommands));
     }
 
     @Override

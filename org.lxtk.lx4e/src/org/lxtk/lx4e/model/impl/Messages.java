@@ -17,8 +17,7 @@ import org.eclipse.osgi.util.NLS;
 class Messages
     extends NLS
 {
-    private static final String BUNDLE_NAME =
-        "org.lxtk.lx4e.model.impl.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.lxtk.lx4e.model.impl.messages"; //$NON-NLS-1$
 
     public static String LanguageSourceFile_No_working_copy_URI;
 

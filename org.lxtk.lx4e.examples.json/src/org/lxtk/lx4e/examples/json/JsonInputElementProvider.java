@@ -27,8 +27,7 @@ public class JsonInputElementProvider
     /**
      * The sole instance of the {@link JsonInputElementProvider}.
      */
-    public static final JsonInputElementProvider INSTANCE =
-        new JsonInputElementProvider();
+    public static final JsonInputElementProvider INSTANCE = new JsonInputElementProvider();
 
     @Override
     public ILanguageSourceFile getElement(IEditorInput editorInput)

@@ -47,38 +47,29 @@ import org.lxtk.util.Registry;
 public class DefaultLanguageService
     implements LanguageService
 {
-    private final Registry<CodeActionProvider> codeActionProviders =
-        Registry.newInstance();
-    private final Registry<CompletionProvider> completionProviders =
-        Registry.newInstance();
-    private final Registry<DefinitionProvider> definitionProviders =
-        Registry.newInstance();
+    private final Registry<CodeActionProvider> codeActionProviders = Registry.newInstance();
+    private final Registry<CompletionProvider> completionProviders = Registry.newInstance();
+    private final Registry<DefinitionProvider> definitionProviders = Registry.newInstance();
     private final Registry<DocumentFormattingProvider> documentFormattingProviders =
         Registry.newInstance();
     private final Registry<DocumentHighlightProvider> documentHighlightProviders =
         Registry.newInstance();
     private final Registry<DocumentRangeFormattingProvider> documentRangeFormattingProviders =
         Registry.newInstance();
-    private final Registry<DocumentSymbolProvider> documentSymbolProviders =
-        Registry.newInstance();
-    private final Registry<HoverProvider> hoverProviders =
-        Registry.newInstance();
-    private final Registry<ReferenceProvider> referenceProviders =
-        Registry.newInstance();
-    private final Registry<RenameProvider> renameProviders =
-        Registry.newInstance();
-    private final Registry<SignatureHelpProvider> signatureHelpProviders =
-        Registry.newInstance();
+    private final Registry<DocumentSymbolProvider> documentSymbolProviders = Registry.newInstance();
+    private final Registry<HoverProvider> hoverProviders = Registry.newInstance();
+    private final Registry<ReferenceProvider> referenceProviders = Registry.newInstance();
+    private final Registry<RenameProvider> renameProviders = Registry.newInstance();
+    private final Registry<SignatureHelpProvider> signatureHelpProviders = Registry.newInstance();
 
     @Override
     public CodeActionCapabilities getCodeActionCapabilities()
     {
-        CodeActionKindCapabilities codeActionKind =
-            new CodeActionKindCapabilities();
-        codeActionKind.setValueSet(Arrays.asList(CodeActionKind.QuickFix,
-            CodeActionKind.Refactor, CodeActionKind.RefactorExtract,
-            CodeActionKind.RefactorInline, CodeActionKind.RefactorRewrite,
-            CodeActionKind.Source, CodeActionKind.SourceOrganizeImports));
+        CodeActionKindCapabilities codeActionKind = new CodeActionKindCapabilities();
+        codeActionKind.setValueSet(Arrays.asList(CodeActionKind.QuickFix, CodeActionKind.Refactor,
+            CodeActionKind.RefactorExtract, CodeActionKind.RefactorInline,
+            CodeActionKind.RefactorRewrite, CodeActionKind.Source,
+            CodeActionKind.SourceOrganizeImports));
 
         CodeActionLiteralSupportCapabilities codeActionLiteralSupport =
             new CodeActionLiteralSupportCapabilities();
@@ -99,19 +90,16 @@ public class DefaultLanguageService
     @Override
     public CompletionCapabilities getCompletionCapabilities()
     {
-        CompletionItemCapabilities completionItem =
-            new CompletionItemCapabilities();
+        CompletionItemCapabilities completionItem = new CompletionItemCapabilities();
         completionItem.setSnippetSupport(true);
         completionItem.setCommitCharactersSupport(true);
-        completionItem.setDocumentationFormat(Arrays.asList(MarkupKind.MARKDOWN,
-            MarkupKind.PLAINTEXT));
+        completionItem.setDocumentationFormat(
+            Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         completionItem.setDeprecatedSupport(true);
         completionItem.setPreselectSupport(true);
 
-        CompletionItemKindCapabilities completionItemKind =
-            new CompletionItemKindCapabilities();
-        completionItemKind.setValueSet(Arrays.asList(
-            CompletionItemKind.values()));
+        CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
+        completionItemKind.setValueSet(Arrays.asList(CompletionItemKind.values()));
 
         CompletionCapabilities completion = new CompletionCapabilities();
         completion.setDynamicRegistration(true);
@@ -159,8 +147,7 @@ public class DefaultLanguageService
     @Override
     public DocumentHighlightCapabilities getDocumentHighlightCapabilities()
     {
-        DocumentHighlightCapabilities documentHighlight =
-            new DocumentHighlightCapabilities();
+        DocumentHighlightCapabilities documentHighlight = new DocumentHighlightCapabilities();
         documentHighlight.setDynamicRegistration(true);
         return documentHighlight;
     }
@@ -174,8 +161,7 @@ public class DefaultLanguageService
     @Override
     public RangeFormattingCapabilities getDocumentRangeFormattingCapabilities()
     {
-        RangeFormattingCapabilities rangeFormatting =
-            new RangeFormattingCapabilities();
+        RangeFormattingCapabilities rangeFormatting = new RangeFormattingCapabilities();
         rangeFormatting.setDynamicRegistration(true);
         return rangeFormatting;
     }
@@ -192,8 +178,7 @@ public class DefaultLanguageService
         SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
         symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
 
-        DocumentSymbolCapabilities documentSymbol =
-            new DocumentSymbolCapabilities();
+        DocumentSymbolCapabilities documentSymbol = new DocumentSymbolCapabilities();
         documentSymbol.setDynamicRegistration(true);
         documentSymbol.setSymbolKind(symbolKind);
         documentSymbol.setHierarchicalDocumentSymbolSupport(true);
@@ -211,8 +196,7 @@ public class DefaultLanguageService
     {
         HoverCapabilities hover = new HoverCapabilities();
         hover.setDynamicRegistration(true);
-        hover.setContentFormat(Arrays.asList(MarkupKind.MARKDOWN,
-            MarkupKind.PLAINTEXT));
+        hover.setContentFormat(Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         return hover;
     }
 
@@ -260,12 +244,11 @@ public class DefaultLanguageService
 
         SignatureInformationCapabilities signatureInformation =
             new SignatureInformationCapabilities();
-        signatureInformation.setDocumentationFormat(Arrays.asList(
-            MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
+        signatureInformation.setDocumentationFormat(
+            Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         signatureInformation.setParameterInformation(parameterInformation);
 
-        SignatureHelpCapabilities signatureHelp =
-            new SignatureHelpCapabilities();
+        SignatureHelpCapabilities signatureHelp = new SignatureHelpCapabilities();
         signatureHelp.setDynamicRegistration(true);
         signatureHelp.setSignatureInformation(signatureInformation);
         return signatureHelp;

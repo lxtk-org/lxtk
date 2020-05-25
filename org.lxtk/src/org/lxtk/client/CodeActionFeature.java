@@ -55,8 +55,7 @@ public final class CodeActionFeature
      * @param languageService not <code>null</code>
      * @param commandService not <code>null</code>
      */
-    public CodeActionFeature(LanguageService languageService,
-        CommandService commandService)
+    public CodeActionFeature(LanguageService languageService, CommandService commandService)
     {
         super(languageService);
         this.commandService = Objects.requireNonNull(commandService);
@@ -69,11 +68,9 @@ public final class CodeActionFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setCodeAction(
-            getLanguageService().getCodeActionCapabilities());
+        capabilities.setCodeAction(getLanguageService().getCodeActionCapabilities());
     }
 
     @Override
@@ -83,10 +80,9 @@ public final class CodeActionFeature
         if (documentSelector == null)
             return;
 
-        Either<Boolean, CodeActionOptions> capability =
-            capabilities.getCodeActionProvider();
-        if (capability == null || !(capability.isRight() || Boolean.TRUE.equals(
-            capability.getLeft())))
+        Either<Boolean, CodeActionOptions> capability = capabilities.getCodeActionProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
         register(new Registration(UUID.randomUUID().toString(), METHOD,
@@ -103,28 +99,26 @@ public final class CodeActionFeature
     protected Disposable registerLanguageFeatureProvider(String method,
         TextDocumentRegistrationOptions options)
     {
-        return getLanguageService().getCodeActionProviders().add(
-            new CodeActionProvider()
+        return getLanguageService().getCodeActionProviders().add(new CodeActionProvider()
+        {
+            @Override
+            public TextDocumentRegistrationOptions getRegistrationOptions()
             {
-                @Override
-                public TextDocumentRegistrationOptions getRegistrationOptions()
-                {
-                    return options;
-                }
+                return options;
+            }
 
-                @Override
-                public CompletableFuture<List<Either<Command, CodeAction>>> getCodeActions(
-                    CodeActionParams params)
-                {
-                    return getLanguageServer().getTextDocumentService().codeAction(
-                        params);
-                }
+            @Override
+            public CompletableFuture<List<Either<Command, CodeAction>>> getCodeActions(
+                CodeActionParams params)
+            {
+                return getLanguageServer().getTextDocumentService().codeAction(params);
+            }
 
-                @Override
-                public CommandService getCommandService()
-                {
-                    return commandService;
-                }
-            });
+            @Override
+            public CommandService getCommandService()
+            {
+                return commandService;
+            }
+        });
     }
 }

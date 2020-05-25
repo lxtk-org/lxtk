@@ -73,8 +73,7 @@ public class TextDocumentUriHandler
     @Override
     public String toDisplayString(URI uri)
     {
-        IResource resource = ResourceUtil.getResource(getCorrespondingElement(
-            uri));
+        IResource resource = ResourceUtil.getResource(getCorrespondingElement(uri));
         if (resource != null)
             return resource.getFullPath().makeRelative().toString();
         return null;

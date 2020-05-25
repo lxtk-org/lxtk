@@ -39,8 +39,7 @@ public class JsonCore
     /**
      * JSON Language Service.
      */
-    public static final LanguageService LANG_SERVICE =
-        new EclipseLanguageService();
+    public static final LanguageService LANG_SERVICE = new EclipseLanguageService();
 
     /**
      * JSON file extension.
@@ -122,8 +121,7 @@ public class JsonCore
      */
     public static void addElementChangeListener(IElementChangeListener listener)
     {
-        ModelManager.INSTANCE.getNotificationManager().addElementChangeListener(
-            listener);
+        ModelManager.INSTANCE.getNotificationManager().addElementChangeListener(listener);
     }
 
     /**
@@ -132,11 +130,9 @@ public class JsonCore
      *
      * @param listener the listener (not <code>null</code>)
      */
-    public static void removeElementChangeListener(
-        IElementChangeListener listener)
+    public static void removeElementChangeListener(IElementChangeListener listener)
     {
-        ModelManager.INSTANCE.getNotificationManager().removeElementChangeListener(
-            listener);
+        ModelManager.INSTANCE.getNotificationManager().removeElementChangeListener(listener);
     }
 
     private JsonCore()

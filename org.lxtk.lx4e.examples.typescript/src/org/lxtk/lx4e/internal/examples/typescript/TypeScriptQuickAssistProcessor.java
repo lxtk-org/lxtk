@@ -32,8 +32,7 @@ public class TypeScriptQuickAssistProcessor
      *
      * @param targetSupplier not <code>null</code>
      */
-    public TypeScriptQuickAssistProcessor(
-        Supplier<LanguageOperationTarget> targetSupplier)
+    public TypeScriptQuickAssistProcessor(Supplier<LanguageOperationTarget> targetSupplier)
     {
         this.targetSupplier = Objects.requireNonNull(targetSupplier);
     }

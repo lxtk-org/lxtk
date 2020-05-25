@@ -348,8 +348,7 @@ public abstract class Request<T>
                 }
 
                 EclipseFuture<T> eFuture = EclipseFuture.of(future);
-                SubMonitor sMonitor =
-                    SubMonitor.convert(monitor, request.getTitle(), 1);
+                SubMonitor sMonitor = SubMonitor.convert(monitor, request.getTitle(), 1);
                 request.setProgressMonitor(sMonitor);
                 return timeout == null ? eFuture.get(sMonitor.split(1))
                     : eFuture.get(timeout, sMonitor.split(1));
@@ -399,10 +398,9 @@ public abstract class Request<T>
         protected T handle(ExecutionException e)
         {
             String title = request.getTitle();
-            String message = title != null
-                ? MessageFormat.format(Messages.Request_Error_occurred__0,
-                    title)
-                : Messages.Request_Error_occurred;
+            String message =
+                title != null ? MessageFormat.format(Messages.Request_Error_occurred__0, title)
+                    : Messages.Request_Error_occurred;
             setErrorMessage(message);
             log(e, message);
             if (request.mayThrow())
@@ -438,10 +436,8 @@ public abstract class Request<T>
             long timeout = request.getTimeout().toMillis();
             String title = request.getTitle();
             String message = title != null
-                ? MessageFormat.format(Messages.Request_Timeout_occurred__0__1,
-                    title, timeout)
-                : MessageFormat.format(Messages.Request_Timeout_occurred__0,
-                    timeout);
+                ? MessageFormat.format(Messages.Request_Timeout_occurred__0__1, title, timeout)
+                : MessageFormat.format(Messages.Request_Timeout_occurred__0, timeout);
             setErrorMessage(message);
             log(e, message);
             cancel();
@@ -505,8 +501,8 @@ public abstract class Request<T>
             ILog log = request.getLog();
             if (log != null)
             {
-                log.log(new Status(IStatus.ERROR,
-                    log.getBundle().getSymbolicName(), message, e.getCause()));
+                log.log(new Status(IStatus.ERROR, log.getBundle().getSymbolicName(), message,
+                    e.getCause()));
             }
         }
 
@@ -521,8 +517,7 @@ public abstract class Request<T>
             ILog log = request.getLog();
             if (log != null)
             {
-                log.log(new Status(IStatus.ERROR,
-                    log.getBundle().getSymbolicName(), message, e));
+                log.log(new Status(IStatus.ERROR, log.getBundle().getSymbolicName(), message, e));
             }
         }
 

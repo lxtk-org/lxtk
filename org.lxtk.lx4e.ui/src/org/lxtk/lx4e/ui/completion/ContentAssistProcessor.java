@@ -63,10 +63,8 @@ import org.lxtk.lx4e.requests.SignatureHelpRequest;
 public class ContentAssistProcessor
     implements IContentAssistProcessor
 {
-    private static final ICompletionProposal[] NO_PROPOSALS =
-        new ICompletionProposal[0];
-    private static final IContextInformation[] NO_INFOS =
-        new IContextInformation[0];
+    private static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
+    private static final IContextInformation[] NO_INFOS = new IContextInformation[0];
 
     private final Supplier<LanguageOperationTarget> targetSupplier;
     private String errorMessage;
@@ -77,15 +75,13 @@ public class ContentAssistProcessor
      * @param targetSupplier the {@link LanguageOperationTarget} supplier
      *  for this processor (not <code>null</code>)
      */
-    public ContentAssistProcessor(
-        Supplier<LanguageOperationTarget> targetSupplier)
+    public ContentAssistProcessor(Supplier<LanguageOperationTarget> targetSupplier)
     {
         this.targetSupplier = Objects.requireNonNull(targetSupplier);
     }
 
     @Override
-    public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
-        int offset)
+    public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
     {
         errorMessage = null;
 
@@ -96,11 +92,9 @@ public class ContentAssistProcessor
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
 
-        CompletionProvider provider =
-            languageService.getDocumentMatcher().getBestMatch(
-                languageService.getCompletionProviders(),
-                CompletionProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
+        CompletionProvider provider = languageService.getDocumentMatcher().getBestMatch(
+            languageService.getCompletionProviders(), CompletionProvider::getDocumentSelector,
+            documentUri, target.getLanguageId());
         if (provider == null)
             return null;
 
@@ -119,13 +113,12 @@ public class ContentAssistProcessor
 
         CompletionRequest request = newCompletionRequest();
         request.setProvider(provider);
-        request.setParams(new CompletionParams(
-            DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setParams(
+            new CompletionParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
         request.setTimeout(getCompletionTimeout());
         request.setMayThrow(false);
 
-        Either<List<CompletionItem>, CompletionList> result =
-            request.sendAndReceive();
+        Either<List<CompletionItem>, CompletionList> result = request.sendAndReceive();
         errorMessage = request.getErrorMessage();
 
         if (result == null)
@@ -144,18 +137,17 @@ public class ContentAssistProcessor
         for (CompletionItem item : items)
         {
             ICompletionProposal proposal = isIncomplete
-                ? new LSIncompleteCompletionProposal(documentUri, document,
-                    offset, item, provider, getImage(item))
-                : new LSCompletionProposal(documentUri, document, offset, item,
-                    provider, getImage(item));
+                ? new LSIncompleteCompletionProposal(documentUri, document, offset, item, provider,
+                    getImage(item))
+                : new LSCompletionProposal(documentUri, document, offset, item, provider,
+                    getImage(item));
             proposals.add(proposal);
         }
         return proposals.toArray(NO_PROPOSALS);
     }
 
     @Override
-    public IContextInformation[] computeContextInformation(ITextViewer viewer,
-        int offset)
+    public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
     {
         errorMessage = null;
 
@@ -166,11 +158,9 @@ public class ContentAssistProcessor
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
 
-        SignatureHelpProvider provider =
-            languageService.getDocumentMatcher().getBestMatch(
-                languageService.getSignatureHelpProviders(),
-                SignatureHelpProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
+        SignatureHelpProvider provider = languageService.getDocumentMatcher().getBestMatch(
+            languageService.getSignatureHelpProviders(), SignatureHelpProvider::getDocumentSelector,
+            documentUri, target.getLanguageId());
         if (provider == null)
             return NO_INFOS;
 
@@ -271,11 +261,9 @@ public class ContentAssistProcessor
      * @return the corresponding context information,
      *  or <code>null</code> if none
      */
-    protected IContextInformation toContextInformation(
-        SignatureInformation signature)
+    protected IContextInformation toContextInformation(SignatureInformation signature)
     {
-        return new ContextInformation(signature.getLabel(),
-            signature.getLabel());
+        return new ContextInformation(signature.getLabel(), signature.getLabel());
     }
 
     /**

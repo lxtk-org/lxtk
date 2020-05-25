@@ -43,8 +43,8 @@ public class JsonSourceViewerConfiguration
     private final ITextEditor editor;
     private final IWorkingCopyManager workingCopyManager;
 
-    public JsonSourceViewerConfiguration(IPreferenceStore preferenceStore,
-        ITextEditor editor, IWorkingCopyManager workingCopyManager)
+    public JsonSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor,
+        IWorkingCopyManager workingCopyManager)
     {
         super(preferenceStore);
         this.editor = editor;
@@ -52,16 +52,13 @@ public class JsonSourceViewerConfiguration
     }
 
     @Override
-    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer,
-        String contentType)
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
     {
-        return new IAutoEditStrategy[] {
-            new LanguageConfigurationAutoEditStrategy() };
+        return new IAutoEditStrategy[] { new LanguageConfigurationAutoEditStrategy() };
     }
 
     @Override
-    public IPresentationReconciler getPresentationReconciler(
-        ISourceViewer viewer)
+    public IPresentationReconciler getPresentationReconciler(ISourceViewer viewer)
     {
         return new TMPresentationReconciler();
     }
@@ -69,8 +66,7 @@ public class JsonSourceViewerConfiguration
     @Override
     public IReconciler getReconciler(ISourceViewer sourceViewer)
     {
-        if (editor == null || !editor.isEditable()
-            || workingCopyManager == null)
+        if (editor == null || !editor.isEditable() || workingCopyManager == null)
             return null;
 
         return new JsonReconciler(editor, workingCopyManager);
@@ -83,8 +79,9 @@ public class JsonSourceViewerConfiguration
             return null;
 
         ContentAssistant assistant = new ContentAssistant(true);
-        assistant.setContentAssistProcessor(new ContentAssistProcessor(
-            this::getLanguageOperationTarget), IDocument.DEFAULT_CONTENT_TYPE);
+        assistant.setContentAssistProcessor(
+            new ContentAssistProcessor(this::getLanguageOperationTarget),
+            IDocument.DEFAULT_CONTENT_TYPE);
         assistant.setSorter(new CompletionProposalSorter());
         assistant.setInformationControlCreator(
             parent -> new DefaultInformationControl(parent, true));
@@ -93,11 +90,10 @@ public class JsonSourceViewerConfiguration
     }
 
     @Override
-    public ITextHover getTextHover(ISourceViewer sourceViewer,
-        String contentType)
+    public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
     {
-        return new FirstMatchHover(super.getTextHover(sourceViewer,
-            contentType), new TextHover(this::getLanguageOperationTarget));
+        return new FirstMatchHover(super.getTextHover(sourceViewer, contentType),
+            new TextHover(this::getLanguageOperationTarget));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

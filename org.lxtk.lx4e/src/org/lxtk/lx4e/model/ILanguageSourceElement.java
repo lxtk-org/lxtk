@@ -60,6 +60,5 @@ public interface ILanguageSourceElement
      * @throws CoreException if this source element does not exist or if an
      *  exception occurs while accessing its corresponding resource
      */
-    ISourceElementInfo getSourceElementInfo(IProgressMonitor monitor)
-        throws CoreException;
+    ISourceElementInfo getSourceElementInfo(IProgressMonitor monitor) throws CoreException;
 }

@@ -61,11 +61,9 @@ public final class DefinitionFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setDefinition(
-            getLanguageService().getDefinitionCapabilities());
+        capabilities.setDefinition(getLanguageService().getDefinitionCapabilities());
     }
 
     @Override
@@ -93,22 +91,21 @@ public final class DefinitionFeature
     protected Disposable registerLanguageFeatureProvider(String method,
         TextDocumentRegistrationOptions options)
     {
-        return getLanguageService().getDefinitionProviders().add(
-            new DefinitionProvider()
+        return getLanguageService().getDefinitionProviders().add(new DefinitionProvider()
+        {
+            @Override
+            public TextDocumentRegistrationOptions getRegistrationOptions()
             {
-                @Override
-                public TextDocumentRegistrationOptions getRegistrationOptions()
-                {
-                    return options;
-                }
+                return options;
+            }
 
-                @Override
-                public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> getDefinition(
+            @Override
+            public CompletableFuture<
+                Either<List<? extends Location>, List<? extends LocationLink>>> getDefinition(
                     TextDocumentPositionParams params)
-                {
-                    return getLanguageServer().getTextDocumentService().definition(
-                        params);
-                }
-            });
+            {
+                return getLanguageServer().getTextDocumentService().definition(params);
+            }
+        });
     }
 }

@@ -74,8 +74,7 @@ public abstract class LanguageElement
     }
 
     @Override
-    public final ILanguageElement[] getChildren(IProgressMonitor monitor)
-        throws CoreException
+    public final ILanguageElement[] getChildren(IProgressMonitor monitor) throws CoreException
     {
         return (ILanguageElement[])getChildren_(EMPTY_CONTEXT, monitor);
     }

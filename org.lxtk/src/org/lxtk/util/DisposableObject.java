@@ -25,8 +25,7 @@ import java.util.concurrent.CompletionStage;
 public class DisposableObject
     implements Disposable2
 {
-    private final CompletableFuture<?> disposeFuture =
-        new CompletableFuture<>();
+    private final CompletableFuture<?> disposeFuture = new CompletableFuture<>();
 
     @Override
     public void dispose()

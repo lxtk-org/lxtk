@@ -70,8 +70,7 @@ public final class ModelManager
             notificationManager = new NotificationManager();
 
             modelContext = new Context();
-            modelContext.bind(INotificationManager.class).to(
-                notificationManager);
+            modelContext.bind(INotificationManager.class).to(notificationManager);
             modelContext.bind(ElementDelta.Factory.class).to(
                 element -> new LanguageElementDelta((ILanguageElement)element));
 

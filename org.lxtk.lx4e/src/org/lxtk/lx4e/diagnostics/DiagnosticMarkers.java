@@ -95,8 +95,7 @@ public class DiagnosticMarkers
     public DiagnosticMarkers(String markerType)
     {
         this.markerType = Objects.requireNonNull(markerType);
-        workspace.addResourceChangeListener(moveProcessor,
-            IResourceChangeEvent.POST_CHANGE);
+        workspace.addResourceChangeListener(moveProcessor, IResourceChangeEvent.POST_CHANGE);
     }
 
     @Override
@@ -109,8 +108,7 @@ public class DiagnosticMarkers
                 deleteMarkers(uri);
                 if (diagnostics == null || diagnostics.isEmpty())
                     return;
-                IFile[] files = workspace.getRoot().findFilesForLocationURI(
-                    uri);
+                IFile[] files = workspace.getRoot().findFilesForLocationURI(uri);
                 for (IFile file : files)
                 {
                     if (file.exists())
@@ -178,16 +176,14 @@ public class DiagnosticMarkers
      * @param uri not <code>null</code>
      * @param diagnostics not <code>null</code>
      */
-    public void createMarkers(IFile file, URI uri,
-        Collection<Diagnostic> diagnostics)
+    public void createMarkers(IFile file, URI uri, Collection<Diagnostic> diagnostics)
     {
         if (!file.exists() || diagnostics.isEmpty())
             return;
         try
         {
             workspace.run(monitor -> doCreateMarkers(file, uri, diagnostics),
-                workspace.getRuleFactory().markerRule(file),
-                IWorkspace.AVOID_UPDATE, null);
+                workspace.getRuleFactory().markerRule(file), IWorkspace.AVOID_UPDATE, null);
         }
         catch (CoreException e)
         {
@@ -195,11 +191,9 @@ public class DiagnosticMarkers
         }
     }
 
-    private void doCreateMarkers(IFile file, URI uri,
-        Collection<Diagnostic> diagnostics)
+    private void doCreateMarkers(IFile file, URI uri, Collection<Diagnostic> diagnostics)
     {
-        Collection<IMarker> markers = getMarkers().computeIfAbsent(uri,
-            k -> new ArrayList<>());
+        Collection<IMarker> markers = getMarkers().computeIfAbsent(uri, k -> new ArrayList<>());
         for (Diagnostic diagnostic : diagnostics)
         {
             try
@@ -244,21 +238,17 @@ public class DiagnosticMarkers
      * @param uri never <code>null</code>
      * @param diagnostic never <code>null</code>
      */
-    protected void fillMarkerAttributes(Map<String, Object> attributes,
-        IFile file, URI uri, Diagnostic diagnostic)
+    protected void fillMarkerAttributes(Map<String, Object> attributes, IFile file, URI uri,
+        Diagnostic diagnostic)
     {
-        attributes.put(IMarker.SEVERITY, getMarkerSeverity(
-            diagnostic.getSeverity()));
+        attributes.put(IMarker.SEVERITY, getMarkerSeverity(diagnostic.getSeverity()));
         attributes.put(IMarker.MESSAGE, diagnostic.getMessage());
-        attributes.put(IMarker.LINE_NUMBER,
-            diagnostic.getRange().getStart().getLine() + 1);
+        attributes.put(IMarker.LINE_NUMBER, diagnostic.getRange().getStart().getLine() + 1);
         try (IBuffer buffer = TextFileBuffer.forFile(file))
         {
-            IRegion region = DocumentUtil.toRegion(buffer.getDocument(),
-                diagnostic.getRange());
+            IRegion region = DocumentUtil.toRegion(buffer.getDocument(), diagnostic.getRange());
             attributes.put(IMarker.CHAR_START, region.getOffset());
-            attributes.put(IMarker.CHAR_END, region.getOffset()
-                + region.getLength());
+            attributes.put(IMarker.CHAR_END, region.getOffset() + region.getLength());
         }
         catch (CoreException | BadLocationException e)
         {
@@ -309,8 +299,7 @@ public class DiagnosticMarkers
             WorkspaceJob job = new WorkspaceJob("Delete Markers") //$NON-NLS-1$
             {
                 @Override
-                public IStatus runInWorkspace(IProgressMonitor monitor)
-                    throws CoreException
+                public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
                 {
                     workspace.deleteMarkers(markers.toArray(NO_MARKERS));
                     return Status.OK_STATUS;
@@ -320,8 +309,7 @@ public class DiagnosticMarkers
             job.schedule();
         }
 
-        private void collectMarkersAddedByMove(IResourceDelta delta,
-            Collection<IMarker> markers)
+        private void collectMarkersAddedByMove(IResourceDelta delta, Collection<IMarker> markers)
         {
             int flags = IResourceDelta.MOVED_FROM | IResourceDelta.MARKERS;
             if ((delta.getFlags() & flags) == flags)
@@ -330,15 +318,14 @@ public class DiagnosticMarkers
                 for (IMarkerDelta markerDelta : markerDeltas)
                 {
                     IMarker marker = markerDelta.getMarker();
-                    if (sourceUuid.equals(marker.getAttribute(
-                        SOURCE_UUID_ATTRIBUTE, null)))
+                    if (sourceUuid.equals(marker.getAttribute(SOURCE_UUID_ATTRIBUTE, null)))
                     {
                         markers.add(marker);
                     }
                 }
             }
-            IResourceDelta[] children = delta.getAffectedChildren(
-                IResourceDelta.ADDED | IResourceDelta.CHANGED);
+            IResourceDelta[] children =
+                delta.getAffectedChildren(IResourceDelta.ADDED | IResourceDelta.CHANGED);
             for (IResourceDelta child : children)
                 collectMarkersAddedByMove(child, markers);
         }

@@ -39,8 +39,7 @@ public interface DocumentMatcher
      * @return the computed match score; positive if the document matches,
      *  and 0 if the document does not match
      */
-    int match(DocumentFilter filter, URI documentUri,
-        String documentLanguageId);
+    int match(DocumentFilter filter, URI documentUri, String documentLanguageId);
 
     /**
      * Computes the match between the given document selector and a document
@@ -53,8 +52,7 @@ public interface DocumentMatcher
      * @return the computed match score; positive if the document matches,
      *  and 0 if the document does not match
      */
-    default int match(Iterable<DocumentFilter> selector, URI documentUri,
-        String documentLanguageId)
+    default int match(Iterable<DocumentFilter> selector, URI documentUri, String documentLanguageId)
     {
         int result = 0;
         if (selector != null)
@@ -79,8 +77,7 @@ public interface DocumentMatcher
      * @return <code>true</code> if the document matches,
      *  and <code>false</code> if the document does not match
      */
-    default boolean isMatch(DocumentFilter filter, URI documentUri,
-        String documentLanguageId)
+    default boolean isMatch(DocumentFilter filter, URI documentUri, String documentLanguageId)
     {
         return match(filter, documentUri, documentLanguageId) > 0;
     }
@@ -124,13 +121,12 @@ public interface DocumentMatcher
      *  no matches
      */
     default <T> T getFirstMatch(Iterable<T> candidates,
-        Function<T, Iterable<DocumentFilter>> selectorExtractor,
-        URI documentUri, String documentLanguageId)
+        Function<T, Iterable<DocumentFilter>> selectorExtractor, URI documentUri,
+        String documentLanguageId)
     {
         for (T candidate : candidates)
         {
-            if (isMatch(selectorExtractor.apply(candidate), documentUri,
-                documentLanguageId))
+            if (isMatch(selectorExtractor.apply(candidate), documentUri, documentLanguageId))
             {
                 return candidate;
             }
@@ -153,15 +149,14 @@ public interface DocumentMatcher
      *  if there are no matches
      */
     default <T> T getBestMatch(Iterable<T> candidates,
-        Function<T, Iterable<DocumentFilter>> selectorExtractor,
-        URI documentUri, String documentLanguageId)
+        Function<T, Iterable<DocumentFilter>> selectorExtractor, URI documentUri,
+        String documentLanguageId)
     {
         T result = null;
         int max = 0;
         for (T candidate : candidates)
         {
-            int score = match(selectorExtractor.apply(candidate), documentUri,
-                documentLanguageId);
+            int score = match(selectorExtractor.apply(candidate), documentUri, documentLanguageId);
             if (score > max)
             {
                 max = score;
@@ -185,14 +180,13 @@ public interface DocumentMatcher
      * @return the matching elements, in the original order (never <code>null</code>)
      */
     default <T> List<T> getMatches(Iterable<T> candidates,
-        Function<T, Iterable<DocumentFilter>> selectorExtractor,
-        URI documentUri, String documentLanguageId)
+        Function<T, Iterable<DocumentFilter>> selectorExtractor, URI documentUri,
+        String documentLanguageId)
     {
         List<T> result = new ArrayList<>();
         for (T candidate : candidates)
         {
-            if (isMatch(selectorExtractor.apply(candidate), documentUri,
-                documentLanguageId))
+            if (isMatch(selectorExtractor.apply(candidate), documentUri, documentLanguageId))
             {
                 result.add(candidate);
             }
@@ -214,20 +208,16 @@ public interface DocumentMatcher
      * @return the matching elements, grouped by their match score,
      *  in descending order (never <code>null</code>)
      */
-    default <T> NavigableMap<Integer, List<T>> getGroupedMatches(
-        Iterable<T> candidates,
-        Function<T, Iterable<DocumentFilter>> selectorExtractor,
-        URI documentUri, String documentLanguageId)
+    default <T> NavigableMap<Integer, List<T>> getGroupedMatches(Iterable<T> candidates,
+        Function<T, Iterable<DocumentFilter>> selectorExtractor, URI documentUri,
+        String documentLanguageId)
     {
-        NavigableMap<Integer, List<T>> result = new TreeMap<>(
-            Comparator.reverseOrder());
+        NavigableMap<Integer, List<T>> result = new TreeMap<>(Comparator.reverseOrder());
         for (T candidate : candidates)
         {
-            int score = match(selectorExtractor.apply(candidate), documentUri,
-                documentLanguageId);
+            int score = match(selectorExtractor.apply(candidate), documentUri, documentLanguageId);
             if (score > 0)
-                result.computeIfAbsent(score, k -> new ArrayList<>()).add(
-                    candidate);
+                result.computeIfAbsent(score, k -> new ArrayList<>()).add(candidate);
         }
         return result;
     }

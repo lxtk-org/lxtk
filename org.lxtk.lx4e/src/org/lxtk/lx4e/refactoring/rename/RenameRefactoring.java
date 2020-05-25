@@ -71,9 +71,8 @@ public class RenameRefactoring
      * @param changeFactory the {@link WorkspaceEditChangeFactory}
      *  for the refactoring (not <code>null</code>)
      */
-    public RenameRefactoring(String name, LanguageOperationTarget target,
-        IDocument document, int offset,
-        WorkspaceEditChangeFactory changeFactory)
+    public RenameRefactoring(String name, LanguageOperationTarget target, IDocument document,
+        int offset, WorkspaceEditChangeFactory changeFactory)
     {
         super(name, changeFactory);
         this.target = Objects.requireNonNull(target);
@@ -236,15 +235,13 @@ public class RenameRefactoring
             return RefactoringStatus.createFatalErrorStatus(
                 Messages.RenameRefactoring_No_rename_provider);
 
-        if (!Boolean.TRUE.equals(
-            renameProvider.getRegistrationOptions().getPrepareProvider()))
+        if (!Boolean.TRUE.equals(renameProvider.getRegistrationOptions().getPrepareProvider()))
             return new RefactoringStatus();
 
         PrepareRenameRequest request = newPrepareRenameRequest();
         request.setProvider(renameProvider);
         request.setParams(new TextDocumentPositionParams(
-            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-            getPosition()));
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), getPosition()));
         request.setProgressMonitor(pm);
 
         try
@@ -281,9 +278,9 @@ public class RenameRefactoring
 
         RenameRequest request = newRenameRequest();
         request.setProvider(renameProvider);
-        request.setParams(new RenameParams(
-            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-            getPosition(), getNewName()));
+        request.setParams(
+            new RenameParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+                getPosition(), getNewName()));
         request.setProgressMonitor(monitor.split(70));
 
         WorkspaceEdit workspaceEdit;
@@ -331,9 +328,8 @@ public class RenameRefactoring
             URI documentUri = target.getDocumentUri();
             LanguageService languageService = target.getLanguageService();
             renameProvider = languageService.getDocumentMatcher().getBestMatch(
-                languageService.getRenameProviders(),
-                RenameProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
+                languageService.getRenameProviders(), RenameProvider::getDocumentSelector,
+                documentUri, target.getLanguageId());
         }
         return renameProvider;
     }
@@ -354,8 +350,7 @@ public class RenameRefactoring
         return position;
     }
 
-    private static RefactoringStatus handleError(Throwable e, String msg)
-        throws CoreException
+    private static RefactoringStatus handleError(Throwable e, String msg) throws CoreException
     {
         if (msg == null)
             msg = e.getMessage();

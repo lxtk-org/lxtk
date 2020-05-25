@@ -23,15 +23,13 @@ import org.lxtk.SignatureHelpProvider;
  * A request for computing signature help.
  */
 public class SignatureHelpRequest
-    extends LanguageFeatureRequest<SignatureHelpProvider,
-        TextDocumentPositionParams, SignatureHelp>
+    extends LanguageFeatureRequest<SignatureHelpProvider, TextDocumentPositionParams, SignatureHelp>
 {
     @Override
     protected Future<SignatureHelp> send(SignatureHelpProvider provider,
         TextDocumentPositionParams params)
     {
-        setTitle(
-            MessageFormat.format(Messages.SignatureHelpRequest_title, params));
+        setTitle(MessageFormat.format(Messages.SignatureHelpRequest_title, params));
         return provider.getSignatureHelp(params);
     }
 }

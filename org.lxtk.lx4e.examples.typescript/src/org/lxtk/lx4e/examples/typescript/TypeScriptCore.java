@@ -37,8 +37,7 @@ public class TypeScriptCore
     /**
      * TypeScript Language Service.
      */
-    public static final LanguageService LANG_SERVICE =
-        new EclipseLanguageService();
+    public static final LanguageService LANG_SERVICE = new EclipseLanguageService();
 
     /**
      * TypeScript language identifier.
@@ -97,8 +96,7 @@ public class TypeScriptCore
      */
     public static void addElementChangeListener(IElementChangeListener listener)
     {
-        ModelManager.INSTANCE.getNotificationManager().addElementChangeListener(
-            listener);
+        ModelManager.INSTANCE.getNotificationManager().addElementChangeListener(listener);
     }
 
     /**
@@ -107,11 +105,9 @@ public class TypeScriptCore
      *
      * @param listener the listener (not <code>null</code>)
      */
-    public static void removeElementChangeListener(
-        IElementChangeListener listener)
+    public static void removeElementChangeListener(IElementChangeListener listener)
     {
-        ModelManager.INSTANCE.getNotificationManager().removeElementChangeListener(
-            listener);
+        ModelManager.INSTANCE.getNotificationManager().removeElementChangeListener(listener);
     }
 
     private TypeScriptCore()

@@ -35,6 +35,5 @@ public interface SignatureHelpProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    CompletableFuture<SignatureHelp> getSignatureHelp(
-        TextDocumentPositionParams params);
+    CompletableFuture<SignatureHelp> getSignatureHelp(TextDocumentPositionParams params);
 }

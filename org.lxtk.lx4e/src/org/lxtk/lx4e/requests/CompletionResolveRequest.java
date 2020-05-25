@@ -22,15 +22,12 @@ import org.lxtk.CompletionProvider;
  * A request for resolving completion item.
  */
 public class CompletionResolveRequest
-    extends
-    LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>
+    extends LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>
 {
     @Override
-    protected Future<CompletionItem> send(CompletionProvider provider,
-        CompletionItem item)
+    protected Future<CompletionItem> send(CompletionProvider provider, CompletionItem item)
     {
-        setTitle(MessageFormat.format(Messages.CompletionResolveRequest_title,
-            item));
+        setTitle(MessageFormat.format(Messages.CompletionResolveRequest_title, item));
         return provider.resolveCompletionItem(item);
     }
 }

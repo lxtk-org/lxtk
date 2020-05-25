@@ -75,9 +75,8 @@ public class ReferenceSearchQuery
      * @param includeDeclaration whether to include the declaration of the symbol
      *  denoted by the given text document position
      */
-    public ReferenceSearchQuery(LanguageOperationTarget target,
-        Position position, String wordAtPosition, Workspace workspace,
-        boolean includeDeclaration)
+    public ReferenceSearchQuery(LanguageOperationTarget target, Position position,
+        String wordAtPosition, Workspace workspace, boolean includeDeclaration)
     {
         super("", false, false, null); //$NON-NLS-1$
         this.target = Objects.requireNonNull(target);
@@ -98,8 +97,7 @@ public class ReferenceSearchQuery
     @Override
     public IStatus run(IProgressMonitor monitor)
     {
-        AbstractTextSearchResult result =
-            (AbstractTextSearchResult)getSearchResult();
+        AbstractTextSearchResult result = (AbstractTextSearchResult)getSearchResult();
         result.removeAll();
 
         ReferenceProvider provider = getReferenceProvider();
@@ -107,8 +105,7 @@ public class ReferenceSearchQuery
             return Status.OK_STATUS;
 
         ReferenceParams params = new ReferenceParams();
-        params.setTextDocument(
-            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()));
+        params.setTextDocument(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()));
         params.setPosition(position);
         params.setContext(new ReferenceContext(includeDeclaration));
 
@@ -124,8 +121,7 @@ public class ReferenceSearchQuery
         }
         catch (CompletionException e)
         {
-            return Activator.createErrorStatus(request.getErrorMessage(),
-                e.getCause());
+            return Activator.createErrorStatus(request.getErrorMessage(), e.getCause());
         }
 
         if (locations == null)
@@ -154,9 +150,8 @@ public class ReferenceSearchQuery
     {
         LanguageService languageService = target.getLanguageService();
         return languageService.getDocumentMatcher().getBestMatch(
-            languageService.getReferenceProviders(),
-            ReferenceProvider::getDocumentSelector, target.getDocumentUri(),
-            target.getLanguageId());
+            languageService.getReferenceProviders(), ReferenceProvider::getDocumentSelector,
+            target.getDocumentUri(), target.getLanguageId());
     }
 
     private Match toMatch(Location location)
@@ -168,8 +163,7 @@ public class ReferenceSearchQuery
         if (textDocument == null)
         {
             IFile[] files =
-                ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(
-                    locationUri);
+                ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(locationUri);
             if (files.length == 0)
                 return null;
             file = files[0];
@@ -182,23 +176,20 @@ public class ReferenceSearchQuery
         {
             if (!(textDocument instanceof EclipseTextDocument))
                 return null;
-            EclipseTextDocument eclipseTextDocument =
-                (EclipseTextDocument)textDocument;
+            EclipseTextDocument eclipseTextDocument = (EclipseTextDocument)textDocument;
             document = eclipseTextDocument.getUnderlyingDocument();
-            file = ResourceUtil.getFile(
-                eclipseTextDocument.getCorrespondingElement());
+            file = ResourceUtil.getFile(eclipseTextDocument.getCorrespondingElement());
         }
         try
         {
             int lineNumber = location.getRange().getStart().getLine();
             IRegion lineRegion = document.getLineInformation(lineNumber);
-            IRegion matchRegion =
-                DocumentUtil.toRegion(document, location.getRange());
-            return new org.eclipse.search.internal.ui.text.FileMatch(file,
-                matchRegion.getOffset(), matchRegion.getLength(),
-                new org.eclipse.search.internal.ui.text.LineElement(file,
-                    lineNumber + 1, lineRegion.getOffset(), document.get(
-                        lineRegion.getOffset(), lineRegion.getLength())));
+            IRegion matchRegion = DocumentUtil.toRegion(document, location.getRange());
+            return new org.eclipse.search.internal.ui.text.FileMatch(file, matchRegion.getOffset(),
+                matchRegion.getLength(),
+                new org.eclipse.search.internal.ui.text.LineElement(file, lineNumber + 1,
+                    lineRegion.getOffset(),
+                    document.get(lineRegion.getOffset(), lineRegion.getLength())));
         }
         catch (BadLocationException e)
         {
@@ -216,15 +207,13 @@ public class ReferenceSearchQuery
     @Override
     public String getResultLabel(int nMatches)
     {
-        String label = MessageFormat.format(
-            Messages.ReferenceSearchQuery_Result_label_prefix, wordAtPosition,
-            fileName, position.getLine() + 1);
+        String label = MessageFormat.format(Messages.ReferenceSearchQuery_Result_label_prefix,
+            wordAtPosition, fileName, position.getLine() + 1);
 
         if (nMatches == 1)
             label += Messages.ReferenceSearchQuery_Result_label_suffix_singular;
         else
-            label += MessageFormat.format(
-                Messages.ReferenceSearchQuery_Result_label_suffix_plural,
+            label += MessageFormat.format(Messages.ReferenceSearchQuery_Result_label_suffix_plural,
                 nMatches);
 
         return label;
@@ -246,8 +235,7 @@ public class ReferenceSearchQuery
 
     private static String readContents(IFile file)
     {
-        TextFileSnapshot snapshot =
-            new TextFileSnapshot(file, TextFileSnapshot.Layer.FILESYSTEM);
+        TextFileSnapshot snapshot = new TextFileSnapshot(file, TextFileSnapshot.Layer.FILESYSTEM);
         if (!snapshot.exists())
             return null;
         return snapshot.getContents();

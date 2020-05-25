@@ -26,17 +26,14 @@ import org.lxtk.DefinitionProvider;
  * A request for computing definition locations.
  */
 public class DefinitionRequest
-    extends
-    LanguageFeatureRequest<DefinitionProvider, TextDocumentPositionParams,
+    extends LanguageFeatureRequest<DefinitionProvider, TextDocumentPositionParams,
         Either<List<? extends Location>, List<? extends LocationLink>>>
 {
     @Override
-    protected Future<
-        Either<List<? extends Location>, List<? extends LocationLink>>> send(
-            DefinitionProvider provider, TextDocumentPositionParams params)
+    protected Future<Either<List<? extends Location>, List<? extends LocationLink>>> send(
+        DefinitionProvider provider, TextDocumentPositionParams params)
     {
-        setTitle(
-            MessageFormat.format(Messages.DefinitionRequest_title, params));
+        setTitle(MessageFormat.format(Messages.DefinitionRequest_title, params));
         return provider.getDefinition(params);
     }
 }

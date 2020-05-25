@@ -59,8 +59,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private final Log log;
     private final BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
-    private final Map<String, DynamicFeature<? super S>> dynamicFeatures =
-        new HashMap<>();
+    private final Map<String, DynamicFeature<? super S>> dynamicFeatures = new HashMap<>();
     private List<DocumentFilter> documentSelector;
 
     /**
@@ -84,8 +83,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         {
             if (feature instanceof DynamicFeature)
             {
-                DynamicFeature<? super S> dynamicFeature =
-                    (DynamicFeature<? super S>)feature;
+                DynamicFeature<? super S> dynamicFeature = (DynamicFeature<? super S>)feature;
                 Set<String> methods = dynamicFeature.getMethods();
                 if (methods.isEmpty())
                     throw new IllegalArgumentException(
@@ -135,12 +133,10 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         {
             for (Registration registration : params.getRegistrations())
             {
-                DynamicFeature<? super S> feature = dynamicFeatures.get(
-                    registration.getMethod());
+                DynamicFeature<? super S> feature = dynamicFeatures.get(registration.getMethod());
                 if (feature == null)
-                    throw new IllegalStateException(
-                        "No feature implementation is found for method " //$NON-NLS-1$
-                            + registration.getMethod());
+                    throw new IllegalStateException("No feature implementation is found for method " //$NON-NLS-1$
+                        + registration.getMethod());
                 Object registerOptions = registration.getRegisterOptions();
                 if (registerOptions instanceof JsonObject)
                 {
@@ -152,8 +148,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
                         {
                             rO.remove(DOCUMENT_SELECTOR);
                             rO.add(DOCUMENT_SELECTOR,
-                                DefaultGson.INSTANCE.toJsonTree(
-                                    documentSelector));
+                                DefaultGson.INSTANCE.toJsonTree(documentSelector));
                         }
                     }
                 }
@@ -163,19 +158,16 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     @Override
-    public CompletableFuture<Void> unregisterCapability(
-        UnregistrationParams params)
+    public CompletableFuture<Void> unregisterCapability(UnregistrationParams params)
     {
         return CompletableFuture.runAsync(() ->
         {
             for (Unregistration unregistration : params.getUnregisterations())
             {
-                DynamicFeature<? super S> feature = dynamicFeatures.get(
-                    unregistration.getMethod());
+                DynamicFeature<? super S> feature = dynamicFeatures.get(unregistration.getMethod());
                 if (feature == null)
-                    throw new IllegalStateException(
-                        "No feature implementation is found for method " //$NON-NLS-1$
-                            + unregistration.getMethod());
+                    throw new IllegalStateException("No feature implementation is found for method " //$NON-NLS-1$
+                        + unregistration.getMethod());
                 feature.unregister(unregistration);
             }
         });
@@ -184,8 +176,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams params)
     {
-        diagnosticConsumer.accept(DocumentUri.convert(params.getUri()),
-            params.getDiagnostics());
+        diagnosticConsumer.accept(DocumentUri.convert(params.getUri()), params.getDiagnostics());
     }
 
     @Override

@@ -23,12 +23,10 @@ import org.lxtk.HoverProvider;
  * A request for computing hover information.
  */
 public class HoverRequest
-    extends
-    LanguageFeatureRequest<HoverProvider, TextDocumentPositionParams, Hover>
+    extends LanguageFeatureRequest<HoverProvider, TextDocumentPositionParams, Hover>
 {
     @Override
-    protected Future<Hover> send(HoverProvider provider,
-        TextDocumentPositionParams params)
+    protected Future<Hover> send(HoverProvider provider, TextDocumentPositionParams params)
     {
         setTitle(MessageFormat.format(Messages.HoverRequest_title, params));
         return provider.getHover(params);

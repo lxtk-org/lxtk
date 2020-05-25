@@ -64,8 +64,7 @@ public class DiagnosticAnnotations
     {
         this.workspace = Objects.requireNonNull(workspace);
         this.subscription = workspace.onDidRemoveTextDocument().subscribe(
-            textDocument -> CompletableFuture.runAsync(() -> removeAnnotations(
-                textDocument)));
+            textDocument -> CompletableFuture.runAsync(() -> removeAnnotations(textDocument)));
     }
 
     /**
@@ -79,8 +78,7 @@ public class DiagnosticAnnotations
     }
 
     @Override
-    public final synchronized void accept(URI uri,
-        Collection<Diagnostic> diagnostics)
+    public final synchronized void accept(URI uri, Collection<Diagnostic> diagnostics)
     {
         if (disposed)
             return;
@@ -92,8 +90,7 @@ public class DiagnosticAnnotations
         IAnnotationModel annotationModel = getAnnotationModel(textDocument);
 
         Collection<Annotation> toRemove = null;
-        Map<IAnnotationModel, Collection<Annotation>> annotations = info.get(
-            textDocument);
+        Map<IAnnotationModel, Collection<Annotation>> annotations = info.get(textDocument);
         if (annotations != null)
         {
             for (Map.Entry<IAnnotationModel, Collection<Annotation>> entry : annotations.entrySet())
@@ -104,8 +101,7 @@ public class DiagnosticAnnotations
                 {
                     try
                     {
-                        replaceAnnotations(entry.getKey(), entry.getValue(),
-                            null);
+                        replaceAnnotations(entry.getKey(), entry.getValue(), null);
                     }
                     catch (Throwable e)
                     {
@@ -127,8 +123,7 @@ public class DiagnosticAnnotations
             {
                 toAdd = toDiagnosticAnnotations(diagnostics, document);
                 if (!toAdd.isEmpty())
-                    addAnnotationInfo(textDocument, annotationModel,
-                        toAdd.keySet());
+                    addAnnotationInfo(textDocument, annotationModel, toAdd.keySet());
             }
         }
 
@@ -154,8 +149,7 @@ public class DiagnosticAnnotations
         if (info.isEmpty())
             return;
 
-        info.values().forEach(annotations -> annotations.forEach((
-            annotationModel, toRemove) ->
+        info.values().forEach(annotations -> annotations.forEach((annotationModel, toRemove) ->
         {
             try
             {
@@ -188,8 +182,7 @@ public class DiagnosticAnnotations
 
     private synchronized void removeAnnotations(TextDocument textDocument)
     {
-        Map<IAnnotationModel, Collection<Annotation>> annotations = info.remove(
-            textDocument);
+        Map<IAnnotationModel, Collection<Annotation>> annotations = info.remove(textDocument);
         if (annotations == null)
             return;
         annotations.forEach((annotationModel, toRemove) ->
@@ -211,8 +204,7 @@ public class DiagnosticAnnotations
      * @param uri not <code>null</code>
      * @param diagnostics not <code>null</code>
      */
-    public final synchronized void addAnnotations(URI uri,
-        Collection<Diagnostic> diagnostics)
+    public final synchronized void addAnnotations(URI uri, Collection<Diagnostic> diagnostics)
     {
         Objects.requireNonNull(uri);
         Objects.requireNonNull(diagnostics);
@@ -232,8 +224,7 @@ public class DiagnosticAnnotations
         if (document == null)
             return;
 
-        Map<Annotation, Position> toAdd = toDiagnosticAnnotations(diagnostics,
-            document);
+        Map<Annotation, Position> toAdd = toDiagnosticAnnotations(diagnostics, document);
         if (toAdd.isEmpty())
             return;
 
@@ -282,11 +273,10 @@ public class DiagnosticAnnotations
         return new DiagnosticAnnotation(diagnostic);
     }
 
-    private Map<Annotation, Position> toDiagnosticAnnotations(
-        Collection<Diagnostic> diagnostics, IDocument document)
+    private Map<Annotation, Position> toDiagnosticAnnotations(Collection<Diagnostic> diagnostics,
+        IDocument document)
     {
-        Map<Annotation, Position> result = new IdentityHashMap<>(
-            diagnostics.size());
+        Map<Annotation, Position> result = new IdentityHashMap<>(diagnostics.size());
         for (Diagnostic diagnostic : diagnostics)
         {
             IRegion r;
@@ -299,19 +289,17 @@ public class DiagnosticAnnotations
                 Activator.logError(e);
                 continue;
             }
-            result.put(createAnnotation(diagnostic), new Position(r.getOffset(),
-                r.getLength()));
+            result.put(createAnnotation(diagnostic), new Position(r.getOffset(), r.getLength()));
         }
         return result;
     }
 
-    private void addAnnotationInfo(TextDocument textDocument,
-        IAnnotationModel annotationModel, Collection<Annotation> toAdd)
+    private void addAnnotationInfo(TextDocument textDocument, IAnnotationModel annotationModel,
+        Collection<Annotation> toAdd)
     {
         Map<IAnnotationModel, Collection<Annotation>> annotationsMap =
             info.computeIfAbsent(textDocument, k -> new IdentityHashMap<>(2));
-        Collection<Annotation> annotations = annotationsMap.get(
-            annotationModel);
+        Collection<Annotation> annotations = annotationsMap.get(annotationModel);
         if (annotations != null)
             annotations.addAll(toAdd);
         else

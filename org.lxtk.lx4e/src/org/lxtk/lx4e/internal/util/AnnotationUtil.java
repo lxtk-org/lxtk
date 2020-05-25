@@ -65,8 +65,7 @@ public class AnnotationUtil
                 }
                 for (Map.Entry<Annotation, Position> entry : toAdd.entrySet())
                 {
-                    annotationModel.addAnnotation(entry.getKey(),
-                        entry.getValue());
+                    annotationModel.addAnnotation(entry.getKey(), entry.getValue());
                 }
             }
         }

@@ -44,8 +44,7 @@ public class FirstMatchHover
     @Override
     public IRegion getHoverRegion(ITextViewer textViewer, int offset)
     {
-        return DefaultWordFinder.INSTANCE.findWord(textViewer.getDocument(),
-            offset);
+        return DefaultWordFinder.INSTANCE.findWord(textViewer.getDocument(), offset);
     }
 
     @Override
@@ -79,8 +78,8 @@ public class FirstMatchHover
 
             if (hover instanceof ITextHoverExtension2)
             {
-                Object hoverInfo = ((ITextHoverExtension2)hover).getHoverInfo2(
-                    textViewer, hoverRegion);
+                Object hoverInfo =
+                    ((ITextHoverExtension2)hover).getHoverInfo2(textViewer, hoverRegion);
                 if (hoverInfo != null)
                 {
                     currentHover = hover;

@@ -34,6 +34,5 @@ public interface ReferenceProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    CompletableFuture<List<? extends Location>> getReferences(
-        ReferenceParams params);
+    CompletableFuture<List<? extends Location>> getReferences(ReferenceParams params);
 }

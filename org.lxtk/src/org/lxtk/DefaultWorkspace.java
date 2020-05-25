@@ -35,12 +35,9 @@ import org.lxtk.util.UriUtil.Normalization;
 public class DefaultWorkspace
     implements Workspace
 {
-    private final Map<URI, TextDocument> textDocuments =
-        new ConcurrentHashMap<>();
-    private final EventEmitter<TextDocument> onDidAddTextDocument =
-        new EventEmitter<>();
-    private final EventEmitter<TextDocument> onDidRemoveTextDocument =
-        new EventEmitter<>();
+    private final Map<URI, TextDocument> textDocuments = new ConcurrentHashMap<>();
+    private final EventEmitter<TextDocument> onDidAddTextDocument = new EventEmitter<>();
+    private final EventEmitter<TextDocument> onDidRemoveTextDocument = new EventEmitter<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChangeTextDocument =
         new EventEmitter<>();
     private final Consumer<TextDocumentChangeEvent> textDocumentChangeEventConsumer =
@@ -52,12 +49,10 @@ public class DefaultWorkspace
         URI uri = normalize(document.getUri());
         if (textDocuments.putIfAbsent(uri, document) != null)
         {
-            throw new IllegalArgumentException(
-                "The workspace already contains a document with URI " //$NON-NLS-1$
-                    + uri);
+            throw new IllegalArgumentException("The workspace already contains a document with URI " //$NON-NLS-1$
+                + uri);
         }
-        Disposable subscription = document.onDidChange().subscribe(
-            textDocumentChangeEventConsumer);
+        Disposable subscription = document.onDidChange().subscribe(textDocumentChangeEventConsumer);
         onDidAddTextDocument.fire(document);
         return () ->
         {
@@ -107,7 +102,6 @@ public class DefaultWorkspace
      */
     protected URI normalize(URI uri)
     {
-        return UriUtil.normalize(uri, EnumSet.of(Normalization.ENCODING,
-            Normalization.PATH));
+        return UriUtil.normalize(uri, EnumSet.of(Normalization.ENCODING, Normalization.PATH));
     }
 }

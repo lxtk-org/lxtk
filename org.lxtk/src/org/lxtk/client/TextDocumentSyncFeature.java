@@ -62,15 +62,14 @@ public final class TextDocumentSyncFeature
     private static final String DID_OPEN = "textDocument/didOpen"; //$NON-NLS-1$
     private static final String DID_CLOSE = "textDocument/didClose"; //$NON-NLS-1$
     private static final String DID_CHANGE = "textDocument/didChange"; //$NON-NLS-1$
-    private static final Set<String> METHODS = Collections.unmodifiableSet(
-        new HashSet<>(Arrays.asList(DID_OPEN, DID_CLOSE, DID_CHANGE)));
+    private static final Set<String> METHODS =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(DID_OPEN, DID_CLOSE, DID_CHANGE)));
 
     private final Workspace workspace;
     private LanguageServer languageServer;
     private Map<String, Map<String, TextDocumentRegistrationOptions>> registrations;
     private final Map<String, Disposable> subscriptions = new HashMap<>();
-    private final Map<TextDocument, Integer> syncedDocumentVersions =
-        new HashMap<>();
+    private final Map<TextDocument, Integer> syncedDocumentVersions = new HashMap<>();
 
     /**
      * Constructor.
@@ -92,13 +91,13 @@ public final class TextDocumentSyncFeature
     public void fillClientCapabilities(ClientCapabilities capabilities)
     {
         ClientCapabilitiesUtil.getOrCreateSynchronization(
-            ClientCapabilitiesUtil.getOrCreateTextDocument(
-                capabilities)).setDynamicRegistration(true);
+            ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities)).setDynamicRegistration(
+                true);
     }
 
     @Override
-    public synchronized void initialize(LanguageServer server,
-        ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
+    public synchronized void initialize(LanguageServer server, ServerCapabilities capabilities,
+        List<DocumentFilter> documentSelector)
     {
         languageServer = server;
         registrations = new HashMap<>();
@@ -118,8 +117,8 @@ public final class TextDocumentSyncFeature
             TextDocumentChangeRegistrationOptions registrationOptions =
                 new TextDocumentChangeRegistrationOptions(syncKind);
             registrationOptions.setDocumentSelector(documentSelector);
-            register(new Registration(UUID.randomUUID().toString(), DID_CHANGE,
-                registrationOptions));
+            register(
+                new Registration(UUID.randomUUID().toString(), DID_CHANGE, registrationOptions));
         }
     }
 
@@ -134,18 +133,16 @@ public final class TextDocumentSyncFeature
                 ? TextDocumentChangeRegistrationOptions.class
                 : TextDocumentRegistrationOptions.class;
         Object rO = registration.getRegisterOptions();
-        TextDocumentRegistrationOptions registrationOptions =
-            rO instanceof JsonElement ? DefaultGson.INSTANCE.fromJson(
-                (JsonElement)rO, optionsClass) : optionsClass.cast(rO);
-        if (registrationOptions == null
-            || registrationOptions.getDocumentSelector() == null)
+        TextDocumentRegistrationOptions registrationOptions = rO instanceof JsonElement
+            ? DefaultGson.INSTANCE.fromJson((JsonElement)rO, optionsClass) : optionsClass.cast(rO);
+        if (registrationOptions == null || registrationOptions.getDocumentSelector() == null)
             return;
 
         if (registrations == null)
             return;
 
-        Map<String, TextDocumentRegistrationOptions> map = registrations.get(
-            registration.getMethod());
+        Map<String, TextDocumentRegistrationOptions> map =
+            registrations.get(registration.getMethod());
         if (map != null && map.containsKey(registration.getId()))
             throw new IllegalArgumentException();
 
@@ -157,18 +154,15 @@ public final class TextDocumentSyncFeature
             Disposable subsription = null;
             if (DID_OPEN.equals(registration.getMethod()))
             {
-                subsription = workspace.onDidAddTextDocument().subscribe(
-                    this::onDidAdd);
+                subsription = workspace.onDidAddTextDocument().subscribe(this::onDidAdd);
             }
             else if (DID_CLOSE.equals(registration.getMethod()))
             {
-                subsription = workspace.onDidRemoveTextDocument().subscribe(
-                    this::onDidRemove);
+                subsription = workspace.onDidRemoveTextDocument().subscribe(this::onDidRemove);
             }
             else if (DID_CHANGE.equals(registration.getMethod()))
             {
-                subsription = workspace.onDidChangeTextDocument().subscribe(
-                    this::onDidChange);
+                subsription = workspace.onDidChangeTextDocument().subscribe(this::onDidChange);
             }
             if (subsription != null)
                 subscriptions.put(registration.getMethod(), subsription);
@@ -180,14 +174,12 @@ public final class TextDocumentSyncFeature
         {
             for (TextDocument document : workspace.getTextDocuments())
             {
-                if (!syncedDocumentVersions.containsKey(document) && isMatch(
-                    document, registrationOptions))
+                if (!syncedDocumentVersions.containsKey(document)
+                    && isMatch(document, registrationOptions))
                 {
-                    TextDocumentSnapshot snapshot =
-                        document.getLastChange().getSnapshot();
+                    TextDocumentSnapshot snapshot = document.getLastChange().getSnapshot();
                     languageServer.getTextDocumentService().didOpen(
-                        new DidOpenTextDocumentParams(toTextDocumentItem(
-                            snapshot)));
+                        new DidOpenTextDocumentParams(toTextDocumentItem(snapshot)));
                     syncedDocumentVersions.put(document, snapshot.getVersion());
                 }
             }
@@ -200,13 +192,12 @@ public final class TextDocumentSyncFeature
         if (registrations == null)
             return;
 
-        Map<String, TextDocumentRegistrationOptions> map = registrations.get(
-            unregistration.getMethod());
+        Map<String, TextDocumentRegistrationOptions> map =
+            registrations.get(unregistration.getMethod());
         if (map == null)
             return;
 
-        TextDocumentRegistrationOptions registrationOptions = map.remove(
-            unregistration.getId());
+        TextDocumentRegistrationOptions registrationOptions = map.remove(unregistration.getId());
         if (registrationOptions == null)
             return;
 
@@ -214,8 +205,7 @@ public final class TextDocumentSyncFeature
         {
             registrations.remove(unregistration.getMethod());
 
-            Disposable subscription = subscriptions.remove(
-                unregistration.getMethod());
+            Disposable subscription = subscriptions.remove(unregistration.getMethod());
             if (subscription != null)
                 subscription.dispose();
         }
@@ -227,10 +217,8 @@ public final class TextDocumentSyncFeature
                 if (isMatch(document, registrationOptions)
                     && !hasMatchingRegistration(document, DID_CLOSE))
                 {
-                    languageServer.getTextDocumentService().didClose(
-                        new DidCloseTextDocumentParams(
-                            DocumentUri.toTextDocumentIdentifier(
-                                document.getUri())));
+                    languageServer.getTextDocumentService().didClose(new DidCloseTextDocumentParams(
+                        DocumentUri.toTextDocumentIdentifier(document.getUri())));
                     syncedDocumentVersions.remove(document);
                 }
             }
@@ -242,8 +230,7 @@ public final class TextDocumentSyncFeature
     {
         registrations = null;
         syncedDocumentVersions.clear();
-        Collection<Disposable> disposables = new ArrayList<>(
-            subscriptions.values());
+        Collection<Disposable> disposables = new ArrayList<>(subscriptions.values());
         subscriptions.clear();
         Disposable.disposeAll(disposables);
     }
@@ -253,8 +240,7 @@ public final class TextDocumentSyncFeature
         if (!syncedDocumentVersions.containsKey(document)
             && hasMatchingRegistration(document, DID_OPEN))
         {
-            TextDocumentSnapshot snapshot =
-                document.getLastChange().getSnapshot();
+            TextDocumentSnapshot snapshot = document.getLastChange().getSnapshot();
             languageServer.getTextDocumentService().didOpen(
                 new DidOpenTextDocumentParams(toTextDocumentItem(snapshot)));
             syncedDocumentVersions.put(document, snapshot.getVersion());
@@ -266,9 +252,8 @@ public final class TextDocumentSyncFeature
         if (syncedDocumentVersions.containsKey(document)
             && hasMatchingRegistration(document, DID_CLOSE))
         {
-            languageServer.getTextDocumentService().didClose(
-                new DidCloseTextDocumentParams(
-                    DocumentUri.toTextDocumentIdentifier(document.getUri())));
+            languageServer.getTextDocumentService().didClose(new DidCloseTextDocumentParams(
+                DocumentUri.toTextDocumentIdentifier(document.getUri())));
             syncedDocumentVersions.remove(document);
         }
     }
@@ -282,13 +267,11 @@ public final class TextDocumentSyncFeature
         TextDocumentSnapshot snapshot = event.getSnapshot();
 
         Integer syncedDocumentVersion = syncedDocumentVersions.get(document);
-        if (syncedDocumentVersion == null
-            || syncedDocumentVersion >= snapshot.getVersion())
+        if (syncedDocumentVersion == null || syncedDocumentVersion >= snapshot.getVersion())
             return;
 
-        VersionedTextDocumentIdentifier versionedId =
-            new VersionedTextDocumentIdentifier(DocumentUri.convert(
-                document.getUri()), snapshot.getVersion());
+        VersionedTextDocumentIdentifier versionedId = new VersionedTextDocumentIdentifier(
+            DocumentUri.convert(document.getUri()), snapshot.getVersion());
 
         for (TextDocumentRegistrationOptions registrationOptions : registrations.get(
             DID_CHANGE).values())
@@ -300,25 +283,21 @@ public final class TextDocumentSyncFeature
                 if (syncKind == TextDocumentSyncKind.Incremental)
                 {
                     languageServer.getTextDocumentService().didChange(
-                        new DidChangeTextDocumentParams(versionedId,
-                            event.getContentChanges()));
+                        new DidChangeTextDocumentParams(versionedId, event.getContentChanges()));
                     syncedDocumentVersions.put(document, snapshot.getVersion());
                 }
                 else if (syncKind == TextDocumentSyncKind.Full)
                 {
                     languageServer.getTextDocumentService().didChange(
-                        new DidChangeTextDocumentParams(versionedId,
-                            Collections.singletonList(
-                                new TextDocumentContentChangeEvent(
-                                    snapshot.getText()))));
+                        new DidChangeTextDocumentParams(versionedId, Collections.singletonList(
+                            new TextDocumentContentChangeEvent(snapshot.getText()))));
                     syncedDocumentVersions.put(document, snapshot.getVersion());
                 }
             }
         }
     }
 
-    private synchronized boolean hasMatchingRegistration(TextDocument document,
-        String method)
+    private synchronized boolean hasMatchingRegistration(TextDocument document, String method)
     {
         for (TextDocumentRegistrationOptions registrationOptions : registrations.get(
             method).values())
@@ -332,17 +311,14 @@ public final class TextDocumentSyncFeature
     private boolean isMatch(TextDocument document,
         TextDocumentRegistrationOptions registrationOptions)
     {
-        return workspace.getDocumentMatcher().isMatch(
-            registrationOptions.getDocumentSelector(), document.getUri(),
-            document.getLanguageId());
+        return workspace.getDocumentMatcher().isMatch(registrationOptions.getDocumentSelector(),
+            document.getUri(), document.getLanguageId());
     }
 
-    private static TextDocumentItem toTextDocumentItem(
-        TextDocumentSnapshot snapshot)
+    private static TextDocumentItem toTextDocumentItem(TextDocumentSnapshot snapshot)
     {
         TextDocument document = snapshot.getDocument();
         return new TextDocumentItem(DocumentUri.convert(document.getUri()),
-            document.getLanguageId(), snapshot.getVersion(),
-            snapshot.getText());
+            document.getLanguageId(), snapshot.getVersion(), snapshot.getText());
     }
 }

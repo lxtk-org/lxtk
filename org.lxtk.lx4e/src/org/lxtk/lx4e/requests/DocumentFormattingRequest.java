@@ -24,15 +24,14 @@ import org.lxtk.DocumentFormattingProvider;
  * A request for computing document formatting edits.
  */
 public class DocumentFormattingRequest
-    extends LanguageFeatureRequest<DocumentFormattingProvider,
-        DocumentFormattingParams, List<? extends TextEdit>>
+    extends LanguageFeatureRequest<DocumentFormattingProvider, DocumentFormattingParams,
+        List<? extends TextEdit>>
 {
     @Override
-    protected Future<List<? extends TextEdit>> send(
-        DocumentFormattingProvider provider, DocumentFormattingParams params)
+    protected Future<List<? extends TextEdit>> send(DocumentFormattingProvider provider,
+        DocumentFormattingParams params)
     {
-        setTitle(MessageFormat.format(Messages.DocumentFormattingRequest_title,
-            params));
+        setTitle(MessageFormat.format(Messages.DocumentFormattingRequest_title, params));
         return provider.getFormattingEdits(params);
     }
 }

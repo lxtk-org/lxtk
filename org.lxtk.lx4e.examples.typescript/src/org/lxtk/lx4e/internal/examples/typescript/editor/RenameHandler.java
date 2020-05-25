@@ -32,11 +32,10 @@ public class RenameHandler
     extends AbstractRenameHandler
 {
     @Override
-    protected RenameRefactoring createRefactoring(
-        LanguageOperationTarget target, IDocument document, int offset)
+    protected RenameRefactoring createRefactoring(LanguageOperationTarget target,
+        IDocument document, int offset)
     {
-        RenameRefactoring refactoring = super.createRefactoring(target,
-            document, offset);
+        RenameRefactoring refactoring = super.createRefactoring(target, document, offset);
         if (refactoring != null && refactoring.isApplicable())
         {
             IRegion r = DefaultWordFinder.INSTANCE.findWord(document, offset);
@@ -44,8 +43,7 @@ public class RenameHandler
             {
                 try
                 {
-                    refactoring.setCurrentName(document.get(r.getOffset(),
-                        r.getLength()));
+                    refactoring.setCurrentName(document.get(r.getOffset(), r.getLength()));
                     return refactoring;
                 }
                 catch (BadLocationException e)
@@ -58,8 +56,7 @@ public class RenameHandler
     }
 
     @Override
-    protected LanguageOperationTarget getLanguageOperationTarget(
-        IEditorPart editor)
+    protected LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor)
     {
         return TypeScriptOperationTargetProvider.getOperationTarget(editor);
     }

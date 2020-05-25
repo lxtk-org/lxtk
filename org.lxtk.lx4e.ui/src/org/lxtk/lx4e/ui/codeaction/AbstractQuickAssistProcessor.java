@@ -111,10 +111,9 @@ public abstract class AbstractQuickAssistProcessor
 
         CodeActionRequest request = newCodeActionRequest();
         request.setProvider(provider);
-        request.setParams(new CodeActionParams(
-            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-            range, getCodeActionContext(new TextInvocationContext(viewer,
-                offset, length))));
+        request.setParams(
+            new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+                range, getCodeActionContext(new TextInvocationContext(viewer, offset, length))));
         request.setTimeout(getCodeActionTimeout());
         request.setMayThrow(false);
 
@@ -217,17 +216,15 @@ public abstract class AbstractQuickAssistProcessor
      * @param invocationContext never <code>null</code>
      * @return the corresponding diagnostics (not <code>null</code>)
      */
-    protected List<Diagnostic> getDiagnostics(
-        IQuickAssistInvocationContext invocationContext)
+    protected List<Diagnostic> getDiagnostics(IQuickAssistInvocationContext invocationContext)
     {
         ISourceViewer viewer = invocationContext.getSourceViewer();
         if (viewer == null)
             return Collections.emptyList();
 
-        IAnnotationModel annotationModel =
-            viewer instanceof ISourceViewerExtension2
-                ? ((ISourceViewerExtension2)viewer).getVisualAnnotationModel()
-                : viewer.getAnnotationModel();
+        IAnnotationModel annotationModel = viewer instanceof ISourceViewerExtension2
+            ? ((ISourceViewerExtension2)viewer).getVisualAnnotationModel()
+            : viewer.getAnnotationModel();
         if (annotationModel == null)
             return Collections.emptyList();
 
@@ -235,11 +232,10 @@ public abstract class AbstractQuickAssistProcessor
         int length = invocationContext.getLength();
 
         List<Diagnostic> result = new ArrayList<>();
-        Iterator<Annotation> it =
-            annotationModel instanceof IAnnotationModelExtension2
-                ? ((IAnnotationModelExtension2)annotationModel).getAnnotationIterator(
-                    offset, length, true, true)
-                : annotationModel.getAnnotationIterator();
+        Iterator<Annotation> it = annotationModel instanceof IAnnotationModelExtension2
+            ? ((IAnnotationModelExtension2)annotationModel).getAnnotationIterator(offset, length,
+                true, true)
+            : annotationModel.getAnnotationIterator();
         while (it.hasNext())
         {
             Annotation annotation = it.next();
@@ -286,8 +282,7 @@ public abstract class AbstractQuickAssistProcessor
             return ((IDiagnosticAnnotation)annotation).getDiagnostic();
 
         if (annotation instanceof SimpleMarkerAnnotation)
-            return getDiagnostic(
-                ((SimpleMarkerAnnotation)annotation).getMarker(),
+            return getDiagnostic(((SimpleMarkerAnnotation)annotation).getMarker(),
                 DiagnosticMarkers.DIAGNOSTIC_ATTRIBUTE);
 
         return null;
@@ -300,8 +295,7 @@ public abstract class AbstractQuickAssistProcessor
      * @param diagnosticAttributeName never <code>null</code>
      * @return the requested diagnostic, or <code>null</code> if none
      */
-    protected Diagnostic getDiagnostic(IMarker marker,
-        String diagnosticAttributeName)
+    protected Diagnostic getDiagnostic(IMarker marker, String diagnosticAttributeName)
     {
         String value = marker.getAttribute(diagnosticAttributeName, null);
         if (value == null)
@@ -318,8 +312,7 @@ public abstract class AbstractQuickAssistProcessor
      * @param commandService never <code>null</code>
      * @return the created proposal (not <code>null</code>)
      */
-    protected ICompletionProposal newProposal(Command command,
-        CommandService commandService)
+    protected ICompletionProposal newProposal(Command command, CommandService commandService)
     {
         return new CommandProposal(command, commandService);
     }
@@ -331,8 +324,7 @@ public abstract class AbstractQuickAssistProcessor
      * @param commandService never <code>null</code>
      * @return the created proposal (not <code>null</code>)
      */
-    protected ICompletionProposal newProposal(CodeAction codeAction,
-        CommandService commandService)
+    protected ICompletionProposal newProposal(CodeAction codeAction, CommandService commandService)
     {
         return new CodeActionProposal(codeAction, commandService);
     }
@@ -418,8 +410,7 @@ public abstract class AbstractQuickAssistProcessor
          * @param codeAction not <code>null</code>
          * @param commandService not <code>null</code>
          */
-        public CodeActionProposal(CodeAction codeAction,
-            CommandService commandService)
+        public CodeActionProposal(CodeAction codeAction, CommandService commandService)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
             this.commandService = Objects.requireNonNull(commandService);
@@ -428,8 +419,8 @@ public abstract class AbstractQuickAssistProcessor
         @Override
         public void apply(IDocument document)
         {
-            CodeActions.execute(codeAction, getDisplayString(),
-                getWorkspaceEditChangeFactory(), commandService);
+            CodeActions.execute(codeAction, getDisplayString(), getWorkspaceEditChangeFactory(),
+                commandService);
         }
 
         @Override

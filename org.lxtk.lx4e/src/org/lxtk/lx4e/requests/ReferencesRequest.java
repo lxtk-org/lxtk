@@ -24,15 +24,13 @@ import org.lxtk.ReferenceProvider;
  * A request for computing references.
  */
 public class ReferencesRequest
-    extends LanguageFeatureRequest<ReferenceProvider, ReferenceParams,
-        List<? extends Location>>
+    extends LanguageFeatureRequest<ReferenceProvider, ReferenceParams, List<? extends Location>>
 {
     @Override
     protected Future<List<? extends Location>> send(ReferenceProvider provider,
         ReferenceParams params)
     {
-        setTitle(
-            MessageFormat.format(Messages.ReferencesRequest_title, params));
+        setTitle(MessageFormat.format(Messages.ReferencesRequest_title, params));
         return provider.getReferences(params);
     }
 }

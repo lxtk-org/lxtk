@@ -56,16 +56,14 @@ import com.google.gson.JsonObject;
 public class JsonLanguageClient
     extends AbstractLanguageClientController<LanguageServer>
 {
-    private static final Log LOG = new EclipseLog(
-        Activator.getDefault().getBundle(), "json-language-client"); //$NON-NLS-1$
+    private static final Log LOG =
+        new EclipseLog(Activator.getDefault().getBundle(), "json-language-client"); //$NON-NLS-1$
 
     private static final List<DocumentFilter> DOCUMENT_SELECTOR =
-        Collections.singletonList(new DocumentFilter(JsonCore.LANG_ID, null,
-            null));
+        Collections.singletonList(new DocumentFilter(JsonCore.LANG_ID, null, null));
 
-    private final BufferingDiagnosticConsumer diagnosticConsumer =
-        new BufferingDiagnosticConsumer(new DefaultDiagnosticConsumer(
-            new DiagnosticMarkers("org.lxtk.lx4e.examples.json.problem"), //$NON-NLS-1$
+    private final BufferingDiagnosticConsumer diagnosticConsumer = new BufferingDiagnosticConsumer(
+        new DefaultDiagnosticConsumer(new DiagnosticMarkers("org.lxtk.lx4e.examples.json.problem"), //$NON-NLS-1$
             new DiagnosticAnnotations(JsonCore.WORKSPACE)));
 
     @Override
@@ -96,17 +94,15 @@ public class JsonLanguageClient
     @Override
     protected AbstractLanguageClient<LanguageServer> getLanguageClient()
     {
-        Collection<Feature<? super LanguageServer>> features =
-            new ArrayList<>();
+        Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
         features.add(new TextDocumentSyncFeature(JsonCore.WORKSPACE));
         features.add(new DocumentFormattingFeature(JsonCore.LANG_SERVICE));
         features.add(new DocumentRangeFormattingFeature(JsonCore.LANG_SERVICE));
         features.add(new DocumentSymbolFeature(JsonCore.LANG_SERVICE));
         features.add(new CompletionFeature(JsonCore.LANG_SERVICE));
         features.add(new HoverFeature(JsonCore.LANG_SERVICE));
-        return new EclipseLanguageClient<LanguageServer>(log(),
-            diagnosticConsumer, JsonWorkspaceEditChangeFactory.INSTANCE,
-            features)
+        return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
+            JsonWorkspaceEditChangeFactory.INSTANCE, features)
         {
             @Override
             public void fillInitializeParams(InitializeParams params)
@@ -118,8 +114,7 @@ public class JsonLanguageClient
             }
 
             @Override
-            public void initialize(LanguageServer server,
-                ServerCapabilities capabilities,
+            public void initialize(LanguageServer server, ServerCapabilities capabilities,
                 List<DocumentFilter> documentSelector)
             {
                 super.initialize(server, capabilities, documentSelector);

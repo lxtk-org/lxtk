@@ -38,17 +38,14 @@ public abstract class AbstractRenameHandler
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException
     {
-        RenameRefactoring refactoring = createRefactoring(
-            HandlerUtil.getActiveEditor(event));
+        RenameRefactoring refactoring = createRefactoring(HandlerUtil.getActiveEditor(event));
         if (refactoring != null)
         {
             RefactoringWizardOpenOperation op =
-                new RefactoringWizardOpenOperation(new RenameRefactoringWizard(
-                    refactoring));
+                new RefactoringWizardOpenOperation(new RenameRefactoringWizard(refactoring));
             try
             {
-                op.run(HandlerUtil.getActiveShell(event),
-                    refactoring.getName());
+                op.run(HandlerUtil.getActiveShell(event), refactoring.getName());
             }
             catch (InterruptedException e)
             {
@@ -64,8 +61,8 @@ public abstract class AbstractRenameHandler
         boolean enabled = false;
         if (evaluationContext instanceof IEvaluationContext)
         {
-            Object editor = ((IEvaluationContext)evaluationContext).getVariable(
-                ISources.ACTIVE_EDITOR_NAME);
+            Object editor =
+                ((IEvaluationContext)evaluationContext).getVariable(ISources.ACTIVE_EDITOR_NAME);
             RenameRefactoring refactoring = createRefactoring(editor);
             if (refactoring != null && refactoring.isApplicable())
                 enabled = true;
@@ -110,12 +107,11 @@ public abstract class AbstractRenameHandler
      * @return the created refactoring object, or <code>null</code>
      *  if the refactoring is not available
      */
-    protected RenameRefactoring createRefactoring(
-        LanguageOperationTarget target, IDocument document, int offset)
+    protected RenameRefactoring createRefactoring(LanguageOperationTarget target,
+        IDocument document, int offset)
     {
-        return new RenameRefactoring(
-            Messages.AbstractRenameHandler_Refactoring_name, target, document,
-            offset, getWorkspaceEditChangeFactory());
+        return new RenameRefactoring(Messages.AbstractRenameHandler_Refactoring_name, target,
+            document, offset, getWorkspaceEditChangeFactory());
     }
 
     /**
@@ -126,8 +122,7 @@ public abstract class AbstractRenameHandler
      * @return the corresponding <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
-    protected abstract LanguageOperationTarget getLanguageOperationTarget(
-        IEditorPart editor);
+    protected abstract LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor);
 
     /**
      * Returns the {@link WorkspaceEditChangeFactory} for the refactoring.

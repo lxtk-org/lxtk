@@ -191,7 +191,7 @@
 <setting id="org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_method_invocation" value="do not insert"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_while" value="insert"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_before_closing_paren_in_switch" value="do not insert"/>
-<setting id="org.eclipse.jdt.core.formatter.alignment_for_method_declaration" value="0"/>
+<setting id="org.eclipse.jdt.core.formatter.alignment_for_method_declaration" value="4"/>
 <setting id="org.eclipse.jdt.core.formatter.join_wrapped_lines" value="true"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_between_empty_parens_in_constructor_declaration" value="do not insert"/>
 <setting id="org.eclipse.jdt.core.formatter.wrap_before_conditional_operator" value="true"/>
@@ -334,7 +334,7 @@
 <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_synchronized" value="insert"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_before_comma_in_for_increments" value="do not insert"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_annotation_type_member_declaration" value="do not insert"/>
-<setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_for_loop_header" value="0"/>
+<setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_for_loop_header" value="16"/>
 <setting id="org.eclipse.jdt.core.formatter.wrap_before_additive_operator" value="true"/>
 <setting id="org.eclipse.jdt.core.formatter.keep_simple_getter_setter_on_one_line" value="false"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_while" value="do not insert"/>
@@ -358,7 +358,7 @@
 <setting id="org.eclipse.jdt.core.formatter.insert_space_before_comma_in_multiple_field_declarations" value="do not insert"/>
 <setting id="org.eclipse.jdt.core.formatter.wrap_before_string_concatenation" value="true"/>
 <setting id="org.eclipse.jdt.core.formatter.blank_lines_between_import_groups" value="1"/>
-<setting id="org.eclipse.jdt.core.formatter.lineSplit" value="80"/>
+<setting id="org.eclipse.jdt.core.formatter.lineSplit" value="100"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_annotation" value="do not insert"/>
 <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_switch" value="insert"/>
 </profile>

@@ -33,8 +33,7 @@ public class FocusableInformationControlCreator
             return false;
 
         if (control instanceof IInformationControlExtension4)
-            ((IInformationControlExtension4)control).setStatusText(
-                getTooltipAffordanceString());
+            ((IInformationControlExtension4)control).setStatusText(getTooltipAffordanceString());
 
         return true;
     }
@@ -48,8 +47,7 @@ public class FocusableInformationControlCreator
         return newDefaultInformationControl(parent);
     }
 
-    protected BrowserInformationControl newBrowserInformationControl(
-        Shell parent)
+    protected BrowserInformationControl newBrowserInformationControl(Shell parent)
     {
         return new BrowserInformationControl(parent, getSymbolicFontName(),
             getTooltipAffordanceString())
@@ -57,17 +55,14 @@ public class FocusableInformationControlCreator
             @Override
             public IInformationControlCreator getInformationPresenterControlCreator()
             {
-                return parent -> new BrowserInformationControl(parent,
-                    getSymbolicFontName(), true);
+                return parent -> new BrowserInformationControl(parent, getSymbolicFontName(), true);
             }
         };
     }
 
-    protected DefaultInformationControl newDefaultInformationControl(
-        Shell parent)
+    protected DefaultInformationControl newDefaultInformationControl(Shell parent)
     {
-        return new DefaultInformationControl(parent,
-            getTooltipAffordanceString())
+        return new DefaultInformationControl(parent, getTooltipAffordanceString())
         {
             @Override
             public IInformationControlCreator getInformationPresenterControlCreator()

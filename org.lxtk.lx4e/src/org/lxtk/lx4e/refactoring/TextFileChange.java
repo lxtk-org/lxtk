@@ -121,8 +121,8 @@ public final class TextFileChange
     }
 
     @Override
-    public RefactoringStatus isValid(IProgressMonitor pm) throws CoreException,
-        OperationCanceledException
+    public RefactoringStatus isValid(IProgressMonitor pm)
+        throws CoreException, OperationCanceledException
     {
         RefactoringStatus result = new RefactoringStatus();
 
@@ -133,9 +133,9 @@ public final class TextFileChange
         {
             if (!base.isEqualTo(buffer.getSnapshot()))
             {
-                result.addFatalError(MessageFormat.format(
-                    Messages.TextFileChange_Cannot_apply_stale_change,
-                    toDisplayString(uri, uriHandler)));
+                result.addFatalError(
+                    MessageFormat.format(Messages.TextFileChange_Cannot_apply_stale_change,
+                        toDisplayString(uri, uriHandler)));
             }
         }
         return result;
@@ -147,22 +147,19 @@ public final class TextFileChange
         SubMonitor subMonitor = SubMonitor.convert(pm, 1);
         try (IBuffer buffer = getBuffer(uri, uriHandler))
         {
-            BufferChangeWithExcludes change = new BufferChangeWithExcludes(
-                getEdit());
+            BufferChangeWithExcludes change = new BufferChangeWithExcludes(getEdit());
             List<TextEdit> excludes = new ArrayList<>();
             TextEditBasedChangeGroup[] groups = getChangeGroups();
             for (TextEditBasedChangeGroup group : groups)
             {
                 if (!group.isEnabled())
                 {
-                    excludes.addAll(Arrays.asList(
-                        group.getTextEditGroup().getTextEdits()));
+                    excludes.addAll(Arrays.asList(group.getTextEditGroup().getTextEdits()));
                 }
             }
             change.setExcludes(excludes);
             change.setBase(base);
-            change.setStyle(IBufferChange.CREATE_UNDO
-                | IBufferChange.UPDATE_REGIONS);
+            change.setStyle(IBufferChange.CREATE_UNDO | IBufferChange.UPDATE_REGIONS);
             change.setSaveMode(saveMode);
 
             IBufferChange undoChange;
@@ -170,19 +167,17 @@ public final class TextFileChange
             try
             {
                 undoChange = buffer.applyChange(change, subMonitor.split(1,
-                    SubMonitor.SUPPRESS_ISCANCELED
-                        | SubMonitor.SUPPRESS_BEGINTASK));
+                    SubMonitor.SUPPRESS_ISCANCELED | SubMonitor.SUPPRESS_BEGINTASK));
             }
             catch (StaleSnapshotException e)
             {
                 throw new CoreException(Activator.createErrorStatus(
-                    MessageFormat.format(
-                        Messages.TextFileChange_Cannot_apply_stale_change,
-                        toDisplayString(uri, uriHandler)), e));
+                    MessageFormat.format(Messages.TextFileChange_Cannot_apply_stale_change,
+                        toDisplayString(uri, uriHandler)),
+                    e));
             }
 
-            return new UndoTextFileChange(getName(), uri, uriHandler,
-                undoChange);
+            return new UndoTextFileChange(getName(), uri, uriHandler, undoChange);
         }
     }
 
@@ -202,8 +197,7 @@ public final class TextFileChange
     }
 
     @Override
-    protected IDocument acquireDocument(IProgressMonitor pm)
-        throws CoreException
+    protected IDocument acquireDocument(IProgressMonitor pm) throws CoreException
     {
         if (buffer != null)
             throw new AssertionError("The buffer has not been released"); //$NON-NLS-1$
@@ -212,8 +206,7 @@ public final class TextFileChange
     }
 
     @Override
-    protected void releaseDocument(IDocument document, IProgressMonitor pm)
-        throws CoreException
+    protected void releaseDocument(IDocument document, IProgressMonitor pm) throws CoreException
     {
         if (buffer == null)
             throw new AssertionError("The buffer has not been acquired"); //$NON-NLS-1$
@@ -223,8 +216,7 @@ public final class TextFileChange
     }
 
     @Override
-    protected void commit(IDocument document, IProgressMonitor pm)
-        throws CoreException
+    protected void commit(IDocument document, IProgressMonitor pm) throws CoreException
     {
         throw new AssertionError("This method should not be called"); //$NON-NLS-1$
     }

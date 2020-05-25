@@ -59,11 +59,9 @@ public final class ReferencesFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setReferences(
-            getLanguageService().getReferencesCapabilities());
+        capabilities.setReferences(getLanguageService().getReferencesCapabilities());
     }
 
     @Override
@@ -91,22 +89,19 @@ public final class ReferencesFeature
     protected Disposable registerLanguageFeatureProvider(String method,
         TextDocumentRegistrationOptions options)
     {
-        return getLanguageService().getReferenceProviders().add(
-            new ReferenceProvider()
+        return getLanguageService().getReferenceProviders().add(new ReferenceProvider()
+        {
+            @Override
+            public TextDocumentRegistrationOptions getRegistrationOptions()
             {
-                @Override
-                public TextDocumentRegistrationOptions getRegistrationOptions()
-                {
-                    return options;
-                }
+                return options;
+            }
 
-                @Override
-                public CompletableFuture<List<? extends Location>> getReferences(
-                    ReferenceParams params)
-                {
-                    return getLanguageServer().getTextDocumentService().references(
-                        params);
-                }
-            });
+            @Override
+            public CompletableFuture<List<? extends Location>> getReferences(ReferenceParams params)
+            {
+                return getLanguageServer().getTextDocumentService().references(params);
+            }
+        });
     }
 }

@@ -41,8 +41,7 @@ class UndoTextFileChange
     private final IBufferChange undoChange;
     private boolean existed;
 
-    UndoTextFileChange(String name, URI uri, IUriHandler uriHandler,
-        IBufferChange undoChange)
+    UndoTextFileChange(String name, URI uri, IUriHandler uriHandler, IBufferChange undoChange)
     {
         this.name = Objects.requireNonNull(name);
         this.uri = Objects.requireNonNull(uri);
@@ -63,8 +62,8 @@ class UndoTextFileChange
     }
 
     @Override
-    public RefactoringStatus isValid(IProgressMonitor pm) throws CoreException,
-        OperationCanceledException
+    public RefactoringStatus isValid(IProgressMonitor pm)
+        throws CoreException, OperationCanceledException
     {
         RefactoringStatus result = new RefactoringStatus();
 
@@ -72,17 +71,16 @@ class UndoTextFileChange
         {
             if (exists(uri, uriHandler))
             {
-                result.addFatalError(MessageFormat.format(
-                    Messages.UndoTextFileChange_File_should_not_exist,
-                    toDisplayString(uri, uriHandler)));
+                result.addFatalError(
+                    MessageFormat.format(Messages.UndoTextFileChange_File_should_not_exist,
+                        toDisplayString(uri, uriHandler)));
             }
             return result; // let the delete/move undo change handle the rest
         }
         else if (!exists(uri, uriHandler))
         {
-            result.addFatalError(MessageFormat.format(
-                Messages.UndoTextFileChange_File_should_exist, toDisplayString(
-                    uri, uriHandler)));
+            result.addFatalError(MessageFormat.format(Messages.UndoTextFileChange_File_should_exist,
+                toDisplayString(uri, uriHandler)));
             return result;
         }
 
@@ -93,9 +91,9 @@ class UndoTextFileChange
         {
             if (!undoChange.getBase().isEqualTo(buffer.getSnapshot()))
             {
-                result.addError(MessageFormat.format(
-                    Messages.UndoTextFileChange_Cannot_undo_stale_change,
-                    toDisplayString(uri, uriHandler)));
+                result.addError(
+                    MessageFormat.format(Messages.UndoTextFileChange_Cannot_undo_stale_change,
+                        toDisplayString(uri, uriHandler)));
             }
         }
         return result;
@@ -112,15 +110,14 @@ class UndoTextFileChange
             try
             {
                 redoChange = buffer.applyChange(undoChange, subMonitor.split(1,
-                    SubMonitor.SUPPRESS_ISCANCELED
-                        | SubMonitor.SUPPRESS_BEGINTASK));
+                    SubMonitor.SUPPRESS_ISCANCELED | SubMonitor.SUPPRESS_BEGINTASK));
             }
             catch (StaleSnapshotException e)
             {
                 throw new CoreException(Activator.createErrorStatus(
-                    MessageFormat.format(
-                        Messages.UndoTextFileChange_Cannot_undo_stale_change,
-                        toDisplayString(uri, uriHandler)), e));
+                    MessageFormat.format(Messages.UndoTextFileChange_Cannot_undo_stale_change,
+                        toDisplayString(uri, uriHandler)),
+                    e));
             }
 
             return new UndoTextFileChange(name, uri, uriHandler, redoChange);

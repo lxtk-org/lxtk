@@ -62,8 +62,7 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
     @Override
     public final void fillClientCapabilities(ClientCapabilities capabilities)
     {
-        fillClientCapabilities(ClientCapabilitiesUtil.getOrCreateTextDocument(
-            capabilities));
+        fillClientCapabilities(ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities));
     }
 
     /**
@@ -71,8 +70,7 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
      *
      * @param capabilities never <code>null</code>
      */
-    protected abstract void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities);
+    protected abstract void fillClientCapabilities(TextDocumentClientCapabilities capabilities);
 
     @Override
     public final synchronized void initialize(LanguageServer server,
@@ -115,8 +113,8 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
 
         Object rO = registration.getRegisterOptions();
         Class<RO> optionsClass = getRegistrationOptionsClass();
-        RO options = rO instanceof JsonElement ? DefaultGson.INSTANCE.fromJson(
-            (JsonElement)rO, optionsClass) : optionsClass.cast(rO);
+        RO options = rO instanceof JsonElement
+            ? DefaultGson.INSTANCE.fromJson((JsonElement)rO, optionsClass) : optionsClass.cast(rO);
         if (options == null || options.getDocumentSelector() == null)
             return;
 
@@ -126,8 +124,7 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
         if (registrations.containsKey(registration.getId()))
             throw new IllegalArgumentException();
 
-        Disposable disposable = registerLanguageFeatureProvider(
-            registration.getMethod(), options);
+        Disposable disposable = registerLanguageFeatureProvider(registration.getMethod(), options);
         if (disposable == null)
             return;
 
@@ -151,8 +148,7 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
      * @return a disposable to remove the registered provider,
      *  or <code>null</code> if no provider was registered
      */
-    protected abstract Disposable registerLanguageFeatureProvider(String method,
-        RO options);
+    protected abstract Disposable registerLanguageFeatureProvider(String method, RO options);
 
     @Override
     public final synchronized void unregister(Unregistration unregistration)

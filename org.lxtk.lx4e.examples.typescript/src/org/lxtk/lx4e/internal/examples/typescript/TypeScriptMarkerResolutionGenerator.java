@@ -32,11 +32,9 @@ public class TypeScriptMarkerResolutionGenerator
         IResource resource = marker.getResource();
         if (!(resource instanceof IFile))
             return null;
-        if (!MarkerUtilities.isMarkerType(marker,
-            TypeScriptLanguageClient.MARKER_TYPE))
+        if (!MarkerUtilities.isMarkerType(marker, TypeScriptLanguageClient.MARKER_TYPE))
             return null;
-        return TypeScriptOperationTargetProvider.getOperationTarget(
-            (IFile)resource);
+        return TypeScriptOperationTargetProvider.getOperationTarget((IFile)resource);
     }
 
     @Override

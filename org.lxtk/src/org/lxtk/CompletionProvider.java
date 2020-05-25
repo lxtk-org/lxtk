@@ -50,6 +50,5 @@ public interface CompletionProvider
      *  additional information for a completion item is available
      * @see CompletionRegistrationOptions#getResolveProvider()
      */
-    CompletableFuture<CompletionItem> resolveCompletionItem(
-        CompletionItem item);
+    CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem item);
 }

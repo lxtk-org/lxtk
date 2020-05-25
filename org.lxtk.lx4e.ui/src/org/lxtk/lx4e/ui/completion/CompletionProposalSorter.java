@@ -30,10 +30,8 @@ public class CompletionProposalSorter
     @Override
     public int compare(ICompletionProposal p1, ICompletionProposal p2)
     {
-        if (p1 instanceof LSCompletionProposal
-            && p2 instanceof LSCompletionProposal)
-            return COMPARATOR.compare((LSCompletionProposal)p1,
-                (LSCompletionProposal)p2);
+        if (p1 instanceof LSCompletionProposal && p2 instanceof LSCompletionProposal)
+            return COMPARATOR.compare((LSCompletionProposal)p1, (LSCompletionProposal)p2);
         if (p1 instanceof LSCompletionProposal)
             return -1;
         if (p2 instanceof LSCompletionProposal)

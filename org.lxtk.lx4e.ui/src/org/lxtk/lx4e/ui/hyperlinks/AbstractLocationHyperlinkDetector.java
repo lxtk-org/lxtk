@@ -47,8 +47,7 @@ public abstract class AbstractLocationHyperlinkDetector
     public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region,
         boolean canShowMultipleHyperlinks)
     {
-        LanguageOperationTarget target =
-            getAdapter(LanguageOperationTarget.class);
+        LanguageOperationTarget target = getAdapter(LanguageOperationTarget.class);
         if (target == null)
             return null;
 
@@ -65,9 +64,8 @@ public abstract class AbstractLocationHyperlinkDetector
             return null;
         }
 
-        Request<Either<List<? extends Location>,
-            List<? extends LocationLink>>> request =
-                createHyperlinkRequest(target, position);
+        Request<Either<List<? extends Location>, List<? extends LocationLink>>> request =
+            createHyperlinkRequest(target, position);
         if (request == null)
             return null;
 
@@ -93,8 +91,7 @@ public abstract class AbstractLocationHyperlinkDetector
             hyperlinks = new ArrayList<>(size);
             for (Location location : locations)
             {
-                hyperlinks.add(
-                    createHyperlink(hyperlinkRegion, location, index++));
+                hyperlinks.add(createHyperlink(hyperlinkRegion, location, index++));
             }
         }
         else if (result.isRight())
@@ -114,8 +111,7 @@ public abstract class AbstractLocationHyperlinkDetector
                 {
                     try
                     {
-                        hyperlinkRegion = DocumentUtil.toRegion(document,
-                            originSelectionRange);
+                        hyperlinkRegion = DocumentUtil.toRegion(document, originSelectionRange);
                     }
                     catch (BadLocationException e)
                     {
@@ -131,9 +127,7 @@ public abstract class AbstractLocationHyperlinkDetector
                     hyperlinkRegion = wordRegion;
                 }
                 hyperlinks.add(createHyperlink(hyperlinkRegion,
-                    new Location(link.getTargetUri(),
-                        link.getTargetSelectionRange()),
-                    index++));
+                    new Location(link.getTargetUri(), link.getTargetSelectionRange()), index++));
             }
         }
         else
@@ -149,8 +143,8 @@ public abstract class AbstractLocationHyperlinkDetector
      * @param position never <code>null</code>
      * @return the created request object, or <code>null</code> if none
      */
-    protected abstract Request<Either<List<? extends Location>,
-        List<? extends LocationLink>>> createHyperlinkRequest(
+    protected abstract Request<
+        Either<List<? extends Location>, List<? extends LocationLink>>> createHyperlinkRequest(
             LanguageOperationTarget target, Position position);
 
     /**
@@ -164,8 +158,7 @@ public abstract class AbstractLocationHyperlinkDetector
      *  or -1 if there is only one hyperlink
      * @return the created hyperlink (not <code>null</code>)
      */
-    protected abstract IHyperlink createHyperlink(IRegion region,
-        Location location, int index);
+    protected abstract IHyperlink createHyperlink(IRegion region, Location location, int index);
 
     /**
      * Returns the region of the word enclosing the given document offset.

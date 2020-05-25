@@ -17,8 +17,7 @@ import org.eclipse.osgi.util.NLS;
 class Messages
     extends NLS
 {
-    private static final String BUNDLE_NAME =
-        "org.lxtk.lx4e.ui.refactoring.rename.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.refactoring.rename.messages"; //$NON-NLS-1$
 
     public static String AbstractRenameHandler_Refactoring_name;
     public static String RenameRefactoringWizard_New_name_label;

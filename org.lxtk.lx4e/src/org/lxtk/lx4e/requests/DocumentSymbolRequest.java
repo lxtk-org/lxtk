@@ -33,8 +33,7 @@ public class DocumentSymbolRequest
     protected Future<List<Either<SymbolInformation, DocumentSymbol>>> send(
         DocumentSymbolProvider provider, DocumentSymbolParams params)
     {
-        setTitle(
-            MessageFormat.format(Messages.DocumentSymbolRequest_title, params));
+        setTitle(MessageFormat.format(Messages.DocumentSymbolRequest_title, params));
         return provider.getDocumentSymbols(params);
     }
 }

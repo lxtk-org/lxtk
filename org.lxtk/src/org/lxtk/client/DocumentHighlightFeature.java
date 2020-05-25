@@ -59,11 +59,9 @@ public final class DocumentHighlightFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setDocumentHighlight(
-            getLanguageService().getDocumentHighlightCapabilities());
+        capabilities.setDocumentHighlight(getLanguageService().getDocumentHighlightCapabilities());
     }
 
     @Override
@@ -104,8 +102,7 @@ public final class DocumentHighlightFeature
                 public CompletableFuture<List<? extends DocumentHighlight>> getDocumentHighlights(
                     TextDocumentPositionParams params)
                 {
-                    return getLanguageServer().getTextDocumentService().documentHighlight(
-                        params);
+                    return getLanguageServer().getTextDocumentService().documentHighlight(params);
                 }
             });
     }

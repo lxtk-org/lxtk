@@ -72,9 +72,8 @@ class DeltaProcessor
     private boolean processProject(IResourceDelta delta)
     {
         IProject project = (IProject)delta.getResource();
-        if (delta.getKind() == IResourceDelta.REMOVED
-            || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags()
-                & IResourceDelta.OPEN) != 0) && !project.isOpen())
+        if (delta.getKind() == IResourceDelta.REMOVED || (delta.getKind() == IResourceDelta.CHANGED
+            && (delta.getFlags() & IResourceDelta.OPEN) != 0) && !project.isOpen())
         {
             Activator.getDefault().disconnect(project);
         }
@@ -151,8 +150,7 @@ class DeltaProcessor
             if (isWorkingCopy)
                 flags |= F_UNDERLYING_RESOURCE;
 
-            if ((delta.getFlags() & ~(IResourceDelta.MARKERS
-                | IResourceDelta.SYNC)) != 0)
+            if ((delta.getFlags() & ~(IResourceDelta.MARKERS | IResourceDelta.SYNC)) != 0)
             {
                 flags |= F_CONTENT;
                 if (!isWorkingCopy)
@@ -191,15 +189,14 @@ class DeltaProcessor
         close(element);
     }
 
-    private void translateAddedDelta(IResourceDelta delta,
-        ILanguageElement element, long flags)
+    private void translateAddedDelta(IResourceDelta delta, ILanguageElement element, long flags)
     {
         LanguageElementDelta result = new LanguageElementDelta(element);
         result.setKind(ADDED);
         if ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)
         {
-            ILanguageElement movedFromElement = TypeScriptCore.create(getResource(
-                delta.getMovedFromPath(), delta.getResource().getType()));
+            ILanguageElement movedFromElement = TypeScriptCore.create(
+                getResource(delta.getMovedFromPath(), delta.getResource().getType()));
             if (movedFromElement != null)
             {
                 flags |= F_MOVED_FROM;
@@ -210,15 +207,14 @@ class DeltaProcessor
         deltas.add(result);
     }
 
-    private void translateRemovedDelta(IResourceDelta delta,
-        ILanguageElement element, long flags)
+    private void translateRemovedDelta(IResourceDelta delta, ILanguageElement element, long flags)
     {
         LanguageElementDelta result = new LanguageElementDelta(element);
         result.setKind(REMOVED);
         if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
         {
-            ILanguageElement movedToElement = TypeScriptCore.create(getResource(
-                delta.getMovedToPath(), delta.getResource().getType()));
+            ILanguageElement movedToElement = TypeScriptCore.create(
+                getResource(delta.getMovedToPath(), delta.getResource().getType()));
             if (movedToElement != null)
             {
                 flags |= F_MOVED_TO;

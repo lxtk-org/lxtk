@@ -48,8 +48,7 @@ public class UriUtil
      */
     public static String toWireString(URI uri)
     {
-        return normalize(uri, EnumSet.of(Normalization.CASE,
-            Normalization.PATH)).toASCIIString();
+        return normalize(uri, EnumSet.of(Normalization.CASE, Normalization.PATH)).toASCIIString();
     }
 
     /**
@@ -118,15 +117,13 @@ public class UriUtil
                 try
                 {
                     if (uri.isOpaque())
-                        uri = new URI(scheme, uri.getSchemeSpecificPart(),
-                            uri.getFragment());
+                        uri = new URI(scheme, uri.getSchemeSpecificPart(), uri.getFragment());
                     else if (host == null)
-                        uri = new URI(scheme, uri.getAuthority(), uri.getPath(),
-                            uri.getQuery(), uri.getFragment());
-                    else
-                        uri = new URI(scheme, uri.getUserInfo(), host,
-                            uri.getPort(), uri.getPath(), uri.getQuery(),
+                        uri = new URI(scheme, uri.getAuthority(), uri.getPath(), uri.getQuery(),
                             uri.getFragment());
+                    else
+                        uri = new URI(scheme, uri.getUserInfo(), host, uri.getPort(), uri.getPath(),
+                            uri.getQuery(), uri.getFragment());
                 }
                 catch (URISyntaxException e)
                 {
@@ -146,8 +143,7 @@ public class UriUtil
         String scheme = toLowerCase(uri.getScheme());
         String host = toLowerCase(uri.getHost());
 
-        if (scheme == uri.getScheme() && host == uri.getHost()
-            && uri.toString().indexOf('%') < 0)
+        if (scheme == uri.getScheme() && host == uri.getHost() && uri.toString().indexOf('%') < 0)
             return uri;
 
         StringBuilder sb = new StringBuilder();
@@ -169,8 +165,8 @@ public class UriUtil
                     sb.append(userInfo);
                     sb.append('@');
                 }
-                boolean needBrackets = ((host.indexOf(':') >= 0)
-                    && !host.startsWith("[") && !host.endsWith("]")); //$NON-NLS-1$ //$NON-NLS-2$
+                boolean needBrackets =
+                    ((host.indexOf(':') >= 0) && !host.startsWith("[") && !host.endsWith("]")); //$NON-NLS-1$ //$NON-NLS-2$
                 if (needBrackets)
                     sb.append('[');
                 sb.append(host);

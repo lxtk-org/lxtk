@@ -43,17 +43,15 @@ public class TypeScriptEditor
     @Override
     protected void initializeEditor()
     {
-        IPreferenceStore preferenceStore = new ChainedPreferenceStore(
-            new IPreferenceStore[] {
-                Activator.getDefault().getPreferenceStore(),
-                EditorsUI.getPreferenceStore() });
+        IPreferenceStore preferenceStore = new ChainedPreferenceStore(new IPreferenceStore[] {
+            Activator.getDefault().getPreferenceStore(), EditorsUI.getPreferenceStore() });
         setPreferenceStore(preferenceStore);
 
         TypeScriptSourceFileDocumentProvider documentProvider =
             Activator.getDefault().getDocumentProvider();
         setDocumentProvider(documentProvider);
-        setSourceViewerConfiguration(new TypeScriptSourceViewerConfiguration(
-            preferenceStore, this, documentProvider));
+        setSourceViewerConfiguration(
+            new TypeScriptSourceViewerConfiguration(preferenceStore, this, documentProvider));
         setEditorContextMenuId("#ExampleTypeScriptEditorContext"); //$NON-NLS-1$
         setRulerContextMenuId("#ExampleTypeScriptRulerContext"); //$NON-NLS-1$
     }
@@ -61,18 +59,16 @@ public class TypeScriptEditor
     @Override
     protected void initializeKeyBindingScopes()
     {
-        setKeyBindingScopes(new String[] {
-            "org.lxtk.lx4e.examples.typescript.editor.scope" }); //$NON-NLS-1$
+        setKeyBindingScopes(new String[] { "org.lxtk.lx4e.examples.typescript.editor.scope" }); //$NON-NLS-1$
     }
 
     @Override
     protected void configureSourceViewerDecorationSupport(
         SourceViewerDecorationSupport decorationSupport)
     {
-        decorationSupport.setCharacterPairMatcher(
-            new LanguageConfigurationCharacterPairMatcher());
-        decorationSupport.setMatchingCharacterPainterPreferenceKeys(
-            EDITOR_MATCHING_BRACKETS, EDITOR_MATCHING_BRACKETS_COLOR);
+        decorationSupport.setCharacterPairMatcher(new LanguageConfigurationCharacterPairMatcher());
+        decorationSupport.setMatchingCharacterPainterPreferenceKeys(EDITOR_MATCHING_BRACKETS,
+            EDITOR_MATCHING_BRACKETS_COLOR);
         super.configureSourceViewerDecorationSupport(decorationSupport);
     }
 

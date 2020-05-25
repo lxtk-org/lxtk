@@ -98,6 +98,5 @@ public interface ILanguageElement
      * @throws CoreException if this element does not exist or if an
      *  exception occurs while accessing its corresponding resource
      */
-    ILanguageElement[] getChildren(IProgressMonitor monitor)
-        throws CoreException;
+    ILanguageElement[] getChildren(IProgressMonitor monitor) throws CoreException;
 }

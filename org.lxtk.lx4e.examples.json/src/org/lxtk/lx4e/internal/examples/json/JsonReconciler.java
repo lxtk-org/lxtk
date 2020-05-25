@@ -36,8 +36,7 @@ public class JsonReconciler
      * @param editor not <code>null</code>
      * @param workingCopyManager not <code>null</code>
      */
-    public JsonReconciler(IEditorPart editor,
-        IWorkingCopyManager workingCopyManager)
+    public JsonReconciler(IEditorPart editor, IWorkingCopyManager workingCopyManager)
     {
         super(editor, workingCopyManager);
     }
@@ -51,10 +50,9 @@ public class JsonReconciler
         {
             Registry<DocumentSymbolProvider> providers =
                 JsonCore.LANG_SERVICE.getDocumentSymbolProviders();
-            rollback.add(providers.onDidAdd().subscribe(
-                provider -> forceReconciling())::dispose);
-            rollback.add(providers.onDidRemove().subscribe(
-                provider -> forceReconciling())::dispose);
+            rollback.add(providers.onDidAdd().subscribe(provider -> forceReconciling())::dispose);
+            rollback.add(
+                providers.onDidRemove().subscribe(provider -> forceReconciling())::dispose);
 
             rollback.setLogger(e -> Activator.logError(e));
             uninstallRunnable = rollback;

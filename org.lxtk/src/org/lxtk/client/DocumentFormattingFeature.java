@@ -59,11 +59,9 @@ public final class DocumentFormattingFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setFormatting(
-            getLanguageService().getDocumentFormattingCapabilities());
+        capabilities.setFormatting(getLanguageService().getDocumentFormattingCapabilities());
     }
 
     @Override
@@ -104,8 +102,7 @@ public final class DocumentFormattingFeature
                 public CompletableFuture<List<? extends TextEdit>> getFormattingEdits(
                     DocumentFormattingParams params)
                 {
-                    return getLanguageServer().getTextDocumentService().formatting(
-                        params);
+                    return getLanguageServer().getTextDocumentService().formatting(params);
                 }
             });
     }

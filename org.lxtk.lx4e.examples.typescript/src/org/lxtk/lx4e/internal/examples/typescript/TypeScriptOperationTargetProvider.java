@@ -40,8 +40,7 @@ public class TypeScriptOperationTargetProvider
             return null;
 
         return getOperationTarget(
-            TypeScriptInputElementProvider.INSTANCE.getElement(
-                editor.getEditorInput()));
+            TypeScriptInputElementProvider.INSTANCE.getElement(editor.getEditorInput()));
     }
 
     /**
@@ -55,8 +54,7 @@ public class TypeScriptOperationTargetProvider
         return getOperationTarget(TypeScriptCore.createSourceFileFrom(file));
     }
 
-    private static LanguageOperationTarget getOperationTarget(
-        ILanguageSourceFile sourceFile)
+    private static LanguageOperationTarget getOperationTarget(ILanguageSourceFile sourceFile)
     {
         if (sourceFile == null)
             return null;

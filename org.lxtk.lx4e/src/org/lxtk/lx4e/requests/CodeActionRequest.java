@@ -26,15 +26,14 @@ import org.lxtk.CodeActionProvider;
  * A request for computing code actions.
  */
 public class CodeActionRequest
-    extends LanguageFeatureRequest<CodeActionProvider, CodeActionParams,
-        List<Either<Command, CodeAction>>>
+    extends
+    LanguageFeatureRequest<CodeActionProvider, CodeActionParams, List<Either<Command, CodeAction>>>
 {
     @Override
-    protected Future<List<Either<Command, CodeAction>>> send(
-        CodeActionProvider provider, CodeActionParams params)
+    protected Future<List<Either<Command, CodeAction>>> send(CodeActionProvider provider,
+        CodeActionParams params)
     {
-        setTitle(
-            MessageFormat.format(Messages.CodeActionRequest_title, params));
+        setTitle(MessageFormat.format(Messages.CodeActionRequest_title, params));
         return provider.getCodeActions(params);
     }
 }

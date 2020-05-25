@@ -17,8 +17,7 @@ import org.eclipse.osgi.util.NLS;
 class Messages
     extends NLS
 {
-    private static final String BUNDLE_NAME =
-        "org.lxtk.lx4e.ui.completion.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.completion.messages"; //$NON-NLS-1$
 
     public static String ContentAssistProcessor_Request_timed_out;
     public static String LSIncompleteCompletionProposal_Tooltip_affordance_string;

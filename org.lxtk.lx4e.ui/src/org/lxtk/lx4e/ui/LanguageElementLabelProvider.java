@@ -48,8 +48,7 @@ public class LanguageElementLabelProvider
     public Image getImage(Object element)
     {
         if (element instanceof ILanguageSymbol)
-            return LSPImages.imageFromSymbolKind(
-                ((ILanguageSymbol)element).getKind());
+            return LSPImages.imageFromSymbolKind(((ILanguageSymbol)element).getKind());
         return super.getImage(element);
     }
 }

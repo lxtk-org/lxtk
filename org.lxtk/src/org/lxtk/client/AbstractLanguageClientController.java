@@ -47,8 +47,8 @@ import org.lxtk.util.connect.AbstractConnectable;
 public abstract class AbstractLanguageClientController<S extends LanguageServer>
     extends AbstractConnectable
 {
-    private BooleanSupplier autoReconnect = Policy.upTo(5).in(
-        Duration.ofSeconds(180)).thenReset()::check; // like in VS Code
+    private BooleanSupplier autoReconnect =
+        Policy.upTo(5).in(Duration.ofSeconds(180)).thenReset()::check; // like in VS Code
 
     /**
      * Sets the auto-reconnect policy. In case the current connection to the
@@ -137,11 +137,11 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
      * @param connection never <code>null</code>
      * @return a new connection initializer (not <code>null</code>)
      */
-    protected ConnectionInitializer newConnectionInitializer(
-        AbstractLanguageClient<S> client, JsonRpcConnection<S> connection)
+    protected ConnectionInitializer newConnectionInitializer(AbstractLanguageClient<S> client,
+        JsonRpcConnection<S> connection)
     {
-        return new ConnectionInitializer(client, connection,
-            () -> computeInitializeParams(client), getInitializeTimeout());
+        return new ConnectionInitializer(client, connection, () -> computeInitializeParams(client),
+            getInitializeTimeout());
     }
 
     /**
@@ -150,8 +150,7 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
      * @param client not <code>null</code>
      * @return initialize params (never <code>null</code>)
      */
-    protected InitializeParams computeInitializeParams(
-        AbstractLanguageClient<S> client)
+    protected InitializeParams computeInitializeParams(AbstractLanguageClient<S> client)
     {
         ClientCapabilities capabilities = new ClientCapabilities();
         client.fillClientCapabilities(capabilities);
@@ -178,30 +177,26 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
                     AbstractLanguageClient<S> client = getLanguageClient();
                     rollback.add(() -> client.dispose());
 
-                    ExecutorService messageListener =
-                        Executors.newSingleThreadExecutor();
+                    ExecutorService messageListener = Executors.newSingleThreadExecutor();
                     rollback.add(() -> messageListener.shutdown());
 
-                    JsonRpcConnection<S> connection =
-                        getConnectionFactory().newConnection(client,
-                            getServerInterface(), messageListener, null);
+                    JsonRpcConnection<S> connection = getConnectionFactory().newConnection(client,
+                        getServerInterface(), messageListener, null);
                     rollback.add(() -> connection.dispose());
 
                     S server = connection.getRemoteProxy();
                     rollback.add(() -> server.exit());
 
-                    InitializeResult result = newConnectionInitializer(client,
-                        connection).initialize();
+                    InitializeResult result =
+                        newConnectionInitializer(client, connection).initialize();
                     rollback.add(() ->
                     {
                         try
                         {
-                            server.shutdown().get(
-                                getShutdownTimeout().toMillis(),
+                            server.shutdown().get(getShutdownTimeout().toMillis(),
                                 TimeUnit.MILLISECONDS);
                         }
-                        catch (InterruptedException | ExecutionException
-                            | TimeoutException e)
+                        catch (InterruptedException | ExecutionException | TimeoutException e)
                         {
                             throw new RuntimeException(e);
                         }
@@ -209,11 +204,9 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
 
                     server.initialized(new InitializedParams());
 
-                    ExecutorService grimReaper =
-                        Executors.newSingleThreadExecutor();
+                    ExecutorService grimReaper = Executors.newSingleThreadExecutor();
                     rollback.add(() -> grimReaper.shutdown());
-                    CompletableFuture<?> connectionMonitor = connection.monitor(
-                        grimReaper);
+                    CompletableFuture<?> connectionMonitor = connection.monitor(grimReaper);
                     rollback.add(() -> connectionMonitor.cancel(true));
                     connectionMonitor.thenRun(new ConnectionCloseHandler(this)
                     {
@@ -224,11 +217,10 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
                         }
                     });
 
-                    client.initialize(server, result.getCapabilities(),
-                        getDocumentSelector());
+                    client.initialize(server, result.getCapabilities(), getDocumentSelector());
 
-                    rollback.setLogger(t -> log().error(
-                        "An error occurred while disconnecting", t)); //$NON-NLS-1$
+                    rollback.setLogger(
+                        t -> log().error("An error occurred while disconnecting", t)); //$NON-NLS-1$
                     connectionCloser = rollback;
                 });
             }

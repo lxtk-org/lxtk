@@ -43,8 +43,7 @@ public abstract class AbstractFindReferencesHandler
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException
     {
-        ReferenceSearchQuery query = createSearchQuery(
-            HandlerUtil.getActiveEditor(event));
+        ReferenceSearchQuery query = createSearchQuery(HandlerUtil.getActiveEditor(event));
         if (query != null)
             NewSearchUI.runQueryInBackground(query);
         return null;
@@ -56,8 +55,8 @@ public abstract class AbstractFindReferencesHandler
         boolean enabled = false;
         if (evaluationContext instanceof IEvaluationContext)
         {
-            Object editor = ((IEvaluationContext)evaluationContext).getVariable(
-                ISources.ACTIVE_EDITOR_NAME);
+            Object editor =
+                ((IEvaluationContext)evaluationContext).getVariable(ISources.ACTIVE_EDITOR_NAME);
             ReferenceSearchQuery query = createSearchQuery(editor);
             if (query != null && query.canRun())
                 enabled = true;
@@ -104,8 +103,7 @@ public abstract class AbstractFindReferencesHandler
      * @return the corresponding <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
-    protected abstract LanguageOperationTarget getLanguageOperationTarget(
-        IEditorPart editor);
+    protected abstract LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor);
 
     /**
      * Returns the {@link Workspace} for this handler.
@@ -124,12 +122,10 @@ public abstract class AbstractFindReferencesHandler
      * @param wordAtPosition never <code>null</code>, never empty
      * @return the created search query (not <code>null</code>)
      */
-    protected ReferenceSearchQuery createSearchQuery(
-        LanguageOperationTarget target, Position position,
-        String wordAtPosition)
+    protected ReferenceSearchQuery createSearchQuery(LanguageOperationTarget target,
+        Position position, String wordAtPosition)
     {
-        return new ReferenceSearchQuery(target, position, wordAtPosition,
-            getWorkspace(), true);
+        return new ReferenceSearchQuery(target, position, wordAtPosition, getWorkspace(), true);
     }
 
     /**

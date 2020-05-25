@@ -21,39 +21,32 @@ import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 
 class ClientCapabilitiesUtil
 {
-    static TextDocumentClientCapabilities getOrCreateTextDocument(
-        ClientCapabilities capabilities)
+    static TextDocumentClientCapabilities getOrCreateTextDocument(ClientCapabilities capabilities)
     {
-        return Optional.ofNullable(capabilities.getTextDocument()).orElseGet(
-            () ->
-            {
-                TextDocumentClientCapabilities textDocument =
-                    new TextDocumentClientCapabilities();
-                capabilities.setTextDocument(textDocument);
-                return textDocument;
-            });
+        return Optional.ofNullable(capabilities.getTextDocument()).orElseGet(() ->
+        {
+            TextDocumentClientCapabilities textDocument = new TextDocumentClientCapabilities();
+            capabilities.setTextDocument(textDocument);
+            return textDocument;
+        });
     }
 
     static SynchronizationCapabilities getOrCreateSynchronization(
         TextDocumentClientCapabilities capabilities)
     {
-        return Optional.ofNullable(capabilities.getSynchronization()).orElseGet(
-            () ->
-            {
-                SynchronizationCapabilities synchronization =
-                    new SynchronizationCapabilities();
-                capabilities.setSynchronization(synchronization);
-                return synchronization;
-            });
+        return Optional.ofNullable(capabilities.getSynchronization()).orElseGet(() ->
+        {
+            SynchronizationCapabilities synchronization = new SynchronizationCapabilities();
+            capabilities.setSynchronization(synchronization);
+            return synchronization;
+        });
     }
 
-    static WorkspaceClientCapabilities getOrCreateWorkspace(
-        ClientCapabilities capabilities)
+    static WorkspaceClientCapabilities getOrCreateWorkspace(ClientCapabilities capabilities)
     {
         return Optional.ofNullable(capabilities.getWorkspace()).orElseGet(() ->
         {
-            WorkspaceClientCapabilities workspace =
-                new WorkspaceClientCapabilities();
+            WorkspaceClientCapabilities workspace = new WorkspaceClientCapabilities();
             capabilities.setWorkspace(workspace);
             return workspace;
         });

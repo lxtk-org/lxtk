@@ -24,15 +24,14 @@ import org.lxtk.DocumentHighlightProvider;
  * A request for computing document highlights.
  */
 public class DocumentHighlightRequest
-    extends LanguageFeatureRequest<DocumentHighlightProvider,
-        TextDocumentPositionParams, List<? extends DocumentHighlight>>
+    extends LanguageFeatureRequest<DocumentHighlightProvider, TextDocumentPositionParams,
+        List<? extends DocumentHighlight>>
 {
     @Override
-    protected Future<List<? extends DocumentHighlight>> send(
-        DocumentHighlightProvider provider, TextDocumentPositionParams params)
+    protected Future<List<? extends DocumentHighlight>> send(DocumentHighlightProvider provider,
+        TextDocumentPositionParams params)
     {
-        setTitle(MessageFormat.format(Messages.DocumentHighlightRequest_title,
-            params));
+        setTitle(MessageFormat.format(Messages.DocumentHighlightRequest_title, params));
         return provider.getDocumentHighlights(params);
     }
 }

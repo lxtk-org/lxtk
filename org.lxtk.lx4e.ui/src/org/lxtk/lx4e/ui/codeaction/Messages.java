@@ -17,8 +17,7 @@ import org.eclipse.osgi.util.NLS;
 class Messages
     extends NLS
 {
-    private static final String BUNDLE_NAME =
-        "org.lxtk.lx4e.ui.codeaction.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.codeaction.messages"; //$NON-NLS-1$
 
     public static String AbstractCodeActionMenu_noActions;
     public static String AbstractQuickAssistProcessor_Request_timed_out;

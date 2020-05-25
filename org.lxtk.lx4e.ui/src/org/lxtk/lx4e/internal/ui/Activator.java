@@ -99,8 +99,7 @@ public class Activator
         {
             return isCancellation(e.getCause());
         }
-        return e instanceof OperationCanceledException
-            || e instanceof CancellationException;
+        return e instanceof OperationCanceledException || e instanceof CancellationException;
     }
 
     @Override

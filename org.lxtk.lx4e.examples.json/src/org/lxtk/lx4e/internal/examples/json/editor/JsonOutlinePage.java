@@ -101,16 +101,14 @@ public class JsonOutlinePage
     @Override
     protected IBaseLabelProvider getLabelProvider()
     {
-        return new DecoratingStyledCellLabelProvider(
-            new LanguageElementLabelProvider(),
+        return new DecoratingStyledCellLabelProvider(new LanguageElementLabelProvider(),
             new ProblemMarkerLabelDecorator(), null);
     }
 
     private static class LinkWithEditorPreference
         extends BooleanPreference
     {
-        static final LinkWithEditorPreference INSTANCE =
-            new LinkWithEditorPreference();
+        static final LinkWithEditorPreference INSTANCE = new LinkWithEditorPreference();
 
         LinkWithEditorPreference()
         {

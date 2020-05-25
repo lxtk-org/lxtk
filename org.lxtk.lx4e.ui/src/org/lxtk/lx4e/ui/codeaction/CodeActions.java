@@ -41,39 +41,35 @@ class CodeActions
     {
         LanguageService languageService = target.getLanguageService();
         return languageService.getDocumentMatcher().getFirstMatch(
-            languageService.getCodeActionProviders(),
-            CodeActionProvider::getDocumentSelector, target.getDocumentUri(),
-            target.getLanguageId()) != null;
+            languageService.getCodeActionProviders(), CodeActionProvider::getDocumentSelector,
+            target.getDocumentUri(), target.getLanguageId()) != null;
     }
 
-    static CodeActionProvider getCodeActionProvider(
-        LanguageOperationTarget target)
+    static CodeActionProvider getCodeActionProvider(LanguageOperationTarget target)
     {
         LanguageService languageService = target.getLanguageService();
         return languageService.getDocumentMatcher().getBestMatch(
-            languageService.getCodeActionProviders(),
-            CodeActionProvider::getDocumentSelector, target.getDocumentUri(),
-            target.getLanguageId());
+            languageService.getCodeActionProviders(), CodeActionProvider::getDocumentSelector,
+            target.getDocumentUri(), target.getLanguageId());
     }
 
-    static void execute(Command command, String label,
-        CommandService commandService)
+    static void execute(Command command, String label, CommandService commandService)
     {
         doExecute(command, label, commandService).exceptionally(e ->
         {
             if (!Activator.isCancellation(e))
             {
-                StatusManager.getManager().handle(Activator.createErrorStatus(
-                    MessageFormat.format(Messages.CodeActions_Execution_error,
-                        label), e), StatusManager.LOG | StatusManager.SHOW);
+                StatusManager.getManager().handle(
+                    Activator.createErrorStatus(
+                        MessageFormat.format(Messages.CodeActions_Execution_error, label), e),
+                    StatusManager.LOG | StatusManager.SHOW);
             }
             return null;
         });
     }
 
     static void execute(CodeAction codeAction, String label,
-        WorkspaceEditChangeFactory workspaceEditChangeFactory,
-        CommandService commandService)
+        WorkspaceEditChangeFactory workspaceEditChangeFactory, CommandService commandService)
     {
         CompletableFuture<?> future = new CompletableFuture<>();
         WorkspaceEdit edit = codeAction.getEdit();
@@ -81,19 +77,17 @@ class CodeActions
             future.complete(null);
         else
         {
-            WorkspaceEditRefactoring refactoring = new WorkspaceEditRefactoring(
-                label, workspaceEditChangeFactory);
+            WorkspaceEditRefactoring refactoring =
+                new WorkspaceEditRefactoring(label, workspaceEditChangeFactory);
             refactoring.setWorkspaceEdit(edit);
 
-            PerformRefactoringOperation operation =
-                new PerformRefactoringOperation(refactoring,
-                    CheckConditionsOperation.ALL_CONDITIONS);
+            PerformRefactoringOperation operation = new PerformRefactoringOperation(refactoring,
+                CheckConditionsOperation.ALL_CONDITIONS);
 
             WorkspaceJob job = new WorkspaceJob(label)
             {
                 @Override
-                public IStatus runInWorkspace(IProgressMonitor monitor)
-                    throws CoreException
+                public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
                 {
                     try
                     {
@@ -111,22 +105,22 @@ class CodeActions
             job.setRule(ResourcesPlugin.getWorkspace().getRoot());
             job.schedule();
         }
-        future.thenCompose(x -> doExecute(codeAction.getCommand(), null,
-            commandService)).exceptionally(e ->
+        future.thenCompose(
+            x -> doExecute(codeAction.getCommand(), null, commandService)).exceptionally(e ->
             {
                 if (!Activator.isCancellation(e))
                 {
                     StatusManager.getManager().handle(
-                        Activator.createErrorStatus(MessageFormat.format(
-                            Messages.CodeActions_Execution_error, label), e),
+                        Activator.createErrorStatus(
+                            MessageFormat.format(Messages.CodeActions_Execution_error, label), e),
                         StatusManager.LOG | StatusManager.SHOW);
                 }
                 return null;
             });
     }
 
-    private static CompletableFuture<Object> doExecute(Command command,
-        String label, CommandService commandService)
+    private static CompletableFuture<Object> doExecute(Command command, String label,
+        CommandService commandService)
     {
         if (command == null)
             return CompletableFuture.completedFuture(null);
@@ -134,14 +128,13 @@ class CodeActions
         if (label == null)
             label = command.getTitle();
 
-        CompletableFuture<Object> result = commandService.executeCommand(
-            command.getCommand(), command.getArguments());
+        CompletableFuture<Object> result =
+            commandService.executeCommand(command.getCommand(), command.getArguments());
         if (result == null)
         {
             result = new CompletableFuture<>();
-            result.completeExceptionally(new CoreException(
-                Activator.createErrorStatus(MessageFormat.format(
-                    Messages.CodeActions_Command_not_available, label), null)));
+            result.completeExceptionally(new CoreException(Activator.createErrorStatus(
+                MessageFormat.format(Messages.CodeActions_Command_not_available, label), null)));
         }
         return result;
     }

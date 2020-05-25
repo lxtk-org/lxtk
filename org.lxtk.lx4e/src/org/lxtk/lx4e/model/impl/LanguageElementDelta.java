@@ -25,8 +25,7 @@ public class LanguageElementDelta
     extends ElementDelta
     implements ILanguageElementDelta
 {
-    private static final LanguageElementDelta[] NO_CHILDREN =
-        new LanguageElementDelta[0];
+    private static final LanguageElementDelta[] NO_CHILDREN = new LanguageElementDelta[0];
 
     /**
      * Constructs an initially empty delta for the given element.

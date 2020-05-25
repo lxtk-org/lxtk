@@ -37,17 +37,15 @@ public class DefinitionHyperlinkDetector
     extends AbstractLocationHyperlinkDetector
 {
     @Override
-    protected Request<Either<List<? extends Location>,
-        List<? extends LocationLink>>> createHyperlinkRequest(
+    protected Request<
+        Either<List<? extends Location>, List<? extends LocationLink>>> createHyperlinkRequest(
             LanguageOperationTarget target, Position position)
     {
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
-        DefinitionProvider provider =
-            languageService.getDocumentMatcher().getBestMatch(
-                languageService.getDefinitionProviders(),
-                DefinitionProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
+        DefinitionProvider provider = languageService.getDocumentMatcher().getBestMatch(
+            languageService.getDefinitionProviders(), DefinitionProvider::getDocumentSelector,
+            documentUri, target.getLanguageId());
         if (provider == null)
             return null;
 
@@ -59,8 +57,7 @@ public class DefinitionHyperlinkDetector
     }
 
     @Override
-    protected IHyperlink createHyperlink(IRegion region, Location location,
-        int index)
+    protected IHyperlink createHyperlink(IRegion region, Location location, int index)
     {
         String text = Messages.DefinitionHyperlinkDetector_Hyperlink_text;
         if (++index > 0)

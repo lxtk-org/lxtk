@@ -37,8 +37,7 @@ public interface CodeActionProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    CompletableFuture<List<Either<Command, CodeAction>>> getCodeActions(
-        CodeActionParams params);
+    CompletableFuture<List<Either<Command, CodeAction>>> getCodeActions(CodeActionParams params);
 
     /**
      * Returns the command service associated with this provider.

@@ -19,8 +19,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 class ServerCapabilitiesUtil
 {
-    static TextDocumentSyncKind getTextDocumentSyncKind(
-        ServerCapabilities capabilities)
+    static TextDocumentSyncKind getTextDocumentSyncKind(ServerCapabilities capabilities)
     {
         Either<TextDocumentSyncKind, TextDocumentSyncOptions> either =
             capabilities.getTextDocumentSync();

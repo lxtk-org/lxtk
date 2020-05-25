@@ -43,12 +43,10 @@ public class DocumentUtil
      * @throws BadLocationException if the specified offset is invalid
      *  in the document
      */
-    public static Position toPosition(IDocument document, int offset)
-        throws BadLocationException
+    public static Position toPosition(IDocument document, int offset) throws BadLocationException
     {
         int line = document.getLineOfOffset(offset);
-        int column = offset - document.getLineInformationOfOffset(
-            offset).getOffset();
+        int column = offset - document.getLineInformationOfOffset(offset).getOffset();
         return new Position(line, column);
     }
 
@@ -61,8 +59,7 @@ public class DocumentUtil
      * @throws BadLocationException if the the specified position is invalid
      *  in the document
      */
-    public static int toOffset(IDocument document, Position position)
-        throws BadLocationException
+    public static int toOffset(IDocument document, Position position) throws BadLocationException
     {
         IRegion line = document.getLineInformation(position.getLine());
         int offsetInLine = position.getCharacter();
@@ -98,8 +95,7 @@ public class DocumentUtil
      * @throws BadLocationException if the specified range is invalid
      *  in the document
      */
-    public static IRegion toRegion(IDocument document, Range range)
-        throws BadLocationException
+    public static IRegion toRegion(IDocument document, Range range) throws BadLocationException
     {
         int offset = toOffset(document, range.getStart());
         int length = toOffset(document, range.getEnd()) - offset;
@@ -115,8 +111,7 @@ public class DocumentUtil
      * @throws BadLocationException if the specified edit range is invalid
      *  in the document
      */
-    public static void applyEdit(IDocument document, TextEdit edit)
-        throws BadLocationException
+    public static void applyEdit(IDocument document, TextEdit edit) throws BadLocationException
     {
         IRegion r = toRegion(document, edit.getRange());
         document.replace(r.getOffset(), r.getLength(), edit.getNewText());
@@ -132,9 +127,8 @@ public class DocumentUtil
      * @throws MalformedTreeException if an edit overlaps with one of its siblings
      * @throws BadLocationException if an edit's range is invalid in the document
      */
-    public static void applyEdits(IDocument document,
-        List<? extends TextEdit> edits) throws MalformedTreeException,
-        BadLocationException
+    public static void applyEdits(IDocument document, List<? extends TextEdit> edits)
+        throws MalformedTreeException, BadLocationException
     {
         if (edits.isEmpty())
             return;
@@ -169,16 +163,14 @@ public class DocumentUtil
      * @throws MalformedTreeException if an edit overlaps with one of its siblings
      * @throws BadLocationException if an edit's range is invalid in the document
      */
-    public static MultiTextEdit toMultiTextEdit(IDocument document,
-        List<? extends TextEdit> edits) throws MalformedTreeException,
-        BadLocationException
+    public static MultiTextEdit toMultiTextEdit(IDocument document, List<? extends TextEdit> edits)
+        throws MalformedTreeException, BadLocationException
     {
         MultiTextEdit result = new MultiTextEdit();
         for (TextEdit edit : edits)
         {
             IRegion r = toRegion(document, edit.getRange());
-            result.addChild(new ReplaceEdit(r.getOffset(), r.getLength(),
-                edit.getNewText()));
+            result.addChild(new ReplaceEdit(r.getOffset(), r.getLength(), edit.getNewText()));
         }
         return result;
     }

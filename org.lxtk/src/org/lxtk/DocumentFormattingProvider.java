@@ -32,6 +32,5 @@ public interface DocumentFormattingProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    CompletableFuture<List<? extends TextEdit>> getFormattingEdits(
-        DocumentFormattingParams params);
+    CompletableFuture<List<? extends TextEdit>> getFormattingEdits(DocumentFormattingParams params);
 }

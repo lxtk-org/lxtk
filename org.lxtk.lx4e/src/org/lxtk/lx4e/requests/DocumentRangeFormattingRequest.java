@@ -24,16 +24,14 @@ import org.lxtk.DocumentRangeFormattingProvider;
  * A request for computing document range formatting edits.
  */
 public class DocumentRangeFormattingRequest
-    extends LanguageFeatureRequest<DocumentRangeFormattingProvider,
-        DocumentRangeFormattingParams, List<? extends TextEdit>>
+    extends LanguageFeatureRequest<DocumentRangeFormattingProvider, DocumentRangeFormattingParams,
+        List<? extends TextEdit>>
 {
     @Override
-    protected Future<List<? extends TextEdit>> send(
-        DocumentRangeFormattingProvider provider,
+    protected Future<List<? extends TextEdit>> send(DocumentRangeFormattingProvider provider,
         DocumentRangeFormattingParams params)
     {
-        setTitle(MessageFormat.format(
-            Messages.DocumentRangeFormattingRequest_title, params));
+        setTitle(MessageFormat.format(Messages.DocumentRangeFormattingRequest_title, params));
         return provider.getRangeFormattingEdits(params);
     }
 }

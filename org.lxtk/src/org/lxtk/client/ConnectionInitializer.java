@@ -73,8 +73,8 @@ public class ConnectionInitializer
      * @param timeout initialization timeout (a positive duration)
      */
     public ConnectionInitializer(LanguageClient client,
-        JsonRpcConnection<? extends LanguageServer> connection,
-        Supplier<InitializeParams> params, Duration timeout)
+        JsonRpcConnection<? extends LanguageServer> connection, Supplier<InitializeParams> params,
+        Duration timeout)
     {
         this.client = Objects.requireNonNull(client);
         this.connection = Objects.requireNonNull(connection);
@@ -136,12 +136,10 @@ public class ConnectionInitializer
         {
             if (connection.isClosed())
                 throw new JsonRpcException(new TimeoutException(
-                    Messages.getString(
-                        "ConnectionInitializer.Error.ConnectionAborted"))); //$NON-NLS-1$
+                    Messages.getString("ConnectionInitializer.Error.ConnectionAborted"))); //$NON-NLS-1$
             try
             {
-                return future.get(Math.min(timeRemaining, MONITOR_PERIOD),
-                    TimeUnit.MILLISECONDS);
+                return future.get(Math.min(timeRemaining, MONITOR_PERIOD), TimeUnit.MILLISECONDS);
             }
             catch (TimeoutException e)
             {
@@ -175,8 +173,8 @@ public class ConnectionInitializer
     protected InitializeResult timedOut(TimeoutException e)
     {
         future.cancel(true);
-        throw new JsonRpcException(new TimeoutException(Messages.getString(
-            "ConnectionInitializer.Error.RequestTimeout"))); //$NON-NLS-1$
+        throw new JsonRpcException(
+            new TimeoutException(Messages.getString("ConnectionInitializer.Error.RequestTimeout"))); //$NON-NLS-1$
     }
 
     /**
@@ -211,11 +209,9 @@ public class ConnectionInitializer
         if (!(cause instanceof ResponseErrorException))
             return false;
 
-        ResponseError error =
-            ((ResponseErrorException)cause).getResponseError();
+        ResponseError error = ((ResponseErrorException)cause).getResponseError();
         Object data = error.getData();
-        if (!(data instanceof InitializeError)
-            || !((InitializeError)data).isRetry())
+        if (!(data instanceof InitializeError) || !((InitializeError)data).isRetry())
             return false;
 
         ShowMessageRequestParams params = new ShowMessageRequestParams();
@@ -223,8 +219,7 @@ public class ConnectionInitializer
         params.setMessage(error.getMessage());
         String retry = Messages.getString("ConnectionInitializer.Action.Retry"); //$NON-NLS-1$
         params.setActions(Arrays.asList(new MessageActionItem(retry),
-            new MessageActionItem(Messages.getString(
-                "ConnectionInitializer.Action.Cancel")))); //$NON-NLS-1$
+            new MessageActionItem(Messages.getString("ConnectionInitializer.Action.Cancel")))); //$NON-NLS-1$
         MessageActionItem answer = null;
         try
         {

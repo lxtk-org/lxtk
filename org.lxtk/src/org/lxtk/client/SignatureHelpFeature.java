@@ -60,11 +60,9 @@ public final class SignatureHelpFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setSignatureHelp(
-            getLanguageService().getSignatureHelpCapabilities());
+        capabilities.setSignatureHelp(getLanguageService().getSignatureHelpCapabilities());
     }
 
     @Override
@@ -74,18 +72,15 @@ public final class SignatureHelpFeature
         if (documentSelector == null)
             return;
 
-        SignatureHelpOptions capability =
-            capabilities.getSignatureHelpProvider();
+        SignatureHelpOptions capability = capabilities.getSignatureHelpProvider();
         if (capability == null)
             return;
 
         SignatureHelpRegistrationOptions registerOptions =
-            new SignatureHelpRegistrationOptions(
-                capability.getTriggerCharacters());
+            new SignatureHelpRegistrationOptions(capability.getTriggerCharacters());
         registerOptions.setDocumentSelector(documentSelector);
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            registerOptions));
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
@@ -98,22 +93,20 @@ public final class SignatureHelpFeature
     protected Disposable registerLanguageFeatureProvider(String method,
         SignatureHelpRegistrationOptions options)
     {
-        return getLanguageService().getSignatureHelpProviders().add(
-            new SignatureHelpProvider()
+        return getLanguageService().getSignatureHelpProviders().add(new SignatureHelpProvider()
+        {
+            @Override
+            public SignatureHelpRegistrationOptions getRegistrationOptions()
             {
-                @Override
-                public SignatureHelpRegistrationOptions getRegistrationOptions()
-                {
-                    return options;
-                }
+                return options;
+            }
 
-                @Override
-                public CompletableFuture<SignatureHelp> getSignatureHelp(
-                    TextDocumentPositionParams params)
-                {
-                    return getLanguageServer().getTextDocumentService().signatureHelp(
-                        params);
-                }
-            });
+            @Override
+            public CompletableFuture<SignatureHelp> getSignatureHelp(
+                TextDocumentPositionParams params)
+            {
+                return getLanguageServer().getTextDocumentService().signatureHelp(params);
+            }
+        });
     }
 }

@@ -65,8 +65,7 @@ public class Highlighter
     private final ISourceViewer viewer;
     private final ISelectionProvider selectionProvider;
     private final Supplier<LanguageOperationTarget> targetSupplier;
-    private final ISelectionChangedListener listener =
-        e -> scheduleHighlighting(e.getSelection());
+    private final ISelectionChangedListener listener = e -> scheduleHighlighting(e.getSelection());
     private final Object jobLock = new Object();
     private HighlightingJob job;
     private ISelection forcedSelection;
@@ -85,8 +84,7 @@ public class Highlighter
      * @param targetSupplier the {@link LanguageOperationTarget} supplier
      *  for this highlighter (not <code>null</code>)
      */
-    public Highlighter(ISourceViewer viewer,
-        ISelectionProvider selectionProvider,
+    public Highlighter(ISourceViewer viewer, ISelectionProvider selectionProvider,
         Supplier<LanguageOperationTarget> targetSupplier)
     {
         this.viewer = Objects.requireNonNull(viewer);
@@ -101,8 +99,7 @@ public class Highlighter
     public final void install()
     {
         if (selectionProvider instanceof IPostSelectionProvider)
-            ((IPostSelectionProvider)selectionProvider).addPostSelectionChangedListener(
-                listener);
+            ((IPostSelectionProvider)selectionProvider).addPostSelectionChangedListener(listener);
         else
             selectionProvider.addSelectionChangedListener(listener);
 
@@ -204,8 +201,7 @@ public class Highlighter
         org.eclipse.lsp4j.Position position;
         try
         {
-            position = DocumentUtil.toPosition(document,
-                ((ITextSelection)selection).getOffset());
+            position = DocumentUtil.toPosition(document, ((ITextSelection)selection).getOffset());
         }
         catch (BadLocationException e)
         {
@@ -220,8 +216,7 @@ public class Highlighter
         job.schedule();
     }
 
-    private void updateAnnotations(
-        Collection<? extends DocumentHighlight> highlights)
+    private void updateAnnotations(Collection<? extends DocumentHighlight> highlights)
     {
         if (!installed)
             return;
@@ -247,8 +242,7 @@ public class Highlighter
         IDocument document = viewer.getDocument();
         if (document == null)
             return Collections.emptyMap();
-        Map<Annotation, Position> result =
-            new IdentityHashMap<>(highlights.size());
+        Map<Annotation, Position> result = new IdentityHashMap<>(highlights.size());
         for (DocumentHighlight highlight : highlights)
         {
             IRegion r;
@@ -266,8 +260,7 @@ public class Highlighter
             {
                 try
                 {
-                    annotation.setText(MessageFormat.format(
-                        getAnnotationText(highlight.getKind()),
+                    annotation.setText(MessageFormat.format(getAnnotationText(highlight.getKind()),
                         document.get(r.getOffset(), r.getLength())));
                 }
                 catch (BadLocationException e)
@@ -342,19 +335,16 @@ public class Highlighter
             {
                 if (monitor.isCanceled() || !isValid())
                     return Status.CANCEL_STATUS;
-                List<? extends DocumentHighlight> highlights =
-                    computeHighlights(monitor);
+                List<? extends DocumentHighlight> highlights = computeHighlights(monitor);
                 PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
                 {
                     if (!isValid())
                         return;
 
-                    ISnapshot currentSnapshot =
-                        getSnapshot(viewer.getDocument());
+                    ISnapshot currentSnapshot = getSnapshot(viewer.getDocument());
 
-                    if ((highlights == null || highlights.isEmpty())
-                        && isSticky() && snapshot != null
-                        && snapshot.isEqualTo(currentSnapshot))
+                    if ((highlights == null || highlights.isEmpty()) && isSticky()
+                        && snapshot != null && snapshot.isEqualTo(currentSnapshot))
                         return;
 
                     snapshot = currentSnapshot;
@@ -371,16 +361,14 @@ public class Highlighter
                 || selection == forcedSelection;
         }
 
-        private List<? extends DocumentHighlight> computeHighlights(
-            IProgressMonitor monitor)
+        private List<? extends DocumentHighlight> computeHighlights(IProgressMonitor monitor)
         {
             URI documentUri = target.getDocumentUri();
             LanguageService languageService = target.getLanguageService();
-            DocumentHighlightProvider provider =
-                languageService.getDocumentMatcher().getBestMatch(
-                    languageService.getDocumentHighlightProviders(),
-                    DocumentHighlightProvider::getDocumentSelector, documentUri,
-                    target.getLanguageId());
+            DocumentHighlightProvider provider = languageService.getDocumentMatcher().getBestMatch(
+                languageService.getDocumentHighlightProviders(),
+                DocumentHighlightProvider::getDocumentSelector, documentUri,
+                target.getLanguageId());
             if (provider == null)
                 return null;
             DocumentHighlightRequest request = newDocumentHighlightRequest();

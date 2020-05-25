@@ -44,21 +44,20 @@ public abstract class AbstractFormatHandler
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException
     {
-        Formatter formatter = createFormatter(HandlerUtil.getActiveEditor(
-            event));
+        Formatter formatter = createFormatter(HandlerUtil.getActiveEditor(event));
         if (formatter != null)
         {
             formatter.setOptions(getFormattingOptions());
             try
             {
-                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(
-                    formatter);
+                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(formatter);
             }
             catch (InvocationTargetException e)
             {
-                StatusManager.getManager().handle(Activator.createErrorStatus(
-                    Messages.AbstractFormatHandler_Execution_error,
-                    e.getCause()), StatusManager.LOG | StatusManager.SHOW);
+                StatusManager.getManager().handle(
+                    Activator.createErrorStatus(Messages.AbstractFormatHandler_Execution_error,
+                        e.getCause()),
+                    StatusManager.LOG | StatusManager.SHOW);
             }
             catch (InterruptedException e)
             {
@@ -74,8 +73,8 @@ public abstract class AbstractFormatHandler
         boolean enabled = false;
         if (evaluationContext instanceof IEvaluationContext)
         {
-            Object editor = ((IEvaluationContext)evaluationContext).getVariable(
-                ISources.ACTIVE_EDITOR_NAME);
+            Object editor =
+                ((IEvaluationContext)evaluationContext).getVariable(ISources.ACTIVE_EDITOR_NAME);
             Formatter formatter = createFormatter(editor);
             if (formatter != null && formatter.isApplicable())
                 enabled = true;
@@ -116,8 +115,7 @@ public abstract class AbstractFormatHandler
      * @return the corresponding <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
-    protected abstract LanguageOperationTarget getLanguageOperationTarget(
-        IEditorPart editor);
+    protected abstract LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor);
 
     /**
      * Returns the {@link EditorHelper} for this handler.
@@ -137,12 +135,12 @@ public abstract class AbstractFormatHandler
     protected FormattingOptions getFormattingOptions()
     {
         IPreferenceStore store = EditorsUI.getPreferenceStore();
-        int tabWidth = store.getInt(
-            AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+        int tabWidth =
+            store.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
         if (tabWidth == 0)
             tabWidth = 4;
-        boolean insertSpaces = store.getBoolean(
-            AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+        boolean insertSpaces =
+            store.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
         return new FormattingOptions(tabWidth, insertSpaces);
     }
 }

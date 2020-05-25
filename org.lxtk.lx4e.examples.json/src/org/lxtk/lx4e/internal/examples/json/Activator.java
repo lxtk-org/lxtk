@@ -75,37 +75,34 @@ public class Activator
                 }
             });
 
-            languageClient.onDidChangeConnectionState().subscribe(
-                new Consumer<Connectable>()
+            languageClient.onDidChangeConnectionState().subscribe(new Consumer<Connectable>()
+            {
+                boolean shutUp;
+
+                @Override
+                public void accept(Connectable c)
                 {
-                    boolean shutUp;
-
-                    @Override
-                    public void accept(Connectable c)
+                    String errorMessage = languageClient.getErrorMessage();
+                    if (errorMessage != null)
                     {
-                        String errorMessage = languageClient.getErrorMessage();
-                        if (errorMessage != null)
+                        PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
                         {
-                            PlatformUI.getWorkbench().getDisplay().asyncExec(
-                                () ->
-                                {
-                                    if (!shutUp)
-                                    {
-                                        shutUp = true;
+                            if (!shutUp)
+                            {
+                                shutUp = true;
 
-                                        Shell shell = null;
-                                        IWorkbenchWindow window =
-                                            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                                        if (window != null)
-                                            shell = window.getShell();
-                                        MessageDialog.openError(shell,
-                                            "JSON Language Client",
-                                            "Unable to connect to the JSON language server. The dependent language services will be disabled. See the Error Log for details");
-                                    }
-                                });
-                        }
+                                Shell shell = null;
+                                IWorkbenchWindow window =
+                                    PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                                if (window != null)
+                                    shell = window.getShell();
+                                MessageDialog.openError(shell, "JSON Language Client",
+                                    "Unable to connect to the JSON language server. The dependent language services will be disabled. See the Error Log for details");
+                            }
+                        });
                     }
-                });
+                }
+            });
 
             ModelManager.INSTANCE.startup();
             rollback.add(() -> ModelManager.INSTANCE.shutdown());

@@ -17,8 +17,7 @@ import org.eclipse.osgi.util.NLS;
 class Messages
     extends NLS
 {
-    private static final String BUNDLE_NAME =
-        "org.lxtk.lx4e.refactoring.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.lxtk.lx4e.refactoring.messages"; //$NON-NLS-1$
 
     public static String TextFileChange_Cannot_apply_stale_change;
     public static String UndoTextFileChange_Cannot_undo_stale_change;

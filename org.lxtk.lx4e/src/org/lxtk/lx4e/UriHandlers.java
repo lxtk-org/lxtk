@@ -134,15 +134,13 @@ public class UriHandlers
      *  exception occurs while accessing the contents of the corresponding
      *  resource
      */
-    public static IBuffer getBuffer(URI uri, IUriHandler uriHandler)
-        throws CoreException
+    public static IBuffer getBuffer(URI uri, IUriHandler uriHandler) throws CoreException
     {
         IBuffer buffer = uriHandler.getBuffer(uri);
         if (buffer != null)
             return buffer;
-        throw new CoreException(Activator.createErrorStatus(
-            MessageFormat.format(Messages.UriHandlers_Cannot_get_buffer,
-                toDisplayString(uri, uriHandler))));
+        throw new CoreException(Activator.createErrorStatus(MessageFormat.format(
+            Messages.UriHandlers_Cannot_get_buffer, toDisplayString(uri, uriHandler))));
     }
 
     /**

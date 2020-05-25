@@ -45,16 +45,16 @@ public abstract class LanguageSourceElement
     }
 
     @Override
-    public final ILanguageSourceElement getSourceElementAt(int position,
-        ISnapshot base, IProgressMonitor monitor) throws CoreException
+    public final ILanguageSourceElement getSourceElementAt(int position, ISnapshot base,
+        IProgressMonitor monitor) throws CoreException
     {
-        return (ILanguageSourceElement)getSourceElementAt_(position, of(
-            BASE_SNAPSHOT, base), monitor);
+        return (ILanguageSourceElement)getSourceElementAt_(position, of(BASE_SNAPSHOT, base),
+            monitor);
     }
 
     @Override
-    public final ISourceElementInfo getSourceElementInfo(
-        IProgressMonitor monitor) throws CoreException
+    public final ISourceElementInfo getSourceElementInfo(IProgressMonitor monitor)
+        throws CoreException
     {
         return getSourceElementInfo_(EMPTY_CONTEXT, monitor);
     }

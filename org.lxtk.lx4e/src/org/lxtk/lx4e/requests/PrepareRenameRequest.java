@@ -29,11 +29,10 @@ public class PrepareRenameRequest
         Either<Range, PrepareRenameResult>>
 {
     @Override
-    protected Future<Either<Range, PrepareRenameResult>> send(
-        RenameProvider provider, TextDocumentPositionParams params)
+    protected Future<Either<Range, PrepareRenameResult>> send(RenameProvider provider,
+        TextDocumentPositionParams params)
     {
-        setTitle(
-            MessageFormat.format(Messages.PrepareRenameRequest_title, params));
+        setTitle(MessageFormat.format(Messages.PrepareRenameRequest_title, params));
         return provider.prepareRename(params);
     }
 }

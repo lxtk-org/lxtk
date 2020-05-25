@@ -38,12 +38,11 @@ public class JsonOperationTargetProvider
         if (editor == null)
             return null;
 
-        return getOperationTarget(JsonInputElementProvider.INSTANCE.getElement(
-            editor.getEditorInput()));
+        return getOperationTarget(
+            JsonInputElementProvider.INSTANCE.getElement(editor.getEditorInput()));
     }
 
-    private static LanguageOperationTarget getOperationTarget(
-        ILanguageSourceFile sourceFile)
+    private static LanguageOperationTarget getOperationTarget(ILanguageSourceFile sourceFile)
     {
         if (sourceFile == null)
             return null;
@@ -52,8 +51,7 @@ public class JsonOperationTargetProvider
         if (documentUri == null)
             return null;
 
-        return new LanguageOperationTarget(documentUri, JsonCore.LANG_ID,
-            JsonCore.LANG_SERVICE);
+        return new LanguageOperationTarget(documentUri, JsonCore.LANG_ID, JsonCore.LANG_SERVICE);
     }
 
     private JsonOperationTargetProvider()

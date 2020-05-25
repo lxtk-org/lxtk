@@ -20,8 +20,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public class JsonPreferenceConstants
 {
     public static final String EDITOR_MATCHING_BRACKETS = "matchingBrackets"; //$NON-NLS-1$
-    public static final String EDITOR_MATCHING_BRACKETS_COLOR =
-        "matchingBracketsColor"; //$NON-NLS-1$
+    public static final String EDITOR_MATCHING_BRACKETS_COLOR = "matchingBracketsColor"; //$NON-NLS-1$
 
     public static void initializeDefaultValues(IPreferenceStore store)
     {

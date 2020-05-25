@@ -47,8 +47,8 @@ public class TypeScriptSourceViewerConfiguration
     private final ITextEditor editor;
     private final IWorkingCopyManager workingCopyManager;
 
-    public TypeScriptSourceViewerConfiguration(IPreferenceStore preferenceStore,
-        ITextEditor editor, IWorkingCopyManager workingCopyManager)
+    public TypeScriptSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor,
+        IWorkingCopyManager workingCopyManager)
     {
         super(preferenceStore);
         this.editor = editor;
@@ -56,16 +56,13 @@ public class TypeScriptSourceViewerConfiguration
     }
 
     @Override
-    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer,
-        String contentType)
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
     {
-        return new IAutoEditStrategy[] {
-            new LanguageConfigurationAutoEditStrategy() };
+        return new IAutoEditStrategy[] { new LanguageConfigurationAutoEditStrategy() };
     }
 
     @Override
-    public IPresentationReconciler getPresentationReconciler(
-        ISourceViewer viewer)
+    public IPresentationReconciler getPresentationReconciler(ISourceViewer viewer)
     {
         return new TMPresentationReconciler();
     }
@@ -73,8 +70,7 @@ public class TypeScriptSourceViewerConfiguration
     @Override
     public IReconciler getReconciler(ISourceViewer sourceViewer)
     {
-        if (editor == null || !editor.isEditable()
-            || workingCopyManager == null)
+        if (editor == null || !editor.isEditable() || workingCopyManager == null)
             return null;
 
         return new TypeScriptReconciler(editor, workingCopyManager);
@@ -87,8 +83,9 @@ public class TypeScriptSourceViewerConfiguration
             return null;
 
         ContentAssistant assistant = new ContentAssistant(true);
-        assistant.setContentAssistProcessor(new ContentAssistProcessor(
-            this::getLanguageOperationTarget), IDocument.DEFAULT_CONTENT_TYPE);
+        assistant.setContentAssistProcessor(
+            new ContentAssistProcessor(this::getLanguageOperationTarget),
+            IDocument.DEFAULT_CONTENT_TYPE);
         assistant.setSorter(new CompletionProposalSorter());
         assistant.setInformationControlCreator(
             parent -> new DefaultInformationControl(parent, true));
@@ -97,21 +94,19 @@ public class TypeScriptSourceViewerConfiguration
     }
 
     @Override
-    public IQuickAssistAssistant getQuickAssistAssistant(
-        ISourceViewer sourceViewer)
+    public IQuickAssistAssistant getQuickAssistAssistant(ISourceViewer sourceViewer)
     {
         if (editor == null || !editor.isEditable())
             return null;
 
         QuickAssistAssistant assistant = new QuickAssistAssistant();
-        assistant.setQuickAssistProcessor(new TypeScriptQuickAssistProcessor(
-            this::getLanguageOperationTarget));
+        assistant.setQuickAssistProcessor(
+            new TypeScriptQuickAssistProcessor(this::getLanguageOperationTarget));
         return assistant;
     }
 
     @Override
-    public IHyperlinkDetector[] getHyperlinkDetectors(
-        ISourceViewer sourceViewer)
+    public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer)
     {
         IAdaptable context = new IAdaptable()
         {
@@ -123,15 +118,13 @@ public class TypeScriptSourceViewerConfiguration
                 return null;
             }
         };
-        DefinitionHyperlinkDetector definitionHyperlinkDetector =
-            new DefinitionHyperlinkDetector();
+        DefinitionHyperlinkDetector definitionHyperlinkDetector = new DefinitionHyperlinkDetector();
         definitionHyperlinkDetector.setContext(context);
         return new IHyperlinkDetector[] { definitionHyperlinkDetector };
     }
 
     @Override
-    public ITextHover getTextHover(ISourceViewer sourceViewer,
-        String contentType)
+    public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
     {
         return new FirstMatchHover(super.getTextHover(sourceViewer, contentType),
             new TextHover(this::getLanguageOperationTarget));

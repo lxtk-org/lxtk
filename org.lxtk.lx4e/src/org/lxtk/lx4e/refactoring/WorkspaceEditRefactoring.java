@@ -41,8 +41,7 @@ public class WorkspaceEditRefactoring
      * @param changeFactory the {@link WorkspaceEditChangeFactory}
      *  for the refactoring (not <code>null</code>)
      */
-    public WorkspaceEditRefactoring(String name,
-        WorkspaceEditChangeFactory changeFactory)
+    public WorkspaceEditRefactoring(String name, WorkspaceEditChangeFactory changeFactory)
     {
         this.name = Objects.requireNonNull(name);
         this.changeFactory = Objects.requireNonNull(changeFactory);
@@ -82,8 +81,7 @@ public class WorkspaceEditRefactoring
     }
 
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
-        OperationCanceledException
+    public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
         return change;
     }

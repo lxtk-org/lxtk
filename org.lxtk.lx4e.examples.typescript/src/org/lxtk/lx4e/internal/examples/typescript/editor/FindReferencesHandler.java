@@ -27,8 +27,7 @@ public class FindReferencesHandler
     extends AbstractFindReferencesHandler
 {
     @Override
-    protected LanguageOperationTarget getLanguageOperationTarget(
-        IEditorPart editor)
+    protected LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor)
     {
         return TypeScriptOperationTargetProvider.getOperationTarget(editor);
     }

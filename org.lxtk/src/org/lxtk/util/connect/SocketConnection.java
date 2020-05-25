@@ -74,8 +74,7 @@ public final class SocketConnection
     @Override
     public boolean isClosed()
     {
-        return isDisposed() || !socket.isBound() || !socket.isConnected()
-            || socket.isClosed() || socket.isInputShutdown()
-            || socket.isOutputShutdown();
+        return isDisposed() || !socket.isBound() || !socket.isConnected() || socket.isClosed()
+            || socket.isInputShutdown() || socket.isOutputShutdown();
     }
 }

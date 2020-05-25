@@ -39,40 +39,36 @@ class StructureBuilder
     private final ISnapshot snapshot;
     private final StructureHelper helper = new StructureHelper();
 
-    StructureBuilder(Map<IElement, Object> newElements, IDocument source,
-        ISnapshot snapshot)
+    StructureBuilder(Map<IElement, Object> newElements, IDocument source, ISnapshot snapshot)
     {
         this.newElements = newElements;
         this.source = source;
         this.snapshot = snapshot;
     }
 
-    void buildStructure(ILanguageSourceFile handle,
-        List<DocumentSymbol> symbols)
+    void buildStructure(ILanguageSourceFile handle, List<DocumentSymbol> symbols)
     {
         SourceElementBody body = new SourceElementBody();
         body.setFullRange(new TextRange(0, source.getLength()));
         body.setSnapshot(snapshot);
 
         for (DocumentSymbol symbol : symbols)
-            process(handle, body, handle.getSymbol(symbol.getName(),
-                symbol.getKind()), symbol);
+            process(handle, body, handle.getSymbol(symbol.getName(), symbol.getKind()), symbol);
 
         body.setChildren(helper.popChildren(body).toArray(NO_SYMBOLS));
         newElements.put(handle, body);
     }
 
-    private void process(ILanguageSourceElement parent, Object parentBody,
-        ILanguageSymbol handle, DocumentSymbol symbol)
+    private void process(ILanguageSourceElement parent, Object parentBody, ILanguageSymbol handle,
+        DocumentSymbol symbol)
     {
         helper.resolveDuplicates((ISourceConstructImplExtension)handle);
         SourceElementBody body = new SourceElementBody();
         try
         {
-            body.setFullRange(toTextRange(DocumentUtil.toRegion(source,
-                symbol.getRange())));
-            body.setIdentifyingRange(toTextRange(DocumentUtil.toRegion(source,
-                symbol.getSelectionRange())));
+            body.setFullRange(toTextRange(DocumentUtil.toRegion(source, symbol.getRange())));
+            body.setIdentifyingRange(
+                toTextRange(DocumentUtil.toRegion(source, symbol.getSelectionRange())));
         }
         catch (BadLocationException e)
         {
@@ -83,8 +79,7 @@ class StructureBuilder
         body.set(ILanguageSymbol.DEPRECATED, symbol.getDeprecated());
 
         for (DocumentSymbol child : symbol.getChildren())
-            process(handle, body, handle.getSymbol(child.getName(),
-                child.getKind()), child);
+            process(handle, body, handle.getSymbol(child.getName(), child.getKind()), child);
 
         body.setChildren(helper.popChildren(body).toArray(NO_SYMBOLS));
         newElements.put(handle, body);

@@ -24,8 +24,7 @@ public class FormatHandler
     extends AbstractFormatHandler
 {
     @Override
-    protected LanguageOperationTarget getLanguageOperationTarget(
-        IEditorPart editor)
+    protected LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor)
     {
         return TypeScriptOperationTargetProvider.getOperationTarget(editor);
     }

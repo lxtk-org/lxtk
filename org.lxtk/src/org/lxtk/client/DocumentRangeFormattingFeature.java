@@ -60,8 +60,7 @@ public final class DocumentRangeFormattingFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setRangeFormatting(
             getLanguageService().getDocumentRangeFormattingCapabilities());
@@ -105,8 +104,7 @@ public final class DocumentRangeFormattingFeature
                 public CompletableFuture<List<? extends TextEdit>> getRangeFormattingEdits(
                     DocumentRangeFormattingParams params)
                 {
-                    return getLanguageServer().getTextDocumentService().rangeFormatting(
-                        params);
+                    return getLanguageServer().getTextDocumentService().rangeFormatting(params);
                 }
             });
     }

@@ -66,8 +66,7 @@ public final class Formatter
      * @param selection the text selection to format (not <code>null</code>,
      *  may be empty)
      */
-    public Formatter(LanguageOperationTarget target, IDocument document,
-        ITextSelection selection)
+    public Formatter(LanguageOperationTarget target, IDocument document, ITextSelection selection)
     {
         this.target = Objects.requireNonNull(target);
         this.document = Objects.requireNonNull(document);
@@ -101,10 +100,8 @@ public final class Formatter
         DocumentMatcher documentMatcher = languageService.getDocumentMatcher();
 
         DocumentRangeFormattingProvider documentRangeFormattingProvider =
-            documentMatcher.getFirstMatch(
-                languageService.getDocumentRangeFormattingProviders(),
-                DocumentRangeFormattingProvider::getDocumentSelector,
-                documentUri, languageId);
+            documentMatcher.getFirstMatch(languageService.getDocumentRangeFormattingProviders(),
+                DocumentRangeFormattingProvider::getDocumentSelector, documentUri, languageId);
         if (documentRangeFormattingProvider != null)
             return true;
 
@@ -112,16 +109,13 @@ public final class Formatter
             return false;
 
         DocumentFormattingProvider documentFormattingProvider =
-            documentMatcher.getFirstMatch(
-                languageService.getDocumentFormattingProviders(),
-                DocumentFormattingProvider::getDocumentSelector, documentUri,
-                languageId);
+            documentMatcher.getFirstMatch(languageService.getDocumentFormattingProviders(),
+                DocumentFormattingProvider::getDocumentSelector, documentUri, languageId);
         return documentFormattingProvider != null;
     }
 
     @Override
-    public void run(IProgressMonitor monitor)
-        throws InvocationTargetException, InterruptedException
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
     {
         Request<List<? extends TextEdit>> request = createFormattingRequest();
         if (request == null)
@@ -187,8 +181,7 @@ public final class Formatter
     private Request<List<? extends TextEdit>> createFormattingRequest()
     {
         if (options == null)
-            throw new IllegalStateException(
-                "Formatting options have not been set"); //$NON-NLS-1$
+            throw new IllegalStateException("Formatting options have not been set"); //$NON-NLS-1$
 
         LanguageService languageService = target.getLanguageService();
         URI documentUri = target.getDocumentUri();
@@ -196,10 +189,8 @@ public final class Formatter
         DocumentMatcher documentMatcher = languageService.getDocumentMatcher();
 
         DocumentRangeFormattingProvider documentRangeFormattingProvider =
-            documentMatcher.getBestMatch(
-                languageService.getDocumentRangeFormattingProviders(),
-                DocumentRangeFormattingProvider::getDocumentSelector,
-                documentUri, languageId);
+            documentMatcher.getBestMatch(languageService.getDocumentRangeFormattingProviders(),
+                DocumentRangeFormattingProvider::getDocumentSelector, documentUri, languageId);
         if (documentRangeFormattingProvider != null)
         {
             int offset;
@@ -221,15 +212,12 @@ public final class Formatter
                 return null;
             }
 
-            DocumentRangeFormattingParams params =
-                new DocumentRangeFormattingParams();
-            params.setTextDocument(
-                DocumentUri.toTextDocumentIdentifier(documentUri));
+            DocumentRangeFormattingParams params = new DocumentRangeFormattingParams();
+            params.setTextDocument(DocumentUri.toTextDocumentIdentifier(documentUri));
             params.setRange(range);
             params.setOptions(options);
 
-            DocumentRangeFormattingRequest request =
-                newDocumentRangeFormattingRequest();
+            DocumentRangeFormattingRequest request = newDocumentRangeFormattingRequest();
             request.setProvider(documentRangeFormattingProvider);
             request.setParams(params);
             return request;
@@ -237,20 +225,15 @@ public final class Formatter
         else if (selection.getLength() <= 0)
         {
             DocumentFormattingProvider documentFormattingProvider =
-                documentMatcher.getBestMatch(
-                    languageService.getDocumentFormattingProviders(),
-                    DocumentFormattingProvider::getDocumentSelector,
-                    documentUri, languageId);
+                documentMatcher.getBestMatch(languageService.getDocumentFormattingProviders(),
+                    DocumentFormattingProvider::getDocumentSelector, documentUri, languageId);
             if (documentFormattingProvider != null)
             {
-                DocumentFormattingParams params =
-                    new DocumentFormattingParams();
-                params.setTextDocument(
-                    DocumentUri.toTextDocumentIdentifier(documentUri));
+                DocumentFormattingParams params = new DocumentFormattingParams();
+                params.setTextDocument(DocumentUri.toTextDocumentIdentifier(documentUri));
                 params.setOptions(options);
 
-                DocumentFormattingRequest request =
-                    newDocumentFormattingRequest();
+                DocumentFormattingRequest request = newDocumentFormattingRequest();
                 request.setProvider(documentFormattingProvider);
                 request.setParams(params);
                 return request;

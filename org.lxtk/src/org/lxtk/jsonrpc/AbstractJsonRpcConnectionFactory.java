@@ -34,16 +34,14 @@ public abstract class AbstractJsonRpcConnectionFactory<T>
     implements JsonRpcConnectionFactory<T>
 {
     @Override
-    public JsonRpcConnection<T> newConnection(Object localService,
-        Class<T> remoteInterface, ExecutorService executorService,
-        Function<MessageConsumer, MessageConsumer> wrapper)
+    public JsonRpcConnection<T> newConnection(Object localService, Class<T> remoteInterface,
+        ExecutorService executorService, Function<MessageConsumer, MessageConsumer> wrapper)
     {
         StreamBasedConnection c = newStreamBasedConnection();
         try
         {
-            Launcher<T> launcher = newLauncher(localService, remoteInterface,
-                c.getInputStream(), c.getOutputStream(), executorService,
-                wrapper);
+            Launcher<T> launcher = newLauncher(localService, remoteInterface, c.getInputStream(),
+                c.getOutputStream(), executorService, wrapper);
             Future<?> future = launcher.startListening();
             return new JsonRpcConnection<T>()
             {
@@ -109,13 +107,12 @@ public abstract class AbstractJsonRpcConnectionFactory<T>
      *  (may be <code>null</code>)
      * @return a new launcher (never <code>null</code>)
      */
-    protected Launcher<T> newLauncher(Object localService,
-        Class<T> remoteInterface, InputStream in, OutputStream out,
-        ExecutorService executorService,
+    protected Launcher<T> newLauncher(Object localService, Class<T> remoteInterface, InputStream in,
+        OutputStream out, ExecutorService executorService,
         Function<MessageConsumer, MessageConsumer> wrapper)
     {
-        return Launcher.createIoLauncher(localService, remoteInterface, in, out,
-            executorService, wrapper);
+        return Launcher.createIoLauncher(localService, remoteInterface, in, out, executorService,
+            wrapper);
     }
 
     /**

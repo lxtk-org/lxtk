@@ -61,8 +61,7 @@ public final class RenameRefactoringWizard
         {
             Composite composite = new Composite(parent, SWT.NONE);
             composite.setLayout(new GridLayout(2, false));
-            composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-                true));
+            composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             setControl(composite);
             initializeDialogUnits(composite);
 
@@ -74,8 +73,7 @@ public final class RenameRefactoringWizard
             String name = getRefactoring().getProposedNewName();
             if (name != null)
                 nameText.setText(name);
-            nameText.setLayoutData(new GridData(GridData.FILL,
-                GridData.BEGINNING, true, false));
+            nameText.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
             nameText.addModifyListener(e -> validatePage());
             nameText.selectAll();
 

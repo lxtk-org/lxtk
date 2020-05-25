@@ -37,7 +37,6 @@ public interface JsonRpcConnectionFactory<T>
      *  (may be <code>null</code>)
      * @return a new JSON-RPC connection (never <code>null</code>)
      */
-    JsonRpcConnection<T> newConnection(Object localService,
-        Class<T> remoteInterface, ExecutorService executorService,
-        Function<MessageConsumer, MessageConsumer> wrapper);
+    JsonRpcConnection<T> newConnection(Object localService, Class<T> remoteInterface,
+        ExecutorService executorService, Function<MessageConsumer, MessageConsumer> wrapper);
 }

@@ -50,8 +50,7 @@ public final class DefaultDiagnosticConsumer
         DiagnosticAnnotations diagnosticAnnotations)
     {
         this.diagnosticMarkers = Objects.requireNonNull(diagnosticMarkers);
-        this.diagnosticAnnotations = Objects.requireNonNull(
-            diagnosticAnnotations);
+        this.diagnosticAnnotations = Objects.requireNonNull(diagnosticAnnotations);
     }
 
     @Override
@@ -59,11 +58,9 @@ public final class DefaultDiagnosticConsumer
     {
         diagnosticMarkers.accept(uri, diagnostics);
 
-        TextDocument textDocument =
-            diagnosticAnnotations.getWorkspace().getTextDocument(uri);
-        if (textDocument instanceof EclipseTextDocument
-            && ResourceUtil.getResource(
-                ((EclipseTextDocument)textDocument).getCorrespondingElement()) == null)
+        TextDocument textDocument = diagnosticAnnotations.getWorkspace().getTextDocument(uri);
+        if (textDocument instanceof EclipseTextDocument && ResourceUtil.getResource(
+            ((EclipseTextDocument)textDocument).getCorrespondingElement()) == null)
         {
             diagnosticAnnotations.accept(uri, diagnostics);
         }

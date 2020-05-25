@@ -29,8 +29,7 @@ public final class EclipseTextDocumentChangeEvent
     private final long modificationStamp;
 
     EclipseTextDocumentChangeEvent(TextDocumentSnapshot snapshot,
-        List<TextDocumentContentChangeEvent> contentChanges,
-        long modificationStamp)
+        List<TextDocumentContentChangeEvent> contentChanges, long modificationStamp)
     {
         super(snapshot, contentChanges);
         this.modificationStamp = modificationStamp;

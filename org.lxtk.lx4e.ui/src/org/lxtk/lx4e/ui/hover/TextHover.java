@@ -70,8 +70,7 @@ public class TextHover
     @Override
     public IRegion getHoverRegion(ITextViewer textViewer, int offset)
     {
-        return DefaultWordFinder.INSTANCE.findWord(textViewer.getDocument(),
-            offset);
+        return DefaultWordFinder.INSTANCE.findWord(textViewer.getDocument(), offset);
     }
 
     @Override
@@ -94,10 +93,8 @@ public class TextHover
         LanguageService languageService = target.getLanguageService();
 
         HoverProvider provider =
-            languageService.getDocumentMatcher().getBestMatch(
-                languageService.getHoverProviders(),
-                HoverProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
+            languageService.getDocumentMatcher().getBestMatch(languageService.getHoverProviders(),
+                HoverProvider::getDocumentSelector, documentUri, target.getLanguageId());
         if (provider == null)
             return null;
 
@@ -106,8 +103,7 @@ public class TextHover
         Position position;
         try
         {
-            position =
-                DocumentUtil.toPosition(document, hoverRegion.getOffset());
+            position = DocumentUtil.toPosition(document, hoverRegion.getOffset());
         }
         catch (BadLocationException e)
         {
@@ -126,14 +122,12 @@ public class TextHover
         if (result == null)
             return null;
 
-        Either<List<Either<String, MarkedString>>, MarkupContent> contents =
-            result.getContents();
+        Either<List<Either<String, MarkedString>>, MarkupContent> contents = result.getContents();
         MarkupContent markupContent;
         if (contents.isLeft())
         {
             StringBuilder builder = new StringBuilder();
-            Iterator<Either<String, MarkedString>> it =
-                contents.getLeft().iterator();
+            Iterator<Either<String, MarkedString>> it = contents.getLeft().iterator();
             while (it.hasNext())
             {
                 Either<String, MarkedString> item = it.next();
@@ -155,8 +149,7 @@ public class TextHover
                         builder.append("\n\n"); //$NON-NLS-1$
                 }
             }
-            markupContent =
-                new MarkupContent(MarkupKind.MARKDOWN, builder.toString());
+            markupContent = new MarkupContent(MarkupKind.MARKDOWN, builder.toString());
         }
         else
             markupContent = contents.getRight();

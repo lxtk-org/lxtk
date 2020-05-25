@@ -64,8 +64,7 @@ public class RenameFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setRename(getLanguageService().getRenameCapabilities());
     }
@@ -77,10 +76,9 @@ public class RenameFeature
         if (documentSelector == null)
             return;
 
-        Either<Boolean, RenameOptions> capability =
-            capabilities.getRenameProvider();
-        if (capability == null || !(capability.isRight() || Boolean.TRUE.equals(
-            capability.getLeft())))
+        Either<Boolean, RenameOptions> capability = capabilities.getRenameProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
         RenameOptions registerOptions = new RenameOptions();
@@ -93,15 +91,14 @@ public class RenameFeature
         }
         else
         {
-            registerOptions.setDocumentSelector(Optional.ofNullable(
-                options.getDocumentSelector()).orElse(documentSelector));
-            registerOptions.setId(Optional.ofNullable(options.getId()).orElse(
-                UUID.randomUUID().toString()));
+            registerOptions.setDocumentSelector(
+                Optional.ofNullable(options.getDocumentSelector()).orElse(documentSelector));
+            registerOptions.setId(
+                Optional.ofNullable(options.getId()).orElse(UUID.randomUUID().toString()));
             registerOptions.setPrepareProvider(options.getPrepareProvider());
         }
 
-        register(new Registration(registerOptions.getId(), METHOD,
-            registerOptions));
+        register(new Registration(registerOptions.getId(), METHOD, registerOptions));
     }
 
     @Override
@@ -111,36 +108,31 @@ public class RenameFeature
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
-        RenameOptions options)
+    protected Disposable registerLanguageFeatureProvider(String method, RenameOptions options)
     {
-        return getLanguageService().getRenameProviders().add(
-            new RenameProvider()
+        return getLanguageService().getRenameProviders().add(new RenameProvider()
+        {
+            @Override
+            public RenameOptions getRegistrationOptions()
             {
-                @Override
-                public RenameOptions getRegistrationOptions()
-                {
-                    return options;
-                }
+                return options;
+            }
 
-                @Override
-                public CompletableFuture<WorkspaceEdit> getRenameEdits(
-                    RenameParams params)
-                {
-                    return getLanguageServer().getTextDocumentService().rename(
-                        params);
-                }
+            @Override
+            public CompletableFuture<WorkspaceEdit> getRenameEdits(RenameParams params)
+            {
+                return getLanguageServer().getTextDocumentService().rename(params);
+            }
 
-                @Override
-                public CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(
-                    TextDocumentPositionParams params)
-                {
-                    if (!Boolean.TRUE.equals(options.getPrepareProvider()))
-                        throw new UnsupportedOperationException();
+            @Override
+            public CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(
+                TextDocumentPositionParams params)
+            {
+                if (!Boolean.TRUE.equals(options.getPrepareProvider()))
+                    throw new UnsupportedOperationException();
 
-                    return getLanguageServer().getTextDocumentService().prepareRename(
-                        params);
-                }
-            });
+                return getLanguageServer().getTextDocumentService().prepareRename(params);
+            }
+        });
     }
 }

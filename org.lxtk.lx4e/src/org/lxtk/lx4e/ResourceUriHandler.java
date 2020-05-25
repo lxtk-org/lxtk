@@ -87,8 +87,7 @@ public class ResourceUriHandler
     protected IFile getFile(URI uri)
     {
         return getNonLinkedOne(
-            ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(
-                uri));
+            ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(uri));
     }
 
     /**
@@ -101,8 +100,7 @@ public class ResourceUriHandler
     protected IContainer getContainer(URI uri)
     {
         return getNonLinkedOne(
-            ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(
-                uri));
+            ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(uri));
     }
 
     private static <T extends IResource> T getNonLinkedOne(T[] resources)

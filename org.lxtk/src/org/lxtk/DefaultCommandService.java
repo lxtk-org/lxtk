@@ -31,8 +31,7 @@ import org.lxtk.util.Disposable;
 public class DefaultCommandService
     implements CommandService
 {
-    private final Map<String, CommandHandler> commands =
-        new ConcurrentHashMap<>();
+    private final Map<String, CommandHandler> commands = new ConcurrentHashMap<>();
 
     @Override
     public Disposable addCommand(String command, CommandHandler handler)
@@ -47,8 +46,7 @@ public class DefaultCommandService
     }
 
     @Override
-    public CompletableFuture<Object> executeCommand(String command,
-        List<Object> arguments)
+    public CompletableFuture<Object> executeCommand(String command, List<Object> arguments)
     {
         CommandHandler handler = commands.get(command);
         if (handler == null)

@@ -86,10 +86,9 @@ public abstract class AbstractCodeActionMenu
 
         CodeActionRequest request = newCodeActionRequest();
         request.setProvider(provider);
-        request.setParams(new CodeActionParams(
-            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-            range, new CodeActionContext(Collections.emptyList(),
-                getCodeActionKinds())));
+        request.setParams(
+            new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+                range, new CodeActionContext(Collections.emptyList(), getCodeActionKinds())));
         request.setTimeout(getCodeActionTimeout());
         request.setMayThrow(false);
 
@@ -122,8 +121,7 @@ public abstract class AbstractCodeActionMenu
         IWorkbenchPart part = getActivePart();
         if (!(part instanceof IEditorPart))
             return null;
-        return DefaultEditorHelper.INSTANCE.getSelectedTextRange(
-            (IEditorPart)part);
+        return DefaultEditorHelper.INSTANCE.getSelectedTextRange((IEditorPart)part);
     }
 
     /**
@@ -135,8 +133,7 @@ public abstract class AbstractCodeActionMenu
     {
         if (serviceLocator == null)
             return null;
-        IPartService partService = serviceLocator.getService(
-            IPartService.class);
+        IPartService partService = serviceLocator.getService(IPartService.class);
         if (partService == null)
             return null;
         return partService.getActivePart();
@@ -204,8 +201,7 @@ public abstract class AbstractCodeActionMenu
      * @param commandService never <code>null</code>
      * @return the requested action, or <code>null</code> if none
      */
-    protected IAction getAction(CodeAction codeAction,
-        CommandService commandService)
+    protected IAction getAction(CodeAction codeAction, CommandService commandService)
     {
         return new CodeActionAction(codeAction, commandService);
     }
@@ -222,8 +218,7 @@ public abstract class AbstractCodeActionMenu
 
     private IContributionItem[] noItems()
     {
-        return new IContributionItem[] { new ActionContributionItem(
-            new NoActionsAction()) };
+        return new IContributionItem[] { new ActionContributionItem(new NoActionsAction()) };
     }
 
     /**
@@ -278,8 +273,7 @@ public abstract class AbstractCodeActionMenu
          * @param codeAction not <code>null</code>
          * @param commandService not <code>null</code>
          */
-        public CodeActionAction(CodeAction codeAction,
-            CommandService commandService)
+        public CodeActionAction(CodeAction codeAction, CommandService commandService)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
             this.commandService = Objects.requireNonNull(commandService);
@@ -289,8 +283,8 @@ public abstract class AbstractCodeActionMenu
         @Override
         public void run()
         {
-            CodeActions.execute(codeAction, getText(),
-                getWorkspaceEditChangeFactory(), commandService);
+            CodeActions.execute(codeAction, getText(), getWorkspaceEditChangeFactory(),
+                commandService);
         }
     }
 

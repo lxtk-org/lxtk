@@ -94,8 +94,7 @@ public class LanguageSymbol
     }
 
     @Override
-    public ILanguageSymbol[] getSymbols(IProgressMonitor monitor)
-        throws CoreException
+    public ILanguageSymbol[] getSymbols(IProgressMonitor monitor) throws CoreException
     {
         return (ILanguageSymbol[])getChildren_(EMPTY_CONTEXT, monitor);
     }

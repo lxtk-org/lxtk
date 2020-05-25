@@ -127,8 +127,7 @@ public class EclipseFuture<T>
      *  while waiting
      * @throws ExecutionException if the computation threw an exception
      */
-    public T get(IProgressMonitor monitor)
-        throws InterruptedException, ExecutionException
+    public T get(IProgressMonitor monitor) throws InterruptedException, ExecutionException
     {
         SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.checkCanceled();
@@ -181,8 +180,7 @@ public class EclipseFuture<T>
             subMonitor.setWorkRemaining(10000);
             try
             {
-                return get(Math.min(monitorPeriod, timeRemaining),
-                    TimeUnit.MILLISECONDS);
+                return get(Math.min(monitorPeriod, timeRemaining), TimeUnit.MILLISECONDS);
             }
             catch (TimeoutException e)
             {

@@ -65,8 +65,7 @@ public class EditorHelper
      *  was opened
      * @throws PartInitException if the editor could not be initialized
      */
-    public IEditorPart openEditor(IWorkbenchPage page, URI uri)
-        throws PartInitException
+    public IEditorPart openEditor(IWorkbenchPage page, URI uri) throws PartInitException
     {
         if (page == null)
             throw new IllegalArgumentException();
@@ -186,8 +185,7 @@ public class EditorHelper
     {
         if (editor == null)
             return null;
-        return editor.getDocumentProvider().getDocument(
-            editor.getEditorInput());
+        return editor.getDocumentProvider().getDocument(editor.getEditorInput());
     }
 
     /**

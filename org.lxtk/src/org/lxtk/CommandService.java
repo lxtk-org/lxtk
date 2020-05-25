@@ -47,8 +47,7 @@ public interface CommandService
      * @return result future, or <code>null</code> if a command with the given
      *  identifier is not present
      */
-    CompletableFuture<Object> executeCommand(String command,
-        List<Object> arguments);
+    CompletableFuture<Object> executeCommand(String command, List<Object> arguments);
 
     /**
      * Returns all commands currently known to this service.

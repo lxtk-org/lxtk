@@ -28,8 +28,7 @@ public class DefaultGson
     /**
      * The default instance of {@link Gson}.
      */
-    public static final Gson INSTANCE = new MessageJsonHandler(
-        Collections.emptyMap()).getGson();
+    public static final Gson INSTANCE = new MessageJsonHandler(Collections.emptyMap()).getGson();
 
     private DefaultGson()
     {

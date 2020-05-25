@@ -33,10 +33,8 @@ public abstract class AbstractConnectable
     implements Connectable
 {
     private volatile String errorMessage;
-    private volatile ConnectionState connectionState =
-        ConnectionState.DISCONNECTED;
-    private final EventEmitter<Connectable> onDidChangeConnectionState =
-        new EventEmitter<>();
+    private volatile ConnectionState connectionState = ConnectionState.DISCONNECTED;
+    private final EventEmitter<Connectable> onDidChangeConnectionState = new EventEmitter<>();
     private ExecutorService connectionExecutor;
     private ConnectionTask connectionTask;
     private Future<?> connectionFuture;
@@ -54,8 +52,7 @@ public abstract class AbstractConnectable
     public final synchronized void connect()
     {
         ConnectionState state = getConnectionState();
-        if (state == ConnectionState.DISCONNECTED
-            || state == ConnectionState.DISCONNECTING)
+        if (state == ConnectionState.DISCONNECTED || state == ConnectionState.DISCONNECTING)
         {
             setErrorMessage(null);
             setConnectionState(ConnectionState.CONNECTING);
@@ -88,11 +85,12 @@ public abstract class AbstractConnectable
                             t);
                         String message = t.getMessage();
                         if (message == null)
-                            message = Messages.getString(
-                                "AbstractConnectable.Error.CouldNotConnect"); //$NON-NLS-1$
+                            message =
+                                Messages.getString("AbstractConnectable.Error.CouldNotConnect"); //$NON-NLS-1$
                         else
-                            message = MessageFormat.format(Messages.getString(
-                                "AbstractConnectable.Error.CouldNotConnectBecauseOf"), //$NON-NLS-1$
+                            message = MessageFormat.format(
+                                Messages.getString(
+                                    "AbstractConnectable.Error.CouldNotConnectBecauseOf"), //$NON-NLS-1$
                                 message);
                         setErrorMessage(message);
                         setConnectionState(ConnectionState.DISCONNECTED);
@@ -102,8 +100,7 @@ public abstract class AbstractConnectable
             }
             synchronized (this)
             {
-                if (task == connectionTask
-                    && getConnectionState() == ConnectionState.CONNECTING)
+                if (task == connectionTask && getConnectionState() == ConnectionState.CONNECTING)
                 {
                     setConnectionState(ConnectionState.CONNECTED);
                 }
@@ -126,8 +123,7 @@ public abstract class AbstractConnectable
     protected final synchronized void disconnect(String errorMessage)
     {
         ConnectionState state = getConnectionState();
-        if (state == ConnectionState.CONNECTED
-            || state == ConnectionState.CONNECTING)
+        if (state == ConnectionState.CONNECTED || state == ConnectionState.CONNECTING)
         {
             setErrorMessage(errorMessage);
             setConnectionState(ConnectionState.DISCONNECTING);
@@ -181,8 +177,7 @@ public abstract class AbstractConnectable
     private void setConnectionState(ConnectionState connectionState)
     {
         this.connectionState = connectionState;
-        ForkJoinPool.commonPool().execute(() -> onDidChangeConnectionState.fire(
-            this));
+        ForkJoinPool.commonPool().execute(() -> onDidChangeConnectionState.fire(this));
     }
 
     @Override
@@ -280,8 +275,7 @@ public abstract class AbstractConnectable
                 if (task == connectionTask)
                 {
                     ConnectionState state = getConnectionState();
-                    if (state == ConnectionState.CONNECTED
-                        || state == ConnectionState.CONNECTING)
+                    if (state == ConnectionState.CONNECTED || state == ConnectionState.CONNECTING)
                     {
                         if (shouldReconnect())
                         {
@@ -292,8 +286,8 @@ public abstract class AbstractConnectable
                         else
                         {
                             log().error("Connection got closed unexpectedly"); //$NON-NLS-1$
-                            disconnect(Messages.getString(
-                                "AbstractConnectable.Error.ConnectionAborted")); //$NON-NLS-1$
+                            disconnect(
+                                Messages.getString("AbstractConnectable.Error.ConnectionAborted")); //$NON-NLS-1$
                         }
                     }
                 }

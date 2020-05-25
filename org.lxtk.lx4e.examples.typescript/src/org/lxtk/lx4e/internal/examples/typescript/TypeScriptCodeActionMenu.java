@@ -28,8 +28,7 @@ public class TypeScriptCodeActionMenu
     @Override
     protected LanguageOperationTarget getLanguageOperationTarget()
     {
-        return TypeScriptOperationTargetProvider.getOperationTarget(
-            (IEditorPart)getActivePart());
+        return TypeScriptOperationTargetProvider.getOperationTarget((IEditorPart)getActivePart());
     }
 
     @Override

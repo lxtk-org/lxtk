@@ -49,8 +49,7 @@ public final class EclipseTextDocument
     private final Object element;
     private final AtomicReference<EclipseTextDocumentChangeEvent> lastChange =
         new AtomicReference<>();
-    private final EventEmitter<TextDocumentChangeEvent> onDidChange =
-        new EventEmitter<>();
+    private final EventEmitter<TextDocumentChangeEvent> onDidChange = new EventEmitter<>();
     private final IDocumentListener listener = new IDocumentListener()
     {
         private TextDocumentContentChangeEvent contentChange;
@@ -66,8 +65,7 @@ public final class EclipseTextDocument
         {
             try
             {
-                notifyChange(newChangeEvent(contentChange,
-                    event.getModificationStamp()));
+                notifyChange(newChangeEvent(contentChange, event.getModificationStamp()));
             }
             finally
             {
@@ -89,8 +87,7 @@ public final class EclipseTextDocument
      * @param buffer the underlying {@link IBuffer} (not <code>null</code>)
      * @param element the corresponding element (may be <code>null</code>)
      */
-    public EclipseTextDocument(URI uri, String languageId, IBuffer buffer,
-        Object element)
+    public EclipseTextDocument(URI uri, String languageId, IBuffer buffer, Object element)
     {
         this.uri = Objects.requireNonNull(uri);
         this.languageId = Objects.requireNonNull(languageId);
@@ -98,9 +95,9 @@ public final class EclipseTextDocument
         this.element = element;
         document = buffer.getDocument();
         document.addDocumentListener(listener);
-        lastChange.compareAndSet(null, new EclipseTextDocumentChangeEvent(
-            new TextDocumentSnapshot(this, 0, document.get()),
-            Collections.emptyList(), getModificationStamp()));
+        lastChange.compareAndSet(null,
+            new EclipseTextDocumentChangeEvent(new TextDocumentSnapshot(this, 0, document.get()),
+                Collections.emptyList(), getModificationStamp()));
         buffer.addRef();
     }
 
@@ -208,35 +205,31 @@ public final class EclipseTextDocument
         lastChange.set(event);
     }
 
-    private TextDocumentContentChangeEvent newContentChangeEvent(
-        DocumentEvent event)
+    private TextDocumentContentChangeEvent newContentChangeEvent(DocumentEvent event)
     {
         Range range;
         try
         {
-            range = DocumentUtil.toRange(document, event.getOffset(),
-                event.getLength());
+            range = DocumentUtil.toRange(document, event.getOffset(), event.getLength());
         }
         catch (BadLocationException e)
         {
             throw new AssertionError(e); // must never happen
         }
-        return new TextDocumentContentChangeEvent(range, event.getLength(),
-            event.getText());
+        return new TextDocumentContentChangeEvent(range, event.getLength(), event.getText());
     }
 
-    private EclipseTextDocumentChangeEvent newChangeEvent(
-        TextDocumentContentChangeEvent event, long modificationStamp)
+    private EclipseTextDocumentChangeEvent newChangeEvent(TextDocumentContentChangeEvent event,
+        long modificationStamp)
     {
         TextDocumentChangeEvent lastEvent = lastChange.get();
-        int lastVersion = (lastEvent == null) ? 0
-            : lastEvent.getSnapshot().getVersion();
-        TextDocumentSnapshot snapshot = new TextDocumentSnapshot(this,
-            lastVersion + 1, document.get());
+        int lastVersion = (lastEvent == null) ? 0 : lastEvent.getSnapshot().getVersion();
+        TextDocumentSnapshot snapshot =
+            new TextDocumentSnapshot(this, lastVersion + 1, document.get());
         if (modificationStamp != getModificationStamp())
             throw new AssertionError();
-        return new EclipseTextDocumentChangeEvent(snapshot,
-            Collections.singletonList(event), modificationStamp);
+        return new EclipseTextDocumentChangeEvent(snapshot, Collections.singletonList(event),
+            modificationStamp);
     }
 
     private void checkNotDisposed()

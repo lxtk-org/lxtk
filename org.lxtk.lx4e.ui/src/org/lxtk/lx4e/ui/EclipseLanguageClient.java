@@ -81,23 +81,20 @@ public class EclipseLanguageClient<S extends LanguageServer>
         Collection<Feature<? super S>> features)
     {
         super(log, diagnosticConsumer, features);
-        this.workspaceEditChangeFactory = Objects.requireNonNull(
-            workspaceEditChangeFactory);
+        this.workspaceEditChangeFactory = Objects.requireNonNull(workspaceEditChangeFactory);
     }
 
     @Override
     public void fillClientCapabilities(ClientCapabilities capabilities)
     {
-        WorkspaceEditCapabilities workspaceEdit =
-            new WorkspaceEditCapabilities();
+        WorkspaceEditCapabilities workspaceEdit = new WorkspaceEditCapabilities();
         workspaceEdit.setDocumentChanges(true);
         // TODO Support resource operations
 //        workspaceEdit.setResourceOperations(Arrays.asList(
 //            ResourceOperationKind.Create, ResourceOperationKind.Delete,
 //            ResourceOperationKind.Rename));
 
-        WorkspaceClientCapabilities workspace =
-            new WorkspaceClientCapabilities();
+        WorkspaceClientCapabilities workspace = new WorkspaceClientCapabilities();
         workspace.setApplyEdit(true);
         workspace.setWorkspaceEdit(workspaceEdit);
 
@@ -106,25 +103,22 @@ public class EclipseLanguageClient<S extends LanguageServer>
     }
 
     @Override
-    public CompletableFuture<ApplyWorkspaceEditResponse> applyEdit(
-        ApplyWorkspaceEditParams params)
+    public CompletableFuture<ApplyWorkspaceEditResponse> applyEdit(ApplyWorkspaceEditParams params)
     {
         String label = getEditLabel(params);
 
-        WorkspaceEditRefactoring refactoring = new WorkspaceEditRefactoring(
-            label, workspaceEditChangeFactory);
+        WorkspaceEditRefactoring refactoring =
+            new WorkspaceEditRefactoring(label, workspaceEditChangeFactory);
         refactoring.setWorkspaceEdit(params.getEdit());
 
-        PerformRefactoringOperation operation = new PerformRefactoringOperation(
-            refactoring, CheckConditionsOperation.ALL_CONDITIONS);
+        PerformRefactoringOperation operation =
+            new PerformRefactoringOperation(refactoring, CheckConditionsOperation.ALL_CONDITIONS);
 
-        CompletableFuture<ApplyWorkspaceEditResponse> future =
-            new CompletableFuture<>();
+        CompletableFuture<ApplyWorkspaceEditResponse> future = new CompletableFuture<>();
         WorkspaceJob job = new WorkspaceJob(label)
         {
             @Override
-            public IStatus runInWorkspace(IProgressMonitor monitor)
-                throws CoreException
+            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
             {
                 try
                 {
@@ -134,10 +128,8 @@ public class EclipseLanguageClient<S extends LanguageServer>
                     if (status != null && !status.hasFatalError())
                         status = operation.getValidationStatus();
 
-                    ApplyWorkspaceEditResponse response =
-                        new ApplyWorkspaceEditResponse();
-                    response.setApplied(status != null
-                        && !status.hasFatalError());
+                    ApplyWorkspaceEditResponse response = new ApplyWorkspaceEditResponse();
+                    response.setApplied(status != null && !status.hasFatalError());
                     // TODO Set ApplyWorkspaceEditResponse.failureReason when it becomes available in LSP4J
 
                     future.complete(response);
@@ -187,24 +179,21 @@ public class EclipseLanguageClient<S extends LanguageServer>
     {
         PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
         {
-            MessageDialog dialog = new MessageDialog(getShell(),
-                getMessageTitle(params), null, params.getMessage(),
-                getDialogImageType(params), 0, IDialogConstants.OK_LABEL);
+            MessageDialog dialog = new MessageDialog(getShell(), getMessageTitle(params), null,
+                params.getMessage(), getDialogImageType(params), 0, IDialogConstants.OK_LABEL);
             dialog.open();
         });
     }
 
     @Override
-    public CompletableFuture<MessageActionItem> showMessageRequest(
-        ShowMessageRequestParams params)
+    public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams params)
     {
         CompletableFuture<MessageActionItem> future = new CompletableFuture<>();
         PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
         {
             List<MessageActionItem> actions = params.getActions();
-            MessageDialog dialog = new MessageDialog(getShell(),
-                getMessageTitle(params), null, params.getMessage(),
-                getDialogImageType(params), 0, getDialogButtonLabels(actions));
+            MessageDialog dialog = new MessageDialog(getShell(), getMessageTitle(params), null,
+                params.getMessage(), getDialogImageType(params), 0, getDialogButtonLabels(actions));
             int index = dialog.open();
             if (index == SWT.DEFAULT || actions == null || actions.isEmpty())
                 future.complete(null);
@@ -244,8 +233,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
         }
     }
 
-    private static String[] getDialogButtonLabels(
-        List<MessageActionItem> actions)
+    private static String[] getDialogButtonLabels(List<MessageActionItem> actions)
     {
         List<String> labels = new ArrayList<>();
         if (actions == null || actions.isEmpty())
@@ -258,8 +246,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
 
     private static Shell getShell()
     {
-        IWorkbenchWindow window =
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (window == null)
             return null;
         return window.getShell();

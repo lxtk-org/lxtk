@@ -59,8 +59,7 @@ public final class HoverFeature
     }
 
     @Override
-    protected void fillClientCapabilities(
-        TextDocumentClientCapabilities capabilities)
+    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setHover(getLanguageService().getHoverCapabilities());
     }
@@ -99,11 +98,9 @@ public final class HoverFeature
             }
 
             @Override
-            public CompletableFuture<Hover> getHover(
-                TextDocumentPositionParams params)
+            public CompletableFuture<Hover> getHover(TextDocumentPositionParams params)
             {
-                return getLanguageServer().getTextDocumentService().hover(
-                    params);
+                return getLanguageServer().getTextDocumentService().hover(params);
             }
         });
     }

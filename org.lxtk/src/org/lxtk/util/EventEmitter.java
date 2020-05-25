@@ -28,8 +28,7 @@ import java.util.function.Consumer;
 public class EventEmitter<E>
     implements EventStream<E>, Disposable
 {
-    private final Set<Consumer<? super E>> consumers =
-        new CopyOnWriteArraySet<>();
+    private final Set<Consumer<? super E>> consumers = new CopyOnWriteArraySet<>();
 
     @Override
     public Disposable subscribe(Consumer<? super E> consumer)

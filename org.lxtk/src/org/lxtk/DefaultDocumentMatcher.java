@@ -35,8 +35,7 @@ public final class DefaultDocumentMatcher
     private static final String ASTERISK = "*"; //$NON-NLS-1$
 
     @Override
-    public int match(DocumentFilter filter, URI documentUri,
-        String documentLanguage)
+    public int match(DocumentFilter filter, URI documentUri, String documentLanguage)
     {
         String language = filter.getLanguage();
         String scheme = filter.getScheme();

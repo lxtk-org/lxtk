@@ -84,8 +84,7 @@ public abstract class StyledBrowserInformationControlInput
      *
      * @param previous the previous input or <code>null</code> if none
      */
-    public StyledBrowserInformationControlInput(
-        BrowserInformationControlInput previous)
+    public StyledBrowserInformationControlInput(BrowserInformationControlInput previous)
     {
         super(previous);
     }
@@ -115,8 +114,7 @@ public abstract class StyledBrowserInformationControlInput
 
     protected FontData getFontData()
     {
-        return JFaceResources.getFontRegistry().getFontData(
-            JFaceResources.DIALOG_FONT)[0];
+        return JFaceResources.getFontRegistry().getFontData(JFaceResources.DIALOG_FONT)[0];
     }
 
     protected RGB getFgRgb()
@@ -146,8 +144,8 @@ public abstract class StyledBrowserInformationControlInput
             return null;
 
         try (
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                styleSheetUrl.openStream())))
+            BufferedReader reader =
+                new BufferedReader(new InputStreamReader(styleSheetUrl.openStream())))
         {
             StringBuilder builder = new StringBuilder(1500);
             String line = reader.readLine();

@@ -60,13 +60,11 @@ public class Activator
 
     public synchronized void connect(IProject project)
     {
-        if (project == null || connectedProjects == null
-            || connectedProjects.containsKey(project))
+        if (project == null || connectedProjects == null || connectedProjects.containsKey(project))
             return;
         SafeRun.run(rollback ->
         {
-            TypeScriptLanguageClient languageClient =
-                new TypeScriptLanguageClient(project);
+            TypeScriptLanguageClient languageClient = new TypeScriptLanguageClient(project);
             languageClient.connect();
             rollback.add(() ->
             {
@@ -85,39 +83,36 @@ public class Activator
                 }
             });
 
-            languageClient.onDidChangeConnectionState().subscribe(
-                new Consumer<Connectable>()
+            languageClient.onDidChangeConnectionState().subscribe(new Consumer<Connectable>()
+            {
+                boolean shutUp;
+
+                @Override
+                public void accept(Connectable c)
                 {
-                    boolean shutUp;
-
-                    @Override
-                    public void accept(Connectable c)
+                    String errorMessage = languageClient.getErrorMessage();
+                    if (errorMessage != null)
                     {
-                        String errorMessage = languageClient.getErrorMessage();
-                        if (errorMessage != null)
+                        PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
                         {
-                            PlatformUI.getWorkbench().getDisplay().asyncExec(
-                                () ->
-                                {
-                                    if (!shutUp)
-                                    {
-                                        shutUp = true;
+                            if (!shutUp)
+                            {
+                                shutUp = true;
 
-                                        Shell shell = null;
-                                        IWorkbenchWindow window =
-                                            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                                        if (window != null)
-                                            shell = window.getShell();
-                                        MessageDialog.openError(shell,
-                                            "TypeScript Language Client",
-                                            MessageFormat.format(
-                                                "Unable to connect project ''{0}'' to TypeScript language server. Dependent language services will be disabled. See Error Log for details",
-                                                project.getName()));
-                                    }
-                                });
-                        }
+                                Shell shell = null;
+                                IWorkbenchWindow window =
+                                    PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                                if (window != null)
+                                    shell = window.getShell();
+                                MessageDialog.openError(shell, "TypeScript Language Client",
+                                    MessageFormat.format(
+                                        "Unable to connect project ''{0}'' to TypeScript language server. Dependent language services will be disabled. See Error Log for details",
+                                        project.getName()));
+                            }
+                        });
                     }
-                });
+                }
+            });
 
             rollback.setLogger(e -> logError(e));
             connectedProjects.put(project, rollback::run);
@@ -150,9 +145,8 @@ public class Activator
             connectedProjects = new HashMap<>();
             rollback.add(this::disconnectAll);
 
-            rollback.add(
-                TypeScriptCore.WORKSPACE.onDidAddTextDocument().subscribe(
-                    document -> connect(getProject(document)))::dispose);
+            rollback.add(TypeScriptCore.WORKSPACE.onDidAddTextDocument().subscribe(
+                document -> connect(getProject(document)))::dispose);
 
             ModelManager.INSTANCE.startup();
             rollback.add(() -> ModelManager.INSTANCE.shutdown());
@@ -168,8 +162,8 @@ public class Activator
     {
         if (document instanceof EclipseTextDocument)
         {
-            IFile file = ResourceUtil.getFile(
-                ((EclipseTextDocument)document).getCorrespondingElement());
+            IFile file =
+                ResourceUtil.getFile(((EclipseTextDocument)document).getCorrespondingElement());
             if (file != null)
                 return file.getProject();
         }

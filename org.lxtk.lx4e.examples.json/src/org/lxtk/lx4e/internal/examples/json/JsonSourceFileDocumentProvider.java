@@ -28,7 +28,6 @@ public class JsonSourceFileDocumentProvider
     {
         if (!(element instanceof IEditorInput))
             return null;
-        return JsonInputElementProvider.INSTANCE.getElement(
-            (IEditorInput)element);
+        return JsonInputElementProvider.INSTANCE.getElement((IEditorInput)element);
     }
 }

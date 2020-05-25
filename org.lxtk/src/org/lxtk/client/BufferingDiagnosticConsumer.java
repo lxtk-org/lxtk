@@ -42,8 +42,7 @@ public final class BufferingDiagnosticConsumer
      *
      * @param delegate not <code>null</code>
      */
-    public BufferingDiagnosticConsumer(
-        BiConsumer<URI, Collection<Diagnostic>> delegate)
+    public BufferingDiagnosticConsumer(BiConsumer<URI, Collection<Diagnostic>> delegate)
     {
         this.delegate = Objects.requireNonNull(delegate);
     }

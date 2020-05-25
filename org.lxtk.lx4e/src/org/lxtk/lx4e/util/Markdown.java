@@ -35,8 +35,8 @@ public class Markdown
     public static String toHtml(String markdown, boolean asDocument)
     {
         StringWriter out = new StringWriter();
-        MarkupParser parser = new MarkupParser(new MarkdownLanguage(),
-            new HtmlDocumentBuilder(out));
+        MarkupParser parser =
+            new MarkupParser(new MarkdownLanguage(), new HtmlDocumentBuilder(out));
         parser.parse(markdown, asDocument);
         return out.toString();
     }

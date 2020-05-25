@@ -28,7 +28,6 @@ public class TypeScriptSourceFileDocumentProvider
     {
         if (!(element instanceof IEditorInput))
             return null;
-        return TypeScriptInputElementProvider.INSTANCE.getElement(
-            (IEditorInput)element);
+        return TypeScriptInputElementProvider.INSTANCE.getElement((IEditorInput)element);
     }
 }

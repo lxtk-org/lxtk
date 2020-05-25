@@ -47,8 +47,7 @@ import com.google.gson.Gson;
 public abstract class AbstractMarkerResolutionGenerator
     implements IMarkerResolutionGenerator2
 {
-    private static final IMarkerResolution[] NO_RESOLUTIONS =
-        new IMarkerResolution[0];
+    private static final IMarkerResolution[] NO_RESOLUTIONS = new IMarkerResolution[0];
 
     private Gson gson;
 
@@ -66,8 +65,7 @@ public abstract class AbstractMarkerResolutionGenerator
     @Override
     public IMarkerResolution[] getResolutions(IMarker marker)
     {
-        Diagnostic diagnostic = getDiagnostic(marker,
-            getDiagnosticAttributeName());
+        Diagnostic diagnostic = getDiagnostic(marker, getDiagnosticAttributeName());
         if (diagnostic == null)
             return NO_RESOLUTIONS;
 
@@ -81,11 +79,10 @@ public abstract class AbstractMarkerResolutionGenerator
 
         CodeActionRequest request = newCodeActionRequest();
         request.setProvider(provider);
-        request.setParams(new CodeActionParams(
-            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-            diagnostic.getRange(), new CodeActionContext(
-                Collections.singletonList(diagnostic),
-                Collections.singletonList(CodeActionKind.QuickFix))));
+        request.setParams(
+            new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+                diagnostic.getRange(), new CodeActionContext(Collections.singletonList(diagnostic),
+                    Collections.singletonList(CodeActionKind.QuickFix))));
         request.setTimeout(getCodeActionTimeout());
         request.setMayThrow(false);
 
@@ -98,11 +95,9 @@ public abstract class AbstractMarkerResolutionGenerator
         for (Either<Command, CodeAction> item : result)
         {
             if (item.isLeft())
-                resolutions.add(newMarkerResolution(item.getLeft(),
-                    commandService));
+                resolutions.add(newMarkerResolution(item.getLeft(), commandService));
             else if (item.isRight())
-                resolutions.add(newMarkerResolution(item.getRight(),
-                    commandService));
+                resolutions.add(newMarkerResolution(item.getRight(), commandService));
         }
         return resolutions.toArray(NO_RESOLUTIONS);
     }
@@ -115,8 +110,7 @@ public abstract class AbstractMarkerResolutionGenerator
      * @return the corresponding <code>LanguageOperationTarget</code>,
      *  or <code>null</code> if none
      */
-    protected abstract LanguageOperationTarget getLanguageOperationTarget(
-        IMarker marker);
+    protected abstract LanguageOperationTarget getLanguageOperationTarget(IMarker marker);
 
     /**
      * Returns the {@link WorkspaceEditChangeFactory} for this generator.
@@ -153,8 +147,7 @@ public abstract class AbstractMarkerResolutionGenerator
      * @param commandService never <code>null</code>
      * @return the created resolution (not <code>null</code>)
      */
-    protected IMarkerResolution newMarkerResolution(Command command,
-        CommandService commandService)
+    protected IMarkerResolution newMarkerResolution(Command command, CommandService commandService)
     {
         return new CommandMarkerResolution(command, commandService);
     }
@@ -190,8 +183,7 @@ public abstract class AbstractMarkerResolutionGenerator
      * @param diagnosticAttributeName never <code>null</code>
      * @return the requested diagnostic, or <code>null</code> if none
      */
-    protected Diagnostic getDiagnostic(IMarker marker,
-        String diagnosticAttributeName)
+    protected Diagnostic getDiagnostic(IMarker marker, String diagnosticAttributeName)
     {
         String value = marker.getAttribute(diagnosticAttributeName, null);
         if (value == null)
@@ -220,8 +212,7 @@ public abstract class AbstractMarkerResolutionGenerator
          * @param command not <code>null</code>
          * @param commandService not <code>null</code>
          */
-        public CommandMarkerResolution(Command command,
-            CommandService commandService)
+        public CommandMarkerResolution(Command command, CommandService commandService)
         {
             this.command = Objects.requireNonNull(command);
             this.commandService = Objects.requireNonNull(commandService);
@@ -259,8 +250,7 @@ public abstract class AbstractMarkerResolutionGenerator
          * @param codeAction not <code>null</code>
          * @param commandService not <code>null</code>
          */
-        public CodeActionMarkerResolution(CodeAction codeAction,
-            CommandService commandService)
+        public CodeActionMarkerResolution(CodeAction codeAction, CommandService commandService)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
             this.commandService = Objects.requireNonNull(commandService);
@@ -275,8 +265,8 @@ public abstract class AbstractMarkerResolutionGenerator
         @Override
         public void run(IMarker marker)
         {
-            CodeActions.execute(codeAction, getLabel(),
-                getWorkspaceEditChangeFactory(), commandService);
+            CodeActions.execute(codeAction, getLabel(), getWorkspaceEditChangeFactory(),
+                commandService);
         }
     }
 }
