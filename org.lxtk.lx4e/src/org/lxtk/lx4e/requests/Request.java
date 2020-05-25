@@ -338,20 +338,7 @@ public abstract class Request<T>
             try
             {
                 setErrorMessage(null);
-
-                Duration timeout = request.getTimeout();
-                IProgressMonitor monitor = request.getProgressMonitor();
-                if (monitor == null)
-                {
-                    return timeout == null ? future.get()
-                        : future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
-                }
-
-                EclipseFuture<T> eFuture = EclipseFuture.of(future);
-                SubMonitor sMonitor = SubMonitor.convert(monitor, request.getTitle(), 1);
-                request.setProgressMonitor(sMonitor);
-                return timeout == null ? eFuture.get(sMonitor.split(1))
-                    : eFuture.get(timeout, sMonitor.split(1));
+                return doReceive();
             }
             catch (ExecutionException e)
             {
@@ -377,6 +364,33 @@ public abstract class Request<T>
             {
                 return handle(e);
             }
+        }
+
+        /**
+         * Actually receives a response.
+         *
+         * @return the result (may be <code>null</code>)
+         * @throws ExecutionException
+         * @throws InterruptedException
+         * @throws TimeoutException
+         * @throws CancellationException
+         * @throws OperationCanceledException
+         */
+        protected T doReceive() throws ExecutionException, InterruptedException, TimeoutException
+        {
+            Duration timeout = request.getTimeout();
+            IProgressMonitor monitor = request.getProgressMonitor();
+            if (monitor == null)
+            {
+                return timeout == null ? future.get()
+                    : future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            }
+
+            EclipseFuture<T> eFuture = EclipseFuture.of(future);
+            SubMonitor sMonitor = SubMonitor.convert(monitor, request.getTitle(), 1);
+            request.setProgressMonitor(sMonitor);
+            return timeout == null ? eFuture.get(sMonitor.split(1))
+                : eFuture.get(timeout, sMonitor.split(1));
         }
 
         /**
@@ -517,7 +531,7 @@ public abstract class Request<T>
             ILog log = request.getLog();
             if (log != null)
             {
-                log.log(new Status(IStatus.ERROR, log.getBundle().getSymbolicName(), message, e));
+                log.log(new Status(IStatus.WARNING, log.getBundle().getSymbolicName(), message, e));
             }
         }
 

@@ -62,6 +62,6 @@ public class TypeScriptSourceFile
     @Override
     protected Duration getDocumentSymbolTimeout()
     {
-        return Duration.ofSeconds(15);
+        return Duration.ofSeconds(3);
     }
 }
