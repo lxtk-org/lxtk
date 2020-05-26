@@ -19,18 +19,22 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 class ServerCapabilitiesUtil
 {
-    static TextDocumentSyncKind getTextDocumentSyncKind(ServerCapabilities capabilities)
+    static TextDocumentSyncOptions getTextDocumentSyncOptions(ServerCapabilities capabilities)
     {
         Either<TextDocumentSyncKind, TextDocumentSyncOptions> either =
             capabilities.getTextDocumentSync();
         if (either == null)
-            return TextDocumentSyncKind.None;
-        if (either.isLeft())
-            return either.getLeft();
-        TextDocumentSyncKind change = either.getRight().getChange();
-        if (change == null)
-            return TextDocumentSyncKind.None;
-        return change;
+            return new TextDocumentSyncOptions();
+
+        if (either.isRight())
+            return either.getRight();
+
+        TextDocumentSyncOptions options = new TextDocumentSyncOptions();
+        TextDocumentSyncKind syncKind = either.getLeft();
+        options.setChange(syncKind);
+        if (syncKind != null && syncKind != TextDocumentSyncKind.None)
+            options.setOpenClose(true);
+        return options;
     }
 
     private ServerCapabilitiesUtil()

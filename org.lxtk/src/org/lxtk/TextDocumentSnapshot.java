@@ -15,7 +15,7 @@ package org.lxtk;
 import java.util.Objects;
 
 /**
- * A snapshot of a {@link TextDocument}. Thread-safe.
+ * An immutable snapshot of a {@link TextDocument}.
  */
 public final class TextDocumentSnapshot
 {
