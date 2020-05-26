@@ -99,6 +99,12 @@ public interface Workspace
     /**
      * Returns an event emitter firing when the content of a text document
      * in this workspace changes.
+     * <p>
+     * These events may be fired even before firing {@link #onDidAddTextDocument()}
+     * or after firing {@link #onDidRemoveTextDocument()} for a text document.
+     * This provision is to avoid a possibility of a blindspot where some
+     * change events might have escaped a client due to a race condition.
+     * </p>
      *
      * @return an event emitter firing when the content of a text document
      *  changes (never <code>null</code>)

@@ -18,11 +18,11 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import org.lxtk.util.Disposable;
 import org.lxtk.util.EventEmitter;
 import org.lxtk.util.EventStream;
+import org.lxtk.util.SafeRun;
 import org.lxtk.util.UriUtil;
 import org.lxtk.util.UriUtil.Normalization;
 
@@ -40,8 +40,6 @@ public class DefaultWorkspace
     private final EventEmitter<TextDocument> onDidRemoveTextDocument = new EventEmitter<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChangeTextDocument =
         new EventEmitter<>();
-    private final Consumer<TextDocumentChangeEvent> textDocumentChangeEventConsumer =
-        event -> onDidChangeTextDocument.fire(event);
 
     @Override
     public Disposable addTextDocument(TextDocument document)
@@ -52,14 +50,25 @@ public class DefaultWorkspace
             throw new IllegalArgumentException("The workspace already contains a document with URI " //$NON-NLS-1$
                 + uri);
         }
-        Disposable subscription = document.onDidChange().subscribe(textDocumentChangeEventConsumer);
-        onDidAddTextDocument.fire(document);
-        return () ->
+        Disposable result = SafeRun.runWithResult(rollback ->
         {
-            subscription.dispose();
-            if (textDocuments.remove(document.getUri(), document))
-                onDidRemoveTextDocument.fire(document);
-        };
+            // Must subscribe to the document's didChange before onDidAddTextDocument is fired.
+            // Otherwise, it would be possible to lose some change events in a blindspot.
+            Disposable didChangeSubscription =
+                document.onDidChange().subscribe(event -> onDidChangeTextDocument.fire(event));
+            rollback.add(didChangeSubscription::dispose);
+
+            onDidAddTextDocument.fire(document);
+            rollback.add(() ->
+            {
+                if (textDocuments.remove(uri, document))
+                    onDidRemoveTextDocument.fire(document);
+            });
+
+            rollback.setLogger(e -> e.printStackTrace());
+            return rollback::run;
+        });
+        return result;
     }
 
     @Override
