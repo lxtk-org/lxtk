@@ -40,6 +40,7 @@ public class DefaultWorkspace
     private final EventEmitter<TextDocument> onDidRemoveTextDocument = new EventEmitter<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChangeTextDocument =
         new EventEmitter<>();
+    private final EventEmitter<TextDocumentSaveEvent> onDidSaveTextDocument = new EventEmitter<>();
 
     @Override
     public Disposable addTextDocument(TextDocument document)
@@ -64,6 +65,10 @@ public class DefaultWorkspace
                 if (textDocuments.remove(uri, document))
                     onDidRemoveTextDocument.fire(document);
             });
+
+            Disposable didSaveSubscription =
+                document.onDidSave().subscribe(event -> onDidSaveTextDocument.fire(event));
+            rollback.add(didSaveSubscription::dispose);
 
             rollback.setLogger(e -> e.printStackTrace());
             return rollback::run;
@@ -101,6 +106,12 @@ public class DefaultWorkspace
     public EventStream<TextDocumentChangeEvent> onDidChangeTextDocument()
     {
         return onDidChangeTextDocument;
+    }
+
+    @Override
+    public EventStream<TextDocumentSaveEvent> onDidSaveTextDocument()
+    {
+        return onDidSaveTextDocument;
     }
 
     /**

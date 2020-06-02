@@ -110,4 +110,13 @@ public interface Workspace
      *  changes (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onDidChangeTextDocument();
+
+    /**
+     * Returns an event emitter firing when a text document in this workspace
+     * is saved.
+     *
+     * @return an event emitter firing when a text document is saved
+     *  (never <code>null</code>)
+     */
+    EventStream<TextDocumentSaveEvent> onDidSaveTextDocument();
 }

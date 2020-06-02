@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.handly.buffer.IBuffer;
+import org.eclipse.handly.buffer.IBufferListener;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -28,6 +29,7 @@ import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
+import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.EventEmitter;
@@ -50,7 +52,8 @@ public final class EclipseTextDocument
     private final AtomicReference<EclipseTextDocumentChangeEvent> lastChange =
         new AtomicReference<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChange = new EventEmitter<>();
-    private final IDocumentListener listener = new IDocumentListener()
+    private final EventEmitter<TextDocumentSaveEvent> onDidSave = new EventEmitter<>();
+    private final IDocumentListener documentListener = new IDocumentListener()
     {
         private TextDocumentContentChangeEvent contentChange;
 
@@ -73,6 +76,19 @@ public final class EclipseTextDocument
             }
         }
     };
+    private final IBufferListener bufferListener = new IBufferListener()
+    {
+        @Override
+        public void bufferSaved(IBuffer buffer)
+        {
+            if (buffer.isDirty())
+                return; // concurrent modification
+            String text = getLastChange().getSnapshot().getText();
+            if (buffer.isDirty())
+                return; // double check the buffer is not dirty
+            onDidSave.fire(newSaveEvent(text));
+        };
+    };
     private boolean isDisposed;
 
     /**
@@ -94,10 +110,12 @@ public final class EclipseTextDocument
         this.buffer = Objects.requireNonNull(buffer);
         this.element = element;
         document = buffer.getDocument();
-        document.addDocumentListener(listener);
+        document.addDocumentListener(documentListener);
         lastChange.compareAndSet(null,
             new EclipseTextDocumentChangeEvent(new TextDocumentSnapshot(this, 0, document.get()),
                 Collections.emptyList(), getModificationStamp()));
+        if ((buffer.getSupportedListenerMethods() & IBufferListener.M_BUFFER_SAVED) != 0)
+            buffer.addListener(bufferListener);
         buffer.addRef();
     }
 
@@ -170,9 +188,11 @@ public final class EclipseTextDocument
             return;
 
         isDisposed = true;
+        buffer.removeListener(bufferListener);
         buffer.release();
-        document.removeDocumentListener(listener);
+        document.removeDocumentListener(documentListener);
         onDidChange.dispose();
+        onDidSave.dispose();
     }
 
     @Override
@@ -197,6 +217,12 @@ public final class EclipseTextDocument
     public EventStream<TextDocumentChangeEvent> onDidChange()
     {
         return onDidChange;
+    }
+
+    @Override
+    public EventStream<TextDocumentSaveEvent> onDidSave()
+    {
+        return onDidSave;
     }
 
     private void notifyChange(EclipseTextDocumentChangeEvent event)
@@ -230,6 +256,11 @@ public final class EclipseTextDocument
             throw new AssertionError();
         return new EclipseTextDocumentChangeEvent(snapshot, Collections.singletonList(event),
             modificationStamp);
+    }
+
+    private TextDocumentSaveEvent newSaveEvent(String text)
+    {
+        return new TextDocumentSaveEvent(this, text);
     }
 
     private void checkNotDisposed()

@@ -28,14 +28,17 @@ import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Registration;
+import org.eclipse.lsp4j.SaveOptions;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SynchronizationCapabilities;
 import org.eclipse.lsp4j.TextDocumentChangeRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
+import org.eclipse.lsp4j.TextDocumentSaveRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.TextDocumentSyncOptions;
 import org.eclipse.lsp4j.Unregistration;
@@ -44,6 +47,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentUri;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
+import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.Workspace;
 import org.lxtk.jsonrpc.DefaultGson;
@@ -64,8 +68,9 @@ public final class TextDocumentSyncFeature
     private static final String DID_OPEN = "textDocument/didOpen"; //$NON-NLS-1$
     private static final String DID_CLOSE = "textDocument/didClose"; //$NON-NLS-1$
     private static final String DID_CHANGE = "textDocument/didChange"; //$NON-NLS-1$
-    private static final Set<String> METHODS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(DID_OPEN, DID_CLOSE, DID_CHANGE)));
+    private static final String DID_SAVE = "textDocument/didSave"; //$NON-NLS-1$
+    private static final Set<String> METHODS = Collections.unmodifiableSet(
+        new HashSet<>(Arrays.asList(DID_OPEN, DID_CLOSE, DID_CHANGE, DID_SAVE)));
 
     private final Workspace workspace;
     private LanguageServer languageServer;
@@ -96,6 +101,7 @@ public final class TextDocumentSyncFeature
             ClientCapabilitiesUtil.getOrCreateSynchronization(
                 ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities));
         syncronization.setDynamicRegistration(true);
+        syncronization.setDidSave(true);
     }
 
     @Override
@@ -128,6 +134,15 @@ public final class TextDocumentSyncFeature
             register(
                 new Registration(UUID.randomUUID().toString(), DID_CHANGE, registrationOptions));
         }
+
+        SaveOptions saveOptions = syncOptions.getSave();
+        if (saveOptions != null)
+        {
+            TextDocumentSaveRegistrationOptions registrationOptions =
+                new TextDocumentSaveRegistrationOptions(saveOptions.getIncludeText());
+            registrationOptions.setDocumentSelector(documentSelector);
+            register(new Registration(UUID.randomUUID().toString(), DID_SAVE, registrationOptions));
+        }
     }
 
     @Override
@@ -140,6 +155,8 @@ public final class TextDocumentSyncFeature
         Class<? extends TextDocumentRegistrationOptions> optionsClass;
         if (DID_CHANGE.equals(registrationMethod))
             optionsClass = TextDocumentChangeRegistrationOptions.class;
+        else if (DID_SAVE.equals(registrationMethod))
+            optionsClass = TextDocumentSaveRegistrationOptions.class;
         else
             optionsClass = TextDocumentRegistrationOptions.class;
 
@@ -173,6 +190,10 @@ public final class TextDocumentSyncFeature
             else if (DID_CHANGE.equals(registrationMethod))
             {
                 subsription = workspace.onDidChangeTextDocument().subscribe(this::onDidChange);
+            }
+            else if (DID_SAVE.equals(registrationMethod))
+            {
+                subsription = workspace.onDidSaveTextDocument().subscribe(this::onDidSave);
             }
             if (subsription != null)
                 subscriptions.put(registrationMethod, subsription);
@@ -295,6 +316,23 @@ public final class TextDocumentSyncFeature
 
         languageServer.getTextDocumentService().didChange(params);
         syncedDocumentVersions.put(document, snapshotVersion);
+    }
+
+    private synchronized void onDidSave(TextDocumentSaveEvent event)
+    {
+        TextDocument document = event.getDocument();
+
+        TextDocumentSaveRegistrationOptions registrationOptions =
+            (TextDocumentSaveRegistrationOptions)getRegistrationOptions(document, DID_SAVE);
+        if (registrationOptions == null)
+            return;
+
+        DidSaveTextDocumentParams params = new DidSaveTextDocumentParams();
+        params.setTextDocument(DocumentUri.toTextDocumentIdentifier(document.getUri()));
+        if (Boolean.TRUE.equals(registrationOptions.getIncludeText()))
+            params.setText(event.getText());
+
+        languageServer.getTextDocumentService().didSave(params);
     }
 
     private synchronized boolean hasMatchingRegistration(TextDocument document, String method)
