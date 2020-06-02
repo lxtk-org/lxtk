@@ -1,4 +1,4 @@
-name: lxtk release and upload assets
+name: release
 
 on:
   push:
