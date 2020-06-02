@@ -6,7 +6,7 @@ on:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  build-base-target:
+  build-and-release:
 
     runs-on: ubuntu-latest
 
@@ -31,14 +31,14 @@ jobs:
       working-directory: ./releng
       run: mvn clean verify -Dtycho.localArtifacts=ignore -Dtarget=base -Pjavadoc -B -V
 
-    - name: Prepare P2 Repository and Javadocs
+    - name: Prepare P2 repository and Javadocs
       working-directory: ./repository/target
       run: |
         cp lxtk-repository-$(cat VERSION).zip lxtk-repository.zip
         mkdir javadoc && cp -r reference/api/* javadoc
         zip -r lxtk-javadocs.zip javadoc
     
-    - name: Create Release
+    - name: Create release
       id: create_release
       uses: actions/create-release@latest
       env:
