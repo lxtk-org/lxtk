@@ -21,12 +21,12 @@ import org.lxtk.util.EventStream;
 /**
  * Provides support for document management.
  *
- * @see DefaultWorkspace
+ * @see DefaultDocumentService
  */
-public interface Workspace
+public interface DocumentService
 {
     /**
-     * Returns the default document matcher for this workspace.
+     * Returns the default document matcher for this service.
      *
      * @return the default document matcher (never <code>null</code>)
      */
@@ -36,51 +36,50 @@ public interface Workspace
     }
 
     /**
-     * Adds a text document to this workspace.
+     * Adds a text document to the list of documents managed by this service.
      * <p>
-     * If the workspace already contains a document with an equivalent URI,
+     * If the service already manages a text document with an equivalent URI,
      * a runtime exception is thrown.
      * </p>
      *
      * @param document not <code>null</code>
-     * @return a disposable to remove the added text document
-     *  (never <code>null</code>)
+     * @return a disposable to remove the document from the list of documents
+     *  managed by this service (never <code>null</code>)
      */
     Disposable addTextDocument(TextDocument document);
 
     /**
-     * Returns all text documents currently contained in this workspace.
+     * Returns all text documents currently managed by this service.
      * <p>
      * This method must not try to obtain any kind of lock that might conflict
      * with any locks held while firing didAddTextDocument, didRemoveTextDocument,
-     * or didChangeTextDocument events.
+     * didChangeTextDocument, or didSaveTextDocument events.
      * </p>
      *
-     * @return all text documents currently contained in the workspace
+     * @return all text documents currently managed by the service
      *  (never <code>null</code>, may be empty). Clients <b>must not</b>
      *  modify the returned collection
      */
     Collection<TextDocument> getTextDocuments();
 
     /**
-     * Returns the text document in this workspace that has the URI equivalent
-     * to the given URI.
+     * Returns the text document that is managed by this service and
+     * has the URI equivalent to the given URI.
      * <p>
      * This method must not try to obtain any kind of lock that might conflict
      * with any locks held while firing didAddTextDocument, didRemoveTextDocument,
-     * or didChangeTextDocument events.
+     * didChangeTextDocument, or didSaveTextDocument events.
      * </p>
      *
      * @param uri may be <code>null</code>, in which case <code>null</code>
      *  is returned
-     * @return the corresponding text document in the workspace,
-     *  or <code>null</code> if none
+     * @return the corresponding text document, or <code>null</code> if none
      */
     TextDocument getTextDocument(URI uri);
 
     /**
      * Returns an event emitter firing when a text document is added
-     * to this workspace.
+     * to the list of documents managed by this service.
      *
      * @return an event emitter firing when a text document is added
      *  (never <code>null</code>)
@@ -89,7 +88,7 @@ public interface Workspace
 
     /**
      * Returns an event emitter firing when a text document is removed
-     * from this workspace.
+     * from the list of documents managed by this service.
      *
      * @return an event emitter firing when a text document is removed
      *  (never <code>null</code>)
@@ -97,8 +96,8 @@ public interface Workspace
     EventStream<TextDocument> onDidRemoveTextDocument();
 
     /**
-     * Returns an event emitter firing when the content of a text document
-     * in this workspace changes.
+     * Returns an event emitter firing when the content of a managed text document
+     * changes.
      * <p>
      * These events may be fired even before firing {@link #onDidAddTextDocument()}
      * or after firing {@link #onDidRemoveTextDocument()} for a text document.
@@ -106,16 +105,15 @@ public interface Workspace
      * change events might have escaped a client due to a race condition.
      * </p>
      *
-     * @return an event emitter firing when the content of a text document
+     * @return an event emitter firing when the content of a managed text document
      *  changes (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onDidChangeTextDocument();
 
     /**
-     * Returns an event emitter firing when a text document in this workspace
-     * is saved.
+     * Returns an event emitter firing when a managed text document is saved.
      *
-     * @return an event emitter firing when a text document is saved
+     * @return an event emitter firing when a managed text document is saved
      *  (never <code>null</code>)
      */
     EventStream<TextDocumentSaveEvent> onDidSaveTextDocument();

@@ -12,6 +12,10 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.typescript;
 
+import static org.lxtk.lx4e.examples.typescript.TypeScriptCore.DOCUMENT_SERVICE;
+import static org.lxtk.lx4e.examples.typescript.TypeScriptCore.LANGUAGE_ID;
+import static org.lxtk.lx4e.examples.typescript.TypeScriptCore.LANGUAGE_SERVICE;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -50,7 +54,6 @@ import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
 import org.lxtk.lx4e.EclipseLog;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
-import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.ui.EclipseLanguageClient;
 import org.lxtk.util.Log;
 import org.lxtk.util.connect.StdioConnection;
@@ -87,7 +90,7 @@ public class TypeScriptLanguageClient
         if (location == null)
             throw new IllegalStateException();
         documentSelector = Collections.singletonList(
-            new DocumentFilter(TypeScriptCore.LANG_ID, "file", project.getLocation().toString() //$NON-NLS-1$
+            new DocumentFilter(LANGUAGE_ID, "file", project.getLocation().toString() //$NON-NLS-1$
                 + "/**")); //$NON-NLS-1$
         URI locationURI = project.getLocationURI();
         if (locationURI == null)
@@ -124,19 +127,19 @@ public class TypeScriptLanguageClient
     protected AbstractLanguageClient<LanguageServer> getLanguageClient()
     {
         Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
-        features.add(new TextDocumentSyncFeature(TypeScriptCore.WORKSPACE));
+        features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE));
         features.add(new ExecuteCommandFeature(commandService));
-        features.add(new CodeActionFeature(TypeScriptCore.LANG_SERVICE, commandService));
-        features.add(new CompletionFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new DefinitionFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new DocumentFormattingFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new DocumentHighlightFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new DocumentRangeFormattingFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new DocumentSymbolFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new HoverFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new ReferencesFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new RenameFeature(TypeScriptCore.LANG_SERVICE));
-        features.add(new SignatureHelpFeature(TypeScriptCore.LANG_SERVICE));
+        features.add(new CodeActionFeature(LANGUAGE_SERVICE, commandService));
+        features.add(new CompletionFeature(LANGUAGE_SERVICE));
+        features.add(new DefinitionFeature(LANGUAGE_SERVICE));
+        features.add(new DocumentFormattingFeature(LANGUAGE_SERVICE));
+        features.add(new DocumentHighlightFeature(LANGUAGE_SERVICE));
+        features.add(new DocumentRangeFormattingFeature(LANGUAGE_SERVICE));
+        features.add(new DocumentSymbolFeature(LANGUAGE_SERVICE));
+        features.add(new HoverFeature(LANGUAGE_SERVICE));
+        features.add(new ReferencesFeature(LANGUAGE_SERVICE));
+        features.add(new RenameFeature(LANGUAGE_SERVICE));
+        features.add(new SignatureHelpFeature(LANGUAGE_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
             TypeScriptWorkspaceEditChangeFactory.INSTANCE, features)
         {

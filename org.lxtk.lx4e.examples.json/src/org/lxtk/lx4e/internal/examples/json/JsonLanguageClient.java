@@ -12,6 +12,10 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.json;
 
+import static org.lxtk.lx4e.examples.json.JsonCore.DOCUMENT_SERVICE;
+import static org.lxtk.lx4e.examples.json.JsonCore.LANGUAGE_ID;
+import static org.lxtk.lx4e.examples.json.JsonCore.LANGUAGE_SERVICE;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -41,7 +45,6 @@ import org.lxtk.lx4e.EclipseLog;
 import org.lxtk.lx4e.diagnostics.DefaultDiagnosticConsumer;
 import org.lxtk.lx4e.diagnostics.DiagnosticAnnotations;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
-import org.lxtk.lx4e.examples.json.JsonCore;
 import org.lxtk.lx4e.ui.EclipseLanguageClient;
 import org.lxtk.util.Log;
 import org.lxtk.util.connect.StdioConnection;
@@ -60,11 +63,11 @@ public class JsonLanguageClient
         new EclipseLog(Activator.getDefault().getBundle(), "json-language-client"); //$NON-NLS-1$
 
     private static final List<DocumentFilter> DOCUMENT_SELECTOR =
-        Collections.singletonList(new DocumentFilter(JsonCore.LANG_ID, null, null));
+        Collections.singletonList(new DocumentFilter(LANGUAGE_ID, null, null));
 
     private final BufferingDiagnosticConsumer diagnosticConsumer = new BufferingDiagnosticConsumer(
         new DefaultDiagnosticConsumer(new DiagnosticMarkers("org.lxtk.lx4e.examples.json.problem"), //$NON-NLS-1$
-            new DiagnosticAnnotations(JsonCore.WORKSPACE)));
+            new DiagnosticAnnotations(DOCUMENT_SERVICE)));
 
     @Override
     public void dispose()
@@ -95,12 +98,12 @@ public class JsonLanguageClient
     protected AbstractLanguageClient<LanguageServer> getLanguageClient()
     {
         Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
-        features.add(new TextDocumentSyncFeature(JsonCore.WORKSPACE));
-        features.add(new DocumentFormattingFeature(JsonCore.LANG_SERVICE));
-        features.add(new DocumentRangeFormattingFeature(JsonCore.LANG_SERVICE));
-        features.add(new DocumentSymbolFeature(JsonCore.LANG_SERVICE));
-        features.add(new CompletionFeature(JsonCore.LANG_SERVICE));
-        features.add(new HoverFeature(JsonCore.LANG_SERVICE));
+        features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE));
+        features.add(new DocumentFormattingFeature(LANGUAGE_SERVICE));
+        features.add(new DocumentRangeFormattingFeature(LANGUAGE_SERVICE));
+        features.add(new DocumentSymbolFeature(LANGUAGE_SERVICE));
+        features.add(new CompletionFeature(LANGUAGE_SERVICE));
+        features.add(new HoverFeature(LANGUAGE_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
             JsonWorkspaceEditChangeFactory.INSTANCE, features)
         {

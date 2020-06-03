@@ -17,9 +17,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.handly.model.IElementChangeListener;
-import org.lxtk.DefaultWorkspace;
+import org.lxtk.DefaultDocumentService;
 import org.lxtk.LanguageService;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.EclipseLanguageService;
 import org.lxtk.lx4e.internal.examples.json.JsonSourceFile;
 import org.lxtk.lx4e.internal.examples.json.ModelManager;
@@ -32,14 +32,14 @@ import org.lxtk.lx4e.model.ILanguageSourceFile;
 public class JsonCore
 {
     /**
-     * JSON Workspace.
+     * JSON Document Service.
      */
-    public static final Workspace WORKSPACE = new DefaultWorkspace();
+    public static final DocumentService DOCUMENT_SERVICE = new DefaultDocumentService();
 
     /**
      * JSON Language Service.
      */
-    public static final LanguageService LANG_SERVICE = new EclipseLanguageService();
+    public static final LanguageService LANGUAGE_SERVICE = new EclipseLanguageService();
 
     /**
      * JSON file extension.
@@ -49,7 +49,7 @@ public class JsonCore
     /**
      * JSON language identifier.
      */
-    public static final String LANG_ID = JSON;
+    public static final String LANGUAGE_ID = JSON;
 
     /**
      * Returns the element corresponding to the given resource,

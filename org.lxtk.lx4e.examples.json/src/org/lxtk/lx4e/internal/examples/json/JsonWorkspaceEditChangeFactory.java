@@ -29,6 +29,6 @@ public class JsonWorkspaceEditChangeFactory
 
     private JsonWorkspaceEditChangeFactory()
     {
-        super(JsonCore.WORKSPACE);
+        super(JsonCore.DOCUMENT_SERVICE);
     }
 }

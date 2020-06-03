@@ -41,7 +41,7 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.ReferenceProvider;
 import org.lxtk.TextDocument;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.internal.Activator;
@@ -60,7 +60,7 @@ public class ReferenceSearchQuery
     private final LanguageOperationTarget target;
     private final Position position;
     private final String wordAtPosition;
-    private final Workspace workspace;
+    private final DocumentService documentService;
     private final boolean includeDeclaration;
     private final String fileName;
 
@@ -71,12 +71,12 @@ public class ReferenceSearchQuery
      *  (not <code>null</code>)
      * @param position the target text document position (not <code>null</code>)
      * @param wordAtPosition not <code>null</code>, not empty
-     * @param workspace a {@link Workspace} (not <code>null</code>)
+     * @param documentService a {@link DocumentService} (not <code>null</code>)
      * @param includeDeclaration whether to include the declaration of the symbol
      *  denoted by the given text document position
      */
     public ReferenceSearchQuery(LanguageOperationTarget target, Position position,
-        String wordAtPosition, Workspace workspace, boolean includeDeclaration)
+        String wordAtPosition, DocumentService documentService, boolean includeDeclaration)
     {
         super("", false, false, null); //$NON-NLS-1$
         this.target = Objects.requireNonNull(target);
@@ -84,7 +84,7 @@ public class ReferenceSearchQuery
         if (wordAtPosition.isEmpty())
             throw new IllegalArgumentException();
         this.wordAtPosition = wordAtPosition;
-        this.workspace = Objects.requireNonNull(workspace);
+        this.documentService = Objects.requireNonNull(documentService);
         this.includeDeclaration = includeDeclaration;
         fileName = new Path(target.getDocumentUri().getPath()).lastSegment();
     }
@@ -159,7 +159,7 @@ public class ReferenceSearchQuery
         IFile file;
         IDocument document;
         URI locationUri = DocumentUri.convert(location.getUri());
-        TextDocument textDocument = workspace.getTextDocument(locationUri);
+        TextDocument textDocument = documentService.getTextDocument(locationUri);
         if (textDocument == null)
         {
             IFile[] files =

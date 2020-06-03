@@ -17,7 +17,7 @@ import java.time.Duration;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.handly.model.impl.support.IModelManager;
 import org.lxtk.LanguageService;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.model.impl.LanguageElement;
 import org.lxtk.lx4e.model.impl.LanguageSourceFile;
@@ -38,7 +38,7 @@ public class TypeScriptSourceFile
      */
     public TypeScriptSourceFile(LanguageElement parent, IFile file)
     {
-        super(parent, file, TypeScriptCore.LANG_ID);
+        super(parent, file, TypeScriptCore.LANGUAGE_ID);
     }
 
     @Override
@@ -48,15 +48,15 @@ public class TypeScriptSourceFile
     }
 
     @Override
-    protected Workspace getWorkspace()
+    protected DocumentService getDocumentService()
     {
-        return TypeScriptCore.WORKSPACE;
+        return TypeScriptCore.DOCUMENT_SERVICE;
     }
 
     @Override
     protected LanguageService getLanguageService()
     {
-        return TypeScriptCore.LANG_SERVICE;
+        return TypeScriptCore.LANGUAGE_SERVICE;
     }
 
     @Override

@@ -26,6 +26,6 @@ public class TypeScriptWorkspaceEditChangeFactory
 
     private TypeScriptWorkspaceEditChangeFactory()
     {
-        super(TypeScriptCore.WORKSPACE);
+        super(TypeScriptCore.DOCUMENT_SERVICE);
     }
 }

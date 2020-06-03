@@ -49,7 +49,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.lxtk.DocumentUri;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentSnapshot;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EfsUriHandler;
 import org.lxtk.lx4e.IUriHandler;
@@ -63,36 +63,36 @@ import org.lxtk.lx4e.internal.Activator;
 public class WorkspaceEditChangeFactory
 {
     /**
-     * The associated {@link Workspace} (never <code>null</code>).
+     * The associated {@link DocumentService} (never <code>null</code>).
      */
-    protected final Workspace workspace;
+    protected final DocumentService documentService;
     /**
      * The associated {@link IUriHandler} (never <code>null</code>).
      */
     protected final IUriHandler uriHandler;
 
     /**
-     * Creates a new factory instance with the given {@link Workspace} and a
+     * Creates a new factory instance with the given {@link DocumentService} and a
      * default {@link IUriHandler}.
      *
-     * @param workspace not <code>null</code>
+     * @param documentService not <code>null</code>
      */
-    public WorkspaceEditChangeFactory(Workspace workspace)
+    public WorkspaceEditChangeFactory(DocumentService documentService)
     {
-        this(workspace, compose(new TextDocumentUriHandler(workspace), new ResourceUriHandler(),
-            new EfsUriHandler()));
+        this(documentService, compose(new TextDocumentUriHandler(documentService),
+            new ResourceUriHandler(), new EfsUriHandler()));
     }
 
     /**
-     * Creates a new factory instance with the given {@link Workspace}
+     * Creates a new factory instance with the given {@link DocumentService}
      * and the given {@link IUriHandler}.
      *
-     * @param workspace not <code>null</code>
+     * @param documentService not <code>null</code>
      * @param uriHandler not <code>null</code>
      */
-    public WorkspaceEditChangeFactory(Workspace workspace, IUriHandler uriHandler)
+    public WorkspaceEditChangeFactory(DocumentService documentService, IUriHandler uriHandler)
     {
-        this.workspace = Objects.requireNonNull(workspace);
+        this.documentService = Objects.requireNonNull(documentService);
         this.uriHandler = Objects.requireNonNull(uriHandler);
     }
 
@@ -181,7 +181,7 @@ public class WorkspaceEditChangeFactory
 
         IDocument document;
         ISnapshot snapshot;
-        TextDocument textDocument = workspace.getTextDocument(uri);
+        TextDocument textDocument = documentService.getTextDocument(uri);
         if (textDocument != null)
         {
             TextDocumentSnapshot textDocumentSnapshot = textDocument.getLastChange().getSnapshot();

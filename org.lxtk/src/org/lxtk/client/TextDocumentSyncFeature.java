@@ -49,7 +49,7 @@ import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSnapshot;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
 
@@ -57,7 +57,7 @@ import com.google.gson.JsonElement;
 
 /**
  * A language client feature that can dynamically synchronize text documents
- * contained in a given {@link Workspace} to the language server.
+ * managed by a given {@link DocumentService} to the language server.
  * <p>
  * This implementation is thread-safe.
  * </p>
@@ -72,7 +72,7 @@ public final class TextDocumentSyncFeature
     private static final Set<String> METHODS = Collections.unmodifiableSet(
         new HashSet<>(Arrays.asList(DID_OPEN, DID_CLOSE, DID_CHANGE, DID_SAVE)));
 
-    private final Workspace workspace;
+    private final DocumentService documentService;
     private LanguageServer languageServer;
     private Map<String, Map<String, TextDocumentRegistrationOptions>> registrations;
     private final Map<String, Disposable> subscriptions = new HashMap<>();
@@ -81,11 +81,11 @@ public final class TextDocumentSyncFeature
     /**
      * Constructor.
      *
-     * @param workspace not <code>null</code>
+     * @param documentService not <code>null</code>
      */
-    public TextDocumentSyncFeature(Workspace workspace)
+    public TextDocumentSyncFeature(DocumentService documentService)
     {
-        this.workspace = Objects.requireNonNull(workspace);
+        this.documentService = Objects.requireNonNull(documentService);
     }
 
     @Override
@@ -181,19 +181,21 @@ public final class TextDocumentSyncFeature
             Disposable subsription = null;
             if (DID_OPEN.equals(registrationMethod))
             {
-                subsription = workspace.onDidAddTextDocument().subscribe(this::onDidAdd);
+                subsription = documentService.onDidAddTextDocument().subscribe(this::onDidAdd);
             }
             else if (DID_CLOSE.equals(registrationMethod))
             {
-                subsription = workspace.onDidRemoveTextDocument().subscribe(this::onDidRemove);
+                subsription =
+                    documentService.onDidRemoveTextDocument().subscribe(this::onDidRemove);
             }
             else if (DID_CHANGE.equals(registrationMethod))
             {
-                subsription = workspace.onDidChangeTextDocument().subscribe(this::onDidChange);
+                subsription =
+                    documentService.onDidChangeTextDocument().subscribe(this::onDidChange);
             }
             else if (DID_SAVE.equals(registrationMethod))
             {
-                subsription = workspace.onDidSaveTextDocument().subscribe(this::onDidSave);
+                subsription = documentService.onDidSaveTextDocument().subscribe(this::onDidSave);
             }
             if (subsription != null)
                 subscriptions.put(registrationMethod, subsription);
@@ -203,7 +205,7 @@ public final class TextDocumentSyncFeature
 
         if (DID_OPEN.equals(registrationMethod))
         {
-            for (TextDocument document : workspace.getTextDocuments())
+            for (TextDocument document : documentService.getTextDocuments())
             {
                 if (!syncedDocumentVersions.containsKey(document)
                     && isMatch(document, registrationOptions))
@@ -340,7 +342,7 @@ public final class TextDocumentSyncFeature
         Map<String, TextDocumentRegistrationOptions> map = registrations.get(method);
         if (map == null)
             return false;
-        return workspace.getDocumentMatcher().getFirstMatch(map.values(),
+        return documentService.getDocumentMatcher().getFirstMatch(map.values(),
             TextDocumentRegistrationOptions::getDocumentSelector, document.getUri(),
             document.getLanguageId()) != null;
     }
@@ -351,7 +353,7 @@ public final class TextDocumentSyncFeature
         Map<String, TextDocumentRegistrationOptions> map = registrations.get(method);
         if (map == null)
             return null;
-        return workspace.getDocumentMatcher().getBestMatch(map.values(),
+        return documentService.getDocumentMatcher().getBestMatch(map.values(),
             TextDocumentRegistrationOptions::getDocumentSelector, document.getUri(),
             document.getLanguageId());
     }
@@ -359,8 +361,8 @@ public final class TextDocumentSyncFeature
     private boolean isMatch(TextDocument document,
         TextDocumentRegistrationOptions registrationOptions)
     {
-        return workspace.getDocumentMatcher().isMatch(registrationOptions.getDocumentSelector(),
-            document.getUri(), document.getLanguageId());
+        return documentService.getDocumentMatcher().isMatch(
+            registrationOptions.getDocumentSelector(), document.getUri(), document.getLanguageId());
     }
 
     private static TextDocumentItem toTextDocumentItem(TextDocumentSnapshot snapshot)

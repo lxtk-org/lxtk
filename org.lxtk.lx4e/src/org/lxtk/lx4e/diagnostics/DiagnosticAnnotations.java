@@ -31,15 +31,15 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.lsp4j.Diagnostic;
 import org.lxtk.TextDocument;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.util.Disposable;
 
 /**
- * Manages annotations representing LSP diagnostics for text documents in
- * a given {@link Workspace}.
+ * Manages annotations representing LSP diagnostics for text documents
+ * of a given {@link DocumentService}.
  */
 /*
  * Implementation note: methods are synchronized to avoid a race between a thread
@@ -51,30 +51,30 @@ public class DiagnosticAnnotations
 {
     private final Map<TextDocument, Map<IAnnotationModel, Collection<Annotation>>> info =
         new IdentityHashMap<>();
-    private final Workspace workspace;
+    private final DocumentService documentService;
     private final Disposable subscription;
     private boolean disposed;
 
     /**
      * Constructor.
      *
-     * @param workspace not <code>null</code>
+     * @param documentService not <code>null</code>
      */
-    public DiagnosticAnnotations(Workspace workspace)
+    public DiagnosticAnnotations(DocumentService documentService)
     {
-        this.workspace = Objects.requireNonNull(workspace);
-        this.subscription = workspace.onDidRemoveTextDocument().subscribe(
+        this.documentService = Objects.requireNonNull(documentService);
+        this.subscription = documentService.onDidRemoveTextDocument().subscribe(
             textDocument -> CompletableFuture.runAsync(() -> removeAnnotations(textDocument)));
     }
 
     /**
-     * Returns the associated {@link Workspace}.
+     * Returns the associated {@link DocumentService}.
      *
-     * @return the associated <code>Workspace</code> (never <code>null</code>)
+     * @return the associated <code>DocumentService</code> (never <code>null</code>)
      */
-    public final Workspace getWorkspace()
+    public final DocumentService getDocumentService()
     {
-        return workspace;
+        return documentService;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class DiagnosticAnnotations
         if (disposed)
             return;
 
-        TextDocument textDocument = workspace.getTextDocument(uri);
+        TextDocument textDocument = documentService.getTextDocument(uri);
         if (textDocument == null)
             return;
 
@@ -173,7 +173,7 @@ public class DiagnosticAnnotations
         if (disposed)
             return;
 
-        TextDocument textDocument = workspace.getTextDocument(uri);
+        TextDocument textDocument = documentService.getTextDocument(uri);
         if (textDocument == null)
             return;
 
@@ -212,7 +212,7 @@ public class DiagnosticAnnotations
         if (disposed)
             return;
 
-        TextDocument textDocument = workspace.getTextDocument(uri);
+        TextDocument textDocument = documentService.getTextDocument(uri);
         if (textDocument == null)
             return;
 

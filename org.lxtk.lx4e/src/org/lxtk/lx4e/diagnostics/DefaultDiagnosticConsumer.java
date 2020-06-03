@@ -58,7 +58,7 @@ public final class DefaultDiagnosticConsumer
     {
         diagnosticMarkers.accept(uri, diagnostics);
 
-        TextDocument textDocument = diagnosticAnnotations.getWorkspace().getTextDocument(uri);
+        TextDocument textDocument = diagnosticAnnotations.getDocumentService().getTextDocument(uri);
         if (textDocument instanceof EclipseTextDocument && ResourceUtil.getResource(
             ((EclipseTextDocument)textDocument).getCorrespondingElement()) == null)
         {

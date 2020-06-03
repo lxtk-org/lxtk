@@ -50,7 +50,7 @@ public class TypeScriptReconciler
         SafeRun.run(rollback ->
         {
             Registry<DocumentSymbolProvider> providers =
-                TypeScriptCore.LANG_SERVICE.getDocumentSymbolProviders();
+                TypeScriptCore.LANGUAGE_SERVICE.getDocumentSymbolProviders();
             rollback.add(providers.onDidAdd().subscribe(provider -> forceReconciling())::dispose);
             rollback.add(
                 providers.onDidRemove().subscribe(provider -> forceReconciling())::dispose);

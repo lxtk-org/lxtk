@@ -12,11 +12,13 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.json;
 
+import static org.lxtk.lx4e.examples.json.JsonCore.LANGUAGE_ID;
+import static org.lxtk.lx4e.examples.json.JsonCore.LANGUAGE_SERVICE;
+
 import java.net.URI;
 
 import org.eclipse.ui.IEditorPart;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.examples.json.JsonCore;
 import org.lxtk.lx4e.examples.json.JsonInputElementProvider;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 
@@ -51,7 +53,7 @@ public class JsonOperationTargetProvider
         if (documentUri == null)
             return null;
 
-        return new LanguageOperationTarget(documentUri, JsonCore.LANG_ID, JsonCore.LANG_SERVICE);
+        return new LanguageOperationTarget(documentUri, LANGUAGE_ID, LANGUAGE_SERVICE);
     }
 
     private JsonOperationTargetProvider()

@@ -27,7 +27,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.EditorHelper;
@@ -106,11 +106,11 @@ public abstract class AbstractFindReferencesHandler
     protected abstract LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor);
 
     /**
-     * Returns the {@link Workspace} for this handler.
+     * Returns the {@link DocumentService} for this handler.
      *
-     * @return the workspace (not <code>null</code>)
+     * @return the document service (not <code>null</code>)
      */
-    protected abstract Workspace getWorkspace();
+    protected abstract DocumentService getDocumentService();
 
     /**
      * Creates and returns a {@link ReferenceSearchQuery} with the given
@@ -125,7 +125,8 @@ public abstract class AbstractFindReferencesHandler
     protected ReferenceSearchQuery createSearchQuery(LanguageOperationTarget target,
         Position position, String wordAtPosition)
     {
-        return new ReferenceSearchQuery(target, position, wordAtPosition, getWorkspace(), true);
+        return new ReferenceSearchQuery(target, position, wordAtPosition, getDocumentService(),
+            true);
     }
 
     /**

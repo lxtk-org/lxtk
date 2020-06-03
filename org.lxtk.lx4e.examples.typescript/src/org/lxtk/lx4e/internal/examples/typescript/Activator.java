@@ -145,7 +145,7 @@ public class Activator
             connectedProjects = new HashMap<>();
             rollback.add(this::disconnectAll);
 
-            rollback.add(TypeScriptCore.WORKSPACE.onDidAddTextDocument().subscribe(
+            rollback.add(TypeScriptCore.DOCUMENT_SERVICE.onDidAddTextDocument().subscribe(
                 document -> connect(getProject(document)))::dispose);
 
             ModelManager.INSTANCE.startup();

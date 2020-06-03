@@ -49,7 +49,7 @@ public class JsonReconciler
         SafeRun.run(rollback ->
         {
             Registry<DocumentSymbolProvider> providers =
-                JsonCore.LANG_SERVICE.getDocumentSymbolProviders();
+                JsonCore.LANGUAGE_SERVICE.getDocumentSymbolProviders();
             rollback.add(providers.onDidAdd().subscribe(provider -> forceReconciling())::dispose);
             rollback.add(
                 providers.onDidRemove().subscribe(provider -> forceReconciling())::dispose);

@@ -63,8 +63,8 @@ public class TypeScriptOperationTargetProvider
         if (documentUri == null)
             return null;
 
-        return new LanguageOperationTarget(documentUri, TypeScriptCore.LANG_ID,
-            TypeScriptCore.LANG_SERVICE);
+        return new LanguageOperationTarget(documentUri, TypeScriptCore.LANGUAGE_ID,
+            TypeScriptCore.LANGUAGE_SERVICE);
     }
 
     private TypeScriptOperationTargetProvider()

@@ -27,13 +27,13 @@ import org.lxtk.util.UriUtil;
 import org.lxtk.util.UriUtil.Normalization;
 
 /**
- * Default implementation of the {@link Workspace} interface.
+ * Default implementation of the {@link DocumentService} interface.
  * <p>
  * This implementation is thread-safe.
  * </p>
  */
-public class DefaultWorkspace
-    implements Workspace
+public class DefaultDocumentService
+    implements DocumentService
 {
     private final Map<URI, TextDocument> textDocuments = new ConcurrentHashMap<>();
     private final EventEmitter<TextDocument> onDidAddTextDocument = new EventEmitter<>();
@@ -48,7 +48,7 @@ public class DefaultWorkspace
         URI uri = normalize(document.getUri());
         if (textDocuments.putIfAbsent(uri, document) != null)
         {
-            throw new IllegalArgumentException("The workspace already contains a document with URI " //$NON-NLS-1$
+            throw new IllegalArgumentException("The service already manages a text document with URI " //$NON-NLS-1$
                 + uri);
         }
         Disposable result = SafeRun.runWithResult(rollback ->

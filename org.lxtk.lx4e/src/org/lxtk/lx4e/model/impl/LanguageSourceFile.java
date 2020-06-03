@@ -60,7 +60,7 @@ import org.lxtk.DocumentSymbolProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageService;
 import org.lxtk.TextDocumentChangeEvent;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.EclipseTextDocumentChangeEvent;
 import org.lxtk.lx4e.internal.Activator;
@@ -299,11 +299,11 @@ public abstract class LanguageSourceFile
     }
 
     /**
-     * Returns the {@link Workspace} associated with this source file.
+     * Returns the {@link DocumentService} associated with this source file.
      *
-     * @return the associated <code>Workspace</code> (not <code>null</code>)
+     * @return the associated <code>DocumentService</code> (not <code>null</code>)
      */
-    protected abstract Workspace getWorkspace();
+    protected abstract DocumentService getDocumentService();
 
     /**
      * Returns the {@link LanguageService} associated with this source file.
@@ -661,7 +661,7 @@ public abstract class LanguageSourceFile
                     LanguageSourceFile.this);
                 rollback.add(document::dispose);
 
-                Disposable registration = getWorkspace().addTextDocument(document);
+                Disposable registration = getDocumentService().addTextDocument(document);
                 rollback.add(registration::dispose);
 
                 rollback.setLogger(e -> Activator.logError(e));

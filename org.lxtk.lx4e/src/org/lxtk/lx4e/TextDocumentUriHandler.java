@@ -19,35 +19,35 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
 import org.lxtk.TextDocument;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 /**
  * Default implementation of a {@link IUriHandler} that maps URIs to
- * text documents in a given {@link Workspace}.
+ * text documents managed by a given {@link DocumentService}.
  */
 public class TextDocumentUriHandler
     implements IUriHandler
 {
     /**
-     * The associated {@link Workspace} (never <code>null</code>).
+     * The associated {@link DocumentService} (never <code>null</code>).
      */
-    protected final Workspace workspace;
+    protected final DocumentService documentService;
 
     /**
      * Constructor.
      *
-     * @param workspace not <code>null</code>
+     * @param documentService not <code>null</code>
      */
-    public TextDocumentUriHandler(Workspace workspace)
+    public TextDocumentUriHandler(DocumentService documentService)
     {
-        this.workspace = Objects.requireNonNull(workspace);
+        this.documentService = Objects.requireNonNull(documentService);
     }
 
     @Override
     public Object getCorrespondingElement(URI uri)
     {
-        TextDocument textDocument = workspace.getTextDocument(uri);
+        TextDocument textDocument = documentService.getTextDocument(uri);
         if (textDocument instanceof EclipseTextDocument)
             return ((EclipseTextDocument)textDocument).getCorrespondingElement();
         return null;
@@ -56,7 +56,7 @@ public class TextDocumentUriHandler
     @Override
     public Boolean exists(URI uri)
     {
-        if (workspace.getTextDocument(uri) != null)
+        if (documentService.getTextDocument(uri) != null)
             return true;
         return null;
     }
@@ -64,7 +64,7 @@ public class TextDocumentUriHandler
     @Override
     public IBuffer getBuffer(URI uri) throws CoreException
     {
-        TextDocument textDocument = workspace.getTextDocument(uri);
+        TextDocument textDocument = documentService.getTextDocument(uri);
         if (textDocument instanceof EclipseTextDocument)
             return ((EclipseTextDocument)textDocument).getBuffer();
         return null;

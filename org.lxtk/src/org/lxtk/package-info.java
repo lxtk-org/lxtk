@@ -12,7 +12,7 @@
  *******************************************************************************/
 /**
  * Provides API and implementation for LXTK Core Services, such as
- * Language Service and Workspace.
+ * Document Service and Language Service.
  * <p>
  * <b>Note:</b> Unless stated otherwise, implementations of the interfaces
  * defined in this package are expected to be thread-safe.

@@ -14,7 +14,7 @@ package org.lxtk.lx4e.internal.examples.typescript.editor;
 
 import org.eclipse.ui.IEditorPart;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.Workspace;
+import org.lxtk.DocumentService;
 import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptOperationTargetProvider;
 import org.lxtk.lx4e.ui.references.AbstractFindReferencesHandler;
@@ -33,8 +33,8 @@ public class FindReferencesHandler
     }
 
     @Override
-    protected Workspace getWorkspace()
+    protected DocumentService getDocumentService()
     {
-        return TypeScriptCore.WORKSPACE;
+        return TypeScriptCore.DOCUMENT_SERVICE;
     }
 }

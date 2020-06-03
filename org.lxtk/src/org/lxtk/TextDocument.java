@@ -19,7 +19,7 @@ import org.lxtk.util.EventStream;
 /**
  * Represents a text document, such as a source file.
  *
- * @see Workspace
+ * @see DocumentService
  */
 public interface TextDocument
 {
