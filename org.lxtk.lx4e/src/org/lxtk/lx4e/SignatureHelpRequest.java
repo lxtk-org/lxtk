@@ -10,25 +10,26 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.requests;
+package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.concurrent.Future;
 
-import org.eclipse.lsp4j.RenameParams;
-import org.eclipse.lsp4j.WorkspaceEdit;
-import org.lxtk.RenameProvider;
+import org.eclipse.lsp4j.SignatureHelp;
+import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.lxtk.SignatureHelpProvider;
 
 /**
- * A request for computing rename edits.
+ * A request for computing signature help.
  */
-public class RenameRequest
-    extends LanguageFeatureRequest<RenameProvider, RenameParams, WorkspaceEdit>
+public class SignatureHelpRequest
+    extends LanguageFeatureRequest<SignatureHelpProvider, TextDocumentPositionParams, SignatureHelp>
 {
     @Override
-    protected Future<WorkspaceEdit> send(RenameProvider provider, RenameParams params)
+    protected Future<SignatureHelp> send(SignatureHelpProvider provider,
+        TextDocumentPositionParams params)
     {
-        setTitle(MessageFormat.format(Messages.RenameRequest_title, params));
-        return provider.getRenameEdits(params);
+        setTitle(MessageFormat.format(Messages.SignatureHelpRequest_title, params));
+        return provider.getSignatureHelp(params);
     }
 }

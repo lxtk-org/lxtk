@@ -44,8 +44,8 @@ import org.lxtk.TextDocument;
 import org.lxtk.DocumentService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
+import org.lxtk.lx4e.ReferencesRequest;
 import org.lxtk.lx4e.internal.Activator;
-import org.lxtk.lx4e.requests.ReferencesRequest;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 /**

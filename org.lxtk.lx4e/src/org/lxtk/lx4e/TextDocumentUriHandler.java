@@ -18,8 +18,8 @@ import java.util.Objects;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
-import org.lxtk.TextDocument;
 import org.lxtk.DocumentService;
+import org.lxtk.TextDocument;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 /**

@@ -63,11 +63,11 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 import org.lxtk.CompletionProvider;
+import org.lxtk.lx4e.CompletionResolveRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
-import org.lxtk.lx4e.requests.CompletionResolveRequest;
 import org.lxtk.lx4e.util.Markdown;
 
 @SuppressWarnings("javadoc")

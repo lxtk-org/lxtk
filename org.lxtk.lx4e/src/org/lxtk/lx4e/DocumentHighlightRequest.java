@@ -10,25 +10,28 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.requests;
+package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.concurrent.Future;
 
-import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.lxtk.HoverProvider;
+import org.lxtk.DocumentHighlightProvider;
 
 /**
- * A request for computing hover information.
+ * A request for computing document highlights.
  */
-public class HoverRequest
-    extends LanguageFeatureRequest<HoverProvider, TextDocumentPositionParams, Hover>
+public class DocumentHighlightRequest
+    extends LanguageFeatureRequest<DocumentHighlightProvider, TextDocumentPositionParams,
+        List<? extends DocumentHighlight>>
 {
     @Override
-    protected Future<Hover> send(HoverProvider provider, TextDocumentPositionParams params)
+    protected Future<List<? extends DocumentHighlight>> send(DocumentHighlightProvider provider,
+        TextDocumentPositionParams params)
     {
-        setTitle(MessageFormat.format(Messages.HoverRequest_title, params));
-        return provider.getHover(params);
+        setTitle(MessageFormat.format(Messages.DocumentHighlightRequest_title, params));
+        return provider.getDocumentHighlights(params);
     }
 }

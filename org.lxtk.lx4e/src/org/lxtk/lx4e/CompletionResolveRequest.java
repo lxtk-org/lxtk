@@ -10,26 +10,24 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.requests;
+package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.concurrent.Future;
 
-import org.eclipse.lsp4j.SignatureHelp;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.lxtk.SignatureHelpProvider;
+import org.eclipse.lsp4j.CompletionItem;
+import org.lxtk.CompletionProvider;
 
 /**
- * A request for computing signature help.
+ * A request for resolving completion item.
  */
-public class SignatureHelpRequest
-    extends LanguageFeatureRequest<SignatureHelpProvider, TextDocumentPositionParams, SignatureHelp>
+public class CompletionResolveRequest
+    extends LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>
 {
     @Override
-    protected Future<SignatureHelp> send(SignatureHelpProvider provider,
-        TextDocumentPositionParams params)
+    protected Future<CompletionItem> send(CompletionProvider provider, CompletionItem item)
     {
-        setTitle(MessageFormat.format(Messages.SignatureHelpRequest_title, params));
-        return provider.getSignatureHelp(params);
+        setTitle(MessageFormat.format(Messages.CompletionResolveRequest_title, item));
+        return provider.resolveCompletionItem(item);
     }
 }

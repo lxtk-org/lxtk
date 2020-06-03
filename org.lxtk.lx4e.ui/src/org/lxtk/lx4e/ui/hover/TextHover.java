@@ -39,10 +39,10 @@ import org.lxtk.HoverProvider;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DocumentUtil;
+import org.lxtk.lx4e.HoverRequest;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
-import org.lxtk.lx4e.requests.HoverRequest;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 import org.lxtk.lx4e.util.Markdown;
 

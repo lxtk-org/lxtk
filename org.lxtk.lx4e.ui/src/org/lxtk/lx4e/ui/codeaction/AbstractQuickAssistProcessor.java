@@ -47,12 +47,12 @@ import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
+import org.lxtk.lx4e.CodeActionRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
-import org.lxtk.lx4e.requests.CodeActionRequest;
 
 import com.google.gson.Gson;
 

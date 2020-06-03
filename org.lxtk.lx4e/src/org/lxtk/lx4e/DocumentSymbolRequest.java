@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.requests;
+package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;

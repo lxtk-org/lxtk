@@ -19,6 +19,23 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.messages"; //$NON-NLS-1$
 
+    public static String CodeActionRequest_title;
+    public static String CompletionRequest_title;
+    public static String CompletionResolveRequest_title;
+    public static String DefinitionRequest_title;
+    public static String DocumentFormattingRequest_title;
+    public static String DocumentHighlightRequest_title;
+    public static String DocumentRangeFormattingRequest_title;
+    public static String DocumentSymbolRequest_title;
+    public static String HoverRequest_title;
+    public static String PrepareRenameRequest_title;
+    public static String ReferencesRequest_title;
+    public static String RenameRequest_title;
+    public static String Request_Error_occurred;
+    public static String Request_Error_occurred__0;
+    public static String Request_Timeout_occurred__0;
+    public static String Request_Timeout_occurred__0__1;
+    public static String SignatureHelpRequest_title;
     public static String UriHandlers_Cannot_get_buffer;
 
     static

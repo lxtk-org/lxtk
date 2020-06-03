@@ -10,30 +10,29 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.requests;
+package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.concurrent.Future;
 
-import org.eclipse.lsp4j.CodeAction;
-import org.eclipse.lsp4j.CodeActionParams;
-import org.eclipse.lsp4j.Command;
+import org.eclipse.lsp4j.PrepareRenameResult;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.lxtk.CodeActionProvider;
+import org.lxtk.RenameProvider;
 
 /**
- * A request for computing code actions.
+ * A request for preparing rename operation.
  */
-public class CodeActionRequest
-    extends
-    LanguageFeatureRequest<CodeActionProvider, CodeActionParams, List<Either<Command, CodeAction>>>
+public class PrepareRenameRequest
+    extends LanguageFeatureRequest<RenameProvider, TextDocumentPositionParams,
+        Either<Range, PrepareRenameResult>>
 {
     @Override
-    protected Future<List<Either<Command, CodeAction>>> send(CodeActionProvider provider,
-        CodeActionParams params)
+    protected Future<Either<Range, PrepareRenameResult>> send(RenameProvider provider,
+        TextDocumentPositionParams params)
     {
-        setTitle(MessageFormat.format(Messages.CodeActionRequest_title, params));
-        return provider.getCodeActions(params);
+        setTitle(MessageFormat.format(Messages.PrepareRenameRequest_title, params));
+        return provider.prepareRename(params);
     }
 }

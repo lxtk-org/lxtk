@@ -10,24 +10,25 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.requests;
+package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.concurrent.Future;
 
-import org.eclipse.lsp4j.CompletionItem;
-import org.lxtk.CompletionProvider;
+import org.eclipse.lsp4j.RenameParams;
+import org.eclipse.lsp4j.WorkspaceEdit;
+import org.lxtk.RenameProvider;
 
 /**
- * A request for resolving completion item.
+ * A request for computing rename edits.
  */
-public class CompletionResolveRequest
-    extends LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>
+public class RenameRequest
+    extends LanguageFeatureRequest<RenameProvider, RenameParams, WorkspaceEdit>
 {
     @Override
-    protected Future<CompletionItem> send(CompletionProvider provider, CompletionItem item)
+    protected Future<WorkspaceEdit> send(RenameProvider provider, RenameParams params)
     {
-        setTitle(MessageFormat.format(Messages.CompletionResolveRequest_title, item));
-        return provider.resolveCompletionItem(item);
+        setTitle(MessageFormat.format(Messages.RenameRequest_title, params));
+        return provider.getRenameEdits(params);
     }
 }

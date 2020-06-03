@@ -26,8 +26,8 @@ import org.lxtk.DefinitionProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
-import org.lxtk.lx4e.requests.DefinitionRequest;
-import org.lxtk.lx4e.requests.Request;
+import org.lxtk.lx4e.DefinitionRequest;
+import org.lxtk.lx4e.Request;
 
 /**
  * Default implementation of a hyperlink detector that computes hyperlinks

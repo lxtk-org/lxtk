@@ -10,27 +10,25 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.requests;
+package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.concurrent.Future;
 
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.ReferenceParams;
-import org.lxtk.ReferenceProvider;
+import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.lxtk.HoverProvider;
 
 /**
- * A request for computing references.
+ * A request for computing hover information.
  */
-public class ReferencesRequest
-    extends LanguageFeatureRequest<ReferenceProvider, ReferenceParams, List<? extends Location>>
+public class HoverRequest
+    extends LanguageFeatureRequest<HoverProvider, TextDocumentPositionParams, Hover>
 {
     @Override
-    protected Future<List<? extends Location>> send(ReferenceProvider provider,
-        ReferenceParams params)
+    protected Future<Hover> send(HoverProvider provider, TextDocumentPositionParams params)
     {
-        setTitle(MessageFormat.format(Messages.ReferencesRequest_title, params));
-        return provider.getReferences(params);
+        setTitle(MessageFormat.format(Messages.HoverRequest_title, params));
+        return provider.getHover(params);
     }
 }
