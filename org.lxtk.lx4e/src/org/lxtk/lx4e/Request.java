@@ -31,7 +31,8 @@ import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.util.EclipseFuture;
 
 /**
- * The superclass for requests.
+ * A command object that sends a request to an asynchronous service
+ * and waits until a response is received.
  *
  * @param <T> result type
  */
@@ -233,7 +234,7 @@ public abstract class Request<T>
     protected abstract Future<T> send();
 
     /**
-     * A request handler.
+     * A customizable template for sending a request and receiving a response.
      *
      * @param <T> request result type
      */

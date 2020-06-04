@@ -30,7 +30,7 @@ public interface SignatureHelpProvider
     SignatureHelpRegistrationOptions getRegistrationOptions();
 
     /**
-     * Computes signature information for the given text document position.
+     * Requests signature information for the given text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

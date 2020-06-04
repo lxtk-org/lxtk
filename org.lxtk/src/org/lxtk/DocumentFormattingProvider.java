@@ -27,7 +27,7 @@ public interface DocumentFormattingProvider
     extends LanguageFeatureProvider
 {
     /**
-     * Computes formatting edits for the given {@link DocumentFormattingParams}.
+     * Requests formatting edits for the given {@link DocumentFormattingParams}.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

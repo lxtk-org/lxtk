@@ -20,7 +20,7 @@ import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.lxtk.SignatureHelpProvider;
 
 /**
- * A request for computing signature help.
+ * Requests signature information for the given text document position.
  */
 public class SignatureHelpRequest
     extends LanguageFeatureRequest<SignatureHelpProvider, TextDocumentPositionParams, SignatureHelp>

@@ -136,8 +136,7 @@ public abstract class AbstractLocationHyperlinkDetector
     }
 
     /**
-     * Creates and returns a request for computing hyperlink locations
-     * at the given document position.
+     * Creates and returns a hyperlink request for the given document position.
      *
      * @param target never <code>null</code>
      * @param position never <code>null</code>
@@ -173,7 +172,7 @@ public abstract class AbstractLocationHyperlinkDetector
     }
 
     /**
-     * Returns the timeout for computing hyperlink locations.
+     * Returns the timeout for a hyperlink request.
      *
      * @return a positive duration
      */

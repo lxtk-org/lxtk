@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.CodeActionProvider;
 
 /**
- * A request for computing code actions.
+ * Requests code actions for the given {@link CodeActionParams}.
  */
 public class CodeActionRequest
     extends

@@ -137,7 +137,7 @@ public class ReferenceSearchQuery
     }
 
     /**
-     * Returns a request for computing references.
+     * Returns a new instance of {@link ReferencesRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */

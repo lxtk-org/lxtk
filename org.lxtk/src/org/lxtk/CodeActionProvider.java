@@ -32,7 +32,7 @@ public interface CodeActionProvider
     //CodeActionRegistrationOptions getRegistrationOptions();
 
     /**
-     * Computes code actions for the given {@link CodeActionParams}.
+     * Requests code actions for the given {@link CodeActionParams}.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

@@ -302,7 +302,7 @@ public class RenameRefactoring
     }
 
     /**
-     * Returns a request for preparing rename operation.
+     * Returns a new instance of {@link PrepareRenameRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */
@@ -312,7 +312,7 @@ public class RenameRefactoring
     }
 
     /**
-     * Returns a request for computing rename edits.
+     * Returns a new instance of {@link RenameRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */

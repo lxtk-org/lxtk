@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DefinitionProvider;
 
 /**
- * A request for computing definition locations.
+ * Requests definition locations for the symbol denoted by the given text document position.
  */
 public class DefinitionRequest
     extends LanguageFeatureRequest<DefinitionProvider, TextDocumentPositionParams,

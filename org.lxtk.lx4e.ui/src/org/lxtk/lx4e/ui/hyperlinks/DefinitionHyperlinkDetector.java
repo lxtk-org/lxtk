@@ -66,7 +66,7 @@ public class DefinitionHyperlinkDetector
     }
 
     /**
-     * Returns a request for computing definition locations.
+     * Returns a new instance of {@link DefinitionRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */

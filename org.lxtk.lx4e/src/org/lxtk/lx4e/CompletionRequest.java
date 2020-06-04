@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.CompletionProvider;
 
 /**
- * A request for computing completion items.
+ * Requests completion items for the given {@link CompletionParams}.
  */
 public class CompletionRequest
     extends LanguageFeatureRequest<CompletionProvider, CompletionParams,

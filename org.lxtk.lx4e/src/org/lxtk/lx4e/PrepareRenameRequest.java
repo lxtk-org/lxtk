@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.RenameProvider;
 
 /**
- * A request for preparing rename operation.
+ * Requests preparation for rename of the symbol denoted by the given text document position.
  */
 public class PrepareRenameRequest
     extends LanguageFeatureRequest<RenameProvider, TextDocumentPositionParams,

@@ -182,7 +182,7 @@ public class Highlighter
     }
 
     /**
-     * Returns a request for computing document highlights.
+     * Returns a new instance of {@link DocumentHighlightRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */

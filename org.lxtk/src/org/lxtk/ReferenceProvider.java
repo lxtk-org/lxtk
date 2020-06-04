@@ -28,7 +28,7 @@ public interface ReferenceProvider
     extends LanguageFeatureProvider
 {
     /**
-     * Computes locations for all references to the symbol denoted by the given
+     * Requests locations for all references to the symbol denoted by the given
      * text document position.
      *
      * @param params not <code>null</code>

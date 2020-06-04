@@ -159,7 +159,7 @@ public final class Formatter
     }
 
     /**
-     * Returns a request for computing document formatting edits.
+     * Returns a new instance of {@link DocumentFormattingRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */
@@ -169,7 +169,7 @@ public final class Formatter
     }
 
     /**
-     * Returns a request for computing document range formatting edits.
+     * Returns a new instance of {@link DocumentRangeFormattingRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */

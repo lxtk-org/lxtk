@@ -35,7 +35,7 @@ public interface RenameProvider
     RenameOptions getRegistrationOptions();
 
     /**
-     * Computes the workspace edit for the given {@link RenameParams}.
+     * Requests the workspace edit for the given {@link RenameParams}.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
@@ -43,7 +43,7 @@ public interface RenameProvider
     CompletableFuture<WorkspaceEdit> getRenameEdits(RenameParams params);
 
     /**
-     * Prepares rename of the symbol denoted by the given text document position.
+     * Requests preparation for rename of the symbol denoted by the given text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

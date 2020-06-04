@@ -26,7 +26,7 @@ public interface HoverProvider
     extends LanguageFeatureProvider
 {
     /**
-     * Computes hover information for the given text document position.
+     * Requests hover information for the given text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

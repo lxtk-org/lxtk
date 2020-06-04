@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.TextEdit;
 import org.lxtk.DocumentFormattingProvider;
 
 /**
- * A request for computing document formatting edits.
+ * Requests formatting edits for the given {@link DocumentFormattingParams}.
  */
 public class DocumentFormattingRequest
     extends LanguageFeatureRequest<DocumentFormattingProvider, DocumentFormattingParams,

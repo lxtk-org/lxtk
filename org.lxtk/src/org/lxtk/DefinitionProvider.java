@@ -21,8 +21,7 @@ import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
- * Provides definition locations for the symbol denoted by a given
- * text document position.
+ * Provides definition locations for the symbol denoted by a given text document position.
  *
  * @see LanguageService
  */
@@ -30,8 +29,7 @@ public interface DefinitionProvider
     extends LanguageFeatureProvider
 {
     /**
-     * Computes definition locations for the symbol denoted by the given
-     * text document position.
+     * Requests definition locations for the symbol denoted by the given text document position.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

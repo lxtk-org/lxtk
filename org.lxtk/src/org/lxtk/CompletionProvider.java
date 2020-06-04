@@ -33,7 +33,7 @@ public interface CompletionProvider
     CompletionRegistrationOptions getRegistrationOptions();
 
     /**
-     * Computes completion items for the given {@link CompletionParams}.
+     * Requests completion items for the given {@link CompletionParams}.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
@@ -42,7 +42,7 @@ public interface CompletionProvider
         CompletionParams params);
 
     /**
-     * Resolves additional information for the given completion item.
+     * Requests additional information for the given completion item.
      *
      * @param item not <code>null</code>
      * @return result future (never <code>null</code>)

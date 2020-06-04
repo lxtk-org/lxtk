@@ -20,7 +20,7 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.lxtk.RenameProvider;
 
 /**
- * A request for computing rename edits.
+ * Requests the workspace edit for the given {@link RenameParams}.
  */
 public class RenameRequest
     extends LanguageFeatureRequest<RenameProvider, RenameParams, WorkspaceEdit>

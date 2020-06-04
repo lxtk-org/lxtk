@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.TextEdit;
 import org.lxtk.DocumentRangeFormattingProvider;
 
 /**
- * A request for computing document range formatting edits.
+ * Requests formatting edits for the given {@link DocumentRangeFormattingParams}.
  */
 public class DocumentRangeFormattingRequest
     extends LanguageFeatureRequest<DocumentRangeFormattingProvider, DocumentRangeFormattingParams,

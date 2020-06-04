@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.lxtk.DocumentHighlightProvider;
 
 /**
- * A request for computing document highlights.
+ * Requests document highlights for the given text document position.
  */
 public class DocumentHighlightRequest
     extends LanguageFeatureRequest<DocumentHighlightProvider, TextDocumentPositionParams,

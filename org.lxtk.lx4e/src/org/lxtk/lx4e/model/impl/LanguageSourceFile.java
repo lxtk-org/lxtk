@@ -313,7 +313,7 @@ public abstract class LanguageSourceFile
     protected abstract LanguageService getLanguageService();
 
     /**
-     * Returns the timeout for computing document symbols.
+     * Returns the timeout for a document symbol request.
      *
      * @return a positive duration
      */
@@ -333,7 +333,7 @@ public abstract class LanguageSourceFile
     }
 
     /**
-     * Returns a request for computing document symbols.
+     * Returns a new instance of {@link DocumentSymbolRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */

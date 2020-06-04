@@ -29,7 +29,7 @@ public interface DocumentSymbolProvider
     extends LanguageFeatureProvider
 {
     /**
-     * Computes information about symbols defined in the given text document.
+     * Requests information about symbols defined in the given text document.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)

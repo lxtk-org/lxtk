@@ -120,7 +120,7 @@ public abstract class AbstractMarkerResolutionGenerator
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
-     * Returns the timeout for computing code actions.
+     * Returns the timeout for a code action request.
      *
      * @return a positive duration
      */
@@ -130,7 +130,7 @@ public abstract class AbstractMarkerResolutionGenerator
     }
 
     /**
-     * Returns a request for computing code actions.
+     * Returns a new instance of {@link CodeActionRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */

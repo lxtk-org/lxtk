@@ -194,7 +194,7 @@ public class TextHover
     }
 
     /**
-     * Returns a request for computing hover information.
+     * Returns a new instance of {@link HoverRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */
@@ -204,7 +204,7 @@ public class TextHover
     }
 
     /**
-     * Returns the timeout for computing hover information.
+     * Returns the timeout for a hover request.
      *
      * @return a positive duration
      */

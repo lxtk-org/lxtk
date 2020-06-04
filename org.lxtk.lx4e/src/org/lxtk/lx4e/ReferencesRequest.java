@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.ReferenceParams;
 import org.lxtk.ReferenceProvider;
 
 /**
- * A request for computing references.
+ * Requests locations for all references to the symbol denoted by the given text document position.
  */
 public class ReferencesRequest
     extends LanguageFeatureRequest<ReferenceProvider, ReferenceParams, List<? extends Location>>

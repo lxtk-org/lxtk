@@ -20,7 +20,7 @@ import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.lxtk.HoverProvider;
 
 /**
- * A request for computing hover information.
+ * Requests hover information for the given text document position.
  */
 public class HoverRequest
     extends LanguageFeatureRequest<HoverProvider, TextDocumentPositionParams, Hover>

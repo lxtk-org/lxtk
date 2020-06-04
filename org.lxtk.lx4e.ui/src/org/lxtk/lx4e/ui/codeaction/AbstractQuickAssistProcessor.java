@@ -177,7 +177,7 @@ public abstract class AbstractQuickAssistProcessor
     protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
-     * Returns a request for computing code actions.
+     * Returns a new instance of {@link CodeActionRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */
@@ -187,7 +187,7 @@ public abstract class AbstractQuickAssistProcessor
     }
 
     /**
-     * Returns the timeout for computing code actions.
+     * Returns the timeout for a code action request.
      *
      * @return a positive duration
      */

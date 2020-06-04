@@ -19,7 +19,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.lxtk.CompletionProvider;
 
 /**
- * A request for resolving completion item.
+ * Requests additional information for the given completion item.
  */
 public class CompletionResolveRequest
     extends LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>

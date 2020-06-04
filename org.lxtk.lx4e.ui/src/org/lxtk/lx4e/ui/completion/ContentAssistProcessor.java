@@ -267,7 +267,7 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns a request for computing completion items.
+     * Returns a new instance of {@link CompletionRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */
@@ -277,7 +277,7 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns the timeout for computing completion items.
+     * Returns the timeout for a completion request.
      *
      * @return a positive duration
      */
@@ -287,7 +287,7 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns a request for computing signature help.
+     * Returns a new instance of {@link SignatureHelpRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */
@@ -297,7 +297,7 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns the timeout for computing signature help.
+     * Returns the timeout for a signature help request.
      *
      * @return a positive duration
      */

@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentSymbolProvider;
 
 /**
- * A request for computing document symbols.
+ * Requests information about symbols defined in the given text document.
  */
 public class DocumentSymbolRequest
     extends LanguageFeatureRequest<DocumentSymbolProvider, DocumentSymbolParams,
