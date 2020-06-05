@@ -89,9 +89,8 @@ public class TypeScriptLanguageClient
         IPath location = project.getLocation();
         if (location == null)
             throw new IllegalStateException();
-        documentSelector = Collections.singletonList(
-            new DocumentFilter(LANGUAGE_ID, "file", project.getLocation().toString() //$NON-NLS-1$
-                + "/**")); //$NON-NLS-1$
+        documentSelector = Collections.singletonList(new DocumentFilter(LANGUAGE_ID, "file", //$NON-NLS-1$
+            project.getLocation().append("**").toOSString())); //$NON-NLS-1$
         URI locationURI = project.getLocationURI();
         if (locationURI == null)
             throw new IllegalStateException();
