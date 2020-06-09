@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -56,11 +55,11 @@ import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.lxtk.DocumentService;
 import org.lxtk.DocumentSymbolProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageService;
 import org.lxtk.TextDocumentChangeEvent;
-import org.lxtk.DocumentService;
 import org.lxtk.lx4e.DocumentSymbolRequest;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.EclipseTextDocumentChangeEvent;
@@ -437,7 +436,7 @@ public abstract class LanguageSourceFile
      */
     protected class DocumentSymbolTimeoutHandler
     {
-        protected final AtomicInteger timeouts = new AtomicInteger();
+        protected int timeouts;
         protected final Job job = createJob();
 
         /**
@@ -447,7 +446,7 @@ public abstract class LanguageSourceFile
          */
         public int getTimeouts()
         {
-            return timeouts.get();
+            return timeouts;
         }
 
         /**
@@ -457,7 +456,7 @@ public abstract class LanguageSourceFile
          */
         public void onTimeout(DocumentSymbolRequest request)
         {
-            timeouts.incrementAndGet();
+            timeouts++;
 
             request.setMayThrow(false); // suppress the TimeoutExeption
 
@@ -473,13 +472,13 @@ public abstract class LanguageSourceFile
          */
         public void reset()
         {
-            timeouts.set(0);
+            timeouts = 0;
             job.cancel();
         }
 
         protected boolean shouldRetry()
         {
-            return getTimeouts() < 5;
+            return timeouts < 5;
         }
 
         protected Job createJob()
