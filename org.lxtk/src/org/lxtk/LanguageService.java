@@ -17,6 +17,7 @@ import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
@@ -149,6 +150,21 @@ public interface LanguageService
      * @return the registry of document symbol providers (never <code>null</code>)
      */
     Registry<DocumentSymbolProvider> getDocumentSymbolProviders();
+
+    /**
+     * Returns folding range capabilities provided by this service.
+     *
+     * @return folding range capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    FoldingRangeCapabilities getFoldingRangeCapabilities();
+
+    /**
+     * Returns the registry of folding range providers for this service.
+     *
+     * @return the registry of folding range providers (never <code>null</code>)
+     */
+    Registry<FoldingRangeProvider> getFoldingRangeProviders();
 
     /**
      * Returns hover capabilities provided by this service.

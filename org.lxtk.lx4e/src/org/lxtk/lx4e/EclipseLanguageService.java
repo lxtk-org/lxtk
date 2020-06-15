@@ -13,6 +13,7 @@
 package org.lxtk.lx4e;
 
 import org.eclipse.lsp4j.CompletionCapabilities;
+import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.lxtk.DefaultLanguageService;
 import org.lxtk.LanguageService;
 
@@ -30,6 +31,14 @@ public class EclipseLanguageService
     {
         CompletionCapabilities capabilities = super.getCompletionCapabilities();
         capabilities.setContextSupport(false);
+        return capabilities;
+    }
+
+    @Override
+    public FoldingRangeCapabilities getFoldingRangeCapabilities()
+    {
+        FoldingRangeCapabilities capabilities = super.getFoldingRangeCapabilities();
+        capabilities.setLineFoldingOnly(true);
         return capabilities;
     }
 }

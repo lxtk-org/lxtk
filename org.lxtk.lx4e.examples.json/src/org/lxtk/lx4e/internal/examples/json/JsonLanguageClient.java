@@ -37,6 +37,7 @@ import org.lxtk.client.DocumentFormattingFeature;
 import org.lxtk.client.DocumentRangeFormattingFeature;
 import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.Feature;
+import org.lxtk.client.FoldingRangeFeature;
 import org.lxtk.client.HoverFeature;
 import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
@@ -99,10 +100,11 @@ public class JsonLanguageClient
     {
         Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
         features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE));
+        features.add(new CompletionFeature(LANGUAGE_SERVICE));
         features.add(new DocumentFormattingFeature(LANGUAGE_SERVICE));
         features.add(new DocumentRangeFormattingFeature(LANGUAGE_SERVICE));
         features.add(new DocumentSymbolFeature(LANGUAGE_SERVICE));
-        features.add(new CompletionFeature(LANGUAGE_SERVICE));
+        features.add(new FoldingRangeFeature(LANGUAGE_SERVICE));
         features.add(new HoverFeature(LANGUAGE_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
             JsonWorkspaceEditChangeFactory.INSTANCE, features)

@@ -17,6 +17,7 @@ import static java.util.Collections.emptyMap;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.Position;
@@ -42,7 +43,8 @@ public class AnnotationUtil
      *  or empty)
      */
     public static void replaceAnnotations(IAnnotationModel annotationModel,
-        Collection<Annotation> toRemove, Map<Annotation, Position> toAdd)
+        Collection<? extends Annotation> toRemove,
+        Map<? extends Annotation, ? extends Position> toAdd)
     {
         if (toRemove == null)
             toRemove = emptyList();
@@ -63,7 +65,7 @@ public class AnnotationUtil
                 {
                     annotationModel.removeAnnotation(annotation);
                 }
-                for (Map.Entry<Annotation, Position> entry : toAdd.entrySet())
+                for (Entry<? extends Annotation, ? extends Position> entry : toAdd.entrySet())
                 {
                     annotationModel.addAnnotation(entry.getKey(), entry.getValue());
                 }

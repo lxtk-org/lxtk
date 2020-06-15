@@ -25,6 +25,7 @@ import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
@@ -57,6 +58,7 @@ public class DefaultLanguageService
     private final Registry<DocumentRangeFormattingProvider> documentRangeFormattingProviders =
         Registry.newInstance();
     private final Registry<DocumentSymbolProvider> documentSymbolProviders = Registry.newInstance();
+    private final Registry<FoldingRangeProvider> foldingRangeProviders = Registry.newInstance();
     private final Registry<HoverProvider> hoverProviders = Registry.newInstance();
     private final Registry<ReferenceProvider> referenceProviders = Registry.newInstance();
     private final Registry<RenameProvider> renameProviders = Registry.newInstance();
@@ -189,6 +191,20 @@ public class DefaultLanguageService
     public Registry<DocumentSymbolProvider> getDocumentSymbolProviders()
     {
         return documentSymbolProviders;
+    }
+
+    @Override
+    public FoldingRangeCapabilities getFoldingRangeCapabilities()
+    {
+        FoldingRangeCapabilities foldingRange = new FoldingRangeCapabilities();
+        foldingRange.setDynamicRegistration(true);
+        return foldingRange;
+    }
+
+    @Override
+    public Registry<FoldingRangeProvider> getFoldingRangeProviders()
+    {
+        return foldingRangeProviders;
     }
 
     @Override
