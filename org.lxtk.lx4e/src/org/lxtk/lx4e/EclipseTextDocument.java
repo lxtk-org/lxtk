@@ -114,7 +114,7 @@ public final class EclipseTextDocument
         lastChange.compareAndSet(null,
             new EclipseTextDocumentChangeEvent(new TextDocumentSnapshot(this, 0, document.get()),
                 Collections.emptyList(), getModificationStamp()));
-        if ((buffer.getSupportedListenerMethods() & IBufferListener.M_BUFFER_SAVED) != 0)
+        if ((buffer.getSupportedListenerMethods() & IBufferListener.BUFFER_SAVED) != 0)
             buffer.addListener(bufferListener);
         buffer.addRef();
     }
