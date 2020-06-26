@@ -30,6 +30,7 @@ import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -44,6 +45,7 @@ import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.jface.text.link.ProposalPosition;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.CompletionItem;
@@ -526,7 +528,13 @@ class LSIncompleteCompletionProposal
                 allEdits.addAll(additionalEdits);
                 DocumentUtil.applyEdits(document, allEdits);
             } else {
-                DocumentUtil.applyEdit(document, textEdit);
+                ISelection viewerSelection = viewer.getSelectionProvider().getSelection();
+                if (viewerSelection instanceof TextSelection) {
+                    TextSelection textSelection = (TextSelection)viewerSelection;
+                    DocumentUtil.applyEditWithSelection(document, textEdit, textSelection.getOffset(), textSelection.getLength());
+                } else {
+                    DocumentUtil.applyEdit(document, textEdit);
+                }
             }
 
             if (viewer != null && !regions.isEmpty()) {

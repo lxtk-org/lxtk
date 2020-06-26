@@ -118,6 +118,40 @@ public class DocumentUtil
     }
 
     /**
+     * Applies the given LSP text edit to the given document.
+     *
+     * @param document not <code>null</code>
+     * @param edit an LSP text edit to apply to the document
+     *  (not <code>null</code>)
+     * @param selectionOffset current text selection offset or -1 if there is no text selection
+     * @param selectionLength current text selection length. not negative number.
+     * @throws BadLocationException if the specified edit range is invalid
+     *  in the document
+     */
+    public static void applyEditWithSelection(IDocument document, TextEdit edit, int selectionOffset,
+        int selectionLength) throws BadLocationException
+    {
+        IRegion r = toRegion(document, edit.getRange());
+        int finalOffset = r.getOffset();
+        int finalLength = r.getLength();
+
+        if (selectionLength > 0 && selectionOffset > -1)
+        {
+            if (selectionOffset < finalOffset)
+            {
+                finalOffset = selectionOffset;
+                finalLength = r.getOffset() - selectionOffset;
+            }
+            if (selectionLength > 0)
+            {
+                finalLength += selectionLength;
+            }
+        }
+
+        document.replace(finalOffset, finalLength, edit.getNewText());
+    }
+
+    /**
      * Applies the given sequence of LSP text edits to the given document
      * as a single document modification.
      *
