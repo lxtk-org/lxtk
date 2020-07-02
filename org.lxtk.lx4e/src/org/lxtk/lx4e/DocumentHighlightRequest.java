@@ -17,19 +17,19 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.eclipse.lsp4j.DocumentHighlight;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.DocumentHighlightParams;
 import org.lxtk.DocumentHighlightProvider;
 
 /**
  * Requests document highlights for the given text document position.
  */
 public class DocumentHighlightRequest
-    extends LanguageFeatureRequest<DocumentHighlightProvider, TextDocumentPositionParams,
+    extends LanguageFeatureRequest<DocumentHighlightProvider, DocumentHighlightParams,
         List<? extends DocumentHighlight>>
 {
     @Override
     protected Future<List<? extends DocumentHighlight>> send(DocumentHighlightProvider provider,
-        TextDocumentPositionParams params)
+        DocumentHighlightParams params)
     {
         setTitle(MessageFormat.format(Messages.DocumentHighlightRequest_title, params));
         return provider.getDocumentHighlights(params);

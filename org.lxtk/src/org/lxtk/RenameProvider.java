@@ -14,11 +14,11 @@ package org.lxtk;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.RenameOptions;
 import org.eclipse.lsp4j.RenameParams;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
@@ -52,5 +52,5 @@ public interface RenameProvider
      * @see RenameOptions#getPrepareProvider()
      */
     CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(
-        TextDocumentPositionParams params);
+        PrepareRenameParams params);
 }

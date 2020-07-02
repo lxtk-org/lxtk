@@ -15,9 +15,9 @@ package org.lxtk.lx4e;
 import java.text.MessageFormat;
 import java.util.concurrent.Future;
 
+import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.RenameProvider;
 
@@ -25,12 +25,12 @@ import org.lxtk.RenameProvider;
  * Requests preparation for rename of the symbol denoted by the given text document position.
  */
 public class PrepareRenameRequest
-    extends LanguageFeatureRequest<RenameProvider, TextDocumentPositionParams,
-        Either<Range, PrepareRenameResult>>
+    extends
+    LanguageFeatureRequest<RenameProvider, PrepareRenameParams, Either<Range, PrepareRenameResult>>
 {
     @Override
     protected Future<Either<Range, PrepareRenameResult>> send(RenameProvider provider,
-        TextDocumentPositionParams params)
+        PrepareRenameParams params)
     {
         setTitle(MessageFormat.format(Messages.PrepareRenameRequest_title, params));
         return provider.prepareRename(params);

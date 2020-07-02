@@ -16,17 +16,17 @@ import java.text.MessageFormat;
 import java.util.concurrent.Future;
 
 import org.eclipse.lsp4j.Hover;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.HoverParams;
 import org.lxtk.HoverProvider;
 
 /**
  * Requests hover information for the given text document position.
  */
 public class HoverRequest
-    extends LanguageFeatureRequest<HoverProvider, TextDocumentPositionParams, Hover>
+    extends LanguageFeatureRequest<HoverProvider, HoverParams, Hover>
 {
     @Override
-    protected Future<Hover> send(HoverProvider provider, TextDocumentPositionParams params)
+    protected Future<Hover> send(HoverProvider provider, HoverParams params)
     {
         setTitle(MessageFormat.format(Messages.HoverRequest_title, params));
         return provider.getHover(params);

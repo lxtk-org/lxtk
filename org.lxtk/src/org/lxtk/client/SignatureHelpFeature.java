@@ -23,9 +23,9 @@ import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SignatureHelp;
 import org.eclipse.lsp4j.SignatureHelpOptions;
+import org.eclipse.lsp4j.SignatureHelpParams;
 import org.eclipse.lsp4j.SignatureHelpRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.lxtk.LanguageService;
 import org.lxtk.SignatureHelpProvider;
 import org.lxtk.util.Disposable;
@@ -103,7 +103,7 @@ public final class SignatureHelpFeature
 
             @Override
             public CompletableFuture<SignatureHelp> getSignatureHelp(
-                TextDocumentPositionParams params)
+                SignatureHelpParams params)
             {
                 return getLanguageServer().getTextDocumentService().signatureHelp(params);
             }

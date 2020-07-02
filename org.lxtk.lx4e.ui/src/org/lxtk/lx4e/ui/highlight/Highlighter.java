@@ -47,7 +47,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.DocumentHighlightKind;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.DocumentHighlightParams;
 import org.eclipse.ui.PlatformUI;
 import org.lxtk.DocumentHighlightProvider;
 import org.lxtk.DocumentUri;
@@ -373,7 +373,7 @@ public class Highlighter
                 return null;
             DocumentHighlightRequest request = newDocumentHighlightRequest();
             request.setProvider(provider);
-            request.setParams(new TextDocumentPositionParams(
+            request.setParams(new DocumentHighlightParams(
                 DocumentUri.toTextDocumentIdentifier(documentUri), position));
             request.setProgressMonitor(monitor);
             request.setMayThrow(false);

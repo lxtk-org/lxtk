@@ -28,11 +28,10 @@ import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.lsp4j.Hover;
-import org.eclipse.lsp4j.MarkedString;
+import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentUri;
 import org.lxtk.HoverProvider;
@@ -113,8 +112,8 @@ public class TextHover
 
         HoverRequest request = newHoverRequest();
         request.setProvider(provider);
-        request.setParams(new TextDocumentPositionParams(
-            DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setParams(
+            new HoverParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
         request.setTimeout(getHoverTimeout());
         request.setMayThrow(false);
 
@@ -122,15 +121,20 @@ public class TextHover
         if (result == null)
             return null;
 
-        Either<List<Either<String, MarkedString>>, MarkupContent> contents = result.getContents();
+        @SuppressWarnings("deprecation")
+        Either<List<Either<String, org.eclipse.lsp4j.MarkedString>>, MarkupContent> contents =
+            result.getContents();
         MarkupContent markupContent;
         if (contents.isLeft())
         {
             StringBuilder builder = new StringBuilder();
-            Iterator<Either<String, MarkedString>> it = contents.getLeft().iterator();
+            @SuppressWarnings("deprecation")
+            Iterator<Either<String, org.eclipse.lsp4j.MarkedString>> it =
+                contents.getLeft().iterator();
             while (it.hasNext())
             {
-                Either<String, MarkedString> item = it.next();
+                @SuppressWarnings("deprecation")
+                Either<String, org.eclipse.lsp4j.MarkedString> item = it.next();
                 if (item.isLeft())
                 {
                     builder.append(item.getLeft());
@@ -139,11 +143,16 @@ public class TextHover
                 }
                 else if (item.isRight())
                 {
-                    MarkedString markedString = item.getRight();
+                    @SuppressWarnings("deprecation")
+                    org.eclipse.lsp4j.MarkedString markedString = item.getRight();
                     builder.append("```"); //$NON-NLS-1$
-                    builder.append(markedString.getLanguage());
+                    @SuppressWarnings("deprecation")
+                    String language = markedString.getLanguage();
+                    builder.append(language);
                     builder.append('\n');
-                    builder.append(markedString.getValue());
+                    @SuppressWarnings("deprecation")
+                    String value = markedString.getValue();
+                    builder.append(value);
                     builder.append("\n```"); //$NON-NLS-1$
                     if (it.hasNext())
                         builder.append("\n\n"); //$NON-NLS-1$

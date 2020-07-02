@@ -25,10 +25,10 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.RenameParams;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -240,7 +240,7 @@ public class RenameRefactoring
 
         PrepareRenameRequest request = newPrepareRenameRequest();
         request.setProvider(renameProvider);
-        request.setParams(new TextDocumentPositionParams(
+        request.setParams(new PrepareRenameParams(
             DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), getPosition()));
         request.setProgressMonitor(pm);
 

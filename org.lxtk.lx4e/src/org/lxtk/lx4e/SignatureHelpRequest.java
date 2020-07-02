@@ -16,18 +16,17 @@ import java.text.MessageFormat;
 import java.util.concurrent.Future;
 
 import org.eclipse.lsp4j.SignatureHelp;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.SignatureHelpParams;
 import org.lxtk.SignatureHelpProvider;
 
 /**
  * Requests signature information for the given text document position.
  */
 public class SignatureHelpRequest
-    extends LanguageFeatureRequest<SignatureHelpProvider, TextDocumentPositionParams, SignatureHelp>
+    extends LanguageFeatureRequest<SignatureHelpProvider, SignatureHelpParams, SignatureHelp>
 {
     @Override
-    protected Future<SignatureHelp> send(SignatureHelpProvider provider,
-        TextDocumentPositionParams params)
+    protected Future<SignatureHelp> send(SignatureHelpProvider provider, SignatureHelpParams params)
     {
         setTitle(MessageFormat.format(Messages.SignatureHelpRequest_title, params));
         return provider.getSignatureHelp(params);

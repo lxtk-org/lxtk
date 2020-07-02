@@ -20,10 +20,10 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.lxtk.HoverProvider;
 import org.lxtk.LanguageService;
@@ -98,7 +98,7 @@ public final class HoverFeature
             }
 
             @Override
-            public CompletableFuture<Hover> getHover(TextDocumentPositionParams params)
+            public CompletableFuture<Hover> getHover(HoverParams params)
             {
                 return getLanguageServer().getTextDocumentService().hover(params);
             }

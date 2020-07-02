@@ -18,13 +18,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DefinitionProvider;
@@ -102,7 +102,7 @@ public final class DefinitionFeature
             @Override
             public CompletableFuture<
                 Either<List<? extends Location>, List<? extends LocationLink>>> getDefinition(
-                    TextDocumentPositionParams params)
+                    DefinitionParams params)
             {
                 return getLanguageServer().getTextDocumentService().definition(params);
             }

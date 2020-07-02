@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DefinitionProvider;
 import org.lxtk.DocumentUri;
@@ -51,8 +51,8 @@ public class DefinitionHyperlinkDetector
 
         DefinitionRequest request = newDefinitionRequest();
         request.setProvider(provider);
-        request.setParams(new TextDocumentPositionParams(
-            DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setParams(
+            new DefinitionParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
         return request;
     }
 

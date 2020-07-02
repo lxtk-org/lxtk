@@ -15,9 +15,9 @@ package org.lxtk;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
@@ -35,5 +35,5 @@ public interface DefinitionProvider
      * @return result future (never <code>null</code>)
      */
     CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> getDefinition(
-        TextDocumentPositionParams params);
+        DefinitionParams params);
 }

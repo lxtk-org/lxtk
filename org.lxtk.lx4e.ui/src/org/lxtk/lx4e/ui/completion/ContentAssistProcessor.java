@@ -33,8 +33,8 @@ import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.SignatureHelp;
+import org.eclipse.lsp4j.SignatureHelpParams;
 import org.eclipse.lsp4j.SignatureInformation;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.swt.graphics.Image;
 import org.lxtk.CompletionProvider;
@@ -179,8 +179,8 @@ public class ContentAssistProcessor
 
         SignatureHelpRequest request = newSignatureHelpRequest();
         request.setProvider(provider);
-        request.setParams(new TextDocumentPositionParams(
-            DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setParams(
+            new SignatureHelpParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
         request.setTimeout(getSignatureHelpTimeout());
         request.setMayThrow(false);
 

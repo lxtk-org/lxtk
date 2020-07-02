@@ -15,7 +15,7 @@ package org.lxtk;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.Hover;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.HoverParams;
 
 /**
  * Provides hover information for a given text document position.
@@ -31,5 +31,5 @@ public interface HoverProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    CompletableFuture<Hover> getHover(TextDocumentPositionParams params);
+    CompletableFuture<Hover> getHover(HoverParams params);
 }

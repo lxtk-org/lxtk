@@ -17,7 +17,7 @@
 <!--
    Currently, the Base Platform includes:
    * Eclipse SDK 4.8 (Photon)
-   * Eclipse LSP4J 0.8.1
+   * Eclipse LSP4J 0.9
    * Eclipse Handly 1.4
    * Eclipse TM4E 0.3.4
 -->
@@ -39,17 +39,18 @@
 <unit id="org.eclipse.mylyn.wikitext" version="0.0.0"/>
 <unit id="org.eclipse.mylyn.wikitext.markdown" version="0.0.0"/>
 <unit id="com.google.gson" version="0.0.0"/>
-<unit id="com.google.guava" version="0.0.0"/>
 <unit id="org.jcodings" version="0.0.0"/>
 <unit id="org.joni" version="0.0.0"/>
 <unit id="org.jsoup" version="0.0.0"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/releases/2019-06/201906191000"/>
+<repository location="http://download.eclipse.org/releases/2019-09/201909181001"/>
 <unit id="org.eclipse.xtext.xbase.lib" version="0.0.0"/>
+<unit id="com.google.guava" version="0.0.0"/> <!-- Xbase requires Guava 27.1 -->
+<unit id="com.google.guava" version="21.0.0.v20170206-1425"/> <!-- Mylyn requires Guava 21 -->
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/lsp4j/updates/releases/0.8.1"/>
+<repository location="http://download.eclipse.org/lsp4j/updates/releases/0.9.0"/>
 <unit id="org.eclipse.lsp4j" version="0.0.0"/>
 <unit id="org.eclipse.lsp4j.jsonrpc" version="0.0.0"/>
 </location>

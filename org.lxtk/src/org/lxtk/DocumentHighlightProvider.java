@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentHighlight;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.DocumentHighlightParams;
 
 /**
  * Provides {@link DocumentHighlight}s for a given text document position.
@@ -33,5 +33,5 @@ public interface DocumentHighlightProvider
      * @return result future (never <code>null</code>)
      */
     CompletableFuture<List<? extends DocumentHighlight>> getDocumentHighlights(
-        TextDocumentPositionParams params);
+        DocumentHighlightParams params);
 }

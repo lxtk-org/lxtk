@@ -16,9 +16,9 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DefinitionProvider;
 
@@ -26,12 +26,12 @@ import org.lxtk.DefinitionProvider;
  * Requests definition locations for the symbol denoted by the given text document position.
  */
 public class DefinitionRequest
-    extends LanguageFeatureRequest<DefinitionProvider, TextDocumentPositionParams,
+    extends LanguageFeatureRequest<DefinitionProvider, DefinitionParams,
         Either<List<? extends Location>, List<? extends LocationLink>>>
 {
     @Override
     protected Future<Either<List<? extends Location>, List<? extends LocationLink>>> send(
-        DefinitionProvider provider, TextDocumentPositionParams params)
+        DefinitionProvider provider, DefinitionParams params)
     {
         setTitle(MessageFormat.format(Messages.DefinitionRequest_title, params));
         return provider.getDefinition(params);

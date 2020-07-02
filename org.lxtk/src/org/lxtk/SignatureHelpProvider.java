@@ -15,8 +15,8 @@ package org.lxtk;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.SignatureHelp;
+import org.eclipse.lsp4j.SignatureHelpParams;
 import org.eclipse.lsp4j.SignatureHelpRegistrationOptions;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 
 /**
  * Provides signature information for a given text document position.
@@ -35,5 +35,5 @@ public interface SignatureHelpProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    CompletableFuture<SignatureHelp> getSignatureHelp(TextDocumentPositionParams params);
+    CompletableFuture<SignatureHelp> getSignatureHelp(SignatureHelpParams params);
 }

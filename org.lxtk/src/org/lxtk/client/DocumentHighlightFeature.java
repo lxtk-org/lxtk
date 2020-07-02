@@ -20,10 +20,10 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.DocumentHighlight;
+import org.eclipse.lsp4j.DocumentHighlightParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.lxtk.DocumentHighlightProvider;
 import org.lxtk.LanguageService;
@@ -100,7 +100,7 @@ public final class DocumentHighlightFeature
 
                 @Override
                 public CompletableFuture<List<? extends DocumentHighlight>> getDocumentHighlights(
-                    TextDocumentPositionParams params)
+                    DocumentHighlightParams params)
                 {
                     return getLanguageServer().getTextDocumentService().documentHighlight(params);
                 }
