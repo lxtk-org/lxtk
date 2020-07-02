@@ -519,6 +519,13 @@ class LSIncompleteCompletionProposal
                 }
             }
             textEdit.setNewText(insertText); // insertText now has placeholder removed
+
+            Point selectedRange = viewer.getSelectedRange();
+            if (selectedRange.y > 0 && isInsertEdit(textEdit)) {
+                adjustToSelection(textEdit, DocumentUtil.toRange(document,
+                    selectedRange.x, selectedRange.y));
+            }
+
             List<TextEdit> additionalEdits = item.getAdditionalTextEdits();
             if (additionalEdits != null && !additionalEdits.isEmpty()) {
                 List<TextEdit> allEdits = new ArrayList<>();
@@ -552,6 +559,20 @@ class LSIncompleteCompletionProposal
             }
         } catch (BadLocationException ex) {
             Activator.logError(ex);
+        }
+    }
+
+    private static boolean isInsertEdit(TextEdit textEdit) {
+        if (textEdit.getNewText().isEmpty()) {
+            return false;
+        }
+        Range range = textEdit.getRange();
+        return range.getStart().equals(range.getEnd());
+    }
+
+    private static void adjustToSelection(TextEdit textEdit, Range selectedRange) {
+        if (textEdit.getRange().getStart().equals(selectedRange.getStart())) {
+            textEdit.setRange(selectedRange);
         }
     }
 
