@@ -22,20 +22,26 @@ import java.util.function.Supplier;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ContextInformation;
-import org.eclipse.jface.text.contentassist.ContextInformationValidator;
+import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.text.contentassist.IContextInformationPresenter;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
+import org.eclipse.lsp4j.ParameterInformation;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.SignatureHelp;
+import org.eclipse.lsp4j.SignatureHelpContext;
 import org.eclipse.lsp4j.SignatureHelpParams;
+import org.eclipse.lsp4j.SignatureHelpTriggerKind;
 import org.eclipse.lsp4j.SignatureInformation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.messages.Tuple.Two;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Image;
 import org.lxtk.CompletionProvider;
 import org.lxtk.DocumentUri;
@@ -68,6 +74,7 @@ public class ContentAssistProcessor
 
     private final Supplier<LanguageOperationTarget> targetSupplier;
     private String errorMessage;
+    private IContextInformationValidator contextInformationValidator;
 
     /**
      * Constructor.
@@ -151,38 +158,9 @@ public class ContentAssistProcessor
     {
         errorMessage = null;
 
-        LanguageOperationTarget target = targetSupplier.get();
-        if (target == null)
+        SignatureHelpRequest request = getSignatureHelpRequest(viewer, offset, null);
+        if (request == null)
             return NO_INFOS;
-
-        URI documentUri = target.getDocumentUri();
-        LanguageService languageService = target.getLanguageService();
-
-        SignatureHelpProvider provider = languageService.getDocumentMatcher().getBestMatch(
-            languageService.getSignatureHelpProviders(), SignatureHelpProvider::getDocumentSelector,
-            documentUri, target.getLanguageId());
-        if (provider == null)
-            return NO_INFOS;
-
-        IDocument document = viewer.getDocument();
-
-        Position position;
-        try
-        {
-            position = DocumentUtil.toPosition(document, offset);
-        }
-        catch (BadLocationException e)
-        {
-            Activator.logError(e);
-            return NO_INFOS;
-        }
-
-        SignatureHelpRequest request = newSignatureHelpRequest();
-        request.setProvider(provider);
-        request.setParams(
-            new SignatureHelpParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
-        request.setTimeout(getSignatureHelpTimeout());
-        request.setMayThrow(false);
 
         SignatureHelp result = request.sendAndReceive();
         errorMessage = request.getErrorMessage();
@@ -190,30 +168,20 @@ public class ContentAssistProcessor
         if (result == null)
             return NO_INFOS;
 
-        List<SignatureInformation> signatures = result.getSignatures();
-        int size = signatures.size();
-        int activeSignature;
-        if (result.getActiveSignature() == null)
-            activeSignature = 0;
-        else
-        {
-            activeSignature = result.getActiveSignature().intValue();
-            if (activeSignature < 0 || activeSignature >= size)
-                activeSignature = 0;
-        }
+        normalize(result);
+
+        int size = result.getSignatures().size();
         List<IContextInformation> infos = new ArrayList<>(size);
-        int index = 0;
-        for (SignatureInformation signature : signatures)
+        for (int index = 0; index < size; index++)
         {
-            IContextInformation info = toContextInformation(signature);
+            IContextInformation info = toContextInformation(result, index);
             if (info != null)
             {
-                if (index == activeSignature)
+                if (index == result.getActiveSignature())
                     infos.add(0, info);
                 else
                     infos.add(info);
             }
-            index++;
         }
         return infos.toArray(NO_INFOS);
     }
@@ -239,7 +207,19 @@ public class ContentAssistProcessor
     @Override
     public IContextInformationValidator getContextInformationValidator()
     {
-        return new ContextInformationValidator(this);
+        if (contextInformationValidator == null)
+            contextInformationValidator = newContextInformationValidator();
+        return contextInformationValidator;
+    }
+
+    /**
+     * Returns a new instance of {@link IContextInformationValidator}.
+     *
+     * @return the created validator (not <code>null</code>)
+     */
+    protected IContextInformationValidator newContextInformationValidator()
+    {
+        return new SignatureContextInformationValidator();
     }
 
     /**
@@ -254,16 +234,16 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Converts the given {@link SignatureInformation} to
-     * an {@link IContextInformation} object.
+     * Converts the given signature to a context information object.
      *
-     * @param signature never <code>null</code>
-     * @return the corresponding context information,
-     *  or <code>null</code> if none
+     * @param signatureHelp a {@link SignatureHelp} (never <code>null</code>)
+     * @param signatureIndex a valid index into <code>signatureHelp.getSignatures()</code>
+     * @return the corresponding context information, or <code>null</code> if none
      */
-    protected IContextInformation toContextInformation(SignatureInformation signature)
+    protected IContextInformation toContextInformation(SignatureHelp signatureHelp,
+        int signatureIndex)
     {
-        return new ContextInformation(signature.getLabel(), signature.getLabel());
+        return new SignatureContextInformation(signatureHelp, signatureIndex);
     }
 
     /**
@@ -304,5 +284,260 @@ public class ContentAssistProcessor
     protected Duration getSignatureHelpTimeout()
     {
         return Duration.ofSeconds(1);
+    }
+
+    /**
+     * Returns whether the signature's active parameter should be highlighted.
+     * <p>
+     * Note that even if this method returns <code>true</code>, it might not be feasible
+     * to highlight the signature's active parameter in some cases, depending on the
+     * {@link SignatureHelpProvider} implementation. That would be the case, for example,
+     * if the signature help provider does not support a {@link SignatureHelpContext}.
+     * </p>
+     *
+     * @return <code>true</code> if the signature's active parameter should be highlighted,
+     *  and <code>false</code> otherwise
+     */
+    protected boolean shouldMarkSignatureActiveParameter()
+    {
+        return true;
+    }
+
+    private SignatureHelpRequest getSignatureHelpRequest(ITextViewer viewer, int offset,
+        SignatureHelpContext context)
+    {
+        LanguageOperationTarget target = targetSupplier.get();
+        if (target == null)
+            return null;
+
+        URI documentUri = target.getDocumentUri();
+        LanguageService languageService = target.getLanguageService();
+
+        SignatureHelpProvider provider = languageService.getDocumentMatcher().getBestMatch(
+            languageService.getSignatureHelpProviders(), SignatureHelpProvider::getDocumentSelector,
+            documentUri, target.getLanguageId());
+        if (provider == null)
+            return null;
+
+        IDocument document = viewer.getDocument();
+
+        Position position;
+        try
+        {
+            position = DocumentUtil.toPosition(document, offset);
+        }
+        catch (BadLocationException e)
+        {
+            Activator.logError(e);
+            return null;
+        }
+
+        SignatureHelpRequest request = newSignatureHelpRequest();
+        request.setProvider(provider);
+        request.setParams(new SignatureHelpParams(DocumentUri.toTextDocumentIdentifier(documentUri),
+            position, context));
+        request.setTimeout(getSignatureHelpTimeout());
+        request.setMayThrow(false);
+        return request;
+    }
+
+    private static void normalize(SignatureHelp signatureHelp)
+    {
+        if (signatureHelp.getActiveSignature() == null)
+            signatureHelp.setActiveSignature(0);
+        else
+        {
+            int activeSignature = signatureHelp.getActiveSignature().intValue();
+            if (activeSignature < 0 || activeSignature >= signatureHelp.getSignatures().size())
+                signatureHelp.setActiveSignature(0);
+        }
+
+        if (signatureHelp.getActiveParameter() == null)
+            signatureHelp.setActiveParameter(0);
+        else
+        {
+            int activeParameter = signatureHelp.getActiveParameter().intValue();
+            if (activeParameter < 0 || activeParameter >= signatureHelp.getSignatures().get(
+                signatureHelp.getActiveSignature()).getParameters().size())
+                signatureHelp.setActiveParameter(0);
+        }
+    }
+
+    private static class SignatureContextInformation
+        implements IContextInformation
+    {
+        final SignatureHelp signatureHelp;
+        final int signatureIndex;
+        final SignatureInformation signature;
+        final String label;
+
+        SignatureContextInformation(SignatureHelp signatureHelp, int signatureIndex)
+        {
+            this.signatureHelp = signatureHelp;
+            this.signatureIndex = signatureIndex;
+            signature = signatureHelp.getSignatures().get(signatureIndex);
+            label = signature.getLabel();
+        }
+
+        @Override
+        public String getContextDisplayString()
+        {
+            return label;
+        }
+
+        @Override
+        public Image getImage()
+        {
+            return null;
+        }
+
+        @Override
+        public String getInformationDisplayString()
+        {
+            return label;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            SignatureContextInformation other = (SignatureContextInformation)obj;
+            return label.equals(other.label);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return label.hashCode();
+        }
+    }
+
+    private class SignatureContextInformationValidator
+        implements IContextInformationValidator, IContextInformationPresenter
+    {
+        private SignatureContextInformation info;
+        private ITextViewer viewer;
+        private SignatureHelp signatureHelp;
+        private ParameterInformation currentParameter;
+        private boolean markActiveParameter;
+
+        @Override
+        public void install(IContextInformation info, ITextViewer viewer, int offset)
+        {
+            this.info = (SignatureContextInformation)info;
+            this.viewer = viewer;
+            signatureHelp = null;
+            currentParameter = null;
+            markActiveParameter = shouldMarkSignatureActiveParameter();
+        }
+
+        @Override
+        public boolean isContextInformationValid(int offset)
+        {
+            signatureHelp = computeSignatureHelp(offset);
+            if (signatureHelp == null)
+                return false;
+
+            return signatureHelp.getSignatures().contains(info.signature);
+        }
+
+        @Override
+        public boolean updatePresentation(int offset, TextPresentation presentation)
+        {
+            if (!markActiveParameter)
+                return false;
+
+            if (signatureHelp == null)
+                signatureHelp = computeSignatureHelp(offset);
+            if (signatureHelp == null)
+            {
+                if (currentParameter == null)
+                    return false;
+
+                presentation.clear();
+                return true;
+            }
+
+            SignatureInformation activeSignature =
+                signatureHelp.getSignatures().get(signatureHelp.getActiveSignature());
+            if (!info.signature.equals(activeSignature))
+            {
+                if (currentParameter == null)
+                    return false;
+
+                presentation.clear();
+                return true;
+            }
+
+            ParameterInformation activeParameter =
+                activeSignature.getParameters().get(signatureHelp.getActiveParameter());
+            if (activeParameter.equals(currentParameter))
+                return false;
+
+            currentParameter = activeParameter;
+
+            Two<Integer, Integer> offsets = getOffsets(activeParameter);
+            if (offsets == null)
+            {
+                presentation.clear();
+                return true;
+            }
+
+            int start = offsets.getFirst();
+            int end = offsets.getSecond();
+
+            presentation.clear();
+
+            if (start > 0)
+                presentation.addStyleRange(new StyleRange(0, start, null, null, SWT.NORMAL));
+
+            if (end > start)
+                presentation.addStyleRange(
+                    new StyleRange(start, end - start, null, null, SWT.BOLD));
+
+            if (end < info.label.length())
+                presentation.addStyleRange(
+                    new StyleRange(end, info.label.length() - end, null, null, SWT.NORMAL));
+
+            return true;
+        }
+
+        private SignatureHelp computeSignatureHelp(int offset)
+        {
+            SignatureHelpContext context = new SignatureHelpContext();
+            context.setTriggerKind(SignatureHelpTriggerKind.ContentChange);
+            context.setIsRetrigger(true);
+            context.setActiveSignatureHelp(info.signatureHelp);
+            info.signatureHelp.setActiveSignature(info.signatureIndex);
+
+            SignatureHelpRequest request = getSignatureHelpRequest(viewer, offset, context);
+            if (request == null)
+                return null;
+
+            SignatureHelp result = request.sendAndReceive();
+            if (result != null)
+                normalize(result);
+            return result;
+        }
+
+        private Two<Integer, Integer> getOffsets(ParameterInformation parameter)
+        {
+            Either<String, Two<Integer, Integer>> label = parameter.getLabel();
+            Two<Integer, Integer> offsets = null;
+            if (label.isRight())
+                offsets = label.getRight();
+            else if (label.isLeft())
+            {
+                int index = info.label.indexOf(label.getLeft());
+                if (index >= 0)
+                    offsets = new Two<>(index, index + label.getLeft().length());
+            }
+            return offsets;
+        }
     }
 }

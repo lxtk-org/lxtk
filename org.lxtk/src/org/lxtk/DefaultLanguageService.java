@@ -266,6 +266,7 @@ public class DefaultLanguageService
 
         SignatureHelpCapabilities signatureHelp = new SignatureHelpCapabilities();
         signatureHelp.setDynamicRegistration(true);
+        signatureHelp.setContextSupport(true);
         signatureHelp.setSignatureInformation(signatureInformation);
         return signatureHelp;
     }
