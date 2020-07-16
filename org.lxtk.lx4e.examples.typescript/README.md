@@ -1,5 +1,5 @@
-LXTK Eclipse Integration Example: TypeScript Editor
-===================================================
+Sample Editor for TypeScript
+============================
 
 This example demonstrates a TypeScript editor based on the [TypeScript language server][1].
 The server is started for a project when the first TypeScript file in the project
