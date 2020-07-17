@@ -32,11 +32,10 @@ import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
+import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.CodeActionRequest;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
-
-import com.google.gson.Gson;
 
 /**
  * Partial implementation of an {@link IMarkerResolutionGenerator2} that computes
@@ -48,8 +47,6 @@ public abstract class AbstractMarkerResolutionGenerator
     implements IMarkerResolutionGenerator2
 {
     private static final IMarkerResolution[] NO_RESOLUTIONS = new IMarkerResolution[0];
-
-    private Gson gson;
 
     @Override
     public boolean hasResolutions(IMarker marker)
@@ -188,9 +185,7 @@ public abstract class AbstractMarkerResolutionGenerator
         String value = marker.getAttribute(diagnosticAttributeName, null);
         if (value == null)
             return null;
-        if (gson == null)
-            gson = new Gson();
-        return gson.fromJson(value, Diagnostic.class);
+        return DefaultGson.INSTANCE.fromJson(value, Diagnostic.class);
     }
 
     /**
