@@ -165,7 +165,7 @@ public class JsonLanguageClient
                 Process process;
                 try
                 {
-                    process = new ProcessBuilder("vscode-json-languageserver", //$NON-NLS-1$
+                    process = new ProcessBuilder("npx", "vscode-json-languageserver", //$NON-NLS-1$ //$NON-NLS-2$
                         "--stdio").start(); //$NON-NLS-1$
                 }
                 catch (IOException e)

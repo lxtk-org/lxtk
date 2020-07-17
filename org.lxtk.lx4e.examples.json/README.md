@@ -5,16 +5,12 @@ This example demonstrates a JSON editor based on the [VSCode JSON language serve
 The server is started when the first JSON file is opened. This example supports
 files in the Eclipse workspace as well as files outside the workspace. Initially,
 the server knows the JSON schema for `package.json` files; other schemas can be
-specified in JSON files using a `$schema` property.
+specified in JSON files using the `$schema` property.
 
-To try the example, install the `vscode-json-languageserver` npm module:
-
-`npm install -g vscode-json-languageserver`
-
-Make sure that `npm bin -g` folder (such as `/usr/local/bin`) is in the `PATH`.
-
-Note that GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by default.
-For details, see [My Mac .apps don’t find /usr/local/bin utilities][2].
+Before you begin, make sure you have [npx][2] installed.
+Note that GUI apps on macOS might have a problem with finding `npx`; see
+[My Mac .apps don’t find /usr/local/bin utilities][3] for how to fix this.
 
 [1]: https://www.npmjs.com/package/vscode-json-languageserver
-[2]: https://docs.brew.sh/FAQ#my-mac-apps-dont-find-usrlocalbin-utilities
+[2]: https://www.npmjs.com/package/npx
+[3]: https://docs.brew.sh/FAQ#my-mac-apps-dont-find-usrlocalbin-utilities

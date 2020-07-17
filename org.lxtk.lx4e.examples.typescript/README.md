@@ -3,20 +3,13 @@ Sample Editor for TypeScript
 
 This example demonstrates a TypeScript editor based on the [TypeScript language server][1].
 The server is started for a project when the first TypeScript file in the project
-is opened. Note that this example does not support external files (files outside
-the Eclipse workspace).
+is opened. Note that this example does not support external files (i.e. files
+outside the Eclipse workspace).
 
-To try the example, install the `typescript` and `typescript-language-server`
-npm modules:
+Before you begin, make sure you have [npx][2] installed.
+Note that GUI apps on macOS might have a problem with finding `npx`; see
+[My Mac .apps don’t find /usr/local/bin utilities][3] for how to fix this.
 
-`npm install -g typescript`
-
-`npm install -g typescript-language-server`
-
-Make sure that `npm bin -g` folder (such as `/usr/local/bin`) is in the `PATH`.
-
-Note that GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by default.
-For details, see [My Mac .apps don’t find /usr/local/bin utilities][2].
-
-[1]: https://github.com/theia-ide/typescript-language-server
-[2]: https://docs.brew.sh/FAQ#my-mac-apps-dont-find-usrlocalbin-utilities
+[1]: https://www.npmjs.com/package/vscode-json-languageserver
+[2]: https://www.npmjs.com/package/npx
+[3]: https://docs.brew.sh/FAQ#my-mac-apps-dont-find-usrlocalbin-utilities

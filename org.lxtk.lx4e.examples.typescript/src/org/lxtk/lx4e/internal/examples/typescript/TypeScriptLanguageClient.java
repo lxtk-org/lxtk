@@ -170,7 +170,7 @@ public class TypeScriptLanguageClient
                 Process process;
                 try
                 {
-                    process = new ProcessBuilder("typescript-language-server", //$NON-NLS-1$
+                    process = new ProcessBuilder("npx", "typescript-language-server", //$NON-NLS-1$ //$NON-NLS-2$
                         "--stdio").start(); //$NON-NLS-1$
                 }
                 catch (IOException e)
