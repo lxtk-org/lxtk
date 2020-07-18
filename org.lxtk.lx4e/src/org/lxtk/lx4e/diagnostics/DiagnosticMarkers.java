@@ -9,6 +9,7 @@
  *
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
+ *     Alexander Kozinko (1C)
  *******************************************************************************/
 package org.lxtk.lx4e.diagnostics;
 
