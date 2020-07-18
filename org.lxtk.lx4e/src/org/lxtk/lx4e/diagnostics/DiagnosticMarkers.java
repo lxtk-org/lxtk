@@ -9,6 +9,7 @@
  *
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
+ *     Alexander Kozinko (1C)
  *******************************************************************************/
 package org.lxtk.lx4e.diagnostics;
 
@@ -40,11 +41,10 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.util.Disposable;
-
-import com.google.gson.Gson;
 
 /**
  * Manages resource markers representing LSP diagnostics.
@@ -84,7 +84,6 @@ public class DiagnosticMarkers
     private final IWorkspace workspace = ResourcesPlugin.getWorkspace();
     private final IResourceChangeListener moveProcessor = new MoveProcessor();
     private final String sourceUuid = UUID.randomUUID().toString();
-    private Gson gson;
 
     /**
      * Constructor.
@@ -254,9 +253,7 @@ public class DiagnosticMarkers
         {
             Activator.logError(e);
         }
-        if (gson == null)
-            gson = new Gson();
-        attributes.put(DIAGNOSTIC_ATTRIBUTE, gson.toJson(diagnostic));
+        attributes.put(DIAGNOSTIC_ATTRIBUTE, DefaultGson.INSTANCE.toJson(diagnostic));
     }
 
     private static int getMarkerSeverity(DiagnosticSeverity severity)

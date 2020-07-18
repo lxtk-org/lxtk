@@ -9,6 +9,7 @@
  *
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
+ *     Alexander Kozinko (1C)
  *******************************************************************************/
 package org.lxtk.lx4e.ui.codeaction;
 
@@ -47,14 +48,13 @@ import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
+import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.CodeActionRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
-
-import com.google.gson.Gson;
 
 /**
  * Partial implementation of an {@link IQuickAssistProcessor} that computes
@@ -64,7 +64,6 @@ public abstract class AbstractQuickAssistProcessor
     implements IQuickAssistProcessor
 {
     private String errorMessage;
-    private Gson gson;
 
     @Override
     public ICompletionProposal[] computeQuickAssistProposals(
@@ -300,9 +299,7 @@ public abstract class AbstractQuickAssistProcessor
         String value = marker.getAttribute(diagnosticAttributeName, null);
         if (value == null)
             return null;
-        if (gson == null)
-            gson = new Gson();
-        return gson.fromJson(value, Diagnostic.class);
+        return DefaultGson.INSTANCE.fromJson(value, Diagnostic.class);
     }
 
     /**
