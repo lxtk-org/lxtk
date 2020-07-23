@@ -37,6 +37,7 @@ import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SignatureInformationCapabilities;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.SymbolKindCapabilities;
+import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.lxtk.util.Registry;
 
 /**
@@ -63,6 +64,7 @@ public class DefaultLanguageService
     private final Registry<ReferenceProvider> referenceProviders = Registry.newInstance();
     private final Registry<RenameProvider> renameProviders = Registry.newInstance();
     private final Registry<SignatureHelpProvider> signatureHelpProviders = Registry.newInstance();
+    private final Registry<TypeDefinitionProvider> typeDefinitionProviders = Registry.newInstance();
 
     @Override
     public CodeActionCapabilities getCodeActionCapabilities()
@@ -275,5 +277,20 @@ public class DefaultLanguageService
     public Registry<SignatureHelpProvider> getSignatureHelpProviders()
     {
         return signatureHelpProviders;
+    }
+
+    @Override
+    public TypeDefinitionCapabilities getTypeDefinitionCapabilities()
+    {
+        TypeDefinitionCapabilities typeDefinition = new TypeDefinitionCapabilities();
+        typeDefinition.setDynamicRegistration(true);
+        typeDefinition.setLinkSupport(true);
+        return typeDefinition;
+    }
+
+    @Override
+    public Registry<TypeDefinitionProvider> getTypeDefinitionProviders()
+    {
+        return typeDefinitionProviders;
     }
 }

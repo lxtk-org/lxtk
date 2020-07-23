@@ -21,6 +21,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
@@ -37,6 +38,7 @@ import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
 import org.lxtk.lx4e.ui.hover.FirstMatchHover;
 import org.lxtk.lx4e.ui.hover.TextHover;
 import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
+import org.lxtk.lx4e.ui.hyperlinks.TypeDefinitionHyperlinkDetector;
 
 /**
  * Configuration for a source viewer which shows TypeScript code.
@@ -118,9 +120,11 @@ public class TypeScriptSourceViewerConfiguration
                 return null;
             }
         };
-        DefinitionHyperlinkDetector definitionHyperlinkDetector = new DefinitionHyperlinkDetector();
-        definitionHyperlinkDetector.setContext(context);
-        return new IHyperlinkDetector[] { definitionHyperlinkDetector };
+        AbstractHyperlinkDetector[] hyperlinkDetectors = new AbstractHyperlinkDetector[] {
+            new DefinitionHyperlinkDetector(), new TypeDefinitionHyperlinkDetector() };
+        for (AbstractHyperlinkDetector hyperlinkDetector : hyperlinkDetectors)
+            hyperlinkDetector.setContext(context);
+        return hyperlinkDetectors;
     }
 
     @Override

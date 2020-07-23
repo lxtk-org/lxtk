@@ -37,6 +37,7 @@ class Messages
     public static String Request_Timeout_occurred__0;
     public static String Request_Timeout_occurred__0__1;
     public static String SignatureHelpRequest_title;
+    public static String TypeDefinitionRequest_title;
     public static String UriHandlers_Cannot_get_buffer;
 
     static

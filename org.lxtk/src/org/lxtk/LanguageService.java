@@ -24,6 +24,7 @@ import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
+import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.lxtk.util.Registry;
 
 /**
@@ -225,4 +226,19 @@ public interface LanguageService
      * @return the registry of signature help providers (never <code>null</code>)
      */
     Registry<SignatureHelpProvider> getSignatureHelpProviders();
+
+    /**
+     * Returns type definition capabilities provided by this service.
+     *
+     * @return type definition capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    TypeDefinitionCapabilities getTypeDefinitionCapabilities();
+
+    /**
+     * Returns the registry of type definition providers for this service.
+     *
+     * @return the registry of type definition providers (never <code>null</code>)
+     */
+    Registry<TypeDefinitionProvider> getTypeDefinitionProviders();
 }

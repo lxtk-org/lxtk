@@ -50,6 +50,7 @@ import org.lxtk.client.ReferencesFeature;
 import org.lxtk.client.RenameFeature;
 import org.lxtk.client.SignatureHelpFeature;
 import org.lxtk.client.TextDocumentSyncFeature;
+import org.lxtk.client.TypeDefinitionFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
 import org.lxtk.lx4e.EclipseLog;
@@ -139,6 +140,7 @@ public class TypeScriptLanguageClient
         features.add(new ReferencesFeature(LANGUAGE_SERVICE));
         features.add(new RenameFeature(LANGUAGE_SERVICE));
         features.add(new SignatureHelpFeature(LANGUAGE_SERVICE));
+        features.add(new TypeDefinitionFeature(LANGUAGE_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
             TypeScriptWorkspaceEditChangeFactory.INSTANCE, features)
         {
