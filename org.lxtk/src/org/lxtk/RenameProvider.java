@@ -51,6 +51,5 @@ public interface RenameProvider
      *  is available
      * @see RenameOptions#getPrepareProvider()
      */
-    CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(
-        PrepareRenameParams params);
+    CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(PrepareRenameParams params);
 }

@@ -102,8 +102,7 @@ public final class SignatureHelpFeature
             }
 
             @Override
-            public CompletableFuture<SignatureHelp> getSignatureHelp(
-                SignatureHelpParams params)
+            public CompletableFuture<SignatureHelp> getSignatureHelp(SignatureHelpParams params)
             {
                 return getLanguageServer().getTextDocumentService().signatureHelp(params);
             }

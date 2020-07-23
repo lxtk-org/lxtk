@@ -48,8 +48,8 @@ public class DefaultDocumentService
         URI uri = normalize(document.getUri());
         if (textDocuments.putIfAbsent(uri, document) != null)
         {
-            throw new IllegalArgumentException("The service already manages a text document with URI " //$NON-NLS-1$
-                + uri);
+            throw new IllegalArgumentException(
+                "The service already manages a text document with URI " + uri); //$NON-NLS-1$
         }
         Disposable result = SafeRun.runWithResult(rollback ->
         {

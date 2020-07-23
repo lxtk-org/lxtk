@@ -266,7 +266,6 @@ public final class EclipseTextDocument
     private void checkNotDisposed()
     {
         if (isDisposed)
-            throw new IllegalStateException("The document has been disposed: " //$NON-NLS-1$
-                + uri);
+            throw new IllegalStateException("The document has been disposed: " + uri); //$NON-NLS-1$
     }
 }
