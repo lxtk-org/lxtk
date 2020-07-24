@@ -70,9 +70,6 @@ public class FoldingRangeFeature
     protected void initialize(ServerCapabilities capabilities,
         List<DocumentFilter> documentSelector)
     {
-        if (documentSelector == null)
-            return;
-
         Either<Boolean, FoldingRangeProviderOptions> capability =
             capabilities.getFoldingRangeProvider();
         if (capability == null

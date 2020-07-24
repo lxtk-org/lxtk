@@ -71,9 +71,6 @@ public final class TypeDefinitionFeature
     protected void initialize(ServerCapabilities capabilities,
         List<DocumentFilter> documentSelector)
     {
-        if (documentSelector == null)
-            return;
-
         Either<Boolean, StaticRegistrationOptions> capability =
             capabilities.getTypeDefinitionProvider();
         if (capability == null

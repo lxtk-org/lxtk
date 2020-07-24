@@ -73,9 +73,6 @@ public class RenameFeature
     protected void initialize(ServerCapabilities capabilities,
         List<DocumentFilter> documentSelector)
     {
-        if (documentSelector == null)
-            return;
-
         Either<Boolean, RenameOptions> capability = capabilities.getRenameProvider();
         if (capability == null
             || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
