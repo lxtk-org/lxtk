@@ -40,6 +40,7 @@ import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
 import org.lxtk.lx4e.ui.hover.FirstMatchHover;
 import org.lxtk.lx4e.ui.hover.TextHover;
 import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
+import org.lxtk.lx4e.ui.hyperlinks.ImplementationHyperlinkDetector;
 import org.lxtk.lx4e.ui.hyperlinks.TypeDefinitionHyperlinkDetector;
 
 /**
@@ -124,8 +125,9 @@ public class TypeScriptSourceViewerConfiguration
                 return null;
             }
         };
-        AbstractHyperlinkDetector[] hyperlinkDetectors = new AbstractHyperlinkDetector[] {
-            new DefinitionHyperlinkDetector(), new TypeDefinitionHyperlinkDetector() };
+        AbstractHyperlinkDetector[] hyperlinkDetectors =
+            new AbstractHyperlinkDetector[] { new DefinitionHyperlinkDetector(),
+                new TypeDefinitionHyperlinkDetector(), new ImplementationHyperlinkDetector() };
         for (AbstractHyperlinkDetector hyperlinkDetector : hyperlinkDetectors)
             hyperlinkDetector.setContext(context);
         return hyperlinkDetectors;

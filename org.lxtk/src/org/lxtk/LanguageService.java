@@ -20,6 +20,7 @@ import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
+import org.eclipse.lsp4j.ImplementationCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
@@ -181,6 +182,21 @@ public interface LanguageService
      * @return the registry of hover providers (never <code>null</code>)
      */
     Registry<HoverProvider> getHoverProviders();
+
+    /**
+     * Returns implementation capabilities provided by this service.
+     *
+     * @return implementation capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    ImplementationCapabilities getImplementationCapabilities();
+
+    /**
+     * Returns the registry of implementation providers for this service.
+     *
+     * @return the registry of implementation providers (never <code>null</code>)
+     */
+    Registry<ImplementationProvider> getImplementationProviders();
 
     /**
      * Returns references capabilities provided by this service.

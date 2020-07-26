@@ -46,6 +46,7 @@ import org.lxtk.client.DocumentSymbolFeature;
 import org.lxtk.client.ExecuteCommandFeature;
 import org.lxtk.client.Feature;
 import org.lxtk.client.HoverFeature;
+import org.lxtk.client.ImplementationFeature;
 import org.lxtk.client.ReferencesFeature;
 import org.lxtk.client.RenameFeature;
 import org.lxtk.client.SignatureHelpFeature;
@@ -137,6 +138,7 @@ public class TypeScriptLanguageClient
         features.add(new DocumentRangeFormattingFeature(LANGUAGE_SERVICE));
         features.add(new DocumentSymbolFeature(LANGUAGE_SERVICE));
         features.add(new HoverFeature(LANGUAGE_SERVICE));
+        features.add(new ImplementationFeature(LANGUAGE_SERVICE));
         features.add(new ReferencesFeature(LANGUAGE_SERVICE));
         features.add(new RenameFeature(LANGUAGE_SERVICE));
         features.add(new SignatureHelpFeature(LANGUAGE_SERVICE));

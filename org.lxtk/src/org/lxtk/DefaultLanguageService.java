@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
+import org.eclipse.lsp4j.ImplementationCapabilities;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.ParameterInformationCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
@@ -61,6 +62,7 @@ public class DefaultLanguageService
     private final Registry<DocumentSymbolProvider> documentSymbolProviders = Registry.newInstance();
     private final Registry<FoldingRangeProvider> foldingRangeProviders = Registry.newInstance();
     private final Registry<HoverProvider> hoverProviders = Registry.newInstance();
+    private final Registry<ImplementationProvider> implementationProviders = Registry.newInstance();
     private final Registry<ReferenceProvider> referenceProviders = Registry.newInstance();
     private final Registry<RenameProvider> renameProviders = Registry.newInstance();
     private final Registry<SignatureHelpProvider> signatureHelpProviders = Registry.newInstance();
@@ -222,6 +224,21 @@ public class DefaultLanguageService
     public Registry<HoverProvider> getHoverProviders()
     {
         return hoverProviders;
+    }
+
+    @Override
+    public ImplementationCapabilities getImplementationCapabilities()
+    {
+        ImplementationCapabilities implementation = new ImplementationCapabilities();
+        implementation.setDynamicRegistration(true);
+        implementation.setLinkSupport(true);
+        return implementation;
+    }
+
+    @Override
+    public Registry<ImplementationProvider> getImplementationProviders()
+    {
+        return implementationProviders;
     }
 
     @Override
