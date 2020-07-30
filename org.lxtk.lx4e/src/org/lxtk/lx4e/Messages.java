@@ -22,6 +22,7 @@ class Messages
     public static String CodeActionRequest_title;
     public static String CompletionRequest_title;
     public static String CompletionResolveRequest_title;
+    public static String DeclarationRequest_title;
     public static String DefinitionRequest_title;
     public static String DocumentFormattingRequest_title;
     public static String DocumentHighlightRequest_title;

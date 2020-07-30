@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItemCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.CompletionItemKindCapabilities;
+import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
@@ -52,6 +53,7 @@ public class DefaultLanguageService
 {
     private final Registry<CodeActionProvider> codeActionProviders = Registry.newInstance();
     private final Registry<CompletionProvider> completionProviders = Registry.newInstance();
+    private final Registry<DeclarationProvider> declarationProviders = Registry.newInstance();
     private final Registry<DefinitionProvider> definitionProviders = Registry.newInstance();
     private final Registry<DocumentFormattingProvider> documentFormattingProviders =
         Registry.newInstance();
@@ -119,6 +121,21 @@ public class DefaultLanguageService
     public Registry<CompletionProvider> getCompletionProviders()
     {
         return completionProviders;
+    }
+
+    @Override
+    public DeclarationCapabilities getDeclarationCapabilities()
+    {
+        DeclarationCapabilities declaration = new DeclarationCapabilities();
+        declaration.setDynamicRegistration(true);
+        declaration.setLinkSupport(true);
+        return declaration;
+    }
+
+    @Override
+    public Registry<DeclarationProvider> getDeclarationProviders()
+    {
+        return declarationProviders;
     }
 
     @Override

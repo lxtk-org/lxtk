@@ -14,6 +14,7 @@ package org.lxtk;
 
 import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
+import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
@@ -75,6 +76,21 @@ public interface LanguageService
      * @return the registry of completion providers (never <code>null</code>)
      */
     Registry<CompletionProvider> getCompletionProviders();
+
+    /**
+     * Returns declaration capabilities provided by this service.
+     *
+     * @return declaration capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    DeclarationCapabilities getDeclarationCapabilities();
+
+    /**
+     * Returns the registry of declaration providers for this service.
+     *
+     * @return the registry of declaration providers (never <code>null</code>)
+     */
+    Registry<DeclarationProvider> getDeclarationProviders();
 
     /**
      * Returns definition capabilities provided by this service.
