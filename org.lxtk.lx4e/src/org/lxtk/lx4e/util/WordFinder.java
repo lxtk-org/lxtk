@@ -19,6 +19,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
+import org.lxtk.lx4e.internal.Activator;
 
 /**
  * Finds the <i>word</i> at a given document offset.
@@ -48,52 +49,69 @@ public class WordFinder
      */
     public IRegion findWord(IDocument document, int offset)
     {
-        int start = -2;
-        int end = -1;
+        return findWord(document, offset, false);
+    }
+
+    /**
+     * Returns the region of the word enclosing the given document offset,
+     * using the given search mode.
+     *
+     * @param document not <code>null</code>
+     * @param offset 0-based
+     * @param strict the search mode:
+     *  <ul>
+     *  <li>in strict mode, the offset must fall strictly within the word region;</li>
+     *  <li>in non-strict mode, the offset may immediately follow the word region,
+     *  i.e., the end offset of the word region may equal <code>offset - 1</code>.</li>
+     *  </ul>
+     * @return the corresponding word region, or <code>null</code> if none
+     */
+    public IRegion findWord(IDocument document, int offset, boolean strict)
+    {
+        int start;
+        int end;
 
         try
         {
-            int pos = offset;
-            char c;
+            if (!strict && offset > 0 && !isWordPart(document.getChar(offset)))
+                --offset;
 
-            while (pos >= 0 && pos < document.getLength())
+            int pos = offset;
+            do
             {
-                c = document.getChar(pos);
-                if (!isWordPart(c))
+                if (!isWordPart(document.getChar(pos)))
                     break;
                 --pos;
             }
+            while (pos >= 0);
 
             start = pos;
 
-            pos = offset;
             int length = document.getLength();
-
-            while (pos < length)
+            pos = offset;
+            do
             {
-                c = document.getChar(pos);
-                if (!isWordPart(c))
+                if (!isWordPart(document.getChar(pos)))
                     break;
                 ++pos;
             }
+            while (pos < length);
 
             end = pos;
         }
-        catch (BadLocationException x)
+        catch (BadLocationException e)
         {
+            Activator.logError(e);
+            return null;
         }
 
-        if (start >= -1 && end > -1)
-        {
-            if (start == offset && end == offset)
-                return new Region(offset, 0);
-            else if (start == offset)
-                return new Region(start, end - start);
-            else
-                return new Region(start + 1, end - start - 1);
-        }
+        if (start == offset && end == offset)
+            return null;
 
-        return null;
+        if (start == offset)
+            return new Region(start, end - start);
+
+        return new Region(start + 1, end - start - 1);
     }
 
     /**
