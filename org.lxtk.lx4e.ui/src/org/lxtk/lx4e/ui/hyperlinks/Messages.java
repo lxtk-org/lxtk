@@ -19,8 +19,13 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.hyperlinks.messages"; //$NON-NLS-1$
 
+    public static String AbstractLocationHyperlinkDetector_Result_label;
     public static String DefinitionHyperlinkDetector_Hyperlink_text;
+    public static String DefinitionHyperlinkDetector_Hyperlink_text2;
+    public static String DefinitionHyperlinkDetector_Result_label;
     public static String TypeDefinitionHyperlinkDetector_Hyperlink_text;
+    public static String TypeDefinitionHyperlinkDetector_Hyperlink_text2;
+    public static String TypeDefinitionHyperlinkDetector_Result_label;
 
     static
     {

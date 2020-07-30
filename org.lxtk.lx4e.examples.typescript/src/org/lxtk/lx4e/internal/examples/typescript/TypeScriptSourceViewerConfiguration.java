@@ -32,7 +32,9 @@ import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationAutoEditStrat
 import org.eclipse.tm4e.ui.text.TMPresentationReconciler;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.lxtk.DocumentService;
 import org.lxtk.LanguageOperationTarget;
+import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
 import org.lxtk.lx4e.ui.hover.FirstMatchHover;
@@ -117,6 +119,8 @@ public class TypeScriptSourceViewerConfiguration
             {
                 if (adapter == LanguageOperationTarget.class)
                     return adapter.cast(getLanguageOperationTarget());
+                if (adapter == DocumentService.class)
+                    return adapter.cast(TypeScriptCore.DOCUMENT_SERVICE);
                 return null;
             }
         };

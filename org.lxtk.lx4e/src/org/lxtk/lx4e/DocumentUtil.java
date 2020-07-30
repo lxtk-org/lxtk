@@ -40,8 +40,7 @@ public class DocumentUtil
      * @param document not <code>null</code>
      * @param offset a zero-based offset in the document
      * @return the corresponding {@link Position} (never <code>null</code>)
-     * @throws BadLocationException if the specified offset is invalid
-     *  in the document
+     * @throws BadLocationException if the specified offset is invalid in the document
      */
     public static Position toPosition(IDocument document, int offset) throws BadLocationException
     {
@@ -56,8 +55,7 @@ public class DocumentUtil
      * @param document not <code>null</code>
      * @param position an LSP position in the document (not <code>null</code>)
      * @return the corresponding offset (zero-based)
-     * @throws BadLocationException if the the specified position is invalid
-     *  in the document
+     * @throws BadLocationException if the the specified position is invalid in the document
      */
     public static int toOffset(IDocument document, Position position) throws BadLocationException
     {
@@ -69,14 +67,38 @@ public class DocumentUtil
     }
 
     /**
+     * Returns the editor column corresponding to the given LSP position.
+     *
+     * @param document not <code>null</code>
+     * @param position an LSP position in the document (not <code>null</code>)
+     * @param tabWidth the number of spaces used to represent the width of a tab character
+     * @return the corresponding editor column (zero-based)
+     * @throws BadLocationException if the the specified position is invalid in the document
+     */
+    public static int getColumn(IDocument document, Position position, int tabWidth)
+        throws BadLocationException
+    {
+        int lineOffset = document.getLineOffset(position.getLine());
+        int characterOffset = lineOffset + position.getCharacter();
+        int column = 0;
+        for (int i = lineOffset; i < characterOffset; i++)
+        {
+            if ('\t' == document.getChar(i))
+                column += tabWidth - (tabWidth == 0 ? 0 : column % tabWidth);
+            else
+                column++;
+        }
+        return column;
+    }
+
+    /**
      * Returns the LSP range corresponding to the given document offset and length.
      *
      * @param document not <code>null</code>
      * @param offset the offset of the range
      * @param length the length of the range
      * @return the corresponding {@link Range} (never <code>null</code>)
-     * @throws BadLocationException if the specified range is invalid
-     *  in the document
+     * @throws BadLocationException if the specified range is invalid in the document
      */
     public static Range toRange(IDocument document, int offset, int length)
         throws BadLocationException
@@ -92,8 +114,7 @@ public class DocumentUtil
      * @param document not <code>null</code>
      * @param range an LSP range in the document (not <code>null</code>)
      * @return the corresponding {@link IRegion} (never <code>null</code>)
-     * @throws BadLocationException if the specified range is invalid
-     *  in the document
+     * @throws BadLocationException if the specified range is invalid in the document
      */
     public static IRegion toRegion(IDocument document, Range range) throws BadLocationException
     {
@@ -108,8 +129,7 @@ public class DocumentUtil
      * @param document not <code>null</code>
      * @param edit an LSP text edit to apply to the document
      *  (not <code>null</code>)
-     * @throws BadLocationException if the specified edit range is invalid
-     *  in the document
+     * @throws BadLocationException if the specified edit range is invalid in the document
      */
     public static void applyEdit(IDocument document, TextEdit edit) throws BadLocationException
     {

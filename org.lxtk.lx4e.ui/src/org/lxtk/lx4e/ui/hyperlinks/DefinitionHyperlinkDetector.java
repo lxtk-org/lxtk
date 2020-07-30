@@ -13,9 +13,11 @@
 package org.lxtk.lx4e.ui.hyperlinks;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
@@ -23,6 +25,7 @@ import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DefinitionProvider;
+import org.lxtk.DocumentService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
@@ -63,6 +66,27 @@ public class DefinitionHyperlinkDetector
         if (++index > 0)
             text += " " + index; //$NON-NLS-1$
         return new LocationHyperlink(region, text, location);
+    }
+
+    @Override
+    protected IHyperlink createHyperlink(ITextViewer textViewer, IRegion region,
+        List<? extends Location> locations)
+    {
+        DocumentService documentService = getAdapter(DocumentService.class);
+        if (documentService == null)
+            return null;
+
+        return new ShowSearchResultHyperlink(region,
+            Messages.DefinitionHyperlinkDetector_Hyperlink_text2, new LocationSearchQuery(locations,
+                getResultLabel(textViewer, region, locations), documentService));
+    }
+
+    @Override
+    protected String getResultLabel(ITextViewer textViewer, IRegion region,
+        List<? extends Location> locations)
+    {
+        return MessageFormat.format(Messages.DefinitionHyperlinkDetector_Result_label,
+            super.getResultLabel(textViewer, region, locations));
     }
 
     /**
