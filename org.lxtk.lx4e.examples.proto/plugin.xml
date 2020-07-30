@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+   Copyright (c) 2020 1C-Soft LLC.
+
+   This program and the accompanying materials are made available under
+   the terms of the Eclipse Public License 2.0 which is available at
+   https://www.eclipse.org/legal/epl-2.0/
+
+   SPDX-License-Identifier: EPL-2.0
+
+   Contributors:
+       Vladimir Piskarev (1C) - initial API and implementation
+-->
+<plugin>
+   <extension
+         id="problem"
+         name="Proto Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            id="org.lxtk.lx4e.examples.proto"
+            name="Proto (LXTK Example)"
+            file-extensions="proto"
+            base-type="org.eclipse.core.runtime.text"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.lxtk.lx4e.internal.examples.proto.ProtoPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            id="org.lxtk.lx4e.examples.proto.editor"
+            name="Proto Editor (LXTK Example)"
+            default="false"
+            class="org.lxtk.lx4e.internal.examples.proto.editor.ProtoEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
+         <contentTypeBinding
+               contentTypeId="org.lxtk.lx4e.examples.proto">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.lxtk.lx4e.examples.proto.editor.scope"
+            parentId="org.eclipse.ui.textEditorScope"
+            name="Editing Proto Source (LXTK Example)"
+            description="Editing Proto Source Context">
+      </context>
+   </extension>
+</plugin>
