@@ -147,6 +147,7 @@
                   <additionalArgument>-tag noimplement:t:Restriction:</additionalArgument>
                   <additionalArgument>-tag noinstantiate:t:Restriction:</additionalArgument>
                   <additionalArgument>-tag noreference:a:Restriction:</additionalArgument>
+                  <additionalArgument>-source 8</additionalArgument>
                   <additionalArgument>-link https://docs.oracle.com/javase/8/docs/api/</additionalArgument>
                 </additionalArguments>
               </javadocOptions>
