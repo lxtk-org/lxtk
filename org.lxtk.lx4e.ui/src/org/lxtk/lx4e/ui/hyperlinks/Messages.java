@@ -22,15 +22,19 @@ class Messages
     public static String AbstractLocationHyperlinkDetector_Result_label;
     public static String DeclarationHyperlinkDetector_Hyperlink_text;
     public static String DeclarationHyperlinkDetector_Hyperlink_text2;
+    public static String DeclarationHyperlinkDetector_Hyperlink_text3;
     public static String DeclarationHyperlinkDetector_Result_label;
     public static String DefinitionHyperlinkDetector_Hyperlink_text;
     public static String DefinitionHyperlinkDetector_Hyperlink_text2;
+    public static String DefinitionHyperlinkDetector_Hyperlink_text3;
     public static String DefinitionHyperlinkDetector_Result_label;
     public static String ImplementationHyperlinkDetector_Hyperlink_text;
     public static String ImplementationHyperlinkDetector_Hyperlink_text2;
+    public static String ImplementationHyperlinkDetector_Hyperlink_text3;
     public static String ImplementationHyperlinkDetector_Result_label;
     public static String TypeDefinitionHyperlinkDetector_Hyperlink_text;
     public static String TypeDefinitionHyperlinkDetector_Hyperlink_text2;
+    public static String TypeDefinitionHyperlinkDetector_Hyperlink_text3;
     public static String TypeDefinitionHyperlinkDetector_Result_label;
 
     static

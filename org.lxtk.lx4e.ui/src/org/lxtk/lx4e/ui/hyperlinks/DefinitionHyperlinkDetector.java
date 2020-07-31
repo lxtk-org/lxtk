@@ -62,9 +62,9 @@ public class DefinitionHyperlinkDetector
     @Override
     protected IHyperlink createHyperlink(IRegion region, Location location, int index)
     {
-        String text = Messages.DefinitionHyperlinkDetector_Hyperlink_text;
-        if (++index > 0)
-            text += " " + index; //$NON-NLS-1$
+        String text = (++index > 0)
+            ? MessageFormat.format(Messages.DefinitionHyperlinkDetector_Hyperlink_text2, index)
+            : Messages.DefinitionHyperlinkDetector_Hyperlink_text;
         return new LocationHyperlink(region, text, location);
     }
 
@@ -77,7 +77,7 @@ public class DefinitionHyperlinkDetector
             return null;
 
         return new ShowSearchResultHyperlink(region,
-            Messages.DefinitionHyperlinkDetector_Hyperlink_text2, new LocationSearchQuery(locations,
+            Messages.DefinitionHyperlinkDetector_Hyperlink_text3, new LocationSearchQuery(locations,
                 getResultLabel(textViewer, region, locations), documentService));
     }
 
