@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,10 +19,10 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.references.messages"; //$NON-NLS-1$
 
+    public static String AbstractFindReferencesHandler_Result_label_pattern;
     public static String ReferenceSearchQuery_Label;
-    public static String ReferenceSearchQuery_Result_label_prefix;
-    public static String ReferenceSearchQuery_Result_label_suffix_plural;
-    public static String ReferenceSearchQuery_Result_label_suffix_singular;
+    public static String ReferenceSearchQuery_Result_label_plural;
+    public static String ReferenceSearchQuery_Result_label_singular;
 
     static
     {

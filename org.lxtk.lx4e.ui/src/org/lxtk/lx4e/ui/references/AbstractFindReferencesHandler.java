@@ -12,10 +12,13 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.references;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -26,16 +29,16 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.lxtk.LanguageOperationTarget;
 import org.lxtk.DocumentService;
+import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.DocumentUtil;
+import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.EditorHelper;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
- * Partial implementation of a handler that creates and runs a {@link
- * ReferenceSearchQuery}.
+ * Partial implementation of a handler that creates and runs a {@link ReferenceSearchQuery}.
  */
 public abstract class AbstractFindReferencesHandler
     extends AbstractHandler
@@ -64,7 +67,13 @@ public abstract class AbstractFindReferencesHandler
         setBaseEnabled(enabled);
     }
 
-    private ReferenceSearchQuery createSearchQuery(Object context)
+    /**
+     * Creates and returns a {@link ReferenceSearchQuery} for the given context.
+     *
+     * @param context may be <code>null</code>
+     * @return the created search query, or <code>null</code> if none
+     */
+    protected ReferenceSearchQuery createSearchQuery(Object context)
     {
         EditorHelper editorHelper = getEditorHelper();
         ITextEditor editor = editorHelper.getTextEditor(context);
@@ -76,9 +85,19 @@ public abstract class AbstractFindReferencesHandler
         IDocument document = editorHelper.getDocument(editor);
         if (document == null)
             return null;
-        String wordAtPosition = wordAt(document, selection.getOffset());
-        if (wordAtPosition == null || wordAtPosition.isEmpty())
+        IRegion wordRegion = findWord(document, selection.getOffset());
+        if (wordRegion == null)
             return null;
+        String wordAtPosition;
+        try
+        {
+            wordAtPosition = document.get(wordRegion.getOffset(), wordRegion.getLength());
+        }
+        catch (BadLocationException e)
+        {
+            Activator.logError(e);
+            return null;
+        }
         Position position;
         try
         {
@@ -86,18 +105,22 @@ public abstract class AbstractFindReferencesHandler
         }
         catch (BadLocationException e)
         {
+            Activator.logError(e);
             return null;
         }
         LanguageOperationTarget target = getLanguageOperationTarget(editor);
         if (target == null)
             return null;
-        return createSearchQuery(target, position, wordAtPosition);
-
+        String fileName = new Path(target.getDocumentUri().getPath()).lastSegment();
+        int column = getColumn(editor, document, wordRegion.getOffset());
+        String resultLabelPattern =
+            MessageFormat.format(Messages.AbstractFindReferencesHandler_Result_label_pattern,
+                wordAtPosition, fileName, position.getLine() + 1, column + 1);
+        return createSearchQuery(target, position, resultLabelPattern);
     }
 
     /**
-     * Returns the corresponding {@link LanguageOperationTarget}
-     * for the given editor.
+     * Returns the corresponding {@link LanguageOperationTarget} for the given editor.
      *
      * @param editor never <code>null</code>
      * @return the corresponding <code>LanguageOperationTarget</code>,
@@ -113,20 +136,28 @@ public abstract class AbstractFindReferencesHandler
     protected abstract DocumentService getDocumentService();
 
     /**
-     * Creates and returns a {@link ReferenceSearchQuery} with the given
-     * parameters.
+     * Creates and returns a {@link ReferenceSearchQuery} for the given parameters.
      *
      * @param target the {@link LanguageOperationTarget} for the search query
      *  (never <code>null</code>)
      * @param position the target text document position (never <code>null</code>)
-     * @param wordAtPosition never <code>null</code>, never empty
+     * @param resultLabelPattern a MessageFormat pattern for the search result label
+     *  (may be <code>null</code> or empty)
      * @return the created search query (not <code>null</code>)
      */
     protected ReferenceSearchQuery createSearchQuery(LanguageOperationTarget target,
-        Position position, String wordAtPosition)
+        Position position, String resultLabelPattern)
     {
-        return new ReferenceSearchQuery(target, position, wordAtPosition, getDocumentService(),
-            true);
+        return new ReferenceSearchQuery(target, position, getDocumentService(), true)
+        {
+            @Override
+            public String getResultLabel(int nMatches)
+            {
+                return resultLabelPattern == null || resultLabelPattern.isEmpty()
+                    ? super.getResultLabel(nMatches)
+                    : MessageFormat.format(resultLabelPattern, super.getResultLabel(nMatches));
+            }
+        };
     }
 
     /**
@@ -151,18 +182,22 @@ public abstract class AbstractFindReferencesHandler
         return DefaultWordFinder.INSTANCE.findWord(document, offset);
     }
 
-    private String wordAt(IDocument document, int offset)
+    private int getColumn(ITextEditor editor, IDocument document, int offset)
     {
-        IRegion wordRegion = findWord(document, offset);
-        if (wordRegion == null)
-            return null;
-        try
+        int column = -1;
+        Integer tabWidth = getEditorHelper().getTabWidth(editor);
+        if (tabWidth != null)
         {
-            return document.get(wordRegion.getOffset(), wordRegion.getLength());
+            try
+            {
+                Position position = DocumentUtil.toPosition(document, offset);
+                column = DocumentUtil.getColumn(document, position, tabWidth);
+            }
+            catch (BadLocationException e)
+            {
+                Activator.logError(e);
+            }
         }
-        catch (BadLocationException e)
-        {
-            return null;
-        }
+        return column;
     }
 }

@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -33,22 +32,19 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.ReferenceProvider;
 import org.lxtk.lx4e.ReferencesRequest;
-import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.AbstractLocationSearchQuery;
+import org.lxtk.lx4e.internal.ui.Activator;
 
 /**
- * Default implementation of an {@link ISearchQuery} that uses a {@link
- * ReferenceProvider} to find references to the symbol denoted by a
- * given text document position.
+ * Default implementation of an {@link ISearchQuery} that uses a {@link ReferenceProvider}
+ * to find references to the symbol denoted by a given text document position.
  */
 public class ReferenceSearchQuery
     extends AbstractLocationSearchQuery
 {
     private final LanguageOperationTarget target;
     private final Position position;
-    private final String wordAtPosition;
     private final boolean includeDeclaration;
-    private final String fileName;
 
     /**
      * Constructor.
@@ -56,22 +52,17 @@ public class ReferenceSearchQuery
      * @param target the {@link LanguageOperationTarget} for this search query
      *  (not <code>null</code>)
      * @param position the target text document position (not <code>null</code>)
-     * @param wordAtPosition not <code>null</code>, not empty
      * @param documentService a {@link DocumentService} (not <code>null</code>)
      * @param includeDeclaration whether to include the declaration of the symbol
      *  denoted by the given text document position
      */
     public ReferenceSearchQuery(LanguageOperationTarget target, Position position,
-        String wordAtPosition, DocumentService documentService, boolean includeDeclaration)
+        DocumentService documentService, boolean includeDeclaration)
     {
         super(documentService);
         this.target = Objects.requireNonNull(target);
         this.position = Objects.requireNonNull(position);
-        if (wordAtPosition.isEmpty())
-            throw new IllegalArgumentException();
-        this.wordAtPosition = wordAtPosition;
         this.includeDeclaration = includeDeclaration;
-        fileName = new Path(target.getDocumentUri().getPath()).lastSegment();
     }
 
     public boolean canRun()
@@ -142,16 +133,8 @@ public class ReferenceSearchQuery
     @Override
     public String getResultLabel(int nMatches)
     {
-        String label = MessageFormat.format(Messages.ReferenceSearchQuery_Result_label_prefix,
-            wordAtPosition, fileName, position.getLine() + 1);
-
-        if (nMatches == 1)
-            label += Messages.ReferenceSearchQuery_Result_label_suffix_singular;
-        else
-            label += MessageFormat.format(Messages.ReferenceSearchQuery_Result_label_suffix_plural,
-                nMatches);
-
-        return label;
+        return nMatches == 1 ? Messages.ReferenceSearchQuery_Result_label_singular
+            : MessageFormat.format(Messages.ReferenceSearchQuery_Result_label_plural, nMatches);
     }
 
     @Override

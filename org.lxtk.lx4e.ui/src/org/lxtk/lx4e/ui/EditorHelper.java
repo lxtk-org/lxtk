@@ -25,6 +25,8 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -186,6 +188,21 @@ public class EditorHelper
         if (editor == null)
             return null;
         return editor.getDocumentProvider().getDocument(editor.getEditorInput());
+    }
+
+    /**
+     * Returns the tab width of the given text editor.
+     *
+     * @param editor may be <code>null</code>
+     * @return the tab width measured in characters, or <code>null</code> if unknown
+     */
+    public Integer getTabWidth(ITextEditor editor)
+    {
+        if (editor == null)
+            return null;
+        Control textWidget = editor.getAdapter(Control.class);
+        return textWidget instanceof StyledText && !textWidget.isDisposed()
+            ? ((StyledText)textWidget).getTabs() : null;
     }
 
     /**
