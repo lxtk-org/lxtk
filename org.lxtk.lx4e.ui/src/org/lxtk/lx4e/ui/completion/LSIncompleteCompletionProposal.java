@@ -549,7 +549,16 @@ class LSIncompleteCompletionProposal
 
                 LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
                 // ui.setExitPolicy(new ExitPolicy(closingCharacter, document));
-                ui.setExitPosition(viewer, insertionOffset + textEdit.getNewText().length(), 0, Integer.MAX_VALUE);
+                List<LinkedPosition> exitPositions = regions.get(String.valueOf(0));
+                int exitOffset = 0;
+                int exitLength = 0;
+                if (exitPositions != null && exitPositions.size() == 1) {
+                    exitOffset = exitPositions.get(0).getOffset();
+                    exitLength = exitPositions.get(0).getLength();
+                } else {
+                    exitOffset = insertionOffset + textEdit.getNewText().length();
+                }
+                ui.setExitPosition(viewer, exitOffset, exitLength, Integer.MAX_VALUE);
                 ui.setCyclingMode(LinkedModeUI.CYCLE_WHEN_NO_PARENT);
                 // ui.setDoContextInfo(true);
                 ui.enter();
