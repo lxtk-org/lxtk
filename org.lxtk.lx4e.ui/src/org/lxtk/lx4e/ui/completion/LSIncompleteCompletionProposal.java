@@ -537,6 +537,15 @@ class LSIncompleteCompletionProposal
             }
 
             if (viewer != null && !regions.isEmpty()) {
+                int exitOffset;
+                List<LinkedPosition> exitPositions = regions.remove(String.valueOf(0));
+                if (exitPositions != null && exitPositions.size() == 1) {
+                    LinkedPosition exitPosition = exitPositions.get(0);
+                    exitOffset = exitPosition.getOffset() + exitPosition.getLength();
+                } else {
+                    exitOffset = insertionOffset + textEdit.getNewText().length();
+                }
+
                 LinkedModeModel model = new LinkedModeModel();
                 for (List<LinkedPosition> positions: regions.values()) {
                     LinkedPositionGroup group = new LinkedPositionGroup();
@@ -549,16 +558,7 @@ class LSIncompleteCompletionProposal
 
                 LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
                 // ui.setExitPolicy(new ExitPolicy(closingCharacter, document));
-                List<LinkedPosition> exitPositions = regions.get(String.valueOf(0));
-                int exitOffset = 0;
-                int exitLength = 0;
-                if (exitPositions != null && exitPositions.size() == 1) {
-                    exitOffset = exitPositions.get(0).getOffset();
-                    exitLength = exitPositions.get(0).getLength();
-                } else {
-                    exitOffset = insertionOffset + textEdit.getNewText().length();
-                }
-                ui.setExitPosition(viewer, exitOffset, exitLength, Integer.MAX_VALUE);
+                ui.setExitPosition(viewer, exitOffset, 0, Integer.MAX_VALUE);
                 ui.setCyclingMode(LinkedModeUI.CYCLE_WHEN_NO_PARENT);
                 // ui.setDoContextInfo(true);
                 ui.enter();
