@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2019 Red Hat Inc. and others.
+ * Copyright (c) 2016, 2020 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -536,16 +536,16 @@ class LSIncompleteCompletionProposal
                 DocumentUtil.applyEdit(document, textEdit);
             }
 
-            if (viewer != null && !regions.isEmpty()) {
-                int exitOffset;
-                List<LinkedPosition> exitPositions = regions.remove(String.valueOf(0));
-                if (exitPositions != null && exitPositions.size() == 1) {
-                    LinkedPosition exitPosition = exitPositions.get(0);
-                    exitOffset = exitPosition.getOffset() + exitPosition.getLength();
-                } else {
-                    exitOffset = insertionOffset + textEdit.getNewText().length();
-                }
+            int exitOffset;
+            List<LinkedPosition> exitPositions = regions.remove(String.valueOf(0));
+            if (exitPositions != null && exitPositions.size() == 1) {
+                LinkedPosition exitPosition = exitPositions.get(0);
+                exitOffset = exitPosition.getOffset() + exitPosition.getLength();
+            } else {
+                exitOffset = insertionOffset + textEdit.getNewText().length();
+            }
 
+            if (viewer != null && !regions.isEmpty()) {
                 LinkedModeModel model = new LinkedModeModel();
                 for (List<LinkedPosition> positions: regions.values()) {
                     LinkedPositionGroup group = new LinkedPositionGroup();
@@ -562,9 +562,10 @@ class LSIncompleteCompletionProposal
                 ui.setCyclingMode(LinkedModeUI.CYCLE_WHEN_NO_PARENT);
                 // ui.setDoContextInfo(true);
                 ui.enter();
+
                 selection = ui.getSelectedRegion();
             } else {
-                selection = new Region(insertionOffset + textEdit.getNewText().length(), 0);
+                selection = new Region(exitOffset, 0);
             }
         } catch (BadLocationException ex) {
             Activator.logError(ex);
