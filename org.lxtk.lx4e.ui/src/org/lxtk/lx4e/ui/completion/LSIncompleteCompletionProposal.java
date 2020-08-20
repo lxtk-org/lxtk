@@ -538,7 +538,7 @@ class LSIncompleteCompletionProposal
 
             if (viewer != null && !regions.isEmpty()) {
                 int exitOffset;
-                List<LinkedPosition> exitPositions = regions.remove(String.valueOf(0));
+                List<LinkedPosition> exitPositions = regions.get(String.valueOf(0));
                 if (exitPositions != null && exitPositions.size() == 1) {
                     LinkedPosition exitPosition = exitPositions.get(0);
                     exitOffset = exitPosition.getOffset() + exitPosition.getLength();
