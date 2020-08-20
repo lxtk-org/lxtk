@@ -557,10 +557,7 @@ class LSIncompleteCompletionProposal
                 model.forceInstall();
 
                 LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
-                // ui.setExitPolicy(new ExitPolicy(closingCharacter, document));
                 ui.setExitPosition(viewer, exitOffset, 0, Integer.MAX_VALUE);
-                ui.setCyclingMode(LinkedModeUI.CYCLE_WHEN_NO_PARENT);
-                // ui.setDoContextInfo(true);
                 ui.enter();
 
                 selection = ui.getSelectedRegion();
