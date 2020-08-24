@@ -30,7 +30,7 @@
     <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
     <qualifierPrefix>v</qualifierPrefix>
     <buildQualifier>${qualifierPrefix}${buildTimestamp}</buildQualifier>
-    <tycho.scmUrl>scm:git:https://github.com/1C-Company/lxtk.git</tycho.scmUrl>
+    <tycho.scmUrl>scm:git:https://github.com/lxtk-org/lxtk.git</tycho.scmUrl>
   </properties>
   <modules>
     <module>../org.lxtk</module>

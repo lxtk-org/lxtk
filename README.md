@@ -1,4 +1,4 @@
-# LXTK: Language Client/Server Toolkit [![Build](https://github.com/1C-Company/lxtk/workflows/build/badge.svg)](https://github.com/1C-Company/lxtk/actions)
+# LXTK: Language Client/Server Toolkit [![Build](https://github.com/lxtk-org/lxtk/workflows/build/badge.svg)](https://github.com/lxtk-org/lxtk/actions)
 
 LXTK is an open source toolkit for implementing *language clients* talking
 to *language servers* according to the [Language Server Protocol][1]. Currently,
