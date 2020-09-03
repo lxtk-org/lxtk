@@ -23,7 +23,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
- * Tries the given hovers in sequence, and uses the first one that fits.
+ * Checks the given hovers in sequence, and uses the first one that fits.
  */
 public class FirstMatchHover
     implements ITextHover, ITextHoverExtension, ITextHoverExtension2

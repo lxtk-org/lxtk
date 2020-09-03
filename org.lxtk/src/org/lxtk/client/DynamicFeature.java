@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 /**
  * Represents a dynamic feature of the language client.
  * <p>
- * <b>Note:</b> Implementations of this interface must be thread-safe.
+ * <b>Note:</b> Implementations of this interface need to be thread-safe.
  * </p>
  *
  * @param <S> server interface type

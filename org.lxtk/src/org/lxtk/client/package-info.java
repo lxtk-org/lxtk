@@ -12,5 +12,20 @@
  *******************************************************************************/
 /**
  * Provides support for implementing Language Server Protocol clients in LXTK.
+ * <p>
+ * The class {@link org.lxtk.client.AbstractLanguageClientController} provides an extensible
+ * framework for controlling a language client talking to a language server according to
+ * the Language Server Protocol. A subclass of that class must return an instance of
+ * {@link org.lxtk.client.AbstractLanguageClient} from the <code>getLanguageClient()</code> method,
+ * which is called by the framework each time a connection to the language server is created using
+ * the connection factory returned from the <code>getConnectionFactory()</code> method.
+ * The <code>AbstractLanguageClient</code> provides partial implementation of a
+ * {@link org.eclipse.lsp4j.services.LanguageClient} that is also a composite
+ * {@link org.lxtk.client.Feature} by containing a given collection of <code>Feature</code>s.
+ * Features that support dynamic registration are represented by the
+ * {@link org.lxtk.client.DynamicFeature} sub-interface. This package provides
+ * a number of <code>DynamicFeature</code> implementations that are integrated
+ * with {@linkplain org.lxtk LXTK Core Services}.
+ * </p>
  */
 package org.lxtk.client;

@@ -12,5 +12,18 @@
  *******************************************************************************/
 /**
  * Provides basic facilities related to connection management in LXTK.
+ * <p>
+ * {@link org.lxtk.util.connect.Connection} is a common interface for connections.
+ * Sub-interface {@link org.lxtk.util.connect.StreamBasedConnection} represents a connection
+ * based on input and output streams. {@link org.lxtk.util.connect.StdioConnection} and
+ * {@link org.lxtk.util.connect.SocketConnection} are two general-purpose implementations
+ * of <code>StreamBasedConnection</code>.
+ * </p>
+ * <p>
+ * {@link org.lxtk.util.connect.Connectable} provides a common interface for connecting,
+ * disconnecting, and monitoring the connection state of <i>connectable</i> objects.
+ * {@link org.lxtk.util.connect.AbstractConnectable} is the root class of all
+ * <code>Connectable</code> objects.
+ * </p>
  */
 package org.lxtk.util.connect;
