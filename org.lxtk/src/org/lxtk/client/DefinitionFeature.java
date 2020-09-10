@@ -39,7 +39,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class DefinitionFeature
-    extends LanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
 {
     private static final String METHOD = "textDocument/definition"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -61,14 +61,13 @@ public final class DefinitionFeature
     }
 
     @Override
-    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
+    void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setDefinition(getLanguageService().getDefinitionCapabilities());
     }
 
     @Override
-    protected void initialize(ServerCapabilities capabilities,
-        List<DocumentFilter> documentSelector)
+    void initialize(ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
     {
         if (documentSelector == null)
             return;
@@ -82,13 +81,13 @@ public final class DefinitionFeature
     }
 
     @Override
-    protected Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
     {
         return TextDocumentRegistrationOptions.class;
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
+    Disposable registerLanguageFeatureProvider(String method,
         TextDocumentRegistrationOptions options)
     {
         return getLanguageService().getDefinitionProviders().add(new DefinitionProvider()

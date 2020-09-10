@@ -41,6 +41,7 @@ class Messages
     public static String SignatureHelpRequest_title;
     public static String TypeDefinitionRequest_title;
     public static String UriHandlers_Cannot_get_buffer;
+    public static String WorkspaceSymbolRequest_title;
 
     static
     {

@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
+import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
@@ -25,12 +26,10 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  *
  * @see LanguageService
  */
+// TODO CodeActionRegistrationOptions is missing in LSP4J
 public interface CodeActionProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
 {
-    // TODO CodeActionRegistrationOptions is missing in LSP4J
-    //CodeActionRegistrationOptions getRegistrationOptions();
-
     /**
      * Requests code actions for the given {@link CodeActionParams}.
      *

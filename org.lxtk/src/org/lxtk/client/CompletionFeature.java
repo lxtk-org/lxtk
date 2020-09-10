@@ -40,7 +40,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class CompletionFeature
-    extends LanguageFeature<CompletionRegistrationOptions>
+    extends TextDocumentLanguageFeature<CompletionRegistrationOptions>
 {
     private static final String METHOD = "textDocument/completion"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -62,14 +62,13 @@ public final class CompletionFeature
     }
 
     @Override
-    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
+    void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setCompletion(getLanguageService().getCompletionCapabilities());
     }
 
     @Override
-    protected void initialize(ServerCapabilities capabilities,
-        List<DocumentFilter> documentSelector)
+    void initialize(ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
     {
         if (documentSelector == null)
             return;
@@ -86,14 +85,13 @@ public final class CompletionFeature
     }
 
     @Override
-    protected Class<CompletionRegistrationOptions> getRegistrationOptionsClass()
+    Class<CompletionRegistrationOptions> getRegistrationOptionsClass()
     {
         return CompletionRegistrationOptions.class;
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
-        CompletionRegistrationOptions options)
+    Disposable registerLanguageFeatureProvider(String method, CompletionRegistrationOptions options)
     {
         return getLanguageService().getCompletionProviders().add(new CompletionProvider()
         {

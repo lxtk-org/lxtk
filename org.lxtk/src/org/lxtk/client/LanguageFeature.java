@@ -17,12 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
-import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.LanguageFeatureProvider;
@@ -32,7 +29,7 @@ import org.lxtk.util.Disposable;
 
 import com.google.gson.JsonElement;
 
-abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
+abstract class LanguageFeature<RO>
     implements DynamicFeature<LanguageServer>
 {
     private final LanguageService languageService;
@@ -54,23 +51,10 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
      *
      * @return the language service (never <code>null</code>)
      */
-    protected final LanguageService getLanguageService()
+    final LanguageService getLanguageService()
     {
         return languageService;
     }
-
-    @Override
-    public final void fillClientCapabilities(ClientCapabilities capabilities)
-    {
-        fillClientCapabilities(ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities));
-    }
-
-    /**
-     * Fills the text document client capabilities this feature implements.
-     *
-     * @param capabilities never <code>null</code>
-     */
-    protected abstract void fillClientCapabilities(TextDocumentClientCapabilities capabilities);
 
     @Override
     public final synchronized void initialize(LanguageServer server,
@@ -89,7 +73,7 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
      *  Feature#initialize(LanguageServer, ServerCapabilities, List)
      *  initialized}
      */
-    protected final LanguageServer getLanguageServer()
+    final LanguageServer getLanguageServer()
     {
         if (languageServer == null)
             throw new IllegalStateException();
@@ -102,7 +86,7 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
      * @param capabilities not <code>null</code>
      * @param documentSelector a default document selector, or <code>null</code>
      */
-    protected abstract void initialize(ServerCapabilities capabilities,
+    abstract void initialize(ServerCapabilities capabilities,
         List<DocumentFilter> documentSelector);
 
     @Override
@@ -115,7 +99,7 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
         Class<RO> optionsClass = getRegistrationOptionsClass();
         RO options = rO instanceof JsonElement
             ? DefaultGson.INSTANCE.fromJson((JsonElement)rO, optionsClass) : optionsClass.cast(rO);
-        if (options == null || options.getDocumentSelector() == null)
+        if (!checkRegistrationOptions(options))
             return;
 
         if (registrations == null)
@@ -136,19 +120,28 @@ abstract class LanguageFeature<RO extends TextDocumentRegistrationOptions>
      *
      * @return the registration options class (never <code>null</code>)
      */
-    protected abstract Class<RO> getRegistrationOptionsClass();
+    abstract Class<RO> getRegistrationOptionsClass();
+
+    /**
+     * Checks the given registration options.
+     *
+     * @param options may be <code>null</code>
+     * @return <code>true</code> if the given options are valid,
+     *  and <code>false</code> otherwise
+     */
+    abstract boolean checkRegistrationOptions(RO options);
 
     /**
      * Contributes a {@link LanguageFeatureProvider} to the language service.
      *
      * @param method one of the methods supported by the feature
      *  (never <code>null</code>)
-     * @param options the corresponding registration options
-     *  (never <code>null</code>)
+     * @param options the corresponding registration options,
+     *  checked by {@link #checkRegistrationOptions(RO)}
      * @return a disposable to remove the registered provider,
      *  or <code>null</code> if no provider was registered
      */
-    protected abstract Disposable registerLanguageFeatureProvider(String method, RO options);
+    abstract Disposable registerLanguageFeatureProvider(String method, RO options);
 
     @Override
     public final synchronized void unregister(Unregistration unregistration)

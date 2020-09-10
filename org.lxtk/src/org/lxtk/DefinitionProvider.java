@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
+import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
@@ -26,7 +27,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * @see LanguageService
  */
 public interface DefinitionProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
 {
     /**
      * Requests definition locations for the symbol denoted by the given text document position.

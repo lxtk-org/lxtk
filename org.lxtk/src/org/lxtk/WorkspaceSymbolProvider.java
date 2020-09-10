@@ -15,27 +15,30 @@ package org.lxtk;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.lsp4j.DeclarationParams;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.LocationLink;
-import org.eclipse.lsp4j.StaticRegistrationOptions;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.lsp4j.WorkspaceSymbolParams;
 
 /**
- * Provides declaration locations for the symbol denoted by a given text document position.
+ * Provides information about project-wide symbols matching a query string.
  *
  * @see LanguageService
  */
-public interface DeclarationProvider
-    extends LanguageFeatureProvider<StaticRegistrationOptions>
+public interface WorkspaceSymbolProvider
+    extends LanguageFeatureProvider<Object>
 {
     /**
-     * Requests declaration locations for the symbol denoted by the given text document position.
+     * Requests information about project-wide symbols matching the given query string.
      *
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    CompletableFuture<
-        Either<List<? extends Location>, List<? extends LocationLink>>> getDeclaration(
-            DeclarationParams params);
+    CompletableFuture<List<? extends SymbolInformation>> getWorkspaceSymbols(
+        WorkspaceSymbolParams params);
+
+    /**
+     * Returns a context object associated with this provider.
+     *
+     * @return the associated context object, or <code>null</code> if none
+     */
+    Object getContext();
 }

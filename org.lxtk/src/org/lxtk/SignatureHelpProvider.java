@@ -24,11 +24,8 @@ import org.eclipse.lsp4j.SignatureHelpRegistrationOptions;
  * @see LanguageService
  */
 public interface SignatureHelpProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<SignatureHelpRegistrationOptions>
 {
-    @Override
-    SignatureHelpRegistrationOptions getRegistrationOptions();
-
     /**
      * Requests signature information for the given text document position.
      *

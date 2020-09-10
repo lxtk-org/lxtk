@@ -24,6 +24,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Control;
@@ -32,6 +33,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.lxtk.DocumentUri;
 import org.lxtk.lx4e.DocumentUtil;
 
 /**
@@ -52,6 +54,34 @@ public class EditorHelper
      */
     protected EditorHelper()
     {
+    }
+
+    /**
+     * Opens an editor for the given location. Selects the location's range in the editor
+     * on a best effort basis.
+     * <p>
+     * If the given page already has an open editor for the location's URI,
+     * that editor is brought to front; otherwise, a new editor is opened.
+     * </p>
+     *
+     * @param page not <code>null</code>
+     * @param location not <code>null</code>
+     * @return an open editor or <code>null</code> if an external editor
+     *  was opened
+     * @throws PartInitException if the editor could not be initialized
+     */
+    public IEditorPart openEditor(IWorkbenchPage page, Location location) throws PartInitException
+    {
+        if (page == null)
+            throw new IllegalArgumentException();
+        if (location == null)
+            throw new IllegalArgumentException();
+
+        IEditorPart editor = openEditor(page, DocumentUri.convert(location.getUri()));
+        if (editor != null)
+            selectTextRange(editor, location.getRange());
+
+        return editor;
     }
 
     /**

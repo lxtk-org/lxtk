@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -52,6 +53,7 @@ import org.lxtk.client.RenameFeature;
 import org.lxtk.client.SignatureHelpFeature;
 import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.client.TypeDefinitionFeature;
+import org.lxtk.client.WorkspaceSymbolFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
 import org.lxtk.lx4e.EclipseLog;
@@ -69,6 +71,7 @@ public class TypeScriptLanguageClient
 {
     static final String MARKER_TYPE = "org.lxtk.lx4e.examples.typescript.problem"; //$NON-NLS-1$
 
+    private final IProject project;
     private final Log log;
     private final List<DocumentFilter> documentSelector;
     private final String rootUri;
@@ -86,6 +89,7 @@ public class TypeScriptLanguageClient
      */
     public TypeScriptLanguageClient(IProject project)
     {
+        this.project = Objects.requireNonNull(project);
         log = new EclipseLog(Activator.getDefault().getBundle(),
             "typescript-language-client:" + project.getName());
         IPath location = project.getLocation();
@@ -143,6 +147,7 @@ public class TypeScriptLanguageClient
         features.add(new RenameFeature(LANGUAGE_SERVICE));
         features.add(new SignatureHelpFeature(LANGUAGE_SERVICE));
         features.add(new TypeDefinitionFeature(LANGUAGE_SERVICE));
+        features.add(new WorkspaceSymbolFeature(LANGUAGE_SERVICE, project));
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
             TypeScriptWorkspaceEditChangeFactory.INSTANCE, features)
         {

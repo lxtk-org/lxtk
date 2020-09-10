@@ -95,6 +95,13 @@
             name="Source">
       </category>
       <command
+            id="org.lxtk.lx4e.examples.typescript.openSymbol"
+            categoryId="org.eclipse.ui.category.navigate"
+            name="Open Symbol (TypeScript)"
+            description="Show a list of project-wide symbols"
+            defaultHandler="org.lxtk.lx4e.internal.examples.typescript.TypeScriptSymbolSelectionHandler">
+      </command>
+      <command
             id="org.lxtk.lx4e.examples.typescript.editor.quickOutline"
             categoryId="org.eclipse.ui.category.navigate"
             name="Quick Outline"
@@ -125,6 +132,12 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
+      <key
+            sequence="M2+M3+Y"
+            commandId="org.lxtk.lx4e.examples.typescript.openSymbol"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
       <key
             sequence="M1+O"
             commandId="org.lxtk.lx4e.examples.typescript.editor.quickOutline"

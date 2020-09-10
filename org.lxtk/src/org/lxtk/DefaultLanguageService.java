@@ -37,6 +37,7 @@ import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SignatureInformationCapabilities;
+import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.SymbolKindCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
@@ -69,6 +70,8 @@ public class DefaultLanguageService
     private final Registry<RenameProvider> renameProviders = Registry.newInstance();
     private final Registry<SignatureHelpProvider> signatureHelpProviders = Registry.newInstance();
     private final Registry<TypeDefinitionProvider> typeDefinitionProviders = Registry.newInstance();
+    private final Registry<WorkspaceSymbolProvider> workspaceSymbolProviders =
+        Registry.newInstance();
 
     @Override
     public CodeActionCapabilities getCodeActionCapabilities()
@@ -326,5 +329,23 @@ public class DefaultLanguageService
     public Registry<TypeDefinitionProvider> getTypeDefinitionProviders()
     {
         return typeDefinitionProviders;
+    }
+
+    @Override
+    public SymbolCapabilities getWorkspaceSymbolCapabilities()
+    {
+        SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
+        symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
+
+        SymbolCapabilities workspaceSymbol = new SymbolCapabilities();
+        workspaceSymbol.setDynamicRegistration(true);
+        workspaceSymbol.setSymbolKind(symbolKind);
+        return workspaceSymbol;
+    }
+
+    @Override
+    public Registry<WorkspaceSymbolProvider> getWorkspaceSymbolProviders()
+    {
+        return workspaceSymbolProviders;
     }
 }

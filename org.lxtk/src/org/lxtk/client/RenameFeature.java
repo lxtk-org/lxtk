@@ -42,7 +42,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public class RenameFeature
-    extends LanguageFeature<RenameOptions>
+    extends TextDocumentLanguageFeature<RenameOptions>
 {
     private static final String METHOD = "textDocument/rename"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -64,14 +64,13 @@ public class RenameFeature
     }
 
     @Override
-    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
+    void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setRename(getLanguageService().getRenameCapabilities());
     }
 
     @Override
-    protected void initialize(ServerCapabilities capabilities,
-        List<DocumentFilter> documentSelector)
+    void initialize(ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
     {
         Either<Boolean, RenameOptions> capability = capabilities.getRenameProvider();
         if (capability == null
@@ -99,13 +98,13 @@ public class RenameFeature
     }
 
     @Override
-    protected Class<RenameOptions> getRegistrationOptionsClass()
+    Class<RenameOptions> getRegistrationOptionsClass()
     {
         return RenameOptions.class;
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method, RenameOptions options)
+    Disposable registerLanguageFeatureProvider(String method, RenameOptions options)
     {
         return getLanguageService().getRenameProviders().add(new RenameProvider()
         {

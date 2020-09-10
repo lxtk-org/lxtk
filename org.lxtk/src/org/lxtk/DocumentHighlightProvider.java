@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.DocumentHighlightParams;
+import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 
 /**
  * Provides {@link DocumentHighlight}s for a given text document position.
@@ -24,7 +25,7 @@ import org.eclipse.lsp4j.DocumentHighlightParams;
  * @see LanguageService
  */
 public interface DocumentHighlightProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
 {
     /**
      * Requests document highlights for the given text document position.

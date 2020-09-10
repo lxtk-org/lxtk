@@ -40,7 +40,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class TypeDefinitionFeature
-    extends LanguageFeature<StaticRegistrationOptions>
+    extends TextDocumentLanguageFeature<StaticRegistrationOptions>
 {
     private static final String METHOD = "textDocument/typeDefinition"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -62,14 +62,13 @@ public final class TypeDefinitionFeature
     }
 
     @Override
-    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
+    void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setTypeDefinition(getLanguageService().getTypeDefinitionCapabilities());
     }
 
     @Override
-    protected void initialize(ServerCapabilities capabilities,
-        List<DocumentFilter> documentSelector)
+    void initialize(ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
     {
         Either<Boolean, StaticRegistrationOptions> capability =
             capabilities.getTypeDefinitionProvider();
@@ -96,14 +95,13 @@ public final class TypeDefinitionFeature
     }
 
     @Override
-    protected Class<StaticRegistrationOptions> getRegistrationOptionsClass()
+    Class<StaticRegistrationOptions> getRegistrationOptionsClass()
     {
         return StaticRegistrationOptions.class;
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
-        StaticRegistrationOptions options)
+    Disposable registerLanguageFeatureProvider(String method, StaticRegistrationOptions options)
     {
         return getLanguageService().getTypeDefinitionProviders().add(new TypeDefinitionProvider()
         {

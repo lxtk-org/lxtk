@@ -39,7 +39,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public class FoldingRangeFeature
-    extends LanguageFeature<FoldingRangeProviderOptions>
+    extends TextDocumentLanguageFeature<FoldingRangeProviderOptions>
 {
     private static final String METHOD = "textDocument/foldingRange"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -61,14 +61,13 @@ public class FoldingRangeFeature
     }
 
     @Override
-    protected void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
+    void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
         capabilities.setFoldingRange(capabilities.getFoldingRange());
     }
 
     @Override
-    protected void initialize(ServerCapabilities capabilities,
-        List<DocumentFilter> documentSelector)
+    void initialize(ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
     {
         Either<Boolean, FoldingRangeProviderOptions> capability =
             capabilities.getFoldingRangeProvider();
@@ -95,14 +94,13 @@ public class FoldingRangeFeature
     }
 
     @Override
-    protected Class<FoldingRangeProviderOptions> getRegistrationOptionsClass()
+    Class<FoldingRangeProviderOptions> getRegistrationOptionsClass()
     {
         return FoldingRangeProviderOptions.class;
     }
 
     @Override
-    protected Disposable registerLanguageFeatureProvider(String method,
-        FoldingRangeProviderOptions options)
+    Disposable registerLanguageFeatureProvider(String method, FoldingRangeProviderOptions options)
     {
         return getLanguageService().getFoldingRangeProviders().add(new FoldingRangeProvider()
         {

@@ -26,6 +26,7 @@ import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
+import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.lxtk.util.Registry;
 
@@ -273,4 +274,19 @@ public interface LanguageService
      * @return the registry of type definition providers (never <code>null</code>)
      */
     Registry<TypeDefinitionProvider> getTypeDefinitionProviders();
+
+    /**
+     * Returns workspace symbol capabilities provided by this service.
+     *
+     * @return workspace symbol capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    SymbolCapabilities getWorkspaceSymbolCapabilities();
+
+    /**
+     * Returns the registry of workspace symbol providers for this service.
+     *
+     * @return the registry of workspace symbol providers (never <code>null</code>)
+     */
+    Registry<WorkspaceSymbolProvider> getWorkspaceSymbolProviders();
 }

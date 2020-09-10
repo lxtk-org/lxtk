@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
@@ -26,7 +27,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * @see LanguageService
  */
 public interface DocumentSymbolProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
 {
     /**
      * Requests information about symbols defined in the given text document.

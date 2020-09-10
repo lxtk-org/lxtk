@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 
 import org.lxtk.LanguageFeatureProvider;
 
-abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider, S, T>
+abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider<?>, S, T>
     extends Request<T>
 {
     private R provider;

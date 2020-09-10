@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,13 +16,11 @@ import java.util.Objects;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.lxtk.DocumentUri;
-import org.lxtk.lx4e.internal.ui.Activator;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.EditorHelper;
 
@@ -65,17 +63,15 @@ public class LocationHyperlink
         if (page == null)
             return;
         EditorHelper editorHelper = getEditorHelper();
-        IEditorPart editor = null;
         try
         {
-            editor = editorHelper.openEditor(page, DocumentUri.convert(location.getUri()));
+            editorHelper.openEditor(page, location);
         }
         catch (PartInitException e)
         {
-            Activator.logError(e);
+            StatusManager.getManager().handle(e.getStatus(),
+                StatusManager.LOG | StatusManager.SHOW);
         }
-        if (editor != null)
-            editorHelper.selectTextRange(editor, location.getRange());
     }
 
     /**

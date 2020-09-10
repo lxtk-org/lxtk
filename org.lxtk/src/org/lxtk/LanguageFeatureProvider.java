@@ -20,27 +20,29 @@ import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 /**
  * Common interface for language feature providers.
  *
+ * @param <RO> registration options type
  * @see LanguageService
  */
-public interface LanguageFeatureProvider
+public interface LanguageFeatureProvider<RO>
 {
     /**
      * Returns registration options for this provider.
      *
-     * @return registration options (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     * @return registration options. Clients <b>must not</b> modify the returned object
      */
-    TextDocumentRegistrationOptions getRegistrationOptions();
+    RO getRegistrationOptions();
 
     /**
      * Returns the document selector for this provider.
-     * Shortcut to <code>getRegistrationOptions().getDocumentSelector()</code>.
      *
      * @return the document selector, or <code>null</code> if none.
      *  Clients <b>must not</b> modify the returned list or any of its elements
      */
     default List<DocumentFilter> getDocumentSelector()
     {
-        return getRegistrationOptions().getDocumentSelector();
+        RO registrationOptions = getRegistrationOptions();
+        if (registrationOptions instanceof TextDocumentRegistrationOptions)
+            return ((TextDocumentRegistrationOptions)registrationOptions).getDocumentSelector();
+        return null;
     }
 }

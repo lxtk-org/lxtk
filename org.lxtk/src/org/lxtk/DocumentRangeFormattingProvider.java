@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentRangeFormattingParams;
+import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.TextEdit;
 
 /**
@@ -24,7 +25,7 @@ import org.eclipse.lsp4j.TextEdit;
  * @see LanguageService
  */
 public interface DocumentRangeFormattingProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
 {
     /**
      * Requests formatting edits for the given {@link DocumentRangeFormattingParams}.

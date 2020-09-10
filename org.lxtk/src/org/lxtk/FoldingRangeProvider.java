@@ -25,11 +25,8 @@ import org.eclipse.lsp4j.FoldingRangeRequestParams;
  * @see LanguageService
  */
 public interface FoldingRangeProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<FoldingRangeProviderOptions>
 {
-    @Override
-    FoldingRangeProviderOptions getRegistrationOptions();
-
     /**
      * Requests folding ranges found in the given text document.
      *

@@ -27,11 +27,8 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * @see LanguageService
  */
 public interface CompletionProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<CompletionRegistrationOptions>
 {
-    @Override
-    CompletionRegistrationOptions getRegistrationOptions();
-
     /**
      * Requests completion items for the given {@link CompletionParams}.
      *

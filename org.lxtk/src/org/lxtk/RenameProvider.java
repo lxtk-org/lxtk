@@ -29,11 +29,8 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * @see LanguageService
  */
 public interface RenameProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<RenameOptions>
 {
-    @Override
-    RenameOptions getRegistrationOptions();
-
     /**
      * Requests the workspace edit for the given {@link RenameParams}.
      *

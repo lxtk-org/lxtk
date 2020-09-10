@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
+import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 
 /**
  * Provides hover information for a given text document position.
@@ -23,7 +24,7 @@ import org.eclipse.lsp4j.HoverParams;
  * @see LanguageService
  */
 public interface HoverProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
 {
     /**
      * Requests hover information for the given text document position.

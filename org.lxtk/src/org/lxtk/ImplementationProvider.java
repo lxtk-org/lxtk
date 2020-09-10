@@ -27,11 +27,8 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * @see LanguageService
  */
 public interface ImplementationProvider
-    extends LanguageFeatureProvider
+    extends LanguageFeatureProvider<StaticRegistrationOptions>
 {
-    @Override
-    StaticRegistrationOptions getRegistrationOptions();
-
     /**
      * Requests implementation locations for the symbol denoted by the given text document position.
      *
