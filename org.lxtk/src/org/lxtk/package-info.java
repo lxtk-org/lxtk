@@ -25,6 +25,8 @@
  * <p>
  * {@link org.lxtk.DocumentService} provides support for document management.
  * Text documents are represented by the {@link org.lxtk.TextDocument} interface.
+ * </p>
+ * <p>
  * {@link org.lxtk.DefaultDocumentService} provides a general-purpose implementation
  * of the service.
  * </p>
@@ -33,14 +35,29 @@
  * {@link org.lxtk.LanguageService} provides support for participating in language-specific
  * editing features, like code completion, code actions, rename, etc. Each feature provider is
  * represented by a corresponding sub-interface of the {@link org.lxtk.LanguageFeatureProvider}
- * interface. {@link org.lxtk.DefaultLanguageService} provides a general-purpose implementation
+ * interface.
+ * </p>
+ * <p>
+ * {@link org.lxtk.DefaultLanguageService} provides a general-purpose implementation
  * of the service.
  * </p>
  * <h2>Command Service</h2>
  * <p>
  * {@link org.lxtk.CommandService} provides support for command management. A command is a
- * {@link org.lxtk.CommandHandler} with a unique identifier. {@link org.lxtk.DefaultCommandService}
- * provides a general-purpose implementation of the service.
+ * {@link org.lxtk.CommandHandler} with a unique identifier.
+ * </p>
+ * <p>
+ * {@link org.lxtk.DefaultCommandService} provides a general-purpose implementation
+ * of the service.
+ * </p>
+ * <h2>Workspace Service</h2>
+ * <p>
+ * {@link org.lxtk.WorkspaceService} provides support for workspace management. A workspace contains
+ * a collection of {@link org.lxtk.WorkspaceFolder} objects.
+ * </p>
+ * <p>
+ * {@link org.lxtk.DefaultWorkspaceService} provides a general-purpose implementation
+ * of the service.
  * </p>
  */
 package org.lxtk;

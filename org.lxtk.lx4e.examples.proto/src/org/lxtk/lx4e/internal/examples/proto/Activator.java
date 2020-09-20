@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal.examples.proto;
 
+import static org.lxtk.lx4e.examples.proto.ProtoCore.WORKSPACE_SERVICE;
 import static org.lxtk.util.connect.Connectable.ConnectionState.DISCONNECTED;
 
 import java.util.function.Consumer;
@@ -24,6 +25,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.lxtk.lx4e.WorkspaceFoldersManager;
 import org.lxtk.util.SafeRun;
 import org.lxtk.util.connect.Connectable;
 import org.osgi.framework.BundleContext;
@@ -57,6 +59,11 @@ public class Activator
 
         SafeRun.run(rollback ->
         {
+            WorkspaceFoldersManager workspaceFoldersManager =
+                new WorkspaceFoldersManager(WORKSPACE_SERVICE);
+            workspaceFoldersManager.startup();
+            rollback.add(() -> workspaceFoldersManager.shutdown());
+
             languageClient = new ProtoLanguageClient();
             languageClient.connect();
             rollback.add(() ->

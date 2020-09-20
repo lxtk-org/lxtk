@@ -35,9 +35,11 @@ import org.eclipse.lsp4j.RegistrationParams;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.UnregistrationParams;
+import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentUri;
+import org.lxtk.WorkspaceService;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.Log;
@@ -95,6 +97,16 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
                     dynamicFeatures.put(method, dynamicFeature);
             }
         }
+    }
+
+    /**
+     * Returns the workspace service associated with this client.
+     *
+     * @return the associated workspace service, or <code>null</code> if none
+     */
+    public WorkspaceService getWorkspaceService()
+    {
+        return null;
     }
 
     @Override
@@ -193,6 +205,18 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         default:
             log().info(params.getMessage());
         }
+    }
+
+    @Override
+    public CompletableFuture<List<WorkspaceFolder>> workspaceFolders()
+    {
+        return CompletableFuture.supplyAsync(() ->
+        {
+            WorkspaceService workspaceService = getWorkspaceService();
+            if (workspaceService == null)
+                throw new UnsupportedOperationException();
+            return org.lxtk.WorkspaceFolder.toProtocol(workspaceService.getWorkspaceFolders());
+        });
     }
 
     @Override

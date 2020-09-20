@@ -36,7 +36,7 @@ public interface WorkspaceSymbolProvider
         WorkspaceSymbolParams params);
 
     /**
-     * Returns a context object associated with this provider.
+     * Returns the context object associated with this provider.
      *
      * @return the associated context object, or <code>null</code> if none
      */

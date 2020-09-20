@@ -23,6 +23,8 @@
  * to the {@link org.eclipse.core.runtime.ILog} of a given Eclipse bundle</li>
  * <li>{@link org.lxtk.lx4e.ResourceWatchFeature} notifies the language server about
  * Eclipse resource changes</li>
+ * <li>{@link org.lxtk.lx4e.WorkspaceFoldersManager} manages a mapping from the Eclipse workspace
+ * to the workspace folders of a {@link org.lxtk.WorkspaceService}</li>
  * </ul>
  *
  * <h2>URI Handlers</h2>

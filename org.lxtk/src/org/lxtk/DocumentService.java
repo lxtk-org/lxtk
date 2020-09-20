@@ -36,14 +36,14 @@ public interface DocumentService
     }
 
     /**
-     * Adds a text document to the list of documents managed by this service.
+     * Adds a text document to the collection of documents managed by this service.
      * <p>
      * If the service already manages a text document with an equivalent URI,
      * a runtime exception is thrown.
      * </p>
      *
      * @param document not <code>null</code>
-     * @return a disposable to remove the document from the list of documents
+     * @return a disposable to remove the document from the collection of documents
      *  managed by this service (never <code>null</code>)
      */
     Disposable addTextDocument(TextDocument document);
@@ -51,9 +51,9 @@ public interface DocumentService
     /**
      * Returns all text documents currently managed by this service.
      * <p>
-     * This method must not try to obtain any kind of lock that might conflict
-     * with any locks held while firing didAddTextDocument, didRemoveTextDocument,
-     * didChangeTextDocument, or didSaveTextDocument events.
+     * This method must not try to acquire any kind of lock that might conflict
+     * with any locks held during didAddTextDocument, didRemoveTextDocument,
+     * didChangeTextDocument, or didSaveTextDocument event notification.
      * </p>
      *
      * @return all text documents currently managed by the service
@@ -66,9 +66,9 @@ public interface DocumentService
      * Returns the text document that is managed by this service and
      * has the URI equivalent to the given URI.
      * <p>
-     * This method must not try to obtain any kind of lock that might conflict
-     * with any locks held while firing didAddTextDocument, didRemoveTextDocument,
-     * didChangeTextDocument, or didSaveTextDocument events.
+     * This method must not try to acquire any kind of lock that might conflict
+     * with any locks held during didAddTextDocument, didRemoveTextDocument,
+     * didChangeTextDocument, or didSaveTextDocument event notification.
      * </p>
      *
      * @param uri may be <code>null</code>, in which case <code>null</code>
@@ -79,7 +79,7 @@ public interface DocumentService
 
     /**
      * Returns an event emitter firing when a text document is added
-     * to the list of documents managed by this service.
+     * to the collection of documents managed by this service.
      *
      * @return an event emitter firing when a text document is added
      *  (never <code>null</code>)
@@ -88,7 +88,7 @@ public interface DocumentService
 
     /**
      * Returns an event emitter firing when a text document is removed
-     * from the list of documents managed by this service.
+     * from the collection of documents managed by this service.
      *
      * @return an event emitter firing when a text document is removed
      *  (never <code>null</code>)
@@ -101,7 +101,7 @@ public interface DocumentService
      * <p>
      * These events may be fired even before firing {@link #onDidAddTextDocument()}
      * or after firing {@link #onDidRemoveTextDocument()} for a text document.
-     * This provision is to avoid a possibility of a blindspot where some
+     * This provision is to avoid a possibility of a blind-spot where some
      * change events might have escaped a client due to a race condition.
      * </p>
      *

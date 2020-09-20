@@ -13,8 +13,10 @@
 package org.lxtk.lx4e.examples.proto;
 
 import org.lxtk.DefaultDocumentService;
+import org.lxtk.DefaultWorkspaceService;
 import org.lxtk.DocumentService;
 import org.lxtk.LanguageService;
+import org.lxtk.WorkspaceService;
 import org.lxtk.lx4e.EclipseLanguageService;
 
 /**
@@ -36,6 +38,11 @@ public class ProtoCore
      * Proto language identifier.
      */
     public static final String LANGUAGE_ID = "proto"; //$NON-NLS-1$
+
+    /**
+     * Proto workspace service.
+     */
+    public static final WorkspaceService WORKSPACE_SERVICE = new DefaultWorkspaceService();
 
     private ProtoCore()
     {

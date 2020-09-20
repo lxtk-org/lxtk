@@ -15,6 +15,7 @@ package org.lxtk.lx4e.internal.examples.proto;
 import static org.lxtk.lx4e.examples.proto.ProtoCore.DOCUMENT_SERVICE;
 import static org.lxtk.lx4e.examples.proto.ProtoCore.LANGUAGE_ID;
 import static org.lxtk.lx4e.examples.proto.ProtoCore.LANGUAGE_SERVICE;
+import static org.lxtk.lx4e.examples.proto.ProtoCore.WORKSPACE_SERVICE;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -27,12 +28,14 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.lxtk.WorkspaceService;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
 import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.Feature;
 import org.lxtk.client.TextDocumentSyncFeature;
+import org.lxtk.client.WorkspaceFoldersFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
 import org.lxtk.lx4e.EclipseLog;
@@ -92,9 +95,16 @@ public class ProtoLanguageClient
         Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
         features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE));
         features.add(new CompletionFeature(LANGUAGE_SERVICE));
+        features.add(new WorkspaceFoldersFeature(WORKSPACE_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
             new WorkspaceEditChangeFactory(DOCUMENT_SERVICE), features)
         {
+            @Override
+            public WorkspaceService getWorkspaceService()
+            {
+                return WORKSPACE_SERVICE;
+            }
+
             @Override
             public void fillInitializeParams(InitializeParams params)
             {
