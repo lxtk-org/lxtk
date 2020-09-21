@@ -22,6 +22,8 @@
  * The <code>AbstractLanguageClient</code> provides partial implementation of a
  * {@link org.eclipse.lsp4j.services.LanguageClient} that is also a composite
  * {@link org.lxtk.client.Feature} by containing a given collection of <code>Feature</code>s.
+ * This feature-based design of the language client is similar to the design used in
+ * <a href="https://github.com/microsoft/vscode-languageserver-node">vscode-languageserver-node</a>.
  * Features that support dynamic registration are represented by the
  * {@link org.lxtk.client.DynamicFeature} sub-interface. This package provides
  * a number of <code>DynamicFeature</code> implementations that are integrated
