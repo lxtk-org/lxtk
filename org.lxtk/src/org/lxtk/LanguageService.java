@@ -13,6 +13,7 @@
 package org.lxtk;
 
 import org.eclipse.lsp4j.CodeActionCapabilities;
+import org.eclipse.lsp4j.CodeLensCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
@@ -62,6 +63,21 @@ public interface LanguageService
      * @return the registry of code action providers (never <code>null</code>)
      */
     Registry<CodeActionProvider> getCodeActionProviders();
+
+    /**
+     * Returns code lens capabilities provided by this service.
+     *
+     * @return code lens capabilities (never <code>null</code>).
+     *  Clients <b>must not</b> modify the returned object
+     */
+    CodeLensCapabilities getCodeLensCapabilities();
+
+    /**
+     * Returns the registry of code lens providers for this service.
+     *
+     * @return the registry of code lens providers (never <code>null</code>)
+     */
+    Registry<CodeLensProvider> getCodeLensProviders();
 
     /**
      * Returns completion capabilities provided by this service.

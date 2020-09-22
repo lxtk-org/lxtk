@@ -18,6 +18,7 @@ import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CodeActionKind;
 import org.eclipse.lsp4j.CodeActionKindCapabilities;
 import org.eclipse.lsp4j.CodeActionLiteralSupportCapabilities;
+import org.eclipse.lsp4j.CodeLensCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItemCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
@@ -53,6 +54,7 @@ public class DefaultLanguageService
     implements LanguageService
 {
     private final Registry<CodeActionProvider> codeActionProviders = Registry.newInstance();
+    private final Registry<CodeLensProvider> codeLensProviders = Registry.newInstance();
     private final Registry<CompletionProvider> completionProviders = Registry.newInstance();
     private final Registry<DeclarationProvider> declarationProviders = Registry.newInstance();
     private final Registry<DefinitionProvider> definitionProviders = Registry.newInstance();
@@ -96,6 +98,20 @@ public class DefaultLanguageService
     public Registry<CodeActionProvider> getCodeActionProviders()
     {
         return codeActionProviders;
+    }
+
+    @Override
+    public CodeLensCapabilities getCodeLensCapabilities()
+    {
+        CodeLensCapabilities codeLens = new CodeLensCapabilities();
+        codeLens.setDynamicRegistration(true);
+        return codeLens;
+    }
+
+    @Override
+    public Registry<CodeLensProvider> getCodeLensProviders()
+    {
+        return codeLensProviders;
     }
 
     @Override
