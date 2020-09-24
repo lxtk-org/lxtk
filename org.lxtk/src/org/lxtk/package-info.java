@@ -20,8 +20,10 @@
  * <p>
  * LXTK Core Services are the primary entry points to the LXTK Core Framework.
  * Rather than exposing LSP4J services directly, LXTK provides its own service layer.
- * This is somewhat similar to the Extension API of Visual Studio Code, but is more tailored
- * to LSP specifically. In particular, LXTK API directly reuses data types of LSP4J.
+ * This layer is somewhat similar to the Extension API of Visual Studio Code, but is tailored
+ * specifically to LSP. In particular, LXTK API directly reuses protocol data types of LSP4J.
+ * </p>
+ * <p>
  * Here are brief descriptions of the provided services.
  * </p>
  * <h2>Document Service</h2>
