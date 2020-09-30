@@ -96,15 +96,14 @@ public abstract class AbstractCodeActionMenu
         if (result == null || result.isEmpty())
             return noItems();
 
-        CommandService commandService = provider.getCommandService();
         List<IContributionItem> items = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
         {
             IAction action = null;
             if (item.isLeft())
-                action = getAction(item.getLeft(), commandService);
+                action = getAction(item.getLeft(), provider);
             else if (item.isRight())
-                action = getAction(item.getRight(), commandService);
+                action = getAction(item.getRight(), provider);
             if (action != null)
                 items.add(new ActionContributionItem(action));
         }
@@ -186,24 +185,24 @@ public abstract class AbstractCodeActionMenu
      * Returns an {@link IAction} that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
-     * @param commandService never <code>null</code>
+     * @param provider never <code>null</code>
      * @return the requested action, or <code>null</code> if none
      */
-    protected IAction getAction(Command command, CommandService commandService)
+    protected IAction getAction(Command command, CodeActionProvider provider)
     {
-        return new CommandAction(command, commandService);
+        return new CommandAction(command, provider);
     }
 
     /**
      * Returns an {@link IAction} that executes the given {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
-     * @param commandService never <code>null</code>
+     * @param provider never <code>null</code>
      * @return the requested action, or <code>null</code> if none
      */
-    protected IAction getAction(CodeAction codeAction, CommandService commandService)
+    protected IAction getAction(CodeAction codeAction, CodeActionProvider provider)
     {
-        return new CodeActionAction(codeAction, commandService);
+        return new CodeActionAction(codeAction, provider);
     }
 
     /**
@@ -238,12 +237,12 @@ public abstract class AbstractCodeActionMenu
          * Constructor.
          *
          * @param command not <code>null</code>
-         * @param commandService not <code>null</code>
+         * @param provider not <code>null</code>
          */
-        public CommandAction(Command command, CommandService commandService)
+        public CommandAction(Command command, CodeActionProvider provider)
         {
             this.command = Objects.requireNonNull(command);
-            this.commandService = Objects.requireNonNull(commandService);
+            this.commandService = provider.getCommandService();
             setText(command.getTitle());
         }
 
@@ -271,12 +270,12 @@ public abstract class AbstractCodeActionMenu
          * Constructor.
          *
          * @param codeAction not <code>null</code>
-         * @param commandService not <code>null</code>
+         * @param provider not <code>null</code>
          */
-        public CodeActionAction(CodeAction codeAction, CommandService commandService)
+        public CodeActionAction(CodeAction codeAction, CodeActionProvider provider)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
-            this.commandService = Objects.requireNonNull(commandService);
+            this.commandService = provider.getCommandService();
             setText(codeAction.getTitle());
         }
 

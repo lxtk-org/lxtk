@@ -122,14 +122,13 @@ public abstract class AbstractQuickAssistProcessor
         if (result == null || result.isEmpty())
             return null;
 
-        CommandService commandService = provider.getCommandService();
         List<ICompletionProposal> proposals = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
         {
             if (item.isLeft())
-                proposals.add(newProposal(item.getLeft(), commandService));
+                proposals.add(newProposal(item.getLeft(), provider));
             else if (item.isRight())
-                proposals.add(newProposal(item.getRight(), commandService));
+                proposals.add(newProposal(item.getRight(), provider));
         }
         return proposals.toArray(new ICompletionProposal[proposals.size()]);
     }
@@ -306,24 +305,24 @@ public abstract class AbstractQuickAssistProcessor
      * Creates and returns a proposal that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
-     * @param commandService never <code>null</code>
+     * @param provider never <code>null</code>
      * @return the created proposal (not <code>null</code>)
      */
-    protected ICompletionProposal newProposal(Command command, CommandService commandService)
+    protected ICompletionProposal newProposal(Command command, CodeActionProvider provider)
     {
-        return new CommandProposal(command, commandService);
+        return new CommandProposal(command, provider);
     }
 
     /**
      * Creates and returns a proposal that executes the given {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
-     * @param commandService never <code>null</code>
+     * @param provider never <code>null</code>
      * @return the created proposal (not <code>null</code>)
      */
-    protected ICompletionProposal newProposal(CodeAction codeAction, CommandService commandService)
+    protected ICompletionProposal newProposal(CodeAction codeAction, CodeActionProvider provider)
     {
-        return new CodeActionProposal(codeAction, commandService);
+        return new CodeActionProposal(codeAction, provider);
     }
 
     /**
@@ -343,12 +342,12 @@ public abstract class AbstractQuickAssistProcessor
          * Constructor.
          *
          * @param command not <code>null</code>
-         * @param commandService not <code>null</code>
+         * @param provider not <code>null</code>
          */
-        public CommandProposal(Command command, CommandService commandService)
+        public CommandProposal(Command command, CodeActionProvider provider)
         {
             this.command = Objects.requireNonNull(command);
-            this.commandService = Objects.requireNonNull(commandService);
+            this.commandService = provider.getCommandService();
         }
 
         @Override
@@ -405,12 +404,12 @@ public abstract class AbstractQuickAssistProcessor
          * Constructor.
          *
          * @param codeAction not <code>null</code>
-         * @param commandService not <code>null</code>
+         * @param provider not <code>null</code>
          */
-        public CodeActionProposal(CodeAction codeAction, CommandService commandService)
+        public CodeActionProposal(CodeAction codeAction, CodeActionProvider provider)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
-            this.commandService = Objects.requireNonNull(commandService);
+            this.commandService = provider.getCommandService();
         }
 
         @Override

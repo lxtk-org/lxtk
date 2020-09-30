@@ -88,14 +88,13 @@ public abstract class AbstractMarkerResolutionGenerator
         if (result == null || result.isEmpty())
             return NO_RESOLUTIONS;
 
-        CommandService commandService = provider.getCommandService();
         List<IMarkerResolution> resolutions = new ArrayList<>(result.size());
         for (Either<Command, CodeAction> item : result)
         {
             if (item.isLeft())
-                resolutions.add(newMarkerResolution(item.getLeft(), commandService));
+                resolutions.add(newMarkerResolution(item.getLeft(), provider));
             else if (item.isRight())
-                resolutions.add(newMarkerResolution(item.getRight(), commandService));
+                resolutions.add(newMarkerResolution(item.getRight(), provider));
         }
         return resolutions.toArray(NO_RESOLUTIONS);
     }
@@ -142,12 +141,12 @@ public abstract class AbstractMarkerResolutionGenerator
      * {@link Command}.
      *
      * @param command never <code>null</code>
-     * @param commandService never <code>null</code>
+     * @param provider never <code>null</code>
      * @return the created resolution (not <code>null</code>)
      */
-    protected IMarkerResolution newMarkerResolution(Command command, CommandService commandService)
+    protected IMarkerResolution newMarkerResolution(Command command, CodeActionProvider provider)
     {
-        return new CommandMarkerResolution(command, commandService);
+        return new CommandMarkerResolution(command, provider);
     }
 
     /**
@@ -155,13 +154,13 @@ public abstract class AbstractMarkerResolutionGenerator
      * {@link CodeAction}.
      *
      * @param codeAction never <code>null</code>
-     * @param commandService never <code>null</code>
+     * @param provider never <code>null</code>
      * @return the created resolution (not <code>null</code>)
      */
     protected IMarkerResolution newMarkerResolution(CodeAction codeAction,
-        CommandService commandService)
+        CodeActionProvider provider)
     {
-        return new CodeActionMarkerResolution(codeAction, commandService);
+        return new CodeActionMarkerResolution(codeAction, provider);
     }
 
     /**
@@ -206,12 +205,12 @@ public abstract class AbstractMarkerResolutionGenerator
          * Constructor.
          *
          * @param command not <code>null</code>
-         * @param commandService not <code>null</code>
+         * @param provider not <code>null</code>
          */
-        public CommandMarkerResolution(Command command, CommandService commandService)
+        public CommandMarkerResolution(Command command, CodeActionProvider provider)
         {
             this.command = Objects.requireNonNull(command);
-            this.commandService = Objects.requireNonNull(commandService);
+            this.commandService = provider.getCommandService();
         }
 
         @Override
@@ -244,12 +243,12 @@ public abstract class AbstractMarkerResolutionGenerator
          * Constructor.
          *
          * @param codeAction not <code>null</code>
-         * @param commandService not <code>null</code>
+         * @param provider not <code>null</code>
          */
-        public CodeActionMarkerResolution(CodeAction codeAction, CommandService commandService)
+        public CodeActionMarkerResolution(CodeAction codeAction, CodeActionProvider provider)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
-            this.commandService = Objects.requireNonNull(commandService);
+            this.commandService = provider.getCommandService();
         }
 
         @Override
