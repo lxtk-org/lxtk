@@ -33,7 +33,6 @@ import org.lxtk.DocumentUri;
 import org.lxtk.TextDocument;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
-import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.util.ResourceUtil;
 
 @SuppressWarnings("restriction")
@@ -133,7 +132,7 @@ public abstract class AbstractLocationSearchQuery
         }
         catch (BadLocationException e)
         {
-            Activator.logError(e);
+            // silently ignore: the document might have changed in the meantime
             return null;
         }
     }

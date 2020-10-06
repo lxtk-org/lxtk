@@ -19,7 +19,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
-import org.lxtk.lx4e.internal.Activator;
 
 /**
  * Finds the <i>word</i> at a given document offset.
@@ -101,7 +100,6 @@ public class WordFinder
         }
         catch (BadLocationException e)
         {
-            Activator.logError(e);
             return null;
         }
 

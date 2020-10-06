@@ -29,7 +29,6 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.lsp4j.FoldingRange;
-import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.util.Disposable;
 
 /**
@@ -106,7 +105,7 @@ public class FoldingAnnotations
                 }
                 catch (BadLocationException e)
                 {
-                    Activator.logError(e);
+                    // silently ignore: the document might have changed in the meantime
                     continue;
                 }
 

@@ -205,6 +205,7 @@ public class Highlighter
         }
         catch (BadLocationException e)
         {
+            Activator.logError(e);
             return;
         }
         LanguageOperationTarget target = targetSupplier.get();
@@ -252,7 +253,7 @@ public class Highlighter
             }
             catch (BadLocationException e)
             {
-                Activator.logError(e);
+                // silently ignore: the document might have changed in the meantime
                 continue;
             }
             Annotation annotation = createAnnotation(highlight);

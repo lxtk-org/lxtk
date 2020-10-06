@@ -249,9 +249,13 @@ public class DiagnosticMarkers
             attributes.put(IMarker.CHAR_START, region.getOffset());
             attributes.put(IMarker.CHAR_END, region.getOffset() + region.getLength());
         }
-        catch (CoreException | BadLocationException e)
+        catch (CoreException e)
         {
             Activator.logError(e);
+        }
+        catch (BadLocationException e)
+        {
+            // silently ignore: the document might have changed in the meantime
         }
         attributes.put(DIAGNOSTIC_ATTRIBUTE, DefaultGson.INSTANCE.toJson(diagnostic));
     }

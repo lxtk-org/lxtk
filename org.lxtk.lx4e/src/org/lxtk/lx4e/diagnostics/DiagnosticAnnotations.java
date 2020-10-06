@@ -286,7 +286,7 @@ public class DiagnosticAnnotations
             }
             catch (BadLocationException e)
             {
-                Activator.logError(e);
+                // silently ignore: the document might have changed in the meantime
                 continue;
             }
             result.put(createAnnotation(diagnostic), new Position(r.getOffset(), r.getLength()));

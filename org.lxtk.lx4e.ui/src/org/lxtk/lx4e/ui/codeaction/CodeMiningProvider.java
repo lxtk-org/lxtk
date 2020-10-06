@@ -36,7 +36,6 @@ import org.lxtk.CodeLensProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
-import org.lxtk.lx4e.internal.ui.Activator;
 
 /**
  * Default implementation of a code mining provider that computes code minings
@@ -95,7 +94,7 @@ public class CodeMiningProvider
         }
         catch (BadLocationException e)
         {
-            Activator.logError(e);
+            // silently ignore: the document might have changed in the meantime
             return null;
         }
     }
