@@ -37,7 +37,9 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
+import org.lxtk.lx4e.ui.hover.AnnotationHover;
 import org.lxtk.lx4e.ui.hover.FirstMatchHover;
+import org.lxtk.lx4e.ui.hover.ProblemHover;
 import org.lxtk.lx4e.ui.hover.TextHover;
 import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
 import org.lxtk.lx4e.ui.hyperlinks.ImplementationHyperlinkDetector;
@@ -136,8 +138,10 @@ public class TypeScriptSourceViewerConfiguration
     @Override
     public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
     {
-        return new FirstMatchHover(super.getTextHover(sourceViewer, contentType),
-            new TextHover(this::getLanguageOperationTarget));
+        return new FirstMatchHover(
+            new ProblemHover(fPreferenceStore,
+                new TypeScriptQuickAssistProcessor(this::getLanguageOperationTarget)),
+            new TextHover(this::getLanguageOperationTarget), new AnnotationHover(fPreferenceStore));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

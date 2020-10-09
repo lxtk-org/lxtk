@@ -20,8 +20,10 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ltk.ui.refactoring.RefactoringUI;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -33,6 +35,14 @@ public class Activator
 {
     /** The plug-in ID */
     public static final String PLUGIN_ID = "org.lxtk.lx4e.ui"; //$NON-NLS-1$
+
+    private static final String T_DLCL = "/dlcl16/"; //$NON-NLS-1$
+    private static final String T_ELCL = "/elcl16/"; //$NON-NLS-1$
+
+    public static final String IMG_DLCL_CONFIGURE_ANNOTATIONS =
+        PLUGIN_ID + T_DLCL + "configure_annotations.png"; //$NON-NLS-1$
+    public static final String IMG_ELCL_CONFIGURE_ANNOTATIONS =
+        PLUGIN_ID + T_ELCL + "configure_annotations.png"; //$NON-NLS-1$
 
     // The shared instance
     private static Activator plugin;
@@ -102,9 +112,30 @@ public class Activator
         return e instanceof OperationCanceledException || e instanceof CancellationException;
     }
 
+    public static Image getImage(String symbolicName)
+    {
+        return plugin.getImageRegistry().get(symbolicName);
+    }
+
+    public static ImageDescriptor getImageDescriptor(String symbolicName)
+    {
+        return plugin.getImageRegistry().getDescriptor(symbolicName);
+    }
+
     @Override
     protected void initializeImageRegistry(ImageRegistry registry)
     {
         LSPImages.initialize(registry);
+
+        registry.put(IMG_DLCL_CONFIGURE_ANNOTATIONS,
+            imageDescriptorFromSymbolicName(IMG_DLCL_CONFIGURE_ANNOTATIONS));
+        registry.put(IMG_ELCL_CONFIGURE_ANNOTATIONS,
+            imageDescriptorFromSymbolicName(IMG_ELCL_CONFIGURE_ANNOTATIONS));
+    }
+
+    private static ImageDescriptor imageDescriptorFromSymbolicName(String symbolicName)
+    {
+        String path = "$nl$/icons/full" + symbolicName.substring(PLUGIN_ID.length()); //$NON-NLS-1$
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 }

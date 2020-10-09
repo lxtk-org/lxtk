@@ -33,7 +33,6 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension2;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
-import org.eclipse.jface.text.source.TextInvocationContext;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -55,6 +54,7 @@ import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.ui.AnnotationInvocationContext;
 
 /**
  * Partial implementation of an {@link IQuickAssistProcessor} that computes
@@ -108,11 +108,16 @@ public abstract class AbstractQuickAssistProcessor
         if (provider == null)
             return null;
 
+        Annotation annotation = null;
+        if (invocationContext instanceof AnnotationInvocationContext)
+            annotation = ((AnnotationInvocationContext)invocationContext).getAnnotation();
+
         CodeActionRequest request = newCodeActionRequest();
         request.setProvider(provider);
         request.setParams(
             new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                range, getCodeActionContext(new TextInvocationContext(viewer, offset, length))));
+                range, getCodeActionContext(
+                    new AnnotationInvocationContext(viewer, offset, length, annotation))));
         request.setTimeout(getCodeActionTimeout());
         request.setMayThrow(false);
 
@@ -215,6 +220,25 @@ public abstract class AbstractQuickAssistProcessor
      * @return the corresponding diagnostics (not <code>null</code>)
      */
     protected List<Diagnostic> getDiagnostics(IQuickAssistInvocationContext invocationContext)
+    {
+        Annotation annotation = null;
+        if (invocationContext instanceof AnnotationInvocationContext)
+            annotation = ((AnnotationInvocationContext)invocationContext).getAnnotation();
+
+        if (annotation == null)
+            return doGetDiagnostics(invocationContext);
+
+        Diagnostic diagnostic = null;
+        if (isDiagnosticAnnotation(annotation))
+            diagnostic = getDiagnostic(annotation);
+
+        if (diagnostic == null)
+            return Collections.emptyList();
+
+        return Collections.singletonList(diagnostic);
+    }
+
+    private List<Diagnostic> doGetDiagnostics(IQuickAssistInvocationContext invocationContext)
     {
         ISourceViewer viewer = invocationContext.getSourceViewer();
         if (viewer == null)
