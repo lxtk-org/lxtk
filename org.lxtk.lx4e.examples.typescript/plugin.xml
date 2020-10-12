@@ -235,4 +235,17 @@
             markerType="org.lxtk.lx4e.examples.typescript.problem">
       </markerResolutionGenerator>
    </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="org.lxtk.lx4e.examples.typescript.editor.ruler.actions"
+            targetID="org.lxtk.lx4e.examples.typescript.editor">
+         <action
+               label="TypeScript Editor Ruler Single-Click"
+               class="org.lxtk.lx4e.internal.examples.typescript.editor.SelectRulerActionDelegate"
+               actionID="RulerClick"
+               id="org.lxtk.lx4e.examples.typescript.editor.ruler.actions.click">
+         </action>
+      </editorContribution>
+   </extension>
 </plugin>

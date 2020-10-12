@@ -18,9 +18,7 @@ import static org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceCon
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationCharacterPairMatcher;
-import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
-import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.lxtk.LanguageOperationTarget;
@@ -43,8 +41,7 @@ public class TypeScriptEditor
     @Override
     protected void initializeEditor()
     {
-        IPreferenceStore preferenceStore = new ChainedPreferenceStore(new IPreferenceStore[] {
-            Activator.getDefault().getPreferenceStore(), EditorsUI.getPreferenceStore() });
+        IPreferenceStore preferenceStore = Activator.getDefault().getCombinedPreferenceStore();
         setPreferenceStore(preferenceStore);
 
         TypeScriptSourceFileDocumentProvider documentProvider =

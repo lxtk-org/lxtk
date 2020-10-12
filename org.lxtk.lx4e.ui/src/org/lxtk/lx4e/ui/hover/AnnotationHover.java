@@ -658,7 +658,7 @@ public class AnnotationHover implements ITextHover, ITextHoverExtension, ITextHo
 		while (it.hasNext()) {
 			Annotation a= it.next();
 
-			if (!isIncluded(a))
+			if (a.isMarkedDeleted() || !isIncluded(a))
 			    continue;
 
 			AnnotationPreference preference= getAnnotationPreference(a);
@@ -693,7 +693,7 @@ public class AnnotationHover implements ITextHover, ITextHoverExtension, ITextHo
      *  and <code>false</code> otherwise
      */
 	protected boolean isIncluded(Annotation annotation) {
-	    return !annotation.isMarkedDeleted();
+	    return true;
 	}
 
 	/**

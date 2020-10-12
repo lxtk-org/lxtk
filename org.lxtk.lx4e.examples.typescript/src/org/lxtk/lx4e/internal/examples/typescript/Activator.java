@@ -24,10 +24,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.lxtk.TextDocument;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
@@ -52,10 +55,21 @@ public class Activator
     private Runnable stopRunnable;
     private TypeScriptSourceFileDocumentProvider documentProvider;
     private Map<IProject, Disposable> connectedProjects;
+    private IPreferenceStore combinedPreferenceStore;
 
     public TypeScriptSourceFileDocumentProvider getDocumentProvider()
     {
         return documentProvider;
+    }
+
+    public synchronized IPreferenceStore getCombinedPreferenceStore()
+    {
+        if (combinedPreferenceStore == null)
+        {
+            combinedPreferenceStore = new ChainedPreferenceStore(
+                new IPreferenceStore[] { getPreferenceStore(), EditorsUI.getPreferenceStore() });
+        }
+        return combinedPreferenceStore;
     }
 
     public synchronized void connect(IProject project)
