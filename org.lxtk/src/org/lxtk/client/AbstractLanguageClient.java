@@ -36,6 +36,7 @@ import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.UnregistrationParams;
 import org.eclipse.lsp4j.WorkspaceFolder;
+import org.eclipse.lsp4j.jsonrpc.Endpoint;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentUri;
@@ -125,6 +126,16 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         {
             feature.fillClientCapabilities(capabilities);
         }
+    }
+
+    @Override
+    public Endpoint adviseServerEndpoint(Endpoint endpoint)
+    {
+        for (Feature<? super S> feature : featureSet)
+        {
+            endpoint = feature.adviseServerEndpoint(endpoint);
+        }
+        return endpoint;
     }
 
     @Override

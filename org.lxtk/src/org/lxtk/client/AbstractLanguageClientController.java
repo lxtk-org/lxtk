@@ -28,6 +28,8 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.jsonrpc.Endpoint;
+import org.eclipse.lsp4j.jsonrpc.services.ServiceEndpoints;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.jsonrpc.JsonRpcConnection;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
@@ -222,7 +224,14 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
                         }
                     });
 
-                    client.initialize(server, result.getCapabilities(), getDocumentSelector());
+                    Endpoint endpoint = connection.getRemoteEndpoint();
+                    Endpoint advisedEndpoint = client.adviseServerEndpoint(endpoint);
+
+                    client.initialize(
+                        (endpoint == advisedEndpoint) ? server
+                            : ServiceEndpoints.toServiceObject(advisedEndpoint,
+                                getServerInterface()),
+                        result.getCapabilities(), getDocumentSelector());
 
                     rollback.setLogger(
                         t -> log().error("An error occurred while disconnecting", t)); //$NON-NLS-1$

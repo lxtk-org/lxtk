@@ -18,6 +18,7 @@ import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.jsonrpc.Endpoint;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.util.Disposable;
 
@@ -46,6 +47,17 @@ public interface Feature<S extends LanguageServer>
      * @param capabilities the client capabilities to fill (not <code>null</code>)
      */
     void fillClientCapabilities(ClientCapabilities capabilities);
+
+    /**
+     * Allows this feature to advise the server endpoint.
+     *
+     * @param endpoint the server endpoint (not <code>null</code>)
+     * @return the advised endpoint (never <code>null</code>)
+     */
+    default Endpoint adviseServerEndpoint(Endpoint endpoint)
+    {
+        return endpoint;
+    }
 
     /**
      * Initializes this feature. Called just after the client sends the
