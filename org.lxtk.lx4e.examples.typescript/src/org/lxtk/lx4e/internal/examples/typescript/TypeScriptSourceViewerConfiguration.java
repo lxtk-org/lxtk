@@ -38,9 +38,9 @@ import org.lxtk.lx4e.examples.typescript.TypeScriptCore;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
 import org.lxtk.lx4e.ui.hover.AnnotationHover;
+import org.lxtk.lx4e.ui.hover.DocumentHover;
 import org.lxtk.lx4e.ui.hover.FirstMatchHover;
 import org.lxtk.lx4e.ui.hover.ProblemHover;
-import org.lxtk.lx4e.ui.hover.TextHover;
 import org.lxtk.lx4e.ui.hyperlinks.DefinitionHyperlinkDetector;
 import org.lxtk.lx4e.ui.hyperlinks.ImplementationHyperlinkDetector;
 import org.lxtk.lx4e.ui.hyperlinks.TypeDefinitionHyperlinkDetector;
@@ -141,7 +141,7 @@ public class TypeScriptSourceViewerConfiguration
         return new FirstMatchHover(
             new ProblemHover(fPreferenceStore,
                 new TypeScriptQuickAssistProcessor(this::getLanguageOperationTarget)),
-            new TextHover(this::getLanguageOperationTarget), new AnnotationHover(fPreferenceStore));
+            new DocumentHover(this::getLanguageOperationTarget), new AnnotationHover(fPreferenceStore));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

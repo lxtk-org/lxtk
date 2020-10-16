@@ -49,7 +49,7 @@ import org.lxtk.lx4e.util.Markdown;
  * Default implementation of a text hover that computes hover information using
  * a {@link HoverProvider}.
  */
-public class TextHover
+public class DocumentHover
     implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
     private final Supplier<LanguageOperationTarget> targetSupplier;
@@ -61,7 +61,7 @@ public class TextHover
      * @param targetSupplier the {@link LanguageOperationTarget} supplier
      *  for this hover (not <code>null</code>)
      */
-    public TextHover(Supplier<LanguageOperationTarget> targetSupplier)
+    public DocumentHover(Supplier<LanguageOperationTarget> targetSupplier)
     {
         this.targetSupplier = Objects.requireNonNull(targetSupplier);
     }

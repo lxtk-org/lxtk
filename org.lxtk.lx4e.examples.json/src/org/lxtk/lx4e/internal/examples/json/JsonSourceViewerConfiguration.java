@@ -31,8 +31,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.ui.completion.CompletionProposalSorter;
 import org.lxtk.lx4e.ui.completion.ContentAssistProcessor;
+import org.lxtk.lx4e.ui.hover.DocumentHover;
 import org.lxtk.lx4e.ui.hover.FirstMatchHover;
-import org.lxtk.lx4e.ui.hover.TextHover;
 
 /**
  * Configuration for a source viewer which shows JSON code.
@@ -93,7 +93,7 @@ public class JsonSourceViewerConfiguration
     public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
     {
         return new FirstMatchHover(super.getTextHover(sourceViewer, contentType),
-            new TextHover(this::getLanguageOperationTarget));
+            new DocumentHover(this::getLanguageOperationTarget));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

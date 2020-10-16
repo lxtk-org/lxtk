@@ -11,6 +11,6 @@
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
 /**
- * Provides support for implementing LXTK-based document hovers in Eclipse.
+ * Provides support for implementing LXTK-based hovers in Eclipse.
  */
 package org.lxtk.lx4e.ui.hover;
