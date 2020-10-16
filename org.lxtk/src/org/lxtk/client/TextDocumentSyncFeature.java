@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.lxtk.client;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +24,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
@@ -43,13 +49,14 @@ import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.TextDocumentSyncOptions;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
+import org.eclipse.lsp4j.jsonrpc.Endpoint;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.lxtk.DocumentService;
 import org.lxtk.DocumentUri;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSnapshot;
-import org.lxtk.DocumentService;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
 
@@ -77,6 +84,8 @@ public final class TextDocumentSyncFeature
     private Map<String, Map<String, TextDocumentRegistrationOptions>> registrations;
     private final Map<String, Disposable> subscriptions = new HashMap<>();
     private final Map<TextDocument, Integer> syncedDocumentVersions = new HashMap<>();
+    private final PendingChangeManager pendingChangeManager =
+        new PendingChangeManager(this::flushPendingChange);
 
     /**
      * Constructor.
@@ -86,6 +95,16 @@ public final class TextDocumentSyncFeature
     public TextDocumentSyncFeature(DocumentService documentService)
     {
         this.documentService = Objects.requireNonNull(documentService);
+    }
+
+    /**
+     * Sets the delay for which a change may be pending.
+     *
+     * @param delay not <code>null</code>
+     */
+    public void setPendingChangeDelay(Duration delay)
+    {
+        pendingChangeManager.setDelay(delay);
     }
 
     @Override
@@ -102,6 +121,27 @@ public final class TextDocumentSyncFeature
                 ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities));
         syncronization.setDynamicRegistration(true);
         syncronization.setDidSave(true);
+    }
+
+    @Override
+    public Endpoint adviseServerEndpoint(Endpoint endpoint)
+    {
+        return new Endpoint()
+        {
+            @Override
+            public CompletableFuture<?> request(String method, Object parameter)
+            {
+                flushPendingChange();
+                return endpoint.request(method, parameter);
+            }
+
+            @Override
+            public void notify(String method, Object parameter)
+            {
+                flushPendingChange();
+                endpoint.notify(method, parameter);
+            }
+        };
     }
 
     @Override
@@ -262,10 +302,17 @@ public final class TextDocumentSyncFeature
     public synchronized void dispose()
     {
         registrations = null;
-        syncedDocumentVersions.clear();
         Collection<Disposable> disposables = new ArrayList<>(subscriptions.values());
+        disposables.add(pendingChangeManager);
         subscriptions.clear();
-        Disposable.disposeAll(disposables);
+        try
+        {
+            Disposable.disposeAll(disposables);
+        }
+        finally
+        {
+            syncedDocumentVersions.clear();
+        }
     }
 
     private synchronized void onDidAdd(TextDocument document)
@@ -309,15 +356,26 @@ public final class TextDocumentSyncFeature
         if (registrationOptions == null)
             return;
 
+        pendingChangeManager.addChange(document,
+            registrationOptions.getSyncKind() == TextDocumentSyncKind.Full
+                ? Collections.singletonList(new TextDocumentContentChangeEvent(snapshot.getText()))
+                : event.getContentChanges(),
+            snapshotVersion);
+    }
+
+    private synchronized void flushPendingChange()
+    {
+        PendingChange change = pendingChangeManager.removeChange();
+        if (change == null)
+            return;
+
         DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
         params.setTextDocument(new VersionedTextDocumentIdentifier(
-            DocumentUri.convert(document.getUri()), snapshotVersion));
-        params.setContentChanges(registrationOptions.getSyncKind() == TextDocumentSyncKind.Full
-            ? Collections.singletonList(new TextDocumentContentChangeEvent(snapshot.getText()))
-            : event.getContentChanges());
+            DocumentUri.convert(change.document.getUri()), change.version));
+        params.setContentChanges(change.contentChanges);
 
         languageServer.getTextDocumentService().didChange(params);
-        syncedDocumentVersions.put(document, snapshotVersion);
+        syncedDocumentVersions.put(change.document, change.version);
     }
 
     private synchronized void onDidSave(TextDocumentSaveEvent event)
@@ -370,5 +428,115 @@ public final class TextDocumentSyncFeature
         TextDocument document = snapshot.getDocument();
         return new TextDocumentItem(DocumentUri.convert(document.getUri()),
             document.getLanguageId(), snapshot.getVersion(), snapshot.getText());
+    }
+
+    private static class PendingChange
+    {
+        final TextDocument document;
+        final List<TextDocumentContentChangeEvent> contentChanges = new ArrayList<>();
+        int version;
+
+        PendingChange(TextDocument document)
+        {
+            this.document = Objects.requireNonNull(document);
+        }
+
+        void add(List<TextDocumentContentChangeEvent> contentChanges, int version)
+        {
+            if (contentChanges.size() == 1 && contentChanges.get(0).getRange() == null)
+            {
+                this.contentChanges.clear();
+            }
+            this.contentChanges.addAll(contentChanges);
+            this.version = version;
+        }
+    }
+
+    private static class PendingChangeManager
+        implements Disposable
+    {
+        private final Runnable flushCallback;
+        private long delay = 500;
+        private ScheduledChange change;
+        private ScheduledExecutorService executor;
+
+        PendingChangeManager(Runnable flushCallback)
+        {
+            this.flushCallback = Objects.requireNonNull(flushCallback);
+        }
+
+        void setDelay(Duration delay)
+        {
+            this.delay = delay.toMillis();
+        }
+
+        void addChange(TextDocument document, List<TextDocumentContentChangeEvent> contentChanges,
+            int version)
+        {
+            if (change != null)
+            {
+                change.cancel();
+
+                if (change.document != document)
+                {
+                    flushCallback.run();
+                    change = null;
+                }
+            }
+
+            if (change == null)
+                change = new ScheduledChange(document);
+
+            change.add(contentChanges, version);
+
+            if (executor == null)
+                executor = Executors.newSingleThreadScheduledExecutor();
+
+            change.future = executor.schedule(flushCallback, delay, TimeUnit.MILLISECONDS);
+        }
+
+        PendingChange removeChange()
+        {
+            PendingChange result = change;
+            change = null;
+            return result;
+        }
+
+        @Override
+        public void dispose()
+        {
+            if (change != null)
+            {
+                change.cancel();
+
+                flushCallback.run();
+                change = null;
+            }
+            if (executor != null)
+            {
+                executor.shutdown();
+                executor = null;
+            }
+        }
+
+        private static class ScheduledChange
+            extends PendingChange
+        {
+            Future<?> future;
+
+            ScheduledChange(TextDocument document)
+            {
+                super(document);
+            }
+
+            void cancel()
+            {
+                if (future != null)
+                {
+                    future.cancel(false);
+                    future = null;
+                }
+            }
+        }
     }
 }
