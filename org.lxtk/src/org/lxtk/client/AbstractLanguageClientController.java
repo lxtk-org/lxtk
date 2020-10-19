@@ -185,21 +185,26 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
                     rollback.add(() -> connection.dispose());
 
                     S server = connection.getRemoteProxy();
-                    rollback.add(() -> server.exit());
+                    rollback.add(() ->
+                    {
+                        if (!connection.isClosed())
+                            server.exit();
+                    });
 
                     InitializeResult result =
                         newConnectionInitializer(client, connection).initialize();
                     rollback.add(() ->
                     {
-                        try
-                        {
-                            server.shutdown().get(getShutdownTimeout().toMillis(),
-                                TimeUnit.MILLISECONDS);
-                        }
-                        catch (InterruptedException | ExecutionException | TimeoutException e)
-                        {
-                            throw new RuntimeException(e);
-                        }
+                        if (!connection.isClosed())
+                            try
+                            {
+                                server.shutdown().get(getShutdownTimeout().toMillis(),
+                                    TimeUnit.MILLISECONDS);
+                            }
+                            catch (InterruptedException | ExecutionException | TimeoutException e)
+                            {
+                                throw new RuntimeException(e);
+                            }
                     });
 
                     server.initialized(new InitializedParams());
