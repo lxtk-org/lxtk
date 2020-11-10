@@ -25,8 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -34,10 +32,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.handly.context.Context;
 import org.eclipse.handly.context.IContext;
 import org.eclipse.handly.model.impl.IReconcileStrategy;
@@ -63,7 +58,6 @@ import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.lx4e.DocumentSymbolRequest;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.EclipseTextDocumentChangeEvent;
-import org.lxtk.lx4e.Request.Handler;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.model.ILanguageSymbol;
@@ -79,10 +73,6 @@ public abstract class LanguageSourceFile
 {
     private static final Property<URI> WORKING_COPY_URI =
         Property.get(LanguageSourceFile.class.getName() + ".workingCopyUri", URI.class); //$NON-NLS-1$
-
-    private static final Property<DocumentSymbolTimeoutHandler> DOCUMENT_SYMBOL_TIMEOUT_HANDLER =
-        Property.get(LanguageSourceFile.class.getName() + ".documentSymbolTimeoutHandler", //$NON-NLS-1$
-            DocumentSymbolTimeoutHandler.class);
 
     private final FileWrapper fileWrapper;
     private final String languageId;
@@ -242,8 +232,7 @@ public abstract class LanguageSourceFile
     public IContext newWorkingCopyContext_(IContext context)
     {
         return with(ISourceFileImplSupport.super.newWorkingCopyContext_(context),
-            of(WORKING_COPY_URI, getDocumentUri()),
-            of(DOCUMENT_SYMBOL_TIMEOUT_HANDLER, newDocumentSymbolTimeoutHandler()));
+            of(WORKING_COPY_URI, getDocumentUri()));
     }
 
     @Override
@@ -322,25 +311,13 @@ public abstract class LanguageSourceFile
     }
 
     /**
-     * Returns a new instance of {@link DocumentSymbolTimeoutHandler}.
-     *
-     * @return the created handler (not <code>null</code>)
-     */
-    protected DocumentSymbolTimeoutHandler newDocumentSymbolTimeoutHandler()
-    {
-        return new DocumentSymbolTimeoutHandler();
-    }
-
-    /**
      * Returns a new instance of {@link DocumentSymbolRequest}.
      *
      * @return the created request object (not <code>null</code>)
      */
     protected DocumentSymbolRequest newDocumentSymbolRequest()
     {
-        DocumentSymbolRequest request = new DocumentSymbolRequest();
-        request.setHandler(new DocumentSymbolRequestHandler());
-        return request;
+        return new DocumentSymbolRequest();
     }
 
     private List<DocumentSymbol> getDocumentSymbols(URI documentUri, IProgressMonitor monitor)
@@ -393,115 +370,6 @@ public abstract class LanguageSourceFile
                 symbols.add(item.getRight());
         }
         return symbols;
-    }
-
-    /**
-     * A handler for document symbol requests.
-     */
-    protected class DocumentSymbolRequestHandler
-        extends Handler<List<Either<SymbolInformation, DocumentSymbol>>>
-    {
-        @Override
-        protected List<Either<SymbolInformation, DocumentSymbol>> doReceive()
-            throws ExecutionException, InterruptedException, TimeoutException
-        {
-            boolean timeout = false;
-            try
-            {
-                return super.doReceive();
-            }
-            catch (TimeoutException e)
-            {
-                timeout = true;
-                throw e;
-            }
-            finally
-            {
-                IContext context = getWorkingCopyContext_();
-                if (context != null)
-                {
-                    DocumentSymbolTimeoutHandler timeoutHandler =
-                        context.get(DOCUMENT_SYMBOL_TIMEOUT_HANDLER);
-                    if (timeout)
-                        timeoutHandler.onTimeout((DocumentSymbolRequest)getRequest());
-                    else
-                        timeoutHandler.reset();
-                }
-            }
-        }
-    }
-
-    /**
-     * A handler for document symbol timeouts.
-     */
-    protected class DocumentSymbolTimeoutHandler
-    {
-        protected int timeouts;
-        protected final Job job = createJob();
-
-        /**
-         * Returns the number of timeouts seen by this handler.
-         *
-         * @return the number of timeouts
-         */
-        public int getTimeouts()
-        {
-            return timeouts;
-        }
-
-        /**
-         * Handles a timeout for the given request.
-         *
-         * @param request never <code>null</code>
-         */
-        public void onTimeout(DocumentSymbolRequest request)
-        {
-            timeouts++;
-
-            request.setMayThrow(false); // suppress the TimeoutExeption
-
-            if (shouldRetry())
-            {
-                job.cancel();
-                job.schedule();
-            }
-        }
-
-        /**
-         * Resets this handler.
-         */
-        public void reset()
-        {
-            timeouts = 0;
-            job.cancel();
-        }
-
-        protected boolean shouldRetry()
-        {
-            return timeouts < 5;
-        }
-
-        protected Job createJob()
-        {
-            Job job = new Job("") //$NON-NLS-1$
-            {
-                @Override
-                protected IStatus run(IProgressMonitor monitor)
-                {
-                    try
-                    {
-                        reconcile(monitor);
-                    }
-                    catch (CoreException e)
-                    {
-                        Activator.logError(e);
-                    }
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setSystem(true);
-            return job;
-        }
     }
 
     private static interface FileWrapper
@@ -691,9 +559,7 @@ public abstract class LanguageSourceFile
 
             return document.getLastChange() != lastInput.event
                 || getDocumentSymbolProvider(getLanguageService(),
-                    document.getUri()) != lastInput.symbolProvider
-                || getWorkingCopyInfo().getContext().get(
-                    DOCUMENT_SYMBOL_TIMEOUT_HANDLER).getTimeouts() > 0;
+                    document.getUri()) != lastInput.symbolProvider;
         }
 
         @Override
