@@ -12,60 +12,29 @@
  *******************************************************************************/
 package org.lxtk;
 
-import java.util.Objects;
-
 /**
- * An immutable snapshot of a {@link TextDocument}.
+ * Represents an immutable snapshot of a {@link TextDocument}.
  */
-public final class TextDocumentSnapshot
+public interface TextDocumentSnapshot
 {
-    private final TextDocument document;
-    private final int version;
-    private final String text;
-
-    /**
-     * Constructor.
-     *
-     * @param document the snapshot's document (not <code>null</code>)
-     * @param version the snapshot's version (non-negative)
-     * @param text the snapshot's text (not <code>null</code>)
-     */
-    public TextDocumentSnapshot(TextDocument document, int version, String text)
-    {
-        this.document = Objects.requireNonNull(document);
-        if (version < 0)
-            throw new IllegalArgumentException();
-        this.version = version;
-        this.text = Objects.requireNonNull(text);
-    }
-
     /**
      * Returns the snapshot's document.
      *
      * @return the snapshot's document (never <code>null</code>)
      */
-    public TextDocument getDocument()
-    {
-        return document;
-    }
+    TextDocument getDocument();
 
     /**
      * Returns the snapshot's version.
      *
      * @return the snapshot's version (non-negative)
      */
-    public int getVersion()
-    {
-        return version;
-    }
+    int getVersion();
 
     /**
      * Returns the snapshot's text.
      *
      * @return the snapshot's text (never <code>null</code>)
      */
-    public String getText()
-    {
-        return text;
-    }
+    String getText();
 }

@@ -27,6 +27,7 @@ import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.lxtk.DefaultTextDocumentSnapshot;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentSaveEvent;
@@ -113,8 +114,9 @@ public final class EclipseTextDocument
         document = buffer.getDocument();
         document.addDocumentListener(documentListener);
         lastChange.compareAndSet(null,
-            new EclipseTextDocumentChangeEvent(new TextDocumentSnapshot(this, 0, document.get()),
-                Collections.emptyList(), getModificationStamp()));
+            new EclipseTextDocumentChangeEvent(
+                new DefaultTextDocumentSnapshot(this, 0, document.get()), Collections.emptyList(),
+                getModificationStamp()));
         if ((buffer.getSupportedListenerMethods() & IBufferListener.BUFFER_SAVED) != 0)
             buffer.addListener(bufferListener);
         buffer.addRef();
@@ -252,7 +254,7 @@ public final class EclipseTextDocument
         TextDocumentChangeEvent lastEvent = lastChange.get();
         int lastVersion = (lastEvent == null) ? 0 : lastEvent.getSnapshot().getVersion();
         TextDocumentSnapshot snapshot =
-            new TextDocumentSnapshot(this, lastVersion + 1, document.get());
+            new DefaultTextDocumentSnapshot(this, lastVersion + 1, document.get());
         if (modificationStamp != getModificationStamp())
             throw new AssertionError();
         return new EclipseTextDocumentChangeEvent(snapshot, Collections.singletonList(event),
