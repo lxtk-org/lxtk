@@ -18,7 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="[3.15.0,4.0.0)",
  org.eclipse.lsp4j;bundle-version="[0.9.0,0.10.0)",
  org.eclipse.lsp4j.jsonrpc;bundle-version="[0.9.0,0.10.0)",
- org.eclipse.handly;bundle-version="[1.4.0,2.0.0)",
+ org.eclipse.handly;bundle-version="[1.5.0,2.0.0)",
  org.lxtk;bundle-version="[0.2.0,0.3.0)",
  org.lxtk.lx4e;bundle-version="[0.2.0,0.3.0)",
  org.lxtk.lx4e.ui;bundle-version="[0.2.0,0.3.0)"
