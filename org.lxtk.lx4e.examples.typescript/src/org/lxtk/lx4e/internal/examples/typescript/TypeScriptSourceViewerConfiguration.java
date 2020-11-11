@@ -13,7 +13,6 @@
 package org.lxtk.lx4e.internal.examples.typescript;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -52,14 +51,11 @@ public class TypeScriptSourceViewerConfiguration
     extends TextSourceViewerConfiguration
 {
     private final ITextEditor editor;
-    private final IWorkingCopyManager workingCopyManager;
 
-    public TypeScriptSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor,
-        IWorkingCopyManager workingCopyManager)
+    public TypeScriptSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor)
     {
         super(preferenceStore);
         this.editor = editor;
-        this.workingCopyManager = workingCopyManager;
     }
 
     @Override
@@ -77,10 +73,10 @@ public class TypeScriptSourceViewerConfiguration
     @Override
     public IReconciler getReconciler(ISourceViewer sourceViewer)
     {
-        if (editor == null || !editor.isEditable() || workingCopyManager == null)
+        if (editor == null || !editor.isEditable())
             return null;
 
-        return new TypeScriptReconciler(editor, workingCopyManager);
+        return new TypeScriptReconciler(editor);
     }
 
     @Override
@@ -141,7 +137,8 @@ public class TypeScriptSourceViewerConfiguration
         return new FirstMatchHover(
             new ProblemHover(fPreferenceStore,
                 new TypeScriptQuickAssistProcessor(this::getLanguageOperationTarget)),
-            new DocumentHover(this::getLanguageOperationTarget), new AnnotationHover(fPreferenceStore));
+            new DocumentHover(this::getLanguageOperationTarget),
+            new AnnotationHover(fPreferenceStore));
     }
 
     private LanguageOperationTarget getLanguageOperationTarget()

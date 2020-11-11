@@ -19,7 +19,7 @@ import org.eclipse.handly.ui.outline.ProblemMarkerListenerContribution;
 import org.eclipse.handly.ui.preference.BooleanPreference;
 import org.eclipse.handly.ui.preference.FlushingPreferenceStore;
 import org.eclipse.handly.ui.preference.IBooleanPreference;
-import org.eclipse.handly.ui.viewer.ElementTreeContentProvider;
+import org.eclipse.handly.ui.viewer.DeferredElementTreeContentProvider;
 import org.eclipse.handly.ui.viewer.ProblemMarkerLabelDecorator;
 import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -95,7 +95,7 @@ public class TypeScriptOutlinePage
     @Override
     protected ITreeContentProvider getContentProvider()
     {
-        return new ElementTreeContentProvider();
+        return new DeferredElementTreeContentProvider(getTreeViewer(), getEditor().getSite());
     }
 
     @Override

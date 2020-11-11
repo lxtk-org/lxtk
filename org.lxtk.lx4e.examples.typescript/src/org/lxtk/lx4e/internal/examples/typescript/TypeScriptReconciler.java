@@ -13,7 +13,6 @@
 package org.lxtk.lx4e.internal.examples.typescript;
 
 import org.eclipse.handly.model.IElementChangeListener;
-import org.eclipse.handly.ui.IWorkingCopyManager;
 import org.eclipse.handly.ui.text.reconciler.EditorWorkingCopyReconciler;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.ui.IEditorPart;
@@ -35,11 +34,10 @@ public class TypeScriptReconciler
      * Constructor.
      *
      * @param editor not <code>null</code>
-     * @param workingCopyManager not <code>null</code>
      */
-    public TypeScriptReconciler(IEditorPart editor, IWorkingCopyManager workingCopyManager)
+    public TypeScriptReconciler(IEditorPart editor)
     {
-        super(editor, workingCopyManager);
+        super(editor, Activator.getDefault().getDocumentProvider()::getConnectedSourceFile);
     }
 
     @Override

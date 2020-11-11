@@ -24,7 +24,6 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.internal.examples.typescript.Activator;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptOperationTargetProvider;
-import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceFileDocumentProvider;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceViewerConfiguration;
 import org.lxtk.lx4e.ui.highlight.Highlighter;
 
@@ -44,11 +43,9 @@ public class TypeScriptEditor
         IPreferenceStore preferenceStore = Activator.getDefault().getCombinedPreferenceStore();
         setPreferenceStore(preferenceStore);
 
-        TypeScriptSourceFileDocumentProvider documentProvider =
-            Activator.getDefault().getDocumentProvider();
-        setDocumentProvider(documentProvider);
+        setDocumentProvider(Activator.getDefault().getDocumentProvider());
         setSourceViewerConfiguration(
-            new TypeScriptSourceViewerConfiguration(preferenceStore, this, documentProvider));
+            new TypeScriptSourceViewerConfiguration(preferenceStore, this));
         setEditorContextMenuId("#ExampleTypeScriptEditorContext"); //$NON-NLS-1$
         setRulerContextMenuId("#ExampleTypeScriptRulerContext"); //$NON-NLS-1$
     }

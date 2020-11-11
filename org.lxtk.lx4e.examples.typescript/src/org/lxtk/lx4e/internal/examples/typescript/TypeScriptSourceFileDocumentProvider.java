@@ -13,7 +13,7 @@
 package org.lxtk.lx4e.internal.examples.typescript;
 
 import org.eclipse.handly.model.ISourceFile;
-import org.eclipse.handly.ui.texteditor.SourceFileDocumentProvider;
+import org.eclipse.handly.ui.texteditor.DeferredSourceFileDocumentProvider;
 import org.eclipse.ui.IEditorInput;
 import org.lxtk.lx4e.examples.typescript.TypeScriptInputElementProvider;
 
@@ -21,7 +21,7 @@ import org.lxtk.lx4e.examples.typescript.TypeScriptInputElementProvider;
  * TypeScript source file document provider.
  */
 public class TypeScriptSourceFileDocumentProvider
-    extends SourceFileDocumentProvider
+    extends DeferredSourceFileDocumentProvider
 {
     @Override
     protected ISourceFile getSourceFile(Object element)

@@ -14,7 +14,7 @@ package org.lxtk.lx4e.internal.examples.typescript.editor;
 
 import org.eclipse.handly.ui.IInputElementProvider;
 import org.eclipse.handly.ui.quickoutline.HandlyOutlinePopup;
-import org.eclipse.handly.ui.viewer.ElementTreeContentProvider;
+import org.eclipse.handly.ui.viewer.DeferredElementTreeContentProvider;
 import org.eclipse.handly.ui.viewer.ProblemMarkerLabelDecorator;
 import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -37,7 +37,7 @@ public class TypeScriptOutlinePopup
     @Override
     protected ITreeContentProvider getContentProvider()
     {
-        return new ElementTreeContentProvider();
+        return new DeferredElementTreeContentProvider(getTreeViewer(), null);
     }
 
     @Override
