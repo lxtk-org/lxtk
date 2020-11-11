@@ -357,10 +357,18 @@ public class ContentAssistProcessor
         else
         {
             int activeParameter = signatureHelp.getActiveParameter().intValue();
-            if (activeParameter < 0 || activeParameter >= signatureHelp.getSignatures().get(
-                signatureHelp.getActiveSignature()).getParameters().size())
+            if (activeParameter < 0 || activeParameter >= getParameterCount(
+                signatureHelp.getSignatures().get(signatureHelp.getActiveSignature())))
                 signatureHelp.setActiveParameter(0);
         }
+    }
+
+    private static int getParameterCount(SignatureInformation signature)
+    {
+        List<ParameterInformation> parameters = signature.getParameters();
+        if (parameters == null)
+            return 0;
+        return parameters.size();
     }
 
     private static class SignatureContextInformation
@@ -433,7 +441,8 @@ public class ContentAssistProcessor
             this.viewer = viewer;
             signatureHelp = null;
             currentParameter = null;
-            markActiveParameter = shouldMarkSignatureActiveParameter();
+            markActiveParameter =
+                shouldMarkSignatureActiveParameter() && getParameterCount(this.info.signature) > 0;
         }
 
         @Override
@@ -465,7 +474,7 @@ public class ContentAssistProcessor
 
             SignatureInformation activeSignature =
                 signatureHelp.getSignatures().get(signatureHelp.getActiveSignature());
-            if (!info.signature.equals(activeSignature))
+            if (getParameterCount(activeSignature) == 0 || !info.signature.equals(activeSignature))
             {
                 if (currentParameter == null)
                     return false;
