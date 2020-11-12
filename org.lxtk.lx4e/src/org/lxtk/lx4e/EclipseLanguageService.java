@@ -12,10 +12,13 @@
  *******************************************************************************/
 package org.lxtk.lx4e;
 
+import java.util.function.Consumer;
+
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.lxtk.DefaultLanguageService;
 import org.lxtk.LanguageService;
+import org.lxtk.lx4e.internal.Activator;
 
 /**
  * Default implementation of {@link LanguageService} for Eclipse.
@@ -40,5 +43,11 @@ public class EclipseLanguageService
         FoldingRangeCapabilities capabilities = super.getFoldingRangeCapabilities();
         capabilities.setLineFoldingOnly(true);
         return capabilities;
+    }
+
+    @Override
+    protected Consumer<Throwable> getLogger()
+    {
+        return Activator.LOGGER;
     }
 }

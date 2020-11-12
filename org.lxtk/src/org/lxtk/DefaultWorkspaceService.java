@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 import org.lxtk.util.EventEmitter;
 import org.lxtk.util.EventStream;
@@ -74,7 +75,8 @@ public class DefaultWorkspaceService
         }
         try
         {
-            onDidChangeWorkspaceFolders.fire(new WorkspaceFoldersChangeEvent(oldFolders, folders));
+            onDidChangeWorkspaceFolders.fire(new WorkspaceFoldersChangeEvent(oldFolders, folders),
+                getLogger());
         }
         finally
         {
@@ -168,5 +170,15 @@ public class DefaultWorkspaceService
         if (key.charAt(key.length() - 1) != '/')
             key += '/';
         return key;
+    }
+
+    /**
+     * Returns an exception logger for this service.
+     *
+     * @return a logger instance (may be <code>null</code>)
+     */
+    protected Consumer<Throwable> getLogger()
+    {
+        return null;
     }
 }

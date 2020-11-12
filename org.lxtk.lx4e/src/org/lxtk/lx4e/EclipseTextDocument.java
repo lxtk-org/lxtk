@@ -31,6 +31,7 @@ import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSnapshot;
+import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.EventEmitter;
 import org.lxtk.util.EventStream;
@@ -86,7 +87,7 @@ public final class EclipseTextDocument
             String text = getLastChange().getSnapshot().getText();
             if (buffer.isDirty())
                 return; // double check the buffer is not dirty
-            onDidSave.fire(newSaveEvent(text));
+            onDidSave.fire(newSaveEvent(text), Activator.LOGGER);
         };
     };
     private boolean isDisposed;
@@ -227,7 +228,7 @@ public final class EclipseTextDocument
 
     private void notifyChange(EclipseTextDocumentChangeEvent event)
     {
-        onDidChange.fire(event);
+        onDidChange.fire(event, Activator.LOGGER);
         lastChange.set(event);
     }
 

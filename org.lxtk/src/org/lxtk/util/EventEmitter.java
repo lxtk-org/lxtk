@@ -38,16 +38,6 @@ public class EventEmitter<E>
     }
 
     /**
-     * Notify all subscribers about the given event.
-     *
-     * @param event not <code>null</code>
-     */
-    public void fire(E event)
-    {
-        fire(event, null);
-    }
-
-    /**
      * Notify all subscribers about the given event; the given exception handler
      * is used to handle any exception thrown by an event consumer.
      *
@@ -68,6 +58,8 @@ public class EventEmitter<E>
             {
                 if (exceptionHandler != null)
                     exceptionHandler.accept(t);
+                else
+                    t.printStackTrace();
             }
         }
     }

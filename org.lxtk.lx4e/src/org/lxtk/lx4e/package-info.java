@@ -13,10 +13,20 @@
 /**
  * Provides basic facilities for LXTK integration with the Eclipse platform.
  *
- * <h2>Eclipse-specific extensions of LXTK Core Framework</h2>
+ * <h2>Eclipse-specific implementations of LXTK Core Services</h2>
  * <ul>
+ * <li>{@link org.lxtk.lx4e.EclipseDocumentService} provides a {@link org.lxtk.DocumentService}
+ * implementation for Eclipse</li>
  * <li>{@link org.lxtk.lx4e.EclipseLanguageService} provides a {@link org.lxtk.LanguageService}
  * implementation for Eclipse</li>
+ * <li>{@link org.lxtk.lx4e.EclipseCommandService} provides a {@link org.lxtk.CommandService}
+ * implementation for Eclipse</li>
+ * <li>{@link org.lxtk.lx4e.EclipseWorkspaceService} provides a {@link org.lxtk.WorkspaceService}
+ * implementation for Eclipse</li>
+ * </ul>
+ *
+ * <h2>Other extensions of LXTK Core Framework for Eclipse</h2>
+ * <ul>
  * <li>{@link org.lxtk.lx4e.EclipseTextDocument} implements {@link org.lxtk.TextDocument}
  * on top of a given {@link org.eclipse.handly.buffer.IBuffer}</li>
  * <li>{@link org.lxtk.lx4e.EclipseLog} implements a {@link org.lxtk.util.Log} that delegates

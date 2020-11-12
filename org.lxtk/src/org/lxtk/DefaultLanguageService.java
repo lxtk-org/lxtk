@@ -13,6 +13,7 @@
 package org.lxtk;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CodeActionKind;
@@ -53,27 +54,24 @@ import org.lxtk.util.Registry;
 public class DefaultLanguageService
     implements LanguageService
 {
-    private final Registry<CodeActionProvider> codeActionProviders = Registry.newInstance();
-    private final Registry<CodeLensProvider> codeLensProviders = Registry.newInstance();
-    private final Registry<CompletionProvider> completionProviders = Registry.newInstance();
-    private final Registry<DeclarationProvider> declarationProviders = Registry.newInstance();
-    private final Registry<DefinitionProvider> definitionProviders = Registry.newInstance();
-    private final Registry<DocumentFormattingProvider> documentFormattingProviders =
-        Registry.newInstance();
-    private final Registry<DocumentHighlightProvider> documentHighlightProviders =
-        Registry.newInstance();
+    private final Registry<CodeActionProvider> codeActionProviders = newRegistry();
+    private final Registry<CodeLensProvider> codeLensProviders = newRegistry();
+    private final Registry<CompletionProvider> completionProviders = newRegistry();
+    private final Registry<DeclarationProvider> declarationProviders = newRegistry();
+    private final Registry<DefinitionProvider> definitionProviders = newRegistry();
+    private final Registry<DocumentFormattingProvider> documentFormattingProviders = newRegistry();
+    private final Registry<DocumentHighlightProvider> documentHighlightProviders = newRegistry();
     private final Registry<DocumentRangeFormattingProvider> documentRangeFormattingProviders =
-        Registry.newInstance();
-    private final Registry<DocumentSymbolProvider> documentSymbolProviders = Registry.newInstance();
-    private final Registry<FoldingRangeProvider> foldingRangeProviders = Registry.newInstance();
-    private final Registry<HoverProvider> hoverProviders = Registry.newInstance();
-    private final Registry<ImplementationProvider> implementationProviders = Registry.newInstance();
-    private final Registry<ReferenceProvider> referenceProviders = Registry.newInstance();
-    private final Registry<RenameProvider> renameProviders = Registry.newInstance();
-    private final Registry<SignatureHelpProvider> signatureHelpProviders = Registry.newInstance();
-    private final Registry<TypeDefinitionProvider> typeDefinitionProviders = Registry.newInstance();
-    private final Registry<WorkspaceSymbolProvider> workspaceSymbolProviders =
-        Registry.newInstance();
+        newRegistry();
+    private final Registry<DocumentSymbolProvider> documentSymbolProviders = newRegistry();
+    private final Registry<FoldingRangeProvider> foldingRangeProviders = newRegistry();
+    private final Registry<HoverProvider> hoverProviders = newRegistry();
+    private final Registry<ImplementationProvider> implementationProviders = newRegistry();
+    private final Registry<ReferenceProvider> referenceProviders = newRegistry();
+    private final Registry<RenameProvider> renameProviders = newRegistry();
+    private final Registry<SignatureHelpProvider> signatureHelpProviders = newRegistry();
+    private final Registry<TypeDefinitionProvider> typeDefinitionProviders = newRegistry();
+    private final Registry<WorkspaceSymbolProvider> workspaceSymbolProviders = newRegistry();
 
     @Override
     public CodeActionCapabilities getCodeActionCapabilities()
@@ -363,5 +361,20 @@ public class DefaultLanguageService
     public Registry<WorkspaceSymbolProvider> getWorkspaceSymbolProviders()
     {
         return workspaceSymbolProviders;
+    }
+
+    /**
+     * Returns an exception logger for this service.
+     *
+     * @return a logger instance (may be <code>null</code>)
+     */
+    protected Consumer<Throwable> getLogger()
+    {
+        return null;
+    }
+
+    private <E> Registry<E> newRegistry()
+    {
+        return Registry.newInstance(getLogger());
     }
 }

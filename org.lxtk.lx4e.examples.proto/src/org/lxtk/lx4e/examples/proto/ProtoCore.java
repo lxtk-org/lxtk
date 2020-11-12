@@ -12,12 +12,12 @@
  *******************************************************************************/
 package org.lxtk.lx4e.examples.proto;
 
-import org.lxtk.DefaultDocumentService;
-import org.lxtk.DefaultWorkspaceService;
 import org.lxtk.DocumentService;
 import org.lxtk.LanguageService;
 import org.lxtk.WorkspaceService;
+import org.lxtk.lx4e.EclipseDocumentService;
 import org.lxtk.lx4e.EclipseLanguageService;
+import org.lxtk.lx4e.EclipseWorkspaceService;
 
 /**
  * Facade to Proto services.
@@ -27,7 +27,7 @@ public class ProtoCore
     /**
      * Proto document service.
      */
-    public static final DocumentService DOCUMENT_SERVICE = new DefaultDocumentService();
+    public static final DocumentService DOCUMENT_SERVICE = new EclipseDocumentService();
 
     /**
      * Proto language service.
@@ -42,7 +42,7 @@ public class ProtoCore
     /**
      * Proto workspace service.
      */
-    public static final WorkspaceService WORKSPACE_SERVICE = new DefaultWorkspaceService();
+    public static final WorkspaceService WORKSPACE_SERVICE = new EclipseWorkspaceService();
 
     private ProtoCore()
     {

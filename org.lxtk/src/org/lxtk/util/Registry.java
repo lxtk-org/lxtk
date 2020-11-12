@@ -15,6 +15,7 @@ package org.lxtk.util;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Consumer;
 
 /**
  * Represents a registry of elements.
@@ -49,16 +50,18 @@ public interface Registry<E>
     EventStream<E> onDidRemove();
 
     /**
-     * Returns a new instance of default implementation of {@link Registry}.
+     * Returns a new instance of default implementation of {@link Registry}
+     * using the given logger.
      * <p>
      * The returned instance is safe for use by multiple concurrent threads.
      * </p>
      *
      * @param <E> element type
+     * @param logger may be <code>null</code>
      * @return a new instance of default implementation of <code>Registry</code>
      *  (never <code>null</code>)
      */
-    static <E> Registry<E> newInstance()
+    static <E> Registry<E> newInstance(Consumer<Throwable> logger)
     {
         return new Registry<E>()
         {
@@ -91,11 +94,11 @@ public interface Registry<E>
             public Disposable add(E e)
             {
                 if (elements.add(e))
-                    onDidAdd.fire(e);
+                    onDidAdd.fire(e, logger);
                 return () ->
                 {
                     if (elements.remove(e))
-                        onDidRemove.fire(e);
+                        onDidRemove.fire(e, logger);
                 };
             }
 

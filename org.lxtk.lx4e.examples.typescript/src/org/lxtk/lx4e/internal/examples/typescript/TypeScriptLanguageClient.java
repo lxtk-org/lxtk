@@ -32,7 +32,6 @@ import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.CommandService;
-import org.lxtk.DefaultCommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
@@ -56,6 +55,7 @@ import org.lxtk.client.TypeDefinitionFeature;
 import org.lxtk.client.WorkspaceSymbolFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
+import org.lxtk.lx4e.EclipseCommandService;
 import org.lxtk.lx4e.EclipseLog;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.ui.EclipseLanguageClient;
@@ -77,7 +77,7 @@ public class TypeScriptLanguageClient
     private final String rootUri;
     private final BufferingDiagnosticConsumer diagnosticConsumer =
         new BufferingDiagnosticConsumer(new DiagnosticMarkers(MARKER_TYPE));
-    private final CommandService commandService = new DefaultCommandService();
+    private final CommandService commandService = new EclipseCommandService();
 
     /**
      * Creates a new TypeScript language client with the given {@link IProject}

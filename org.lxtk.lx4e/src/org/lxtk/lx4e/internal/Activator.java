@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.lxtk.lx4e.internal;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -25,6 +27,8 @@ public class Activator
     extends Plugin
 {
     public static final String PLUGIN_ID = "org.lxtk.lx4e"; //$NON-NLS-1$
+
+    public static final Consumer<Throwable> LOGGER = e -> logError(e);
 
     private static Activator plugin;
 

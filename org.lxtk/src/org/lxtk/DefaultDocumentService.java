@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import org.lxtk.util.Disposable;
 import org.lxtk.util.EventEmitter;
@@ -55,22 +56,22 @@ public class DefaultDocumentService
         {
             // Must subscribe to the document's didChange before onDidAddTextDocument is fired.
             // Otherwise, it would be possible to lose some change events in a blindspot.
-            Disposable didChangeSubscription =
-                document.onDidChange().subscribe(event -> onDidChangeTextDocument.fire(event));
+            Disposable didChangeSubscription = document.onDidChange().subscribe(
+                event -> onDidChangeTextDocument.fire(event, getLogger()));
             rollback.add(didChangeSubscription::dispose);
 
-            onDidAddTextDocument.fire(document);
+            onDidAddTextDocument.fire(document, getLogger());
             rollback.add(() ->
             {
                 if (textDocuments.remove(uri, document))
-                    onDidRemoveTextDocument.fire(document);
+                    onDidRemoveTextDocument.fire(document, getLogger());
             });
 
-            Disposable didSaveSubscription =
-                document.onDidSave().subscribe(event -> onDidSaveTextDocument.fire(event));
+            Disposable didSaveSubscription = document.onDidSave().subscribe(
+                event -> onDidSaveTextDocument.fire(event, getLogger()));
             rollback.add(didSaveSubscription::dispose);
 
-            rollback.setLogger(e -> e.printStackTrace());
+            rollback.setLogger(getLogger());
             return rollback::run;
         });
         return result;
@@ -123,5 +124,15 @@ public class DefaultDocumentService
     protected URI normalize(URI uri)
     {
         return UriUtil.normalize(uri, EnumSet.of(Normalization.ENCODING, Normalization.PATH));
+    }
+
+    /**
+     * Returns an exception logger for this service.
+     *
+     * @return a logger instance (may be <code>null</code>)
+     */
+    protected Consumer<Throwable> getLogger()
+    {
+        return null;
     }
 }

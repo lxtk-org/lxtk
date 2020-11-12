@@ -138,6 +138,8 @@ public class SafeRun
                 {
                     if (logger != null)
                         logger.accept(t);
+                    else
+                        t.printStackTrace();
                 }
             }
             reset();

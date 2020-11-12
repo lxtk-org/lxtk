@@ -17,9 +17,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.handly.model.IElementChangeListener;
-import org.lxtk.DefaultDocumentService;
-import org.lxtk.LanguageService;
 import org.lxtk.DocumentService;
+import org.lxtk.LanguageService;
+import org.lxtk.lx4e.EclipseDocumentService;
 import org.lxtk.lx4e.EclipseLanguageService;
 import org.lxtk.lx4e.internal.examples.json.JsonSourceFile;
 import org.lxtk.lx4e.internal.examples.json.ModelManager;
@@ -34,7 +34,7 @@ public class JsonCore
     /**
      * JSON Document Service.
      */
-    public static final DocumentService DOCUMENT_SERVICE = new DefaultDocumentService();
+    public static final DocumentService DOCUMENT_SERVICE = new EclipseDocumentService();
 
     /**
      * JSON Language Service.
