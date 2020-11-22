@@ -50,7 +50,7 @@
 <unit id="org.jsoup" version="0.0.0"/> <!-- required by Mylyn -->
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/lsp4j/updates/releases/0.9.0"/>
+<repository location="http://download.eclipse.org/lsp4j/updates/releases/0.10.0"/>
 <unit id="org.eclipse.lsp4j" version="0.0.0"/>
 <unit id="org.eclipse.lsp4j.jsonrpc" version="0.0.0"/>
 </location>

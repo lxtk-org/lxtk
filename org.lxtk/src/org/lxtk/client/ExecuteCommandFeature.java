@@ -91,8 +91,9 @@ public final class ExecuteCommandFeature
         if (options == null)
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new ExecuteCommandRegistrationOptions(options.getCommands())));
+        ExecuteCommandRegistrationOptions registerOptions = new ExecuteCommandRegistrationOptions();
+        registerOptions.setCommands(options.getCommands());
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override

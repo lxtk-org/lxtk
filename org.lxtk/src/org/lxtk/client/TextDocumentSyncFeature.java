@@ -50,6 +50,7 @@ import org.eclipse.lsp4j.TextDocumentSyncOptions;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 import org.eclipse.lsp4j.jsonrpc.Endpoint;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentService;
 import org.lxtk.DocumentUri;
@@ -175,9 +176,10 @@ public final class TextDocumentSyncFeature
                 new Registration(UUID.randomUUID().toString(), DID_CHANGE, registrationOptions));
         }
 
-        SaveOptions saveOptions = syncOptions.getSave();
-        if (saveOptions != null)
+        Either<Boolean, SaveOptions> save = syncOptions.getSave();
+        if (save != null && (Boolean.TRUE.equals(save.getLeft()) || save.isRight()))
         {
+            SaveOptions saveOptions = save.isRight() ? save.getRight() : new SaveOptions();
             TextDocumentSaveRegistrationOptions registrationOptions =
                 new TextDocumentSaveRegistrationOptions(saveOptions.getIncludeText());
             registrationOptions.setDocumentSelector(documentSelector);
