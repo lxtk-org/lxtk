@@ -34,7 +34,7 @@ public class EclipseFuture<T>
     implements Future<T>
 {
     private final Future<T> future;
-    private final long monitorPeriod;
+    private final int monitorPeriod;
 
     /**
      * Returns an {@link EclipseFuture} based on the given future.
@@ -48,13 +48,17 @@ public class EclipseFuture<T>
     {
         if (future instanceof EclipseFuture)
             return (EclipseFuture<T>)future;
-        return new EclipseFuture<>(future, 50);
+        return new EclipseFuture<>(future, 100);
     }
 
     private EclipseFuture(Future<T> future, long monitorPeriod)
     {
         this.future = Objects.requireNonNull(future);
-        this.monitorPeriod = monitorPeriod;
+        if (monitorPeriod < 10)
+            monitorPeriod = 10;
+        else if (monitorPeriod > 500)
+            monitorPeriod = 500;
+        this.monitorPeriod = (int)monitorPeriod;
     }
 
     /**
@@ -133,16 +137,14 @@ public class EclipseFuture<T>
         subMonitor.checkCanceled();
         while (true)
         {
-            // Regardless of the amount of progress reported so far, use 0.01%
-            // of the space remaining in the monitor (logarithmic progress).
-            subMonitor.setWorkRemaining(10000);
+            subMonitor.setWorkRemaining(2000);
             try
             {
                 return get(monitorPeriod, TimeUnit.MILLISECONDS);
             }
             catch (TimeoutException e)
             {
-                subMonitor.split(1);
+                subMonitor.split(monitorPeriod);
             }
         }
     }
@@ -175,16 +177,14 @@ public class EclipseFuture<T>
         subMonitor.checkCanceled();
         while (true)
         {
-            // Regardless of the amount of progress reported so far, use 0.01%
-            // of the space remaining in the monitor (logarithmic progress).
-            subMonitor.setWorkRemaining(10000);
+            subMonitor.setWorkRemaining(2000);
             try
             {
                 return get(Math.min(monitorPeriod, timeRemaining), TimeUnit.MILLISECONDS);
             }
             catch (TimeoutException e)
             {
-                subMonitor.split(1);
+                subMonitor.split(monitorPeriod);
                 timeRemaining -= monitorPeriod;
                 if (timeRemaining <= 0)
                     throw e;
