@@ -33,7 +33,7 @@ public class EventEmitter<E>
     @Override
     public Disposable subscribe(Consumer<? super E> consumer)
     {
-        consumers.add(consumer);
+        consumers.add(Objects.requireNonNull(consumer));
         return () -> consumers.remove(consumer);
     }
 
