@@ -64,5 +64,14 @@
  * {@link org.lxtk.DefaultWorkspaceService} provides a general-purpose implementation
  * of the service.
  * </p>
+ * </p>
+ * <h2>Progress Service</h2>
+ * <p>
+ * {@link org.lxtk.ProgressService} provides support for progress reporting.
+ * </p>
+ * <p>
+ * {@link org.lxtk.DefaultProgressService} provides a general-purpose implementation
+ * of the service.
+ * </p>
  */
 package org.lxtk;

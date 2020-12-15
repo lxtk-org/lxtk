@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
@@ -28,7 +28,7 @@ public class FoldingRangeRequest
     LanguageFeatureRequest<FoldingRangeProvider, FoldingRangeRequestParams, List<FoldingRange>>
 {
     @Override
-    protected Future<List<FoldingRange>> send(FoldingRangeProvider provider,
+    protected CompletableFuture<List<FoldingRange>> send(FoldingRangeProvider provider,
         FoldingRangeRequestParams params)
     {
         setTitle(MessageFormat.format(Messages.FoldingRangeRequest_title, params));

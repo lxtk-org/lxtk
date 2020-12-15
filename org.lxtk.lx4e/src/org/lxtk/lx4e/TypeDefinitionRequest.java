@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
@@ -30,8 +30,9 @@ public class TypeDefinitionRequest
         Either<List<? extends Location>, List<? extends LocationLink>>>
 {
     @Override
-    protected Future<Either<List<? extends Location>, List<? extends LocationLink>>> send(
-        TypeDefinitionProvider provider, TypeDefinitionParams params)
+    protected CompletableFuture<
+        Either<List<? extends Location>, List<? extends LocationLink>>> send(
+            TypeDefinitionProvider provider, TypeDefinitionParams params)
     {
         setTitle(MessageFormat.format(Messages.TypeDefinitionRequest_title, params));
         return provider.getTypeDefinition(params);

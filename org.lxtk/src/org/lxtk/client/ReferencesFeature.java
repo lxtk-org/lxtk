@@ -21,12 +21,13 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceParams;
+import org.eclipse.lsp4j.ReferenceRegistrationOptions;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.ReferenceProvider;
 import org.lxtk.util.Disposable;
 
@@ -38,7 +39,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class ReferencesFeature
-    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<ReferenceRegistrationOptions>
 {
     private static final String METHOD = "textDocument/references"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -77,26 +78,34 @@ public final class ReferencesFeature
         if (!Boolean.TRUE.equals(capability))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new TextDocumentRegistrationOptions(documentSelector)));
+        ReferenceRegistrationOptions registerOptions = new ReferenceRegistrationOptions();
+        registerOptions.setDocumentSelector(documentSelector);
+        // TODO registerOptions.setWorkDoneProgress(workDoneProgress);
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<ReferenceRegistrationOptions> getRegistrationOptionsClass()
     {
-        return TextDocumentRegistrationOptions.class;
+        return ReferenceRegistrationOptions.class;
     }
 
     @Override
-    Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+    Disposable registerLanguageFeatureProvider(String method, ReferenceRegistrationOptions options)
     {
         return getLanguageService().getReferenceProviders().add(new ReferenceProvider()
         {
             @Override
-            public TextDocumentRegistrationOptions getRegistrationOptions()
+            public ReferenceRegistrationOptions getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

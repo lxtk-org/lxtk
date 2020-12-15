@@ -13,7 +13,7 @@
 package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
@@ -29,7 +29,7 @@ public class PrepareRenameRequest
     LanguageFeatureRequest<RenameProvider, PrepareRenameParams, Either<Range, PrepareRenameResult>>
 {
     @Override
-    protected Future<Either<Range, PrepareRenameResult>> send(RenameProvider provider,
+    protected CompletableFuture<Either<Range, PrepareRenameResult>> send(RenameProvider provider,
         PrepareRenameParams params)
     {
         setTitle(MessageFormat.format(Messages.PrepareRenameRequest_title, params));

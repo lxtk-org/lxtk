@@ -13,7 +13,7 @@
 package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.SignatureHelp;
 import org.eclipse.lsp4j.SignatureHelpParams;
@@ -26,7 +26,8 @@ public class SignatureHelpRequest
     extends LanguageFeatureRequest<SignatureHelpProvider, SignatureHelpParams, SignatureHelp>
 {
     @Override
-    protected Future<SignatureHelp> send(SignatureHelpProvider provider, SignatureHelpParams params)
+    protected CompletableFuture<SignatureHelp> send(SignatureHelpProvider provider,
+        SignatureHelpParams params)
     {
         setTitle(MessageFormat.format(Messages.SignatureHelpRequest_title, params));
         return provider.getSignatureHelp(params);

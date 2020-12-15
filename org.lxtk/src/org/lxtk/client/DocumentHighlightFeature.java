@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.lxtk.DocumentHighlightProvider;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.util.Disposable;
 
 /**
@@ -99,6 +100,12 @@ public final class DocumentHighlightFeature
                 public TextDocumentRegistrationOptions getRegistrationOptions()
                 {
                     return options;
+                }
+
+                @Override
+                public ProgressService getProgressService()
+                {
+                    return getLanguageClient().getProgressService();
                 }
 
                 @Override

@@ -26,6 +26,7 @@ import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.WorkspaceSymbolProvider;
 import org.lxtk.util.Disposable;
 
@@ -101,6 +102,12 @@ public final class WorkspaceSymbolFeature
             public Object getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

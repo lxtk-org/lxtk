@@ -34,6 +34,7 @@ abstract class LanguageFeature<RO>
     implements DynamicFeature<LanguageServer>
 {
     private final LanguageService languageService;
+    private AbstractLanguageClient<? extends LanguageServer> languageClient;
     private LanguageServer languageServer;
     private Map<String, Disposable> registrations;
 
@@ -58,10 +59,30 @@ abstract class LanguageFeature<RO>
     }
 
     @Override
+    public void setLanguageClient(AbstractLanguageClient<? extends LanguageServer> client)
+    {
+        languageClient = Objects.requireNonNull(client);
+    }
+
+    /**
+     * Returns the owning language client of this feature.
+     *
+     * @return the language client (never <code>null</code>)
+     * @throws IllegalStateException if the language client has not been {@link
+     *  Feature#setLanguageClient(AbstractLanguageClient) set}
+     */
+    final AbstractLanguageClient<? extends LanguageServer> getLanguageClient()
+    {
+        if (languageClient == null)
+            throw new IllegalStateException();
+        return languageClient;
+    }
+
+    @Override
     public final synchronized void initialize(LanguageServer server,
         InitializeResult initializeResult, List<DocumentFilter> documentSelector)
     {
-        languageServer = server;
+        languageServer = Objects.requireNonNull(server);
         registrations = new HashMap<>();
         initialize(initializeResult.getCapabilities(), documentSelector);
     }
@@ -84,7 +105,7 @@ abstract class LanguageFeature<RO>
     /**
      * Initialization callback.
      *
-     * @param capabilities not <code>null</code>
+     * @param capabilities never <code>null</code>
      * @param documentSelector a default document selector, or <code>null</code>
      */
     abstract void initialize(ServerCapabilities capabilities,

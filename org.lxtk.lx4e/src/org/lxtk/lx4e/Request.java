@@ -15,10 +15,9 @@ package org.lxtk.lx4e;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.ILog;
@@ -27,8 +26,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.lxtk.PartialResultProgress;
+import org.lxtk.WorkDoneProgress;
 import org.lxtk.lx4e.internal.Activator;
-import org.lxtk.lx4e.util.EclipseFuture;
+import org.lxtk.lx4e.util.FutureSupport;
 
 /**
  * A command object that sends a request to an asynchronous service
@@ -40,7 +41,10 @@ public abstract class Request<T>
 {
     private Handler<T> handler;
     private Duration timeout;
+    private boolean strictTimeout;
     private IProgressMonitor monitor;
+    private WorkDoneProgress workDoneProgress;
+    private PartialResultProgress partialResultProgress;
     private boolean mayThrow = true;
     private T defaultResult;
     private ILog log;
@@ -94,6 +98,26 @@ public abstract class Request<T>
     }
 
     /**
+     * Sets whether the timeout for this request (if any) is strict.
+     *
+     * @param value <code>true</code> if the timeout is strict, and <code>false</code> otherwise
+     */
+    public void setStrictTimeout(boolean value)
+    {
+        strictTimeout = value;
+    }
+
+    /**
+     * Returns whether the timeout for this request (if any) is strict.
+     *
+     * @return <code>true</code> if the timeout is strict, and <code>false</code> otherwise
+     */
+    public boolean isStrictTimeout()
+    {
+        return strictTimeout;
+    }
+
+    /**
      * Sets a progress monitor for this request.
      *
      * @param monitor a progress monitor or <code>null</code>
@@ -111,6 +135,46 @@ public abstract class Request<T>
     public IProgressMonitor getProgressMonitor()
     {
         return monitor;
+    }
+
+    /**
+     * Sets a work done progress for this request.
+     *
+     * @param workDoneProgress a work done progress or <code>null</code>
+     */
+    public void setWorkDoneProgress(WorkDoneProgress workDoneProgress)
+    {
+        this.workDoneProgress = workDoneProgress;
+    }
+
+    /**
+     * Returns the work done progress for this request.
+     *
+     * @return the work done progress or <code>null</code>
+     */
+    public WorkDoneProgress getWorkDoneProgress()
+    {
+        return workDoneProgress;
+    }
+
+    /**
+     * Sets a partial result progress for this request.
+     *
+     * @param partialResultProgress a partial result progress or <code>null</code>
+     */
+    public void setPartialResultProgress(PartialResultProgress partialResultProgress)
+    {
+        this.partialResultProgress = partialResultProgress;
+    }
+
+    /**
+     * Return the partial result progress for this request.
+     *
+     * @return the partial result progress or <code>null</code>
+     */
+    public PartialResultProgress getPartialResultProgress()
+    {
+        return partialResultProgress;
     }
 
     /**
@@ -231,7 +295,7 @@ public abstract class Request<T>
      *
      * @return the response future (not <code>null</code>)
      */
-    protected abstract Future<T> send();
+    protected abstract CompletableFuture<T> send();
 
     /**
      * A customizable template for sending a request and receiving a response.
@@ -241,7 +305,7 @@ public abstract class Request<T>
     public static class Handler<T>
     {
         private Request<T> request;
-        private Future<T> future;
+        private CompletableFuture<T> future;
         private String errorMessage;
 
         /**
@@ -312,7 +376,7 @@ public abstract class Request<T>
          *
          * @return the response future
          */
-        protected Future<T> getFuture()
+        protected CompletableFuture<T> getFuture()
         {
             return future;
         }
@@ -322,9 +386,34 @@ public abstract class Request<T>
          *
          * @param future the response future
          */
-        protected void setFuture(Future<T> future)
+        protected void setFuture(CompletableFuture<T> future)
         {
             this.future = future;
+
+            WorkDoneProgress workDoneProgress = request.getWorkDoneProgress();
+            if (workDoneProgress != null)
+            {
+                CompletableFuture<Void> progressFuture = workDoneProgress.toCompletableFuture();
+                future.whenComplete((result, thrown) -> progressFuture.complete(null));
+                progressFuture.whenComplete((result, thrown) ->
+                {
+                    if (progressFuture.isCancelled())
+                        future.cancel(true);
+                });
+            }
+
+            PartialResultProgress partialResultProgress = request.getPartialResultProgress();
+            if (partialResultProgress != null)
+            {
+                CompletableFuture<Void> progressFuture =
+                    partialResultProgress.toCompletableFuture();
+                future.whenComplete((result, thrown) -> progressFuture.complete(null));
+                progressFuture.whenComplete((result, thrown) ->
+                {
+                    if (progressFuture.isCancelled())
+                        future.cancel(true);
+                });
+            }
         }
 
         /**
@@ -379,19 +468,48 @@ public abstract class Request<T>
          */
         protected T doReceive() throws ExecutionException, InterruptedException, TimeoutException
         {
-            Duration timeout = request.getTimeout();
             IProgressMonitor monitor = request.getProgressMonitor();
-            if (monitor == null)
+            if (monitor != null)
             {
-                return timeout == null ? future.get()
-                    : future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+                SubMonitor subMonitor = SubMonitor.convert(monitor, request.getTitle(), 1);
+                request.setProgressMonitor(subMonitor);
+                monitor = subMonitor.split(1);
             }
 
-            EclipseFuture<T> eFuture = EclipseFuture.of(future);
-            SubMonitor sMonitor = SubMonitor.convert(monitor, request.getTitle(), 1);
-            request.setProgressMonitor(sMonitor);
-            return timeout == null ? eFuture.get(sMonitor.split(1))
-                : eFuture.get(timeout, sMonitor.split(1));
+            WorkDoneProgress workDoneProgress = request.getWorkDoneProgress();
+            PartialResultProgress partialResultProgress = request.getPartialResultProgress();
+
+            FutureSupport<T> futureSupport;
+            if (workDoneProgress == null && partialResultProgress == null)
+            {
+                futureSupport = new FutureSupport<>(future);
+            }
+            else if (workDoneProgress != null && partialResultProgress == null)
+            {
+                futureSupport = new ProgressSupport<>(future, workDoneProgress::getState,
+                    workDoneProgress::getLastUpdated);
+            }
+            else if (workDoneProgress == null && partialResultProgress != null)
+            {
+                futureSupport = new ProgressSupport<>(future, () -> null,
+                    partialResultProgress::getLastUpdated);
+            }
+            else
+            {
+                futureSupport = new ProgressSupport<>(future, workDoneProgress::getState,
+                    () -> Math.max(workDoneProgress.getLastUpdated(),
+                        partialResultProgress.getLastUpdated()));
+            }
+
+            Duration timeout = request.getTimeout();
+            if (timeout == null)
+                return futureSupport.join(monitor);
+
+            if (futureSupport instanceof ProgressSupport)
+                return ((ProgressSupport<T>)futureSupport).join(timeout.toMillis(),
+                    request.isStrictTimeout(), monitor);
+
+            return futureSupport.join(timeout.toMillis(), monitor);
         }
 
         /**
@@ -432,6 +550,7 @@ public abstract class Request<T>
          */
         protected T handle(InterruptedException e)
         {
+            Thread.currentThread().interrupt();
             cancel();
             if (request.mayThrow())
                 throw toOCE(e);

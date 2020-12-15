@@ -45,4 +45,14 @@ public interface LanguageFeatureProvider<RO>
             return ((TextDocumentRegistrationOptions)registrationOptions).getDocumentSelector();
         return null;
     }
+
+    /**
+     * Returns the progress service for this provider.
+     *
+     * @return the progress service, or <code>null</code> if none
+     */
+    default ProgressService getProgressService()
+    {
+        return null;
+    }
 }

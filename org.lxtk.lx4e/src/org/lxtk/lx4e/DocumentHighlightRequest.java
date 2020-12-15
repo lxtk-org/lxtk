@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.DocumentHighlightParams;
@@ -28,8 +28,8 @@ public class DocumentHighlightRequest
         List<? extends DocumentHighlight>>
 {
     @Override
-    protected Future<List<? extends DocumentHighlight>> send(DocumentHighlightProvider provider,
-        DocumentHighlightParams params)
+    protected CompletableFuture<List<? extends DocumentHighlight>> send(
+        DocumentHighlightProvider provider, DocumentHighlightParams params)
     {
         setTitle(MessageFormat.format(Messages.DocumentHighlightRequest_title, params));
         return provider.getDocumentHighlights(params);

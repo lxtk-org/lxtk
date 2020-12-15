@@ -30,6 +30,7 @@ import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.TypeDefinitionProvider;
 import org.lxtk.util.Disposable;
 
@@ -113,6 +114,12 @@ public final class TypeDefinitionFeature
             public StaticRegistrationOptions getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

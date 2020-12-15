@@ -15,10 +15,11 @@ package org.lxtk.client;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -31,9 +32,12 @@ import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.jsonrpc.JsonRpcException;
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.messages.ResponseError;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.lxtk.DefaultWorkDoneProgress;
+import org.lxtk.ProgressService;
+import org.lxtk.WorkDoneProgress;
 import org.lxtk.jsonrpc.JsonRpcConnection;
 
 /**
@@ -45,7 +49,7 @@ public class ConnectionInitializer
     /**
      * The given client (never <code>null</code>).
      */
-    protected final LanguageClient client;
+    protected final AbstractLanguageClient<? extends LanguageServer> client;
     /**
      * The given client/server connection (never <code>null</code>).
      */
@@ -61,18 +65,22 @@ public class ConnectionInitializer
     /**
      * The initialize request future.
      */
-    protected Future<InitializeResult> future;
+    protected CompletableFuture<InitializeResult> future;
+    /**
+     * The work done progress.
+     */
+    protected WorkDoneProgress workDoneProgress;
 
     /**
      * Constructor.
      *
-     * @param client a {@link LanguageClient} (not <code>null</code>)
+     * @param client an {@link AbstractLanguageClient} (not <code>null</code>)
      * @param connection a {@link JsonRpcConnection} to the language server
      *  (not <code>null</code>)
      * @param params a supplier of the initialize params (not <code>null</code>)
      * @param timeout initialization timeout (a positive duration)
      */
-    public ConnectionInitializer(LanguageClient client,
+    public ConnectionInitializer(AbstractLanguageClient<? extends LanguageServer> client,
         JsonRpcConnection<? extends LanguageServer> connection, Supplier<InitializeParams> params,
         Duration timeout)
     {
@@ -111,12 +119,50 @@ public class ConnectionInitializer
     }
 
     /**
+     * Creates and returns a work done progress object.
+     *
+     * @return the created progress object
+     */
+    protected WorkDoneProgress newWorkDoneProgress()
+    {
+        return new DefaultWorkDoneProgress(Either.forLeft(UUID.randomUUID().toString()));
+    }
+
+    /**
      * Sends the initialize request.
      */
     protected void sendInitializeRequest()
     {
         if (future == null)
-            future = connection.getRemoteProxy().initialize(params.get());
+        {
+            InitializeParams params = this.params.get();
+
+            ProgressService progressService = client.getProgressService();
+            if (progressService == null)
+                workDoneProgress = null;
+            else
+            {
+                workDoneProgress = newWorkDoneProgress();
+                if (workDoneProgress != null)
+                {
+                    progressService.attachProgress(workDoneProgress);
+                    params.setWorkDoneToken(workDoneProgress.getToken());
+                }
+            }
+
+            future = connection.getRemoteProxy().initialize(params);
+
+            if (workDoneProgress != null)
+            {
+                CompletableFuture<Void> progressFuture = workDoneProgress.toCompletableFuture();
+                future.whenComplete((result, thrown) -> progressFuture.complete(null));
+                progressFuture.whenComplete((result, thrown) ->
+                {
+                    if (progressFuture.isCancelled())
+                        future.cancel(true);
+                });
+            }
+        }
     }
 
     /**
@@ -127,11 +173,13 @@ public class ConnectionInitializer
      *  while waiting
      * @throws ExecutionException if the computation threw an exception
      * @throws TimeoutException if the wait timed out
+     * @throws CancellationException if the computation was cancelled
      */
     protected InitializeResult getInitializeResult()
         throws InterruptedException, ExecutionException, TimeoutException
     {
-        long timeRemaining = timeout.toMillis();
+        long timeoutMillis = timeout.toMillis();
+        long startTime = System.currentTimeMillis();
         while (true)
         {
             if (connection.isClosed())
@@ -139,12 +187,20 @@ public class ConnectionInitializer
                     Messages.getString("ConnectionInitializer.Error.ConnectionAborted"))); //$NON-NLS-1$
             try
             {
-                return future.get(Math.min(timeRemaining, MONITOR_PERIOD), TimeUnit.MILLISECONDS);
+                return future.get(
+                    Math.min(Math.max(0, startTime + timeoutMillis - System.currentTimeMillis()),
+                        MONITOR_PERIOD),
+                    TimeUnit.MILLISECONDS);
             }
             catch (TimeoutException e)
             {
-                timeRemaining -= MONITOR_PERIOD;
-                if (timeRemaining <= 0)
+                if (workDoneProgress != null)
+                {
+                    long lastUpdated = workDoneProgress.getLastUpdated();
+                    if (lastUpdated > startTime)
+                        startTime = lastUpdated;
+                }
+                if (System.currentTimeMillis() - startTime >= timeoutMillis)
                     throw e;
             }
         }
@@ -159,6 +215,7 @@ public class ConnectionInitializer
      */
     protected InitializeResult interrupted(InterruptedException e)
     {
+        Thread.currentThread().interrupt();
         future.cancel(true);
         throw new CancellationException();
     }

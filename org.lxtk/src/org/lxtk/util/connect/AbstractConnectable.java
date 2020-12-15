@@ -14,6 +14,7 @@ package org.lxtk.util.connect;
 
 import java.text.MessageFormat;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
@@ -81,17 +82,21 @@ public abstract class AbstractConnectable
                     if (task == connectionTask
                         && getConnectionState() == ConnectionState.CONNECTING)
                     {
-                        log().error("An error occurred while connecting", //$NON-NLS-1$
-                            t);
-                        String message = t.getMessage();
-                        if (message == null)
-                            message =
-                                Messages.getString("AbstractConnectable.Error.CouldNotConnect"); //$NON-NLS-1$
-                        else
-                            message = MessageFormat.format(
-                                Messages.getString(
-                                    "AbstractConnectable.Error.CouldNotConnectBecauseOf"), //$NON-NLS-1$
-                                message);
+                        String message = null;
+                        if (!(t instanceof CancellationException))
+                        {
+                            log().error("An error occurred while connecting", //$NON-NLS-1$
+                                t);
+                            message = t.getMessage();
+                            if (message == null)
+                                message =
+                                    Messages.getString("AbstractConnectable.Error.CouldNotConnect"); //$NON-NLS-1$
+                            else
+                                message = MessageFormat.format(
+                                    Messages.getString(
+                                        "AbstractConnectable.Error.CouldNotConnectBecauseOf"), //$NON-NLS-1$
+                                    message);
+                        }
                         setErrorMessage(message);
                         setConnectionState(ConnectionState.DISCONNECTED);
                     }
@@ -224,6 +229,8 @@ public abstract class AbstractConnectable
          * to this method must eventually be followed by a call to the
          * {@link #disconnect()} method.
          * </p>
+         * @throws RuntimeException if an error occurred while creating the connection
+         * @throws CancellationException if the operation was cancelled
          */
         public abstract void connect();
 
@@ -240,6 +247,7 @@ public abstract class AbstractConnectable
          * <li>This method may be called even if the <code>connect()</code>
          * method was not called.</li>
          * </ul>
+         * @throws RuntimeException if an error occurred while closing the connection
          */
         public abstract void disconnect();
     }

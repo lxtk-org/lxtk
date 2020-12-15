@@ -30,7 +30,6 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.WorkspaceService;
 import org.lxtk.client.AbstractLanguageClient;
-import org.lxtk.client.AbstractLanguageClientController;
 import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.Feature;
@@ -44,6 +43,7 @@ import org.lxtk.lx4e.diagnostics.DiagnosticAnnotations;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.EclipseLanguageClient;
+import org.lxtk.lx4e.ui.EclipseLanguageClientController;
 import org.lxtk.util.Log;
 import org.lxtk.util.connect.StdioConnection;
 import org.lxtk.util.connect.StreamBasedConnection;
@@ -52,7 +52,7 @@ import org.lxtk.util.connect.StreamBasedConnection;
  * Proto language client.
  */
 public class ProtoLanguageClient
-    extends AbstractLanguageClientController<LanguageServer>
+    extends EclipseLanguageClientController<LanguageServer>
 {
     private static final Log LOG =
         new EclipseLog(Activator.getDefault().getBundle(), "proto-language-client"); //$NON-NLS-1$

@@ -33,6 +33,15 @@ public interface Feature<S extends LanguageServer>
     extends Disposable
 {
     /**
+     * Sets the owning language client of this feature.
+     *
+     * @param client not <code>null</code>
+     */
+    default void setLanguageClient(AbstractLanguageClient<? extends S> client)
+    {
+    }
+
+    /**
      * Fills the relevant initialize params.
      *
      * @param params the initialize params to fill (not <code>null</code>)

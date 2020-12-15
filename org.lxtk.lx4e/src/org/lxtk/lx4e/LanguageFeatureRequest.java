@@ -12,9 +12,14 @@
  *******************************************************************************/
 package org.lxtk.lx4e;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.PartialResultParams;
+import org.eclipse.lsp4j.WorkDoneProgressParams;
 import org.lxtk.LanguageFeatureProvider;
+import org.lxtk.PartialResultProgress;
+import org.lxtk.ProgressService;
+import org.lxtk.WorkDoneProgress;
 
 abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider<?>, S, T>
     extends Request<T>
@@ -63,10 +68,39 @@ abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider<?>, S, T
     }
 
     @Override
-    protected final Future<T> send()
+    protected final CompletableFuture<T> send()
     {
         if (provider == null || params == null)
             throw new IllegalStateException();
+
+        ProgressService progressService = provider.getProgressService();
+        if (progressService != null)
+        {
+            if (params instanceof WorkDoneProgressParams)
+            {
+                WorkDoneProgress workDoneProgress = getWorkDoneProgress();
+                if (workDoneProgress != null)
+                {
+                    progressService.attachProgress(workDoneProgress);
+                    ((WorkDoneProgressParams)params).setWorkDoneToken(workDoneProgress.getToken());
+                }
+            }
+            if (params instanceof PartialResultParams)
+            {
+                PartialResultProgress partialResultProgress = getPartialResultProgress();
+                if (partialResultProgress != null)
+                {
+                    progressService.attachProgress(partialResultProgress);
+                    ((PartialResultParams)params).setPartialResultToken(
+                        partialResultProgress.getToken());
+                }
+            }
+        }
+        else
+        {
+            setWorkDoneProgress(null);
+            setPartialResultProgress(null);
+        }
 
         return send(provider, params);
     }
@@ -79,5 +113,5 @@ abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider<?>, S, T
      * @param params never <code>null</code>
      * @return the response future (not <code>null</code>)
      */
-    protected abstract Future<T> send(R provider, S params);
+    protected abstract CompletableFuture<T> send(R provider, S params);
 }

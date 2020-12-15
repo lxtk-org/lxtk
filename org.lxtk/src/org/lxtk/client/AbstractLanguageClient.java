@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.MessageParams;
+import org.eclipse.lsp4j.ProgressParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.RegistrationParams;
@@ -39,6 +40,7 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.jsonrpc.Endpoint;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.lxtk.ProgressService;
 import org.lxtk.WorkspaceService;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
@@ -62,6 +64,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private final Consumer<PublishDiagnosticsParams> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures = new HashMap<>();
+    private S languageServer;
     private ServerInfo serverInfo;
     private List<DocumentFilter> documentSelector;
 
@@ -83,6 +86,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         featureSet = new LinkedHashSet<>(features);
         for (Feature<? super S> feature : featureSet)
         {
+            feature.setLanguageClient(this);
             if (feature instanceof DynamicFeature)
             {
                 DynamicFeature<? super S> dynamicFeature = (DynamicFeature<? super S>)feature;
@@ -129,6 +133,16 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         return null;
     }
 
+    /**
+     * Returns the progress service associated with this client.
+     *
+     * @return the associated progress service, or <code>null</code> if none
+     */
+    public ProgressService getProgressService()
+    {
+        return null;
+    }
+
     @Override
     public void fillInitializeParams(InitializeParams params)
     {
@@ -160,15 +174,16 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     @Override
-    public void initialize(S server, InitializeResult initializeResult,
+    public void initialize(S languageServer, InitializeResult initializeResult,
         List<DocumentFilter> documentSelector)
     {
+        this.languageServer = languageServer;
         this.serverInfo = initializeResult.getServerInfo();
         this.documentSelector = documentSelector;
 
         for (Feature<? super S> feature : featureSet)
         {
-            feature.initialize(server, initializeResult, documentSelector);
+            feature.initialize(languageServer, initializeResult, documentSelector);
         }
     }
 
@@ -254,9 +269,31 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     @Override
+    public void notifyProgress(ProgressParams params)
+    {
+        ProgressService progressService = getProgressService();
+        if (progressService != null)
+            progressService.accept(params);
+    }
+
+    @Override
     public void dispose()
     {
         Disposable.disposeAll(featureSet);
+    }
+
+    /**
+     * Returns the language server of this client.
+     *
+     * @return the language server (never <code>null</code>)
+     * @throws IllegalStateException if the client has not been {@link
+     *  #initialize(LanguageServer, InitializeResult, List) initialized}
+     */
+    protected final S getLanguageServer()
+    {
+        if (languageServer == null)
+            throw new IllegalStateException();
+        return languageServer;
     }
 
     /**

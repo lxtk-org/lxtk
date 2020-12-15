@@ -28,7 +28,8 @@ import org.eclipse.core.runtime.SubMonitor;
  * A {@link Future} that supports progress reporting and cancellation via
  * {@link IProgressMonitor}.
  *
- * @param <T> result type 
+ * @param <T> result type
+ * @deprecated Replaced with {@link FutureSupport} class hierarchy
  */
 public class EclipseFuture<T>
     implements Future<T>

@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFormattingParams;
 import org.eclipse.lsp4j.TextEdit;
@@ -28,7 +28,7 @@ public class DocumentFormattingRequest
         List<? extends TextEdit>>
 {
     @Override
-    protected Future<List<? extends TextEdit>> send(DocumentFormattingProvider provider,
+    protected CompletableFuture<List<? extends TextEdit>> send(DocumentFormattingProvider provider,
         DocumentFormattingParams params)
     {
         setTitle(MessageFormat.format(Messages.DocumentFormattingRequest_title, params));

@@ -36,8 +36,12 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ServerInfo;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
+import org.eclipse.lsp4j.WindowClientCapabilities;
+import org.eclipse.lsp4j.WorkDoneProgressCancelParams;
+import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceEditCapabilities;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
@@ -47,8 +51,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.lxtk.ProgressService;
+import org.lxtk.WorkDoneProgress;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.Feature;
+import org.lxtk.lx4e.EclipseProgressService;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.util.Log;
@@ -61,6 +68,7 @@ import org.lxtk.util.Log;
 public class EclipseLanguageClient<S extends LanguageServer>
     extends AbstractLanguageClient<S>
 {
+    private final ProgressService progressService = createProgressService();
     private final WorkspaceEditChangeFactory workspaceEditChangeFactory;
 
     /**
@@ -84,20 +92,39 @@ public class EclipseLanguageClient<S extends LanguageServer>
     }
 
     @Override
+    public ProgressService getProgressService()
+    {
+        return progressService;
+    }
+
+    /**
+     * Creates and returns a {@link ProgressService} for this client.
+     *
+     * @return the created service object (never <code>null</code>)
+     */
+    protected ProgressService createProgressService()
+    {
+        return new EclipseProgressService();
+    }
+
+    @Override
     public void fillClientCapabilities(ClientCapabilities capabilities)
     {
+        WorkspaceClientCapabilities workspace = new WorkspaceClientCapabilities();
+        workspace.setApplyEdit(true);
         WorkspaceEditCapabilities workspaceEdit = new WorkspaceEditCapabilities();
         workspaceEdit.setDocumentChanges(true);
         // TODO Support resource operations
 //        workspaceEdit.setResourceOperations(Arrays.asList(
 //            ResourceOperationKind.Create, ResourceOperationKind.Delete,
 //            ResourceOperationKind.Rename));
-
-        WorkspaceClientCapabilities workspace = new WorkspaceClientCapabilities();
-        workspace.setApplyEdit(true);
         workspace.setWorkspaceEdit(workspaceEdit);
-
         capabilities.setWorkspace(workspace);
+
+        WindowClientCapabilities window = new WindowClientCapabilities();
+        window.setWorkDoneProgress(true);
+        capabilities.setWindow(window);
+
         super.fillClientCapabilities(capabilities);
     }
 
@@ -251,5 +278,21 @@ public class EclipseLanguageClient<S extends LanguageServer>
         if (window == null)
             return null;
         return window.getShell();
+    }
+
+    @Override
+    public CompletableFuture<Void> createProgress(WorkDoneProgressCreateParams params)
+    {
+        Either<String, Number> token = params.getToken();
+        WorkDoneProgress workDoneProgress =
+            WorkDoneProgressFactory.newWorkDoneProgressWithJob(token, true);
+        getProgressService().attachProgress(workDoneProgress);
+        CompletableFuture<Void> future = workDoneProgress.toCompletableFuture();
+        future.whenComplete((result, thrown) ->
+        {
+            if (future.isCancelled())
+                getLanguageServer().cancelProgress(new WorkDoneProgressCancelParams(token));
+        });
+        return CompletableFuture.completedFuture(null);
     }
 }

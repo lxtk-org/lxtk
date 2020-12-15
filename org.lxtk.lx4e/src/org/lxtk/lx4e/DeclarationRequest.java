@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DeclarationParams;
 import org.eclipse.lsp4j.Location;
@@ -30,8 +30,9 @@ public class DeclarationRequest
         Either<List<? extends Location>, List<? extends LocationLink>>>
 {
     @Override
-    protected Future<Either<List<? extends Location>, List<? extends LocationLink>>> send(
-        DeclarationProvider provider, DeclarationParams params)
+    protected CompletableFuture<
+        Either<List<? extends Location>, List<? extends LocationLink>>> send(
+            DeclarationProvider provider, DeclarationParams params)
     {
         setTitle(MessageFormat.format(Messages.DeclarationRequest_title, params));
         return provider.getDeclaration(params);

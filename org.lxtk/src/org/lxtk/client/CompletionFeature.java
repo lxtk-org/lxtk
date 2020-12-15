@@ -32,6 +32,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.CommandService;
 import org.lxtk.CompletionProvider;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.util.Disposable;
 
 /**
@@ -119,6 +120,12 @@ public final class CompletionFeature
             public CompletionRegistrationOptions getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

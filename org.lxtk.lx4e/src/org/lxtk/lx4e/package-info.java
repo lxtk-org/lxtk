@@ -23,6 +23,8 @@
  * implementation</li>
  * <li>{@link org.lxtk.lx4e.EclipseWorkspaceService} provides a {@link org.lxtk.WorkspaceService}
  * implementation</li>
+ * <li>{@link org.lxtk.lx4e.EclipseProgressService} provides a {@link org.lxtk.ProgressService}
+ * implementation</li>
  * </ul>
  *
  * <h2>Other extensions of LXTK Core Framework</h2>

@@ -34,6 +34,7 @@ import org.lxtk.ReferenceProvider;
 import org.lxtk.lx4e.ReferencesRequest;
 import org.lxtk.lx4e.internal.ui.AbstractLocationSearchQuery;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Default implementation of an {@link ISearchQuery} that uses a {@link ReferenceProvider}
@@ -86,6 +87,8 @@ public class ReferenceSearchQuery
         request.setProvider(provider);
         request.setParams(params);
         request.setProgressMonitor(monitor);
+        if (Boolean.TRUE.equals(provider.getRegistrationOptions().getWorkDoneProgress()))
+            request.setWorkDoneProgress(WorkDoneProgressFactory.newWorkDoneProgress());
 
         List<? extends Location> locations;
         try

@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -30,7 +30,7 @@ public class CodeActionRequest
     LanguageFeatureRequest<CodeActionProvider, CodeActionParams, List<Either<Command, CodeAction>>>
 {
     @Override
-    protected Future<List<Either<Command, CodeAction>>> send(CodeActionProvider provider,
+    protected CompletableFuture<List<Either<Command, CodeAction>>> send(CodeActionProvider provider,
         CodeActionParams params)
     {
         setTitle(MessageFormat.format(Messages.CodeActionRequest_title, params));

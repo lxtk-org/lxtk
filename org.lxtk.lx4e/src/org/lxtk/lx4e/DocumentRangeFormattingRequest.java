@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentRangeFormattingParams;
 import org.eclipse.lsp4j.TextEdit;
@@ -28,8 +28,8 @@ public class DocumentRangeFormattingRequest
         List<? extends TextEdit>>
 {
     @Override
-    protected Future<List<? extends TextEdit>> send(DocumentRangeFormattingProvider provider,
-        DocumentRangeFormattingParams params)
+    protected CompletableFuture<List<? extends TextEdit>> send(
+        DocumentRangeFormattingProvider provider, DocumentRangeFormattingParams params)
     {
         setTitle(MessageFormat.format(Messages.DocumentRangeFormattingRequest_title, params));
         return provider.getRangeFormattingEdits(params);

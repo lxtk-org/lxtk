@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
@@ -28,7 +28,7 @@ public class WorkspaceSymbolRequest
         List<? extends SymbolInformation>>
 {
     @Override
-    protected Future<List<? extends SymbolInformation>> send(
+    protected CompletableFuture<List<? extends SymbolInformation>> send(
         WorkspaceSymbolProvider provider, WorkspaceSymbolParams params)
     {
         setTitle(MessageFormat.format(Messages.WorkspaceSymbolRequest_title, params));

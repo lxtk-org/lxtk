@@ -13,7 +13,7 @@
 package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
@@ -26,7 +26,7 @@ public class HoverRequest
     extends LanguageFeatureRequest<HoverProvider, HoverParams, Hover>
 {
     @Override
-    protected Future<Hover> send(HoverProvider provider, HoverParams params)
+    protected CompletableFuture<Hover> send(HoverProvider provider, HoverParams params)
     {
         setTitle(MessageFormat.format(Messages.HoverRequest_title, params));
         return provider.getHover(params);

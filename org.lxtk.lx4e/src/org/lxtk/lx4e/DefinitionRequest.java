@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
@@ -30,7 +30,8 @@ public class DefinitionRequest
         Either<List<? extends Location>, List<? extends LocationLink>>>
 {
     @Override
-    protected Future<Either<List<? extends Location>, List<? extends LocationLink>>> send(
+    protected CompletableFuture<
+        Either<List<? extends Location>, List<? extends LocationLink>>> send(
         DefinitionProvider provider, DefinitionParams params)
     {
         setTitle(MessageFormat.format(Messages.DefinitionRequest_title, params));

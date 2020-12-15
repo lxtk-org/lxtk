@@ -32,6 +32,7 @@ import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.RenameProvider;
 import org.lxtk.util.Disposable;
 
@@ -115,6 +116,12 @@ public class RenameFeature
             public RenameOptions getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

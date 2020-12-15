@@ -13,7 +13,7 @@
 package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
@@ -26,7 +26,7 @@ public class RenameRequest
     extends LanguageFeatureRequest<RenameProvider, RenameParams, WorkspaceEdit>
 {
     @Override
-    protected Future<WorkspaceEdit> send(RenameProvider provider, RenameParams params)
+    protected CompletableFuture<WorkspaceEdit> send(RenameProvider provider, RenameParams params)
     {
         setTitle(MessageFormat.format(Messages.RenameRequest_title, params));
         return provider.getRenameEdits(params);

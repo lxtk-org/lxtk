@@ -34,7 +34,6 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.client.AbstractLanguageClient;
-import org.lxtk.client.AbstractLanguageClientController;
 import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CodeActionFeature;
 import org.lxtk.client.CompletionFeature;
@@ -59,6 +58,7 @@ import org.lxtk.lx4e.EclipseCommandService;
 import org.lxtk.lx4e.EclipseLog;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.ui.EclipseLanguageClient;
+import org.lxtk.lx4e.ui.EclipseLanguageClientController;
 import org.lxtk.util.Log;
 import org.lxtk.util.connect.StdioConnection;
 import org.lxtk.util.connect.StreamBasedConnection;
@@ -67,7 +67,7 @@ import org.lxtk.util.connect.StreamBasedConnection;
  * Represents a TypeScript language client.
  */
 public class TypeScriptLanguageClient
-    extends AbstractLanguageClientController<LanguageServer>
+    extends EclipseLanguageClientController<LanguageServer>
 {
     static final String MARKER_TYPE = "org.lxtk.lx4e.examples.typescript.problem"; //$NON-NLS-1$
 

@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.SignatureHelpParams;
 import org.eclipse.lsp4j.SignatureHelpRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.SignatureHelpProvider;
 import org.lxtk.util.Disposable;
 
@@ -102,6 +103,12 @@ public final class SignatureHelpFeature
             public SignatureHelpRegistrationOptions getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

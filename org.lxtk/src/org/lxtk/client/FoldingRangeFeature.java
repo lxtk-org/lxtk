@@ -30,6 +30,7 @@ import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.FoldingRangeProvider;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.util.Disposable;
 
 /**
@@ -111,6 +112,12 @@ public class FoldingRangeFeature
             public FoldingRangeProviderOptions getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

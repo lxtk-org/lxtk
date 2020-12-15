@@ -31,6 +31,7 @@ import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.lxtk.CodeLensProvider;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.util.Disposable;
 
 /**
@@ -105,6 +106,12 @@ public final class CodeLensFeature
             public CodeLensRegistrationOptions getRegistrationOptions()
             {
                 return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return getLanguageClient().getProgressService();
             }
 
             @Override

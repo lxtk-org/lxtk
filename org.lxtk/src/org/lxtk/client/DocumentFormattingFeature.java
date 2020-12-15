@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.TextEdit;
 import org.lxtk.DocumentFormattingProvider;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
 import org.lxtk.util.Disposable;
 
 /**
@@ -99,6 +100,12 @@ public final class DocumentFormattingFeature
                 public TextDocumentRegistrationOptions getRegistrationOptions()
                 {
                     return options;
+                }
+
+                @Override
+                public ProgressService getProgressService()
+                {
+                    return getLanguageClient().getProgressService();
                 }
 
                 @Override

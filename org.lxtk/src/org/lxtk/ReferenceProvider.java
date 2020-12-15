@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceParams;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
+import org.eclipse.lsp4j.ReferenceRegistrationOptions;
 
 /**
  * Provides locations for all references to the symbol denoted by a given
@@ -26,7 +26,7 @@ import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
  * @see LanguageService
  */
 public interface ReferenceProvider
-    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
+    extends LanguageFeatureProvider<ReferenceRegistrationOptions>
 {
     /**
      * Requests locations for all references to the symbol denoted by the given

@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
@@ -30,7 +30,7 @@ public class CompletionRequest
         Either<List<CompletionItem>, CompletionList>>
 {
     @Override
-    protected Future<Either<List<CompletionItem>, CompletionList>> send(CompletionProvider provider,
+    protected CompletableFuture<Either<List<CompletionItem>, CompletionList>> send(CompletionProvider provider,
         CompletionParams params)
     {
         setTitle(MessageFormat.format(Messages.CompletionRequest_title, params));

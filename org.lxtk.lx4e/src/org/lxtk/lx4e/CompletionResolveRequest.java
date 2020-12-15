@@ -13,7 +13,7 @@
 package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CompletionItem;
 import org.lxtk.CompletionProvider;
@@ -25,7 +25,7 @@ public class CompletionResolveRequest
     extends LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>
 {
     @Override
-    protected Future<CompletionItem> send(CompletionProvider provider, CompletionItem item)
+    protected CompletableFuture<CompletionItem> send(CompletionProvider provider, CompletionItem item)
     {
         setTitle(MessageFormat.format(Messages.CompletionResolveRequest_title, item));
         return provider.resolveCompletionItem(item);

@@ -30,7 +30,6 @@ import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.client.AbstractLanguageClient;
-import org.lxtk.client.AbstractLanguageClientController;
 import org.lxtk.client.BufferingDiagnosticConsumer;
 import org.lxtk.client.CompletionFeature;
 import org.lxtk.client.DocumentFormattingFeature;
@@ -47,6 +46,7 @@ import org.lxtk.lx4e.diagnostics.DefaultDiagnosticConsumer;
 import org.lxtk.lx4e.diagnostics.DiagnosticAnnotations;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.ui.EclipseLanguageClient;
+import org.lxtk.lx4e.ui.EclipseLanguageClientController;
 import org.lxtk.util.Log;
 import org.lxtk.util.connect.StdioConnection;
 import org.lxtk.util.connect.StreamBasedConnection;
@@ -58,7 +58,7 @@ import com.google.gson.JsonObject;
  * Represents a JSON language client.
  */
 public class JsonLanguageClient
-    extends AbstractLanguageClientController<LanguageServer>
+    extends EclipseLanguageClientController<LanguageServer>
 {
     private static final Log LOG =
         new EclipseLog(Activator.getDefault().getBundle(), "json-language-client"); //$NON-NLS-1$

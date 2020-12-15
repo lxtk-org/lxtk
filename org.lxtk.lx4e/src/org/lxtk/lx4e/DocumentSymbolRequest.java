@@ -14,7 +14,7 @@ package org.lxtk.lx4e;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
@@ -30,7 +30,7 @@ public class DocumentSymbolRequest
         List<Either<SymbolInformation, DocumentSymbol>>>
 {
     @Override
-    protected Future<List<Either<SymbolInformation, DocumentSymbol>>> send(
+    protected CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> send(
         DocumentSymbolProvider provider, DocumentSymbolParams params)
     {
         setTitle(MessageFormat.format(Messages.DocumentSymbolRequest_title, params));
