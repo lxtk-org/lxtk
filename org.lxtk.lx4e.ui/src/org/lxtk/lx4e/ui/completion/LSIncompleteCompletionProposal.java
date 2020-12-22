@@ -50,6 +50,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionItemTag;
 import org.eclipse.lsp4j.InsertTextFormat;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MarkupKind;
@@ -241,7 +242,13 @@ class LSIncompleteCompletionProposal
     }
 
     private boolean isDeprecated() {
-        return item.getDeprecated() != null && item.getDeprecated().booleanValue();
+        List<CompletionItemTag> tags = item.getTags();
+        if (tags != null && tags.contains(CompletionItemTag.Deprecated)) {
+            return true;
+        }
+        @SuppressWarnings("deprecation")
+        boolean deprecated = Boolean.TRUE.equals(item.getDeprecated());
+        return deprecated;
     }
 
     @Override
@@ -287,7 +294,7 @@ class LSIncompleteCompletionProposal
 
     @Override
     public StyledString getStyledDisplayString() {
-        if (Boolean.TRUE.equals(item.getDeprecated())) {
+        if (isDeprecated()) {
             return new StyledString(getDisplayString(), DEPRECATE);
         }
         return new StyledString(getDisplayString());

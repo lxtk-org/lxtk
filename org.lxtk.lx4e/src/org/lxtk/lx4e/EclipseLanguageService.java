@@ -23,6 +23,8 @@ import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItemCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.CompletionItemKindCapabilities;
+import org.eclipse.lsp4j.CompletionItemTag;
+import org.eclipse.lsp4j.CompletionItemTagSupportCapabilities;
 import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
@@ -72,11 +74,16 @@ public class EclipseLanguageService
     @Override
     public CompletionCapabilities getCompletionCapabilities()
     {
+        CompletionItemTagSupportCapabilities tagSupport =
+            new CompletionItemTagSupportCapabilities();
+        tagSupport.setValueSet(Arrays.asList(CompletionItemTag.values()));
+
         CompletionItemCapabilities completionItem = new CompletionItemCapabilities();
         completionItem.setSnippetSupport(true);
         completionItem.setDocumentationFormat(
             Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         completionItem.setDeprecatedSupport(true);
+        completionItem.setTagSupport(tagSupport);
 
         CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
         completionItemKind.setValueSet(Arrays.asList(CompletionItemKind.values()));
