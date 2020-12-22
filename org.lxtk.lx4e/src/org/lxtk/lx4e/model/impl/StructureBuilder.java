@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2020 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -25,6 +25,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.SymbolTag;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.model.ILanguageSourceElement;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
@@ -76,7 +77,7 @@ class StructureBuilder
         }
         body.setSnapshot(snapshot);
         body.set(ILanguageSymbol.DETAIL, symbol.getDetail());
-        body.set(ILanguageSymbol.DEPRECATED, symbol.getDeprecated());
+        body.set(ILanguageSymbol.DEPRECATED, getDeprecated(symbol));
 
         for (DocumentSymbol child : symbol.getChildren())
             process(handle, body, handle.getSymbol(child.getName(), child.getKind()), child);
@@ -89,5 +90,22 @@ class StructureBuilder
     private static TextRange toTextRange(IRegion region)
     {
         return new TextRange(region.getOffset(), region.getLength());
+    }
+
+    private static Boolean getDeprecated(DocumentSymbol symbol)
+    {
+        List<SymbolTag> tags = symbol.getTags();
+        if (tags != null && tags.contains(SymbolTag.Deprecated))
+            return Boolean.TRUE;
+
+        @SuppressWarnings("deprecation")
+        Boolean deprecated = symbol.getDeprecated();
+        if (deprecated != null)
+            return deprecated;
+
+        if (tags != null && !tags.contains(SymbolTag.Deprecated))
+            return Boolean.FALSE;
+
+        return null;
     }
 }

@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.lsp4j.SymbolInformation;
@@ -201,12 +200,11 @@ public class WorkspaceSymbolSelectionDialog
 
     private class ListLabelProvider
         extends SymbolLabelProvider
-        implements IStyledLabelProvider
     {
         @Override
         public StyledString getStyledText(Object element)
         {
-            StyledString ss = new StyledString(super.getText(element));
+            StyledString ss = super.getStyledText(element);
             if (element instanceof SymbolInformation)
             {
                 ss.append(MessageFormat.format(Messages.WorkspaceSymbolSelectionDialog_itemPattern,

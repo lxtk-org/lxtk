@@ -39,6 +39,8 @@ import org.eclipse.lsp4j.SignatureInformationCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.SymbolKindCapabilities;
+import org.eclipse.lsp4j.SymbolTag;
+import org.eclipse.lsp4j.SymbolTagSupportCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.lxtk.DefaultLanguageService;
 import org.lxtk.LanguageService;
@@ -116,9 +118,13 @@ public class EclipseLanguageService
         SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
         symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
 
+        SymbolTagSupportCapabilities tagSupport = new SymbolTagSupportCapabilities();
+        tagSupport.setValueSet(Arrays.asList(SymbolTag.values()));
+
         DocumentSymbolCapabilities documentSymbol = new DocumentSymbolCapabilities();
         documentSymbol.setSymbolKind(symbolKind);
         documentSymbol.setHierarchicalDocumentSymbolSupport(true);
+        documentSymbol.setTagSupport(tagSupport);
         return documentSymbol;
     }
 
@@ -185,8 +191,12 @@ public class EclipseLanguageService
         SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
         symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
 
+        SymbolTagSupportCapabilities tagSupport = new SymbolTagSupportCapabilities();
+        tagSupport.setValueSet(Arrays.asList(SymbolTag.values()));
+
         SymbolCapabilities workspaceSymbol = new SymbolCapabilities();
         workspaceSymbol.setSymbolKind(symbolKind);
+        workspaceSymbol.setTagSupport(tagSupport);
         return workspaceSymbol;
     }
 
