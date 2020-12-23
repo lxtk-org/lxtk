@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.lxtk.client;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,10 +21,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.ClientCapabilities;
-import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.MessageParams;
@@ -39,7 +37,6 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.jsonrpc.Endpoint;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
-import org.lxtk.DocumentUri;
 import org.lxtk.WorkspaceService;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
@@ -60,7 +57,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private static final String DOCUMENT_SELECTOR = "documentSelector"; //$NON-NLS-1$
 
     private final Log log;
-    private final BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer;
+    private final Consumer<PublishDiagnosticsParams> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures = new HashMap<>();
     private List<DocumentFilter> documentSelector;
@@ -75,8 +72,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
      *  Subsequent modifications of the given collection will have no effect
      *  on the constructed instance
      */
-    public AbstractLanguageClient(Log log,
-        BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer,
+    public AbstractLanguageClient(Log log, Consumer<PublishDiagnosticsParams> diagnosticConsumer,
         Collection<Feature<? super S>> features)
     {
         this.log = Objects.requireNonNull(log);
@@ -199,7 +195,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams params)
     {
-        diagnosticConsumer.accept(DocumentUri.convert(params.getUri()), params.getDiagnostics());
+        diagnosticConsumer.accept(params);
     }
 
     @Override

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -41,6 +42,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.lxtk.DocumentUri;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.Activator;
@@ -57,7 +60,8 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public class DiagnosticMarkers
-    implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
+    implements Consumer<PublishDiagnosticsParams>, BiConsumer<URI, Collection<Diagnostic>>,
+    Disposable
 {
     /**
      * Marker diagnostic attribute. Contains a {@link Diagnostic}
@@ -95,6 +99,12 @@ public class DiagnosticMarkers
     {
         this.markerType = Objects.requireNonNull(markerType);
         workspace.addResourceChangeListener(moveProcessor, IResourceChangeEvent.POST_CHANGE);
+    }
+
+    @Override
+    public final void accept(PublishDiagnosticsParams params)
+    {
+        accept(DocumentUri.convert(params.getUri()), params.getDiagnostics());
     }
 
     @Override

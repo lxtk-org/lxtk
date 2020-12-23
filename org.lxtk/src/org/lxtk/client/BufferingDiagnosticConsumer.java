@@ -12,15 +12,13 @@
  *******************************************************************************/
 package org.lxtk.client;
 
-import java.net.URI;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.lxtk.util.Disposable;
 
 /**
@@ -31,9 +29,9 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class BufferingDiagnosticConsumer
-    implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
+    implements Consumer<PublishDiagnosticsParams>, Disposable
 {
-    private final BiConsumer<URI, Collection<Diagnostic>> delegate;
+    private final Consumer<PublishDiagnosticsParams> delegate;
     private ExecutorService executor;
     private boolean disposed;
 
@@ -42,7 +40,7 @@ public final class BufferingDiagnosticConsumer
      *
      * @param delegate not <code>null</code>
      */
-    public BufferingDiagnosticConsumer(BiConsumer<URI, Collection<Diagnostic>> delegate)
+    public BufferingDiagnosticConsumer(Consumer<PublishDiagnosticsParams> delegate)
     {
         this.delegate = Objects.requireNonNull(delegate);
     }
@@ -76,7 +74,7 @@ public final class BufferingDiagnosticConsumer
     }
 
     @Override
-    public synchronized void accept(URI uri, Collection<Diagnostic> diagnostics)
+    public synchronized void accept(PublishDiagnosticsParams params)
     {
         if (disposed)
             return;
@@ -87,7 +85,7 @@ public final class BufferingDiagnosticConsumer
         executor.execute(() ->
         {
             if (!executor.isShutdown())
-                delegate.accept(uri, diagnostics);
+                delegate.accept(params);
         });
     }
 }

@@ -13,11 +13,13 @@
 package org.lxtk.lx4e.diagnostics;
 
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.lxtk.DocumentUri;
 import org.lxtk.TextDocument;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.util.ResourceUtil;
@@ -35,7 +37,7 @@ import org.lxtk.util.Disposable;
  * @see org.lxtk.client.BufferingDiagnosticConsumer
  */
 public final class DefaultDiagnosticConsumer
-    implements BiConsumer<URI, Collection<Diagnostic>>, Disposable
+    implements Consumer<PublishDiagnosticsParams>, Disposable
 {
     private final DiagnosticMarkers diagnosticMarkers;
     private final DiagnosticAnnotations diagnosticAnnotations;
@@ -54,8 +56,11 @@ public final class DefaultDiagnosticConsumer
     }
 
     @Override
-    public void accept(URI uri, Collection<Diagnostic> diagnostics)
+    public void accept(PublishDiagnosticsParams params)
     {
+        URI uri = DocumentUri.convert(params.getUri());
+        List<Diagnostic> diagnostics = params.getDiagnostics();
+
         diagnosticMarkers.accept(uri, diagnostics);
 
         TextDocument textDocument = diagnosticAnnotations.getDocumentService().getTextDocument(uri);

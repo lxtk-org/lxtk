@@ -12,13 +12,12 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -32,9 +31,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
 import org.eclipse.lsp4j.ApplyWorkspaceEditResponse;
 import org.eclipse.lsp4j.ClientCapabilities;
-import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceEditCapabilities;
@@ -75,8 +74,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
      *  Subsequent modifications of the given collection will have no effect
      *  on the constructed instance
      */
-    public EclipseLanguageClient(Log log,
-        BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer,
+    public EclipseLanguageClient(Log log, Consumer<PublishDiagnosticsParams> diagnosticConsumer,
         WorkspaceEditChangeFactory workspaceEditChangeFactory,
         Collection<Feature<? super S>> features)
     {
