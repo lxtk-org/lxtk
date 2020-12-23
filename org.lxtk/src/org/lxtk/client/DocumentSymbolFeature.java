@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
@@ -63,7 +64,10 @@ public final class DocumentSymbolFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setDocumentSymbol(getLanguageService().getDocumentSymbolCapabilities());
+        DocumentSymbolCapabilities documentSymbol =
+            getLanguageService().getDocumentSymbolCapabilities();
+        documentSymbol.setDynamicRegistration(true);
+        capabilities.setDocumentSymbol(documentSymbol);
     }
 
     @Override

@@ -12,18 +12,11 @@
  *******************************************************************************/
 package org.lxtk;
 
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.CodeActionCapabilities;
-import org.eclipse.lsp4j.CodeActionKind;
-import org.eclipse.lsp4j.CodeActionKindCapabilities;
-import org.eclipse.lsp4j.CodeActionLiteralSupportCapabilities;
 import org.eclipse.lsp4j.CodeLensCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
-import org.eclipse.lsp4j.CompletionItemCapabilities;
-import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
@@ -32,16 +25,11 @@ import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ImplementationCapabilities;
-import org.eclipse.lsp4j.MarkupKind;
-import org.eclipse.lsp4j.ParameterInformationCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
-import org.eclipse.lsp4j.SignatureInformationCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
-import org.eclipse.lsp4j.SymbolKind;
-import org.eclipse.lsp4j.SymbolKindCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.lxtk.util.Registry;
 
@@ -76,20 +64,7 @@ public class DefaultLanguageService
     @Override
     public CodeActionCapabilities getCodeActionCapabilities()
     {
-        CodeActionKindCapabilities codeActionKind = new CodeActionKindCapabilities();
-        codeActionKind.setValueSet(Arrays.asList(CodeActionKind.QuickFix, CodeActionKind.Refactor,
-            CodeActionKind.RefactorExtract, CodeActionKind.RefactorInline,
-            CodeActionKind.RefactorRewrite, CodeActionKind.Source,
-            CodeActionKind.SourceOrganizeImports));
-
-        CodeActionLiteralSupportCapabilities codeActionLiteralSupport =
-            new CodeActionLiteralSupportCapabilities();
-        codeActionLiteralSupport.setCodeActionKind(codeActionKind);
-
-        CodeActionCapabilities codeAction = new CodeActionCapabilities();
-        codeAction.setDynamicRegistration(true);
-        codeAction.setCodeActionLiteralSupport(codeActionLiteralSupport);
-        return codeAction;
+        return new CodeActionCapabilities();
     }
 
     @Override
@@ -101,9 +76,7 @@ public class DefaultLanguageService
     @Override
     public CodeLensCapabilities getCodeLensCapabilities()
     {
-        CodeLensCapabilities codeLens = new CodeLensCapabilities();
-        codeLens.setDynamicRegistration(true);
-        return codeLens;
+        return new CodeLensCapabilities();
     }
 
     @Override
@@ -115,23 +88,7 @@ public class DefaultLanguageService
     @Override
     public CompletionCapabilities getCompletionCapabilities()
     {
-        CompletionItemCapabilities completionItem = new CompletionItemCapabilities();
-        completionItem.setSnippetSupport(true);
-        completionItem.setCommitCharactersSupport(true);
-        completionItem.setDocumentationFormat(
-            Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
-        completionItem.setDeprecatedSupport(true);
-        completionItem.setPreselectSupport(true);
-
-        CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
-        completionItemKind.setValueSet(Arrays.asList(CompletionItemKind.values()));
-
-        CompletionCapabilities completion = new CompletionCapabilities();
-        completion.setDynamicRegistration(true);
-        completion.setContextSupport(true);
-        completion.setCompletionItem(completionItem);
-        completion.setCompletionItemKind(completionItemKind);
-        return completion;
+        return new CompletionCapabilities();
     }
 
     @Override
@@ -143,10 +100,7 @@ public class DefaultLanguageService
     @Override
     public DeclarationCapabilities getDeclarationCapabilities()
     {
-        DeclarationCapabilities declaration = new DeclarationCapabilities();
-        declaration.setDynamicRegistration(true);
-        declaration.setLinkSupport(true);
-        return declaration;
+        return new DeclarationCapabilities();
     }
 
     @Override
@@ -158,10 +112,7 @@ public class DefaultLanguageService
     @Override
     public DefinitionCapabilities getDefinitionCapabilities()
     {
-        DefinitionCapabilities definition = new DefinitionCapabilities();
-        definition.setDynamicRegistration(true);
-        definition.setLinkSupport(true);
-        return definition;
+        return new DefinitionCapabilities();
     }
 
     @Override
@@ -173,9 +124,7 @@ public class DefaultLanguageService
     @Override
     public FormattingCapabilities getDocumentFormattingCapabilities()
     {
-        FormattingCapabilities formatting = new FormattingCapabilities();
-        formatting.setDynamicRegistration(true);
-        return formatting;
+        return new FormattingCapabilities();
     }
 
     @Override
@@ -187,9 +136,7 @@ public class DefaultLanguageService
     @Override
     public DocumentHighlightCapabilities getDocumentHighlightCapabilities()
     {
-        DocumentHighlightCapabilities documentHighlight = new DocumentHighlightCapabilities();
-        documentHighlight.setDynamicRegistration(true);
-        return documentHighlight;
+        return new DocumentHighlightCapabilities();
     }
 
     @Override
@@ -201,9 +148,7 @@ public class DefaultLanguageService
     @Override
     public RangeFormattingCapabilities getDocumentRangeFormattingCapabilities()
     {
-        RangeFormattingCapabilities rangeFormatting = new RangeFormattingCapabilities();
-        rangeFormatting.setDynamicRegistration(true);
-        return rangeFormatting;
+        return new RangeFormattingCapabilities();
     }
 
     @Override
@@ -215,14 +160,7 @@ public class DefaultLanguageService
     @Override
     public DocumentSymbolCapabilities getDocumentSymbolCapabilities()
     {
-        SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
-        symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
-
-        DocumentSymbolCapabilities documentSymbol = new DocumentSymbolCapabilities();
-        documentSymbol.setDynamicRegistration(true);
-        documentSymbol.setSymbolKind(symbolKind);
-        documentSymbol.setHierarchicalDocumentSymbolSupport(true);
-        return documentSymbol;
+        return new DocumentSymbolCapabilities();
     }
 
     @Override
@@ -234,9 +172,7 @@ public class DefaultLanguageService
     @Override
     public FoldingRangeCapabilities getFoldingRangeCapabilities()
     {
-        FoldingRangeCapabilities foldingRange = new FoldingRangeCapabilities();
-        foldingRange.setDynamicRegistration(true);
-        return foldingRange;
+        return new FoldingRangeCapabilities();
     }
 
     @Override
@@ -248,10 +184,7 @@ public class DefaultLanguageService
     @Override
     public HoverCapabilities getHoverCapabilities()
     {
-        HoverCapabilities hover = new HoverCapabilities();
-        hover.setDynamicRegistration(true);
-        hover.setContentFormat(Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
-        return hover;
+        return new HoverCapabilities();
     }
 
     @Override
@@ -263,10 +196,7 @@ public class DefaultLanguageService
     @Override
     public ImplementationCapabilities getImplementationCapabilities()
     {
-        ImplementationCapabilities implementation = new ImplementationCapabilities();
-        implementation.setDynamicRegistration(true);
-        implementation.setLinkSupport(true);
-        return implementation;
+        return new ImplementationCapabilities();
     }
 
     @Override
@@ -278,9 +208,7 @@ public class DefaultLanguageService
     @Override
     public ReferencesCapabilities getReferencesCapabilities()
     {
-        ReferencesCapabilities references = new ReferencesCapabilities();
-        references.setDynamicRegistration(true);
-        return references;
+        return new ReferencesCapabilities();
     }
 
     @Override
@@ -292,10 +220,7 @@ public class DefaultLanguageService
     @Override
     public RenameCapabilities getRenameCapabilities()
     {
-        RenameCapabilities rename = new RenameCapabilities();
-        rename.setDynamicRegistration(true);
-        rename.setPrepareSupport(true);
-        return rename;
+        return new RenameCapabilities();
     }
 
     @Override
@@ -307,21 +232,7 @@ public class DefaultLanguageService
     @Override
     public SignatureHelpCapabilities getSignatureHelpCapabilities()
     {
-        ParameterInformationCapabilities parameterInformation =
-            new ParameterInformationCapabilities();
-        parameterInformation.setLabelOffsetSupport(true);
-
-        SignatureInformationCapabilities signatureInformation =
-            new SignatureInformationCapabilities();
-        signatureInformation.setDocumentationFormat(
-            Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
-        signatureInformation.setParameterInformation(parameterInformation);
-
-        SignatureHelpCapabilities signatureHelp = new SignatureHelpCapabilities();
-        signatureHelp.setDynamicRegistration(true);
-        signatureHelp.setContextSupport(true);
-        signatureHelp.setSignatureInformation(signatureInformation);
-        return signatureHelp;
+        return new SignatureHelpCapabilities();
     }
 
     @Override
@@ -333,10 +244,7 @@ public class DefaultLanguageService
     @Override
     public TypeDefinitionCapabilities getTypeDefinitionCapabilities()
     {
-        TypeDefinitionCapabilities typeDefinition = new TypeDefinitionCapabilities();
-        typeDefinition.setDynamicRegistration(true);
-        typeDefinition.setLinkSupport(true);
-        return typeDefinition;
+        return new TypeDefinitionCapabilities();
     }
 
     @Override
@@ -348,13 +256,7 @@ public class DefaultLanguageService
     @Override
     public SymbolCapabilities getWorkspaceSymbolCapabilities()
     {
-        SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
-        symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
-
-        SymbolCapabilities workspaceSymbol = new SymbolCapabilities();
-        workspaceSymbol.setDynamicRegistration(true);
-        workspaceSymbol.setSymbolKind(symbolKind);
-        return workspaceSymbol;
+        return new SymbolCapabilities();
     }
 
     @Override

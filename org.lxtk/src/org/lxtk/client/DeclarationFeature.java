@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DeclarationParams;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Location;
@@ -64,7 +65,9 @@ public final class DeclarationFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setDeclaration(getLanguageService().getDeclarationCapabilities());
+        DeclarationCapabilities declaration = getLanguageService().getDeclarationCapabilities();
+        declaration.setDynamicRegistration(true);
+        capabilities.setDeclaration(declaration);
     }
 
     @Override

@@ -53,7 +53,7 @@ public interface LanguageService
      * Returns code action capabilities provided by this service.
      *
      * @return code action capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     CodeActionCapabilities getCodeActionCapabilities();
 
@@ -68,7 +68,7 @@ public interface LanguageService
      * Returns code lens capabilities provided by this service.
      *
      * @return code lens capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     CodeLensCapabilities getCodeLensCapabilities();
 
@@ -83,7 +83,7 @@ public interface LanguageService
      * Returns completion capabilities provided by this service.
      *
      * @return completion capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     CompletionCapabilities getCompletionCapabilities();
 
@@ -98,7 +98,7 @@ public interface LanguageService
      * Returns declaration capabilities provided by this service.
      *
      * @return declaration capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     DeclarationCapabilities getDeclarationCapabilities();
 
@@ -113,7 +113,7 @@ public interface LanguageService
      * Returns definition capabilities provided by this service.
      *
      * @return definition capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     DefinitionCapabilities getDefinitionCapabilities();
 
@@ -128,7 +128,7 @@ public interface LanguageService
      * Returns document formatting capabilities provided by this service.
      *
      * @return document formatting capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     FormattingCapabilities getDocumentFormattingCapabilities();
 
@@ -143,7 +143,7 @@ public interface LanguageService
      * Returns document highlight capabilities provided by this service.
      *
      * @return document highlight capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     DocumentHighlightCapabilities getDocumentHighlightCapabilities();
 
@@ -158,7 +158,7 @@ public interface LanguageService
      * Returns document range formatting capabilities provided by this service.
      *
      * @return document range formatting capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     RangeFormattingCapabilities getDocumentRangeFormattingCapabilities();
 
@@ -175,7 +175,7 @@ public interface LanguageService
      * Returns document symbol capabilities provided by this service.
      *
      * @return document symbol capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     DocumentSymbolCapabilities getDocumentSymbolCapabilities();
 
@@ -190,7 +190,7 @@ public interface LanguageService
      * Returns folding range capabilities provided by this service.
      *
      * @return folding range capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     FoldingRangeCapabilities getFoldingRangeCapabilities();
 
@@ -205,7 +205,7 @@ public interface LanguageService
      * Returns hover capabilities provided by this service.
      *
      * @return hover capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     HoverCapabilities getHoverCapabilities();
 
@@ -220,7 +220,7 @@ public interface LanguageService
      * Returns implementation capabilities provided by this service.
      *
      * @return implementation capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     ImplementationCapabilities getImplementationCapabilities();
 
@@ -235,7 +235,7 @@ public interface LanguageService
      * Returns references capabilities provided by this service.
      *
      * @return references capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     ReferencesCapabilities getReferencesCapabilities();
 
@@ -250,7 +250,7 @@ public interface LanguageService
      * Returns rename capabilities provided by this service.
      *
      * @return rename capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     RenameCapabilities getRenameCapabilities();
 
@@ -265,7 +265,7 @@ public interface LanguageService
      * Returns signature help capabilities provided by this service.
      *
      * @return signature help capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     SignatureHelpCapabilities getSignatureHelpCapabilities();
 
@@ -280,7 +280,7 @@ public interface LanguageService
      * Returns type definition capabilities provided by this service.
      *
      * @return type definition capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     TypeDefinitionCapabilities getTypeDefinitionCapabilities();
 
@@ -295,7 +295,7 @@ public interface LanguageService
      * Returns workspace symbol capabilities provided by this service.
      *
      * @return workspace symbol capabilities (never <code>null</code>).
-     *  Clients <b>must not</b> modify the returned object
+     *  Clients may modify the returned object
      */
     SymbolCapabilities getWorkspaceSymbolCapabilities();
 

@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.DocumentFormattingParams;
+import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
@@ -61,7 +62,10 @@ public final class DocumentFormattingFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setFormatting(getLanguageService().getDocumentFormattingCapabilities());
+        FormattingCapabilities formatting =
+            getLanguageService().getDocumentFormattingCapabilities();
+        formatting.setDynamicRegistration(true);
+        capabilities.setFormatting(formatting);
     }
 
     @Override

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionOptions;
@@ -64,7 +65,9 @@ public final class CompletionFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setCompletion(getLanguageService().getCompletionCapabilities());
+        CompletionCapabilities completion = getLanguageService().getCompletionCapabilities();
+        completion.setDynamicRegistration(true);
+        capabilities.setCompletion(completion);
     }
 
     @Override

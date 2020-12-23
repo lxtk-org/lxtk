@@ -19,7 +19,7 @@ import org.lxtk.WorkspaceService;
 import org.lxtk.lx4e.internal.Activator;
 
 /**
- * Default implementation of {@link WorkspaceService} for Eclipse.
+ * LX4E-specific implementation of {@link WorkspaceService}.
  * <p>
  * This implementation is thread-safe.
  * </p>

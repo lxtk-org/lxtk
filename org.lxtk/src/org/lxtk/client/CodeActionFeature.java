@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CodeActionOptions;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
@@ -70,7 +71,9 @@ public final class CodeActionFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setCodeAction(getLanguageService().getCodeActionCapabilities());
+        CodeActionCapabilities codeAction = getLanguageService().getCodeActionCapabilities();
+        codeAction.setDynamicRegistration(true);
+        capabilities.setCodeAction(codeAction);
     }
 
     @Override

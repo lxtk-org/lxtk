@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SignatureHelp;
+import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SignatureHelpOptions;
 import org.eclipse.lsp4j.SignatureHelpParams;
 import org.eclipse.lsp4j.SignatureHelpRegistrationOptions;
@@ -62,7 +63,10 @@ public final class SignatureHelpFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setSignatureHelp(getLanguageService().getSignatureHelpCapabilities());
+        SignatureHelpCapabilities signatureHelp =
+            getLanguageService().getSignatureHelpCapabilities();
+        signatureHelp.setDynamicRegistration(true);
+        capabilities.setSignatureHelp(signatureHelp);
     }
 
     @Override

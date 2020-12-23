@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceParams;
+import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
@@ -61,7 +62,9 @@ public final class ReferencesFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setReferences(getLanguageService().getReferencesCapabilities());
+        ReferencesCapabilities references = getLanguageService().getReferencesCapabilities();
+        references.setDynamicRegistration(true);
+        capabilities.setReferences(references);
     }
 
     @Override

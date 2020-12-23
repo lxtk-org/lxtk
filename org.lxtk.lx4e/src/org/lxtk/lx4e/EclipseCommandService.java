@@ -16,7 +16,7 @@ import org.lxtk.CommandService;
 import org.lxtk.DefaultCommandService;
 
 /**
- * Default implementation of {@link CommandService} for Eclipse.
+ * LX4E-specific implementation of {@link CommandService}.
  * <p>
  * This implementation is thread-safe.
  * </p>

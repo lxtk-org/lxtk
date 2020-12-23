@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Location;
@@ -63,7 +64,9 @@ public final class DefinitionFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setDefinition(getLanguageService().getDefinitionCapabilities());
+        DefinitionCapabilities definition = getLanguageService().getDefinitionCapabilities();
+        definition.setDynamicRegistration(true);
+        capabilities.setDefinition(definition);
     }
 
     @Override

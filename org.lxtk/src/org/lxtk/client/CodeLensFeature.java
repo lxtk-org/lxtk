@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CodeLens;
+import org.eclipse.lsp4j.CodeLensCapabilities;
 import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.CodeLensParams;
 import org.eclipse.lsp4j.CodeLensRegistrationOptions;
@@ -68,7 +69,9 @@ public final class CodeLensFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setCodeLens(getLanguageService().getCodeLensCapabilities());
+        CodeLensCapabilities codeLens = getLanguageService().getCodeLensCapabilities();
+        codeLens.setDynamicRegistration(true);
+        capabilities.setCodeLens(codeLens);
     }
 
     @Override

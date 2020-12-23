@@ -21,7 +21,7 @@ import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentSnapshot;
 
 /**
- * Eclipse-specific extension of {@link TextDocumentChangeEvent}.
+ * LX4E-specific extension of {@link TextDocumentChangeEvent}.
  */
 public final class EclipseTextDocumentChangeEvent
     extends TextDocumentChangeEvent

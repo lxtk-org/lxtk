@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
+import org.eclipse.lsp4j.ImplementationCapabilities;
 import org.eclipse.lsp4j.ImplementationParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
@@ -64,7 +65,10 @@ public final class ImplementationFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setImplementation(getLanguageService().getImplementationCapabilities());
+        ImplementationCapabilities implementation =
+            getLanguageService().getImplementationCapabilities();
+        implementation.setDynamicRegistration(true);
+        capabilities.setImplementation(implementation);
     }
 
     @Override

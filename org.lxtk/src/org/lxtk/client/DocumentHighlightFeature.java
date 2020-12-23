@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.DocumentHighlight;
+import org.eclipse.lsp4j.DocumentHighlightCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
@@ -61,7 +62,10 @@ public final class DocumentHighlightFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setDocumentHighlight(getLanguageService().getDocumentHighlightCapabilities());
+        DocumentHighlightCapabilities documentHighlight =
+            getLanguageService().getDocumentHighlightCapabilities();
+        documentHighlight.setDynamicRegistration(true);
+        capabilities.setDocumentHighlight(documentHighlight);
     }
 
     @Override

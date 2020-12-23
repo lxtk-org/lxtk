@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.DocumentRangeFormattingParams;
+import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
@@ -62,8 +63,10 @@ public final class DocumentRangeFormattingFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setRangeFormatting(
-            getLanguageService().getDocumentRangeFormattingCapabilities());
+        RangeFormattingCapabilities rangeFormatting =
+            getLanguageService().getDocumentRangeFormattingCapabilities();
+        rangeFormatting.setDynamicRegistration(true);
+        capabilities.setRangeFormatting(rangeFormatting);
     }
 
     @Override

@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
 import org.lxtk.LanguageService;
@@ -64,8 +65,9 @@ public final class WorkspaceSymbolFeature
     @Override
     public void fillClientCapabilities(ClientCapabilities capabilities)
     {
-        ClientCapabilitiesUtil.getOrCreateWorkspace(capabilities).setSymbol(
-            getLanguageService().getWorkspaceSymbolCapabilities());
+        SymbolCapabilities symbol = getLanguageService().getWorkspaceSymbolCapabilities();
+        symbol.setDynamicRegistration(true);
+        ClientCapabilitiesUtil.getOrCreateWorkspace(capabilities).setSymbol(symbol);
     }
 
     @Override

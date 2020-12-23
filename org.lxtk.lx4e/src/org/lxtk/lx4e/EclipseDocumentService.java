@@ -19,7 +19,7 @@ import org.lxtk.DocumentService;
 import org.lxtk.lx4e.internal.Activator;
 
 /**
- * Default implementation of {@link DocumentService} for Eclipse.
+ * LX4E-specific implementation of {@link DocumentService}.
  * <p>
  * This implementation is thread-safe.
  * </p>

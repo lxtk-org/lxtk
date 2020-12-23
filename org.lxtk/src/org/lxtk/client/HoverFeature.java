@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
@@ -61,7 +62,9 @@ public final class HoverFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setHover(getLanguageService().getHoverCapabilities());
+        HoverCapabilities hover = getLanguageService().getHoverCapabilities();
+        hover.setDynamicRegistration(true);
+        capabilities.setHover(hover);
     }
 
     @Override

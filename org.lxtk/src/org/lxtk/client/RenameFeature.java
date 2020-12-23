@@ -24,6 +24,7 @@ import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.Registration;
+import org.eclipse.lsp4j.RenameCapabilities;
 import org.eclipse.lsp4j.RenameOptions;
 import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.ServerCapabilities;
@@ -66,7 +67,9 @@ public class RenameFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setRename(getLanguageService().getRenameCapabilities());
+        RenameCapabilities rename = getLanguageService().getRenameCapabilities();
+        rename.setDynamicRegistration(true);
+        capabilities.setRename(rename);
     }
 
     @Override

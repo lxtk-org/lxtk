@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.FoldingRange;
+import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FoldingRangeProviderOptions;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
 import org.eclipse.lsp4j.Registration;
@@ -63,7 +64,9 @@ public class FoldingRangeFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setFoldingRange(capabilities.getFoldingRange());
+        FoldingRangeCapabilities foldingRange = capabilities.getFoldingRange();
+        foldingRange.setDynamicRegistration(true);
+        capabilities.setFoldingRange(foldingRange);
     }
 
     @Override

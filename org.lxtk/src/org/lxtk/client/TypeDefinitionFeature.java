@@ -26,6 +26,7 @@ import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.StaticRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
+import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageService;
@@ -64,7 +65,10 @@ public final class TypeDefinitionFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        capabilities.setTypeDefinition(getLanguageService().getTypeDefinitionCapabilities());
+        TypeDefinitionCapabilities typeDefinition =
+            getLanguageService().getTypeDefinitionCapabilities();
+        typeDefinition.setDynamicRegistration(true);
+        capabilities.setTypeDefinition(typeDefinition);
     }
 
     @Override
