@@ -34,6 +34,7 @@ import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.ServerInfo;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceEditCapabilities;
@@ -213,7 +214,9 @@ public class EclipseLanguageClient<S extends LanguageServer>
      */
     protected String getMessageTitle(MessageParams params)
     {
-        return Messages.EclipseLanguageClient_Message_title;
+        ServerInfo serverInfo = getServerInfo();
+        return serverInfo == null ? Messages.EclipseLanguageClient_Message_title
+            : serverInfo.getName();
     }
 
     private static int getDialogImageType(MessageParams params)

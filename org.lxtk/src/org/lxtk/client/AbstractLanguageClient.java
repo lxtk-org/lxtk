@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.ClientInfo;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
@@ -31,6 +32,7 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.RegistrationParams;
+import org.eclipse.lsp4j.ServerInfo;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.UnregistrationParams;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -60,6 +62,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private final Consumer<PublishDiagnosticsParams> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures = new HashMap<>();
+    private ServerInfo serverInfo;
     private List<DocumentFilter> documentSelector;
 
     /**
@@ -97,6 +100,26 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     /**
+     * Returns the client info.
+     *
+     * @return the client info, or <code>null</code> if none
+     */
+    public ClientInfo getClientInfo()
+    {
+        return null;
+    }
+
+    /**
+     * Returns the server info.
+     *
+     * @return the server info, or <code>null</code> if none
+     */
+    public final ServerInfo getServerInfo()
+    {
+        return serverInfo;
+    }
+
+    /**
      * Returns the workspace service associated with this client.
      *
      * @return the associated workspace service, or <code>null</code> if none
@@ -109,6 +132,8 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     @Override
     public void fillInitializeParams(InitializeParams params)
     {
+        params.setClientInfo(getClientInfo());
+
         for (Feature<? super S> feature : featureSet)
         {
             feature.fillInitializeParams(params);
@@ -138,7 +163,9 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     public void initialize(S server, InitializeResult initializeResult,
         List<DocumentFilter> documentSelector)
     {
+        this.serverInfo = initializeResult.getServerInfo();
         this.documentSelector = documentSelector;
+
         for (Feature<? super S> feature : featureSet)
         {
             feature.initialize(server, initializeResult, documentSelector);
