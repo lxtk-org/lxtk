@@ -26,11 +26,11 @@ import java.util.function.Consumer;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.RegistrationParams;
-import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.UnregistrationParams;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -135,13 +135,13 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     @Override
-    public void initialize(S server, ServerCapabilities capabilities,
+    public void initialize(S server, InitializeResult initializeResult,
         List<DocumentFilter> documentSelector)
     {
         this.documentSelector = documentSelector;
         for (Feature<? super S> feature : featureSet)
         {
-            feature.initialize(server, capabilities, documentSelector);
+            feature.initialize(server, initializeResult, documentSelector);
         }
     }
 

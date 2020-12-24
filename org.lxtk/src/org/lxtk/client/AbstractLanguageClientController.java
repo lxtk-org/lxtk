@@ -227,11 +227,9 @@ public abstract class AbstractLanguageClientController<S extends LanguageServer>
                     Endpoint endpoint = connection.getRemoteEndpoint();
                     Endpoint advisedEndpoint = client.adviseServerEndpoint(endpoint);
 
-                    client.initialize(
-                        (endpoint == advisedEndpoint) ? server
-                            : ServiceEndpoints.toServiceObject(advisedEndpoint,
-                                getServerInterface()),
-                        result.getCapabilities(), getDocumentSelector());
+                    client.initialize(endpoint == advisedEndpoint ? server
+                        : ServiceEndpoints.toServiceObject(advisedEndpoint, getServerInterface()),
+                        result, getDocumentSelector());
 
                     rollback.setLogger(
                         t -> log().error("An error occurred while disconnecting", t)); //$NON-NLS-1$

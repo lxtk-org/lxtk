@@ -27,8 +27,8 @@ import org.eclipse.lsp4j.ExecuteCommandCapabilities;
 import org.eclipse.lsp4j.ExecuteCommandOptions;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.ExecuteCommandRegistrationOptions;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
-import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.CommandService;
@@ -80,13 +80,14 @@ public final class ExecuteCommandFeature
     }
 
     @Override
-    public synchronized void initialize(LanguageServer server, ServerCapabilities capabilities,
+    public synchronized void initialize(LanguageServer server, InitializeResult initializeResult,
         List<DocumentFilter> documentSelector)
     {
         languageServer = server;
         registrations = new HashMap<>();
 
-        ExecuteCommandOptions options = capabilities.getExecuteCommandProvider();
+        ExecuteCommandOptions options =
+            initializeResult.getCapabilities().getExecuteCommandProvider();
         if (options == null)
             return;
 

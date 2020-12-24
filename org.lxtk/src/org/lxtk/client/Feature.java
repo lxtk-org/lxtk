@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
-import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.jsonrpc.Endpoint;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.util.Disposable;
@@ -64,9 +64,9 @@ public interface Feature<S extends LanguageServer>
      * 'initialized' notification to the server.
      *
      * @param server the server proxy (not <code>null</code>)
-     * @param capabilities the server capabilities (not <code>null</code>)
+     * @param initializeResult the server initialize result (not <code>null</code>)
      * @param documentSelector the default document selector, or <code>null</code>
      */
-    void initialize(S server, ServerCapabilities capabilities,
+    void initialize(S server, InitializeResult initializeResult,
         List<DocumentFilter> documentSelector);
 }

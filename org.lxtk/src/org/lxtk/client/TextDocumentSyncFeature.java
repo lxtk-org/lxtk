@@ -36,9 +36,9 @@ import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.DocumentFilter;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.SaveOptions;
-import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SynchronizationCapabilities;
 import org.eclipse.lsp4j.TextDocumentChangeRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
@@ -145,7 +145,7 @@ public final class TextDocumentSyncFeature
     }
 
     @Override
-    public synchronized void initialize(LanguageServer server, ServerCapabilities capabilities,
+    public synchronized void initialize(LanguageServer server, InitializeResult initializeResult,
         List<DocumentFilter> documentSelector)
     {
         languageServer = server;
@@ -155,7 +155,7 @@ public final class TextDocumentSyncFeature
             return;
 
         TextDocumentSyncOptions syncOptions =
-            ServerCapabilitiesUtil.getTextDocumentSyncOptions(capabilities);
+            ServerCapabilitiesUtil.getTextDocumentSyncOptions(initializeResult.getCapabilities());
 
         if (Boolean.TRUE.equals(syncOptions.getOpenClose()))
         {

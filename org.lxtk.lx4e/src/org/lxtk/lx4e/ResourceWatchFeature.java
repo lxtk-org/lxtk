@@ -43,8 +43,8 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.FileChangeType;
 import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.FileSystemWatcher;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
-import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.WatchKind;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
@@ -118,7 +118,7 @@ public class ResourceWatchFeature
 
     @Override
     public final synchronized void initialize(LanguageServer server,
-        ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
+        InitializeResult initializeResult, List<DocumentFilter> documentSelector)
     {
         languageServer = server;
         registrations = new HashMap<>();

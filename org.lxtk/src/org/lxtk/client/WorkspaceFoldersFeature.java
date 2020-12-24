@@ -28,8 +28,8 @@ import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DidChangeWorkspaceFoldersParams;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
-import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.WorkspaceFoldersOptions;
 import org.eclipse.lsp4j.WorkspaceServerCapabilities;
@@ -89,13 +89,13 @@ public final class WorkspaceFoldersFeature
     }
 
     @Override
-    public synchronized void initialize(LanguageServer server, ServerCapabilities capabilities,
+    public synchronized void initialize(LanguageServer server, InitializeResult initializeResult,
         List<DocumentFilter> documentSelector)
     {
         languageServer = server;
         registrations = new HashSet<>();
 
-        WorkspaceServerCapabilities workspace = capabilities.getWorkspace();
+        WorkspaceServerCapabilities workspace = initializeResult.getCapabilities().getWorkspace();
         if (workspace == null)
             return;
 

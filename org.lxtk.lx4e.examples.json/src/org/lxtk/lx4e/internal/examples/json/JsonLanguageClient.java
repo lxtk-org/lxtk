@@ -26,8 +26,8 @@ import java.util.List;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.AbstractLanguageClientController;
@@ -119,10 +119,10 @@ public class JsonLanguageClient
             }
 
             @Override
-            public void initialize(LanguageServer server, ServerCapabilities capabilities,
+            public void initialize(LanguageServer server, InitializeResult initializeResult,
                 List<DocumentFilter> documentSelector)
             {
-                super.initialize(server, capabilities, documentSelector);
+                super.initialize(server, initializeResult, documentSelector);
 
                 JsonObject format = new JsonObject();
                 format.addProperty("enable", true); //$NON-NLS-1$

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.lsp4j.DocumentFilter;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.Unregistration;
@@ -58,11 +59,11 @@ abstract class LanguageFeature<RO>
 
     @Override
     public final synchronized void initialize(LanguageServer server,
-        ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
+        InitializeResult initializeResult, List<DocumentFilter> documentSelector)
     {
         languageServer = server;
         registrations = new HashMap<>();
-        initialize(capabilities, documentSelector);
+        initialize(initializeResult.getCapabilities(), documentSelector);
     }
 
     /**
