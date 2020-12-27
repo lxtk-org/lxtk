@@ -287,20 +287,14 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns whether the signature's active parameter should be highlighted.
-     * <p>
-     * Note that even if this method returns <code>true</code>, it might not be feasible
-     * to highlight the signature's active parameter in some cases, depending on the
-     * {@link SignatureHelpProvider} implementation. That would be the case, for example,
-     * if the signature help provider does not support a {@link SignatureHelpContext}.
-     * </p>
+     * Returns options for active parameter highlighting of a signature.
      *
-     * @return <code>true</code> if the signature's active parameter should be highlighted,
-     *  and <code>false</code> otherwise
+     * @return options for active parameter highlighting of a signature, or <code>null</code>
+     *  if active parameter highlighting is disabled
      */
-    protected boolean shouldMarkSignatureActiveParameter()
+    protected MarkSignatureActiveParameterOptions getMarkSignatureActiveParameterOptions()
     {
-        return true;
+        return MarkSignatureActiveParameterOptions.DEFAULT;
     }
 
     private SignatureHelpRequest getSignatureHelpRequest(ITextViewer viewer, int offset,
@@ -344,31 +338,77 @@ public class ContentAssistProcessor
     private static void normalize(SignatureHelp signatureHelp)
     {
         if (signatureHelp.getActiveSignature() == null)
+        {
             signatureHelp.setActiveSignature(0);
+        }
         else
         {
             int activeSignature = signatureHelp.getActiveSignature().intValue();
             if (activeSignature < 0 || activeSignature >= signatureHelp.getSignatures().size())
+            {
                 signatureHelp.setActiveSignature(0);
+            }
         }
 
         if (signatureHelp.getActiveParameter() == null)
+        {
             signatureHelp.setActiveParameter(0);
+        }
         else
         {
             int activeParameter = signatureHelp.getActiveParameter().intValue();
             if (activeParameter < 0 || activeParameter >= getParameterCount(
                 signatureHelp.getSignatures().get(signatureHelp.getActiveSignature())))
+            {
                 signatureHelp.setActiveParameter(0);
+            }
         }
     }
 
     private static int getParameterCount(SignatureInformation signature)
     {
         List<ParameterInformation> parameters = signature.getParameters();
-        if (parameters == null)
-            return 0;
-        return parameters.size();
+        return parameters == null ? 0 : parameters.size();
+    }
+
+    /**
+     * Describes options for active parameter highlighting of a signature.
+     */
+    protected static final class MarkSignatureActiveParameterOptions
+    {
+        static final MarkSignatureActiveParameterOptions DEFAULT =
+            new MarkSignatureActiveParameterOptions();
+
+        private boolean strict;
+
+        /**
+         * Returns whether active parameter highlighting is <i>strict</i>.
+         * <p>
+         * Depending on {@link SignatureHelpProvider} implementation, it might not be
+         * feasible to accurately highlight the active parameter of a signature in all cases.
+         * In non-strict mode (the default), highlighting is performed even in those cases
+         * when it is not guaranteed to be accurate, in the hope that it will be accurate
+         * in most cases.
+         * </p>
+         *
+         * @return <code>true</code> if active parameter highlighting is strict,
+         *  and <code>false</code> otherwise
+         */
+        public boolean isStrict()
+        {
+            return strict;
+        }
+
+        /**
+         * Sets whether active parameter highlighting is strict.
+         *
+         * @param strict whether active parameter highlighting is strict
+         * @see #isStrict()
+         */
+        public void setStrict(boolean strict)
+        {
+            this.strict = strict;
+        }
     }
 
     private static class SignatureContextInformation
@@ -377,6 +417,7 @@ public class ContentAssistProcessor
         final SignatureHelp signatureHelp;
         final int signatureIndex;
         final SignatureInformation signature;
+        final int parameterCount;
         final String label;
 
         SignatureContextInformation(SignatureHelp signatureHelp, int signatureIndex)
@@ -384,6 +425,7 @@ public class ContentAssistProcessor
             this.signatureHelp = signatureHelp;
             this.signatureIndex = signatureIndex;
             signature = signatureHelp.getSignatures().get(signatureIndex);
+            parameterCount = getParameterCount(signature);
             label = signature.getLabel();
         }
 
@@ -431,8 +473,8 @@ public class ContentAssistProcessor
         private SignatureContextInformation info;
         private ITextViewer viewer;
         private SignatureHelp signatureHelp;
-        private ParameterInformation currentParameter;
-        private boolean markActiveParameter;
+        private Integer markedParameter;
+        private MarkSignatureActiveParameterOptions markActiveParameterOptions;
 
         @Override
         public void install(IContextInformation info, ITextViewer viewer, int offset)
@@ -440,9 +482,8 @@ public class ContentAssistProcessor
             this.info = (SignatureContextInformation)info;
             this.viewer = viewer;
             signatureHelp = null;
-            currentParameter = null;
-            markActiveParameter =
-                shouldMarkSignatureActiveParameter() && getParameterCount(this.info.signature) > 0;
+            markedParameter = null;
+            markActiveParameterOptions = getMarkSignatureActiveParameterOptions();
         }
 
         @Override
@@ -458,44 +499,63 @@ public class ContentAssistProcessor
         @Override
         public boolean updatePresentation(int offset, TextPresentation presentation)
         {
-            if (!markActiveParameter)
+            if (markActiveParameterOptions == null || info.parameterCount == 0)
                 return false;
 
             if (signatureHelp == null)
                 signatureHelp = computeSignatureHelp(offset);
             if (signatureHelp == null)
             {
-                if (currentParameter == null)
+                if (markedParameter == null)
                     return false;
 
+                markedParameter = null;
                 presentation.clear();
                 return true;
             }
 
-            SignatureInformation activeSignature =
-                signatureHelp.getSignatures().get(signatureHelp.getActiveSignature());
-            if (getParameterCount(activeSignature) == 0 || !info.signature.equals(activeSignature))
+            if (markActiveParameterOptions.isStrict())
             {
-                if (currentParameter == null)
-                    return false;
+                SignatureInformation activeSignature =
+                    signatureHelp.getSignatures().get(signatureHelp.getActiveSignature());
+                if (!info.label.equals(activeSignature.getLabel()))
+                {
+                    if (markedParameter == null)
+                        return false;
 
-                presentation.clear();
-                return true;
+                    markedParameter = null;
+                    presentation.clear();
+                    return true;
+                }
             }
 
-            ParameterInformation activeParameter =
-                activeSignature.getParameters().get(signatureHelp.getActiveParameter());
-            if (activeParameter.equals(currentParameter))
+            Integer activeParameter = signatureHelp.getActiveParameter();
+            if (activeParameter.equals(markedParameter))
                 return false;
 
-            currentParameter = activeParameter;
-
-            Two<Integer, Integer> offsets = getOffsets(activeParameter);
-            if (offsets == null)
+            if (activeParameter >= info.parameterCount)
             {
+                if (markedParameter == null)
+                    return false;
+
+                markedParameter = null;
                 presentation.clear();
                 return true;
             }
+
+            Two<Integer, Integer> offsets =
+                getOffsets(info.signature.getParameters().get(activeParameter));
+            if (offsets == null)
+            {
+                if (markedParameter == null)
+                    return false;
+
+                markedParameter = null;
+                presentation.clear();
+                return true;
+            }
+
+            markedParameter = activeParameter;
 
             int start = offsets.getFirst();
             int end = offsets.getSecond();
