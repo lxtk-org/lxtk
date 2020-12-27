@@ -156,8 +156,6 @@ public class EclipseLanguageService
 
         SignatureInformationCapabilities signatureInformation =
             new SignatureInformationCapabilities();
-        signatureInformation.setDocumentationFormat(
-            Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         signatureInformation.setParameterInformation(parameterInformation);
 
         SignatureHelpCapabilities signatureHelp = new SignatureHelpCapabilities();
