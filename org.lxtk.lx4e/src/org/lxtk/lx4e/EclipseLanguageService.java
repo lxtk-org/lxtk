@@ -170,6 +170,7 @@ public class EclipseLanguageService
         SignatureInformationCapabilities signatureInformation =
             new SignatureInformationCapabilities();
         signatureInformation.setParameterInformation(parameterInformation);
+        signatureInformation.setActiveParameterSupport(true);
 
         SignatureHelpCapabilities signatureHelp = new SignatureHelpCapabilities();
         signatureHelp.setContextSupport(true);

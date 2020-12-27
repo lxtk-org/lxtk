@@ -371,6 +371,17 @@ public class ContentAssistProcessor
         return parameters == null ? 0 : parameters.size();
     }
 
+    private static SignatureInformation findSignatureByLabel(List<SignatureInformation> collection,
+        String label)
+    {
+        for (SignatureInformation signature : collection)
+        {
+            if (signature.getLabel().equals(label))
+                return signature;
+        }
+        return null;
+    }
+
     /**
      * Describes options for active parameter highlighting of a signature.
      */
@@ -416,17 +427,13 @@ public class ContentAssistProcessor
     {
         final SignatureHelp signatureHelp;
         final int signatureIndex;
-        final SignatureInformation signature;
-        final int parameterCount;
         final String label;
 
         SignatureContextInformation(SignatureHelp signatureHelp, int signatureIndex)
         {
             this.signatureHelp = signatureHelp;
             this.signatureIndex = signatureIndex;
-            signature = signatureHelp.getSignatures().get(signatureIndex);
-            parameterCount = getParameterCount(signature);
-            label = signature.getLabel();
+            label = signatureHelp.getSignatures().get(signatureIndex).getLabel();
         }
 
         @Override
@@ -483,7 +490,10 @@ public class ContentAssistProcessor
             this.viewer = viewer;
             signatureHelp = null;
             markedParameter = null;
-            markActiveParameterOptions = getMarkSignatureActiveParameterOptions();
+            SignatureInformation signature =
+                this.info.signatureHelp.getSignatures().get(this.info.signatureIndex);
+            markActiveParameterOptions =
+                getParameterCount(signature) > 0 ? getMarkSignatureActiveParameterOptions() : null;
         }
 
         @Override
@@ -493,67 +503,48 @@ public class ContentAssistProcessor
             if (signatureHelp == null)
                 return false;
 
-            return signatureHelp.getSignatures().contains(info.signature);
+            return findSignatureByLabel(signatureHelp.getSignatures(), info.label) != null;
         }
 
         @Override
         public boolean updatePresentation(int offset, TextPresentation presentation)
         {
-            if (markActiveParameterOptions == null || info.parameterCount == 0)
+            if (markActiveParameterOptions == null)
                 return false;
 
             if (signatureHelp == null)
                 signatureHelp = computeSignatureHelp(offset);
             if (signatureHelp == null)
-            {
-                if (markedParameter == null)
-                    return false;
+                return clearMarkedParameter(presentation);
 
-                markedParameter = null;
-                presentation.clear();
-                return true;
-            }
+            SignatureInformation signature =
+                findSignatureByLabel(signatureHelp.getSignatures(), info.label);
+            if (signature == null)
+                return clearMarkedParameter(presentation);
 
-            if (markActiveParameterOptions.isStrict())
+            Integer activeParameter = signature.getActiveParameter();
+            if (activeParameter == null)
             {
-                SignatureInformation activeSignature =
-                    signatureHelp.getSignatures().get(signatureHelp.getActiveSignature());
-                if (!info.label.equals(activeSignature.getLabel()))
+                if (markActiveParameterOptions.isStrict())
                 {
-                    if (markedParameter == null)
-                        return false;
-
-                    markedParameter = null;
-                    presentation.clear();
-                    return true;
+                    SignatureInformation activeSignature =
+                        signatureHelp.getSignatures().get(signatureHelp.getActiveSignature());
+                    if (!info.label.equals(activeSignature.getLabel()))
+                        return clearMarkedParameter(presentation);
                 }
+                activeParameter = signatureHelp.getActiveParameter();
             }
 
-            Integer activeParameter = signatureHelp.getActiveParameter();
             if (activeParameter.equals(markedParameter))
                 return false;
 
-            if (activeParameter >= info.parameterCount)
-            {
-                if (markedParameter == null)
-                    return false;
-
-                markedParameter = null;
-                presentation.clear();
-                return true;
-            }
+            if (activeParameter >= getParameterCount(signature))
+                return clearMarkedParameter(presentation);
 
             Two<Integer, Integer> offsets =
-                getOffsets(info.signature.getParameters().get(activeParameter));
+                getOffsets(signature.getParameters().get(activeParameter));
             if (offsets == null)
-            {
-                if (markedParameter == null)
-                    return false;
-
-                markedParameter = null;
-                presentation.clear();
-                return true;
-            }
+                return clearMarkedParameter(presentation);
 
             markedParameter = activeParameter;
 
@@ -573,6 +564,16 @@ public class ContentAssistProcessor
                 presentation.addStyleRange(
                     new StyleRange(end, info.label.length() - end, null, null, SWT.NORMAL));
 
+            return true;
+        }
+
+        private boolean clearMarkedParameter(TextPresentation presentation)
+        {
+            if (markedParameter == null)
+                return false;
+
+            markedParameter = null;
+            presentation.clear();
             return true;
         }
 
