@@ -33,9 +33,11 @@ import org.eclipse.lsp4j.ApplyWorkspaceEditResponse;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
+import org.eclipse.lsp4j.PublishDiagnosticsCapabilities;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ServerInfo;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
+import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.WindowClientCapabilities;
 import org.eclipse.lsp4j.WorkDoneProgressCancelParams;
 import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
@@ -110,6 +112,12 @@ public class EclipseLanguageClient<S extends LanguageServer>
     @Override
     public void fillClientCapabilities(ClientCapabilities capabilities)
     {
+        TextDocumentClientCapabilities textDocument = new TextDocumentClientCapabilities();
+        PublishDiagnosticsCapabilities publishDiagnostics = new PublishDiagnosticsCapabilities();
+        publishDiagnostics.setDataSupport(true);
+        textDocument.setPublishDiagnostics(publishDiagnostics);
+        capabilities.setTextDocument(textDocument);
+
         WorkspaceClientCapabilities workspace = new WorkspaceClientCapabilities();
         workspace.setApplyEdit(true);
         WorkspaceEditCapabilities workspaceEdit = new WorkspaceEditCapabilities();
