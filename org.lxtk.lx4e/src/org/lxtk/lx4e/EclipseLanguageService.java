@@ -70,6 +70,7 @@ public class EclipseLanguageService
 
         CodeActionCapabilities codeAction = new CodeActionCapabilities();
         codeAction.setCodeActionLiteralSupport(codeActionLiteralSupport);
+        codeAction.setDisabledSupport(true);
         return codeAction;
     }
 

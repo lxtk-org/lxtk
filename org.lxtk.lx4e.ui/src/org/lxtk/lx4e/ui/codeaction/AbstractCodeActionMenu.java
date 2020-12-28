@@ -277,6 +277,7 @@ public abstract class AbstractCodeActionMenu
             this.codeAction = Objects.requireNonNull(codeAction);
             this.commandService = provider.getCommandService();
             setText(codeAction.getTitle());
+            setEnabled(codeAction.getDisabled() == null);
         }
 
         @Override

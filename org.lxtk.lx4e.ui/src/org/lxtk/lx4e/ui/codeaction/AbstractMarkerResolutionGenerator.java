@@ -94,7 +94,11 @@ public abstract class AbstractMarkerResolutionGenerator
             if (item.isLeft())
                 resolutions.add(newMarkerResolution(item.getLeft(), provider));
             else if (item.isRight())
-                resolutions.add(newMarkerResolution(item.getRight(), provider));
+            {
+                CodeAction codeAction = item.getRight();
+                if (codeAction.getDisabled() == null)
+                    resolutions.add(newMarkerResolution(codeAction, provider));
+            }
         }
         return resolutions.toArray(NO_RESOLUTIONS);
     }

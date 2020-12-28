@@ -133,7 +133,11 @@ public abstract class AbstractQuickAssistProcessor
             if (item.isLeft())
                 proposals.add(newProposal(item.getLeft(), provider));
             else if (item.isRight())
-                proposals.add(newProposal(item.getRight(), provider));
+            {
+                CodeAction codeAction = item.getRight();
+                if (codeAction.getDisabled() == null)
+                    proposals.add(newProposal(codeAction, provider));
+            }
         }
         return proposals.toArray(new ICompletionProposal[proposals.size()]);
     }
