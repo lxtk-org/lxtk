@@ -93,13 +93,12 @@ class CodeActions
                     {
                         operation.run(monitor);
                         future.complete(null);
-                        return Status.OK_STATUS;
                     }
                     catch (Throwable e)
                     {
                         future.completeExceptionally(e);
-                        throw e;
                     }
+                    return Status.OK_STATUS;
                 }
             };
             job.setRule(ResourcesPlugin.getWorkspace().getRoot());
