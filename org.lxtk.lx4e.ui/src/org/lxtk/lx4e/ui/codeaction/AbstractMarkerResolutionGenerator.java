@@ -241,7 +241,7 @@ public abstract class AbstractMarkerResolutionGenerator
          */
         protected final CodeAction codeAction;
 
-        private final CommandService commandService;
+        private final CodeActionProvider provider;
 
         /**
          * Constructor.
@@ -252,7 +252,7 @@ public abstract class AbstractMarkerResolutionGenerator
         public CodeActionMarkerResolution(CodeAction codeAction, CodeActionProvider provider)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
-            this.commandService = provider.getCommandService();
+            this.provider = Objects.requireNonNull(provider);
         }
 
         @Override
@@ -264,8 +264,7 @@ public abstract class AbstractMarkerResolutionGenerator
         @Override
         public void run(IMarker marker)
         {
-            CodeActions.execute(codeAction, getLabel(), getWorkspaceEditChangeFactory(),
-                commandService);
+            CodeActions.execute(codeAction, getLabel(), getWorkspaceEditChangeFactory(), provider);
         }
     }
 }

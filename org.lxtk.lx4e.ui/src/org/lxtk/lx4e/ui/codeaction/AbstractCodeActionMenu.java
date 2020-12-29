@@ -264,7 +264,7 @@ public abstract class AbstractCodeActionMenu
          */
         protected final CodeAction codeAction;
 
-        private final CommandService commandService;
+        private final CodeActionProvider provider;
 
         /**
          * Constructor.
@@ -275,7 +275,7 @@ public abstract class AbstractCodeActionMenu
         public CodeActionAction(CodeAction codeAction, CodeActionProvider provider)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
-            this.commandService = provider.getCommandService();
+            this.provider = Objects.requireNonNull(provider);
             setText(codeAction.getTitle());
             setEnabled(codeAction.getDisabled() == null);
         }
@@ -283,8 +283,7 @@ public abstract class AbstractCodeActionMenu
         @Override
         public void run()
         {
-            CodeActions.execute(codeAction, getText(), getWorkspaceEditChangeFactory(),
-                commandService);
+            CodeActions.execute(codeAction, getText(), getWorkspaceEditChangeFactory(), provider);
         }
     }
 

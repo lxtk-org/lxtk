@@ -118,7 +118,7 @@ abstract class LanguageFeature<RO>
             throw new IllegalArgumentException();
 
         Object rO = registration.getRegisterOptions();
-        Class<RO> optionsClass = getRegistrationOptionsClass();
+        Class<? extends RO> optionsClass = getRegistrationOptionsClass();
         RO options = rO instanceof JsonElement
             ? DefaultGson.INSTANCE.fromJson((JsonElement)rO, optionsClass) : optionsClass.cast(rO);
         if (!checkRegistrationOptions(options))
@@ -142,7 +142,7 @@ abstract class LanguageFeature<RO>
      *
      * @return the registration options class (never <code>null</code>)
      */
-    abstract Class<RO> getRegistrationOptionsClass();
+    abstract Class<? extends RO> getRegistrationOptionsClass();
 
     /**
      * Checks the given registration options.

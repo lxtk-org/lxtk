@@ -88,14 +88,18 @@ public final class CodeActionFeature
             || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new TextDocumentRegistrationOptions(documentSelector)));
+        CodeActionRegistrationOptions registerOptions = new CodeActionRegistrationOptions();
+        registerOptions.setDocumentSelector(documentSelector);
+        if (capability.isRight())
+            registerOptions.resolveProvider = capability.getRight().getResolveProvider();
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<? extends TextDocumentRegistrationOptions> getRegistrationOptionsClass()
     {
-        return TextDocumentRegistrationOptions.class;
+        return CodeActionRegistrationOptions.class;
     }
 
     @Override
@@ -105,9 +109,9 @@ public final class CodeActionFeature
         return getLanguageService().getCodeActionProviders().add(new CodeActionProvider()
         {
             @Override
-            public TextDocumentRegistrationOptions getRegistrationOptions()
+            public CodeActionRegistrationOptions getRegistrationOptions()
             {
-                return options;
+                return (CodeActionRegistrationOptions)options;
             }
 
             @Override
@@ -124,10 +128,32 @@ public final class CodeActionFeature
             }
 
             @Override
+            public boolean supportsResolveCodeAction()
+            {
+                return Boolean.TRUE.equals(getRegistrationOptions().resolveProvider);
+            }
+
+            @Override
+            public CompletableFuture<CodeAction> resolveCodeAction(CodeAction unresolved)
+            {
+                if (!supportsResolveCodeAction())
+                    throw new UnsupportedOperationException();
+
+                return getLanguageServer().getTextDocumentService().resolveCodeAction(unresolved);
+            }
+
+            @Override
             public CommandService getCommandService()
             {
                 return commandService;
             }
         });
+    }
+
+    // TODO workaround for missing CodeActionRegistrationOptions in LSP4J
+    static class CodeActionRegistrationOptions
+        extends TextDocumentRegistrationOptions
+    {
+        Boolean resolveProvider;
     }
 }

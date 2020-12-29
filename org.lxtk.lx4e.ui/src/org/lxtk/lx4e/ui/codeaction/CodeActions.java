@@ -69,43 +69,49 @@ class CodeActions
     }
 
     static void execute(CodeAction codeAction, String label,
-        WorkspaceEditChangeFactory workspaceEditChangeFactory, CommandService commandService)
+        WorkspaceEditChangeFactory workspaceEditChangeFactory, CodeActionProvider provider)
     {
-        CompletableFuture<?> future = new CompletableFuture<>();
-        WorkspaceEdit edit = codeAction.getEdit();
-        if (edit == null)
-            future.complete(null);
-        else
+        resolveIfNecessary(codeAction, provider).thenCompose(resolvedCodeAction ->
         {
-            WorkspaceEditRefactoring refactoring =
-                new WorkspaceEditRefactoring(label, workspaceEditChangeFactory);
-            refactoring.setWorkspaceEdit(edit);
+            CompletableFuture<?> future = new CompletableFuture<>();
 
-            PerformRefactoringOperation operation = new PerformRefactoringOperation(refactoring,
-                CheckConditionsOperation.ALL_CONDITIONS);
-
-            WorkspaceJob job = new WorkspaceJob(label)
+            WorkspaceEdit edit = resolvedCodeAction.getEdit();
+            if (edit == null)
+                future.complete(null);
+            else
             {
-                @Override
-                public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+                WorkspaceEditRefactoring refactoring =
+                    new WorkspaceEditRefactoring(label, workspaceEditChangeFactory);
+                refactoring.setWorkspaceEdit(edit);
+
+                PerformRefactoringOperation operation = new PerformRefactoringOperation(refactoring,
+                    CheckConditionsOperation.ALL_CONDITIONS);
+
+                WorkspaceJob job = new WorkspaceJob(label)
                 {
-                    try
+                    @Override
+                    public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
                     {
-                        operation.run(monitor);
-                        future.complete(null);
+                        try
+                        {
+                            operation.run(monitor);
+                            future.complete(null);
+                        }
+                        catch (Throwable e)
+                        {
+                            future.completeExceptionally(e);
+                        }
+                        return Status.OK_STATUS;
                     }
-                    catch (Throwable e)
-                    {
-                        future.completeExceptionally(e);
-                    }
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-            job.schedule();
-        }
-        future.thenCompose(
-            x -> doExecute(codeAction.getCommand(), null, commandService)).exceptionally(e ->
+                };
+                job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+                job.schedule();
+            }
+
+            return future;
+
+        }).thenCompose(x -> doExecute(codeAction.getCommand(), null,
+            provider.getCommandService())).exceptionally(e ->
             {
                 if (!Activator.isCancellation(e))
                 {
@@ -116,6 +122,15 @@ class CodeActions
                 }
                 return null;
             });
+    }
+
+    private static CompletableFuture<CodeAction> resolveIfNecessary(CodeAction codeAction,
+        CodeActionProvider provider)
+    {
+        if (codeAction.getEdit() != null || !provider.supportsResolveCodeAction())
+            return CompletableFuture.completedFuture(codeAction);
+
+        return provider.resolveCodeAction(codeAction);
     }
 
     private static CompletableFuture<Object> doExecute(Command command, String label,

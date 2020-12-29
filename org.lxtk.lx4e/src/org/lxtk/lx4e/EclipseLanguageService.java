@@ -19,6 +19,7 @@ import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CodeActionKind;
 import org.eclipse.lsp4j.CodeActionKindCapabilities;
 import org.eclipse.lsp4j.CodeActionLiteralSupportCapabilities;
+import org.eclipse.lsp4j.CodeActionResolveSupportCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItemCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
@@ -71,6 +72,9 @@ public class EclipseLanguageService
         CodeActionCapabilities codeAction = new CodeActionCapabilities();
         codeAction.setCodeActionLiteralSupport(codeActionLiteralSupport);
         codeAction.setDisabledSupport(true);
+        codeAction.setResolveSupport(
+            new CodeActionResolveSupportCapabilities(Arrays.asList("edit"))); //$NON-NLS-1$
+        codeAction.setDataSupport(true);
         return codeAction;
     }
 

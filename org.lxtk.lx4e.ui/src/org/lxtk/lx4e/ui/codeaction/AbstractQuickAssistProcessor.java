@@ -426,7 +426,7 @@ public abstract class AbstractQuickAssistProcessor
          */
         protected final CodeAction codeAction;
 
-        private final CommandService commandService;
+        private final CodeActionProvider provider;
 
         /**
          * Constructor.
@@ -437,14 +437,14 @@ public abstract class AbstractQuickAssistProcessor
         public CodeActionProposal(CodeAction codeAction, CodeActionProvider provider)
         {
             this.codeAction = Objects.requireNonNull(codeAction);
-            this.commandService = provider.getCommandService();
+            this.provider = Objects.requireNonNull(provider);
         }
 
         @Override
         public void apply(IDocument document)
         {
             CodeActions.execute(codeAction, getDisplayString(), getWorkspaceEditChangeFactory(),
-                commandService);
+                provider);
         }
 
         @Override
