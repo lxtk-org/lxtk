@@ -363,7 +363,7 @@ class LSIncompleteCompletionProposal
     }
 
     protected Duration getCompletionResolveTimeout() {
-        return Duration.ofMillis(5000);
+        return Duration.ofSeconds(1);
     }
 
     @Override
