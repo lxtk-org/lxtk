@@ -15,11 +15,13 @@
 package org.lxtk.lx4e.ui.completion;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,6 +48,7 @@ import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.jface.text.link.ProposalPosition;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.InsertTextFormat;
 import org.eclipse.lsp4j.MarkupContent;
@@ -60,8 +63,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
+import org.lxtk.CommandService;
 import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.CompletionResolveRequest;
 import org.lxtk.lx4e.DocumentUtil;
@@ -566,6 +571,26 @@ class LSIncompleteCompletionProposal
             }
         } catch (BadLocationException ex) {
             Activator.logError(ex);
+        }
+
+        Command command = item.getCommand();
+        if (command != null) {
+            CommandService commandService = provider.getCommandService();
+            if (commandService != null) {
+                CompletableFuture<Object> future = commandService.executeCommand(
+                    command.getCommand(), command.getArguments());
+                if (future != null) {
+                    future.exceptionally(e -> {
+                        if (!Activator.isCancellation(e)) {
+                            StatusManager.getManager().handle(Activator.createErrorStatus(
+                                MessageFormat.format(Messages.LSIncompleteCompletionProposal_Execution_error,
+                                    command.getTitle()), e),
+                                StatusManager.LOG);
+                        }
+                        return null;
+                    });
+                }
+            }
         }
     }
 

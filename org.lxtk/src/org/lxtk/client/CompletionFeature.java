@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.lxtk.CommandService;
 import org.lxtk.CompletionProvider;
 import org.lxtk.LanguageService;
 import org.lxtk.util.Disposable;
@@ -46,14 +47,30 @@ public final class CompletionFeature
     private static final String METHOD = "textDocument/completion"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
+    private final CommandService commandService;
+
     /**
      * Constructor.
      *
      * @param languageService not <code>null</code>
+     * @see #CompletionFeature(LanguageService, CommandService)
      */
     public CompletionFeature(LanguageService languageService)
     {
+        this(languageService, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param languageService not <code>null</code>
+     * @param commandService may be <code>null</code>, in which case no completion item commands
+     *  can be executed
+     */
+    public CompletionFeature(LanguageService languageService, CommandService commandService)
+    {
         super(languageService);
+        this.commandService = commandService;
     }
 
     @Override
@@ -119,6 +136,12 @@ public final class CompletionFeature
                     throw new UnsupportedOperationException();
 
                 return getLanguageServer().getTextDocumentService().resolveCompletionItem(item);
+            }
+
+            @Override
+            public CommandService getCommandService()
+            {
+                return commandService;
             }
         });
     }

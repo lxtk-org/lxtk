@@ -48,4 +48,16 @@ public interface CompletionProvider
      * @see CompletionRegistrationOptions#getResolveProvider()
      */
     CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem item);
+
+    /**
+     * Returns the command service associated with this provider.
+     * Completion item commands cannot be executed if no command service
+     * is associated with the provider.
+     *
+     * @return the associated command service, or <code>null</code> if none
+     */
+    default CommandService getCommandService()
+    {
+        return null;
+    }
 }

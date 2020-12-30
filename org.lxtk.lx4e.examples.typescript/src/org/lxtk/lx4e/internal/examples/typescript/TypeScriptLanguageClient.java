@@ -135,7 +135,7 @@ public class TypeScriptLanguageClient
         features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE));
         features.add(new ExecuteCommandFeature(commandService));
         features.add(new CodeActionFeature(LANGUAGE_SERVICE, commandService));
-        features.add(new CompletionFeature(LANGUAGE_SERVICE));
+        features.add(new CompletionFeature(LANGUAGE_SERVICE, commandService));
         features.add(new DefinitionFeature(LANGUAGE_SERVICE));
         features.add(new DocumentFormattingFeature(LANGUAGE_SERVICE));
         features.add(new DocumentHighlightFeature(LANGUAGE_SERVICE));

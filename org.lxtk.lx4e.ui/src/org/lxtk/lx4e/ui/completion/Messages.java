@@ -20,6 +20,7 @@ class Messages
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.completion.messages"; //$NON-NLS-1$
 
     public static String ContentAssistProcessor_Request_timed_out;
+    public static String LSIncompleteCompletionProposal_Execution_error;
     public static String LSIncompleteCompletionProposal_Tooltip_affordance_string;
 
     static
