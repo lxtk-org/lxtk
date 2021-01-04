@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.handly.buffer.IBuffer;
 import org.eclipse.handly.buffer.TextFileBuffer;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -202,6 +203,28 @@ public class DiagnosticMarkers
 
     private void doCreateMarkers(IFile file, URI uri, Collection<Diagnostic> diagnostics)
     {
+        try (IBuffer buffer = getBuffer(file))
+        {
+            doCreateMarkers(file, uri, diagnostics, buffer != null ? buffer.getDocument() : null);
+        }
+    }
+
+    private static IBuffer getBuffer(IFile file)
+    {
+        try
+        {
+            return TextFileBuffer.forFile(file);
+        }
+        catch (CoreException e)
+        {
+            Activator.logError(e);
+            return null;
+        }
+    }
+
+    private void doCreateMarkers(IFile file, URI uri, Collection<Diagnostic> diagnostics,
+        IDocument document)
+    {
         Collection<IMarker> markers = getMarkers().computeIfAbsent(uri, k -> new ArrayList<>());
         for (Diagnostic diagnostic : diagnostics)
         {
@@ -211,7 +234,7 @@ public class DiagnosticMarkers
                 try
                 {
                     Map<String, Object> attributes = new HashMap<>();
-                    fillMarkerAttributes(attributes, file, uri, diagnostic);
+                    fillMarkerAttributes(attributes, file, uri, diagnostic, document);
                     attributes.put(SOURCE_UUID_ATTRIBUTE, sourceUuid);
                     marker.setAttributes(attributes);
                 }
@@ -246,26 +269,26 @@ public class DiagnosticMarkers
      * @param file never <code>null</code>
      * @param uri never <code>null</code>
      * @param diagnostic never <code>null</code>
+     * @param document the corresponding document, or <code>null</code>
      */
     protected void fillMarkerAttributes(Map<String, Object> attributes, IFile file, URI uri,
-        Diagnostic diagnostic)
+        Diagnostic diagnostic, IDocument document)
     {
         attributes.put(IMarker.SEVERITY, getMarkerSeverity(diagnostic.getSeverity()));
         attributes.put(IMarker.MESSAGE, diagnostic.getMessage());
         attributes.put(IMarker.LINE_NUMBER, diagnostic.getRange().getStart().getLine() + 1);
-        try (IBuffer buffer = TextFileBuffer.forFile(file))
+        if (document != null)
         {
-            IRegion region = DocumentUtil.toRegion(buffer.getDocument(), diagnostic.getRange());
-            attributes.put(IMarker.CHAR_START, region.getOffset());
-            attributes.put(IMarker.CHAR_END, region.getOffset() + region.getLength());
-        }
-        catch (CoreException e)
-        {
-            Activator.logError(e);
-        }
-        catch (BadLocationException e)
-        {
-            // silently ignore: the document might have changed in the meantime
+            try
+            {
+                IRegion region = DocumentUtil.toRegion(document, diagnostic.getRange());
+                attributes.put(IMarker.CHAR_START, region.getOffset());
+                attributes.put(IMarker.CHAR_END, region.getOffset() + region.getLength());
+            }
+            catch (BadLocationException e)
+            {
+                // silently ignore: the document might have changed in the meantime
+            }
         }
         attributes.put(DIAGNOSTIC_ATTRIBUTE, DefaultGson.INSTANCE.toJson(diagnostic));
     }
