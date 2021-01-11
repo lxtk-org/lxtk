@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
-   Copyright (c) 2019, 2020 1C-Soft LLC.
+   Copyright (c) 2019, 2021 1C-Soft LLC.
 
    This program and the accompanying materials are made available under
    the terms of the Eclipse Public License 2.0 which is available at
@@ -34,9 +34,7 @@
 <unit id="com.google.gson" version="0.0.0"/>
 <unit id="com.google.guava" version="0.0.0"/>
 <unit id="com.google.guava" version="21.0.0.v20170206-1425"/> <!-- Mylyn requires Guava 21 -->
-<unit id="org.jcodings" version="0.0.0"/>
-<unit id="org.joni" version="0.0.0"/>
-<unit id="org.jsoup" version="0.0.0"/>
+<unit id="org.jsoup" version="0.0.0"/> <!-- required by Mylyn -->
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <repository location="http://download.eclipse.org/lsp4j/updates/releases/0.9.0"/>
@@ -51,6 +49,8 @@
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <repository location="https://download.eclipse.org/tm4e/releases/0.4.1/"/>
 <unit id="org.eclipse.tm4e.feature.feature.group" version="0.0.0"/>
+<unit id="org.jcodings" version="0.0.0"/>
+<unit id="org.joni" version="0.0.0"/>
 </location>
 </locations>
 </target>
