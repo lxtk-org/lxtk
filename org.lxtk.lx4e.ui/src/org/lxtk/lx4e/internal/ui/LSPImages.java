@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2019 Rogue Wave Software Inc. and others.
+ * Copyright (c) 2016, 2021 Rogue Wave Software Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -214,6 +214,8 @@ public class LSPImages {
 //            return getImageForColor(completionItem);
         case File:
             return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+        case Folder:
+            return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
         case Reference:
             return getImage(IMG_REFERENCE);
         default:
