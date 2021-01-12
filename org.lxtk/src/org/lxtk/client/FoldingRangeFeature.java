@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -64,7 +64,7 @@ public class FoldingRangeFeature
     @Override
     void fillClientCapabilities(TextDocumentClientCapabilities capabilities)
     {
-        FoldingRangeCapabilities foldingRange = capabilities.getFoldingRange();
+        FoldingRangeCapabilities foldingRange = getLanguageService().getFoldingRangeCapabilities();
         foldingRange.setDynamicRegistration(true);
         capabilities.setFoldingRange(foldingRange);
     }
