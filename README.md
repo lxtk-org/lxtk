@@ -103,7 +103,7 @@ workspace, issue pull requests, etc.
 
 ## Contacts
 
-- Website: <https://www.lxtk.org>
+- Website: <https://lxtk.org>
 
 - Community Discussions: <https://github.com/lxtk-org/lxtk/discussions>
 
