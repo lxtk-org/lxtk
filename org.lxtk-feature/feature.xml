@@ -20,7 +20,7 @@
       license-feature="org.eclipse.license"
       license-feature-version="2.0.2.qualifier">
 
-   <description url="http://www.lxtk.org">
+   <description url="https://lxtk.org">
       %description
    </description>
 
