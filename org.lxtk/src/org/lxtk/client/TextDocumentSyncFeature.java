@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -346,8 +346,7 @@ public final class TextDocumentSyncFeature
             return;
 
         TextDocument document = event.getDocument();
-        TextDocumentSnapshot snapshot = event.getSnapshot();
-        int snapshotVersion = snapshot.getVersion();
+        int snapshotVersion = event.getSnapshot().getVersion();
 
         Integer syncedDocumentVersion = syncedDocumentVersions.get(document);
         if (syncedDocumentVersion == null || syncedDocumentVersion >= snapshotVersion)
@@ -358,11 +357,7 @@ public final class TextDocumentSyncFeature
         if (registrationOptions == null)
             return;
 
-        pendingChangeManager.addChange(document,
-            registrationOptions.getSyncKind() == TextDocumentSyncKind.Full
-                ? Collections.singletonList(new TextDocumentContentChangeEvent(snapshot.getText()))
-                : event.getContentChanges(),
-            snapshotVersion);
+        pendingChangeManager.addChange(event, registrationOptions.getSyncKind());
     }
 
     private synchronized void flushPendingChange()
@@ -371,13 +366,44 @@ public final class TextDocumentSyncFeature
         if (change == null)
             return;
 
+        TextDocument document = change.document;
+
+        Integer syncedDocumentVersion = syncedDocumentVersions.get(document);
+        if (syncedDocumentVersion == null)
+            return;
+
+        TextDocumentChangeRegistrationOptions registrationOptions =
+            (TextDocumentChangeRegistrationOptions)getRegistrationOptions(document, DID_CHANGE);
+        if (registrationOptions == null)
+            return;
+
+        int version;
+        List<TextDocumentContentChangeEvent> contentChanges;
+
+        if (registrationOptions.getSyncKind() == TextDocumentSyncKind.Full
+            || change.syncKind == TextDocumentSyncKind.Full)
+        {
+            TextDocumentSnapshot snapshot = document.getLastChange().getSnapshot();
+            version = snapshot.getVersion();
+            contentChanges =
+                Collections.singletonList(new TextDocumentContentChangeEvent(snapshot.getText()));
+        }
+        else
+        {
+            version = change.version;
+            contentChanges = change.contentChanges;
+        }
+
+        if (syncedDocumentVersion >= version)
+            return;
+
         DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
-        params.setTextDocument(new VersionedTextDocumentIdentifier(
-            DocumentUri.convert(change.document.getUri()), change.version));
-        params.setContentChanges(change.contentChanges);
+        params.setTextDocument(
+            new VersionedTextDocumentIdentifier(DocumentUri.convert(document.getUri()), version));
+        params.setContentChanges(contentChanges);
 
         languageServer.getTextDocumentService().didChange(params);
-        syncedDocumentVersions.put(change.document, change.version);
+        syncedDocumentVersions.put(document, version);
     }
 
     private synchronized void onDidSave(TextDocumentSaveEvent event)
@@ -435,22 +461,26 @@ public final class TextDocumentSyncFeature
     private static class PendingChange
     {
         final TextDocument document;
-        final List<TextDocumentContentChangeEvent> contentChanges = new ArrayList<>();
+        final TextDocumentSyncKind syncKind;
+        List<TextDocumentContentChangeEvent> contentChanges;
         int version;
 
-        PendingChange(TextDocument document)
+        PendingChange(TextDocument document, TextDocumentSyncKind syncKind)
         {
             this.document = Objects.requireNonNull(document);
+            this.syncKind = Objects.requireNonNull(syncKind);
         }
 
-        void add(List<TextDocumentContentChangeEvent> contentChanges, int version)
+        void add(TextDocumentChangeEvent event)
         {
-            if (contentChanges.size() == 1 && contentChanges.get(0).getRange() == null)
-            {
-                this.contentChanges.clear();
-            }
-            this.contentChanges.addAll(contentChanges);
-            this.version = version;
+            if (syncKind == TextDocumentSyncKind.Full)
+                return;
+
+            if (contentChanges == null)
+                contentChanges = new ArrayList<>();
+
+            contentChanges.addAll(event.getContentChanges());
+            version = event.getSnapshot().getVersion();
         }
     }
 
@@ -472,14 +502,13 @@ public final class TextDocumentSyncFeature
             this.delay = delay.toMillis();
         }
 
-        void addChange(TextDocument document, List<TextDocumentContentChangeEvent> contentChanges,
-            int version)
+        void addChange(TextDocumentChangeEvent event, TextDocumentSyncKind syncKind)
         {
             if (change != null)
             {
                 change.cancel();
 
-                if (change.document != document)
+                if (change.document != event.getDocument())
                 {
                     flushCallback.run();
                     change = null;
@@ -487,9 +516,9 @@ public final class TextDocumentSyncFeature
             }
 
             if (change == null)
-                change = new ScheduledChange(document);
+                change = new ScheduledChange(event.getDocument(), syncKind);
 
-            change.add(contentChanges, version);
+            change.add(event);
 
             if (executor == null)
                 executor = Executors.newSingleThreadScheduledExecutor();
@@ -526,9 +555,9 @@ public final class TextDocumentSyncFeature
         {
             Future<?> future;
 
-            ScheduledChange(TextDocument document)
+            ScheduledChange(TextDocument document, TextDocumentSyncKind syncKind)
             {
-                super(document);
+                super(document, syncKind);
             }
 
             void cancel()
