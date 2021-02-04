@@ -56,6 +56,8 @@ import org.lxtk.DocumentService;
 import org.lxtk.DocumentUri;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
+import org.lxtk.TextDocumentChangeEventMergeBuilder;
+import org.lxtk.TextDocumentChangeEventMergeStrategy;
 import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.jsonrpc.DefaultGson;
@@ -106,6 +108,16 @@ public final class TextDocumentSyncFeature
     public void setPendingChangeDelay(Duration delay)
     {
         pendingChangeManager.setDelay(delay);
+    }
+
+    /**
+     * Sets the strategy for change event merging.
+     *
+     * @param strategy may be <code>null</code>
+     */
+    public void setChangeEventMergeStrategy(TextDocumentChangeEventMergeStrategy strategy)
+    {
+        pendingChangeManager.setEventMergeStrategy(strategy);
     }
 
     @Override
@@ -232,8 +244,11 @@ public final class TextDocumentSyncFeature
             }
             else if (DID_CHANGE.equals(registrationMethod))
             {
-                subsription =
+                Disposable willChange =
+                    documentService.onWillChangeTextDocument().subscribe(this::onWillChange);
+                Disposable didChange =
                     documentService.onDidChangeTextDocument().subscribe(this::onDidChange);
+                subsription = () -> Disposable.disposeAll(willChange, didChange);
             }
             else if (DID_SAVE.equals(registrationMethod))
             {
@@ -340,6 +355,26 @@ public final class TextDocumentSyncFeature
         }
     }
 
+    private synchronized void onWillChange(TextDocumentChangeEvent event)
+    {
+        if (event.getContentChanges().isEmpty())
+            return;
+
+        TextDocument document = event.getDocument();
+        int snapshotVersion = event.getSnapshot().getVersion();
+
+        Integer syncedDocumentVersion = syncedDocumentVersions.get(document);
+        if (syncedDocumentVersion == null || syncedDocumentVersion > snapshotVersion)
+            return;
+
+        TextDocumentChangeRegistrationOptions registrationOptions =
+            (TextDocumentChangeRegistrationOptions)getRegistrationOptions(document, DID_CHANGE);
+        if (registrationOptions == null)
+            return;
+
+        pendingChangeManager.willAddChange(event, registrationOptions.getSyncKind());
+    }
+
     private synchronized void onDidChange(TextDocumentChangeEvent event)
     {
         if (event.getContentChanges().isEmpty())
@@ -366,7 +401,7 @@ public final class TextDocumentSyncFeature
         if (change == null)
             return;
 
-        TextDocument document = change.document;
+        TextDocument document = change.getDocument();
 
         Integer syncedDocumentVersion = syncedDocumentVersions.get(document);
         if (syncedDocumentVersion == null)
@@ -381,7 +416,7 @@ public final class TextDocumentSyncFeature
         List<TextDocumentContentChangeEvent> contentChanges;
 
         if (registrationOptions.getSyncKind() == TextDocumentSyncKind.Full
-            || change.syncKind == TextDocumentSyncKind.Full)
+            || change.getSyncKind() == TextDocumentSyncKind.Full)
         {
             TextDocumentSnapshot snapshot = document.getLastChange().getSnapshot();
             version = snapshot.getVersion();
@@ -390,8 +425,9 @@ public final class TextDocumentSyncFeature
         }
         else
         {
-            version = change.version;
-            contentChanges = change.contentChanges;
+            TextDocumentChangeEvent changeEvent = change.getEvent();
+            version = changeEvent.getSnapshot().getVersion();
+            contentChanges = changeEvent.getContentChanges();
         }
 
         if (syncedDocumentVersion >= version)
@@ -458,29 +494,146 @@ public final class TextDocumentSyncFeature
             document.getLanguageId(), snapshot.getVersion(), snapshot.getText());
     }
 
-    private static class PendingChange
+    private interface PendingChange
     {
-        final TextDocument document;
-        final TextDocumentSyncKind syncKind;
-        List<TextDocumentContentChangeEvent> contentChanges;
-        int version;
+        TextDocument getDocument();
 
-        PendingChange(TextDocument document, TextDocumentSyncKind syncKind)
+        TextDocumentSyncKind getSyncKind();
+
+        boolean isEmpty(); // this is orthogonal to whether getEvent() returns null
+
+        TextDocumentChangeEvent getEvent();
+
+        void add(TextDocumentChangeEvent event);
+    }
+
+    private static class FullChange
+        implements PendingChange
+    {
+        private final TextDocument document;
+
+        FullChange(TextDocument document)
         {
             this.document = Objects.requireNonNull(document);
-            this.syncKind = Objects.requireNonNull(syncKind);
         }
 
-        void add(TextDocumentChangeEvent event)
+        @Override
+        public TextDocument getDocument()
         {
-            if (syncKind == TextDocumentSyncKind.Full)
-                return;
+            return document;
+        }
 
-            if (contentChanges == null)
-                contentChanges = new ArrayList<>();
+        @Override
+        public TextDocumentSyncKind getSyncKind()
+        {
+            return TextDocumentSyncKind.Full;
+        }
 
+        @Override
+        public boolean isEmpty()
+        {
+            return false; // full change is never empty
+        }
+
+        @Override
+        public TextDocumentChangeEvent getEvent()
+        {
+            return null;
+        }
+
+        @Override
+        public void add(TextDocumentChangeEvent event)
+        {
+        }
+    }
+
+    private static class AccumulatingChange
+        implements PendingChange
+    {
+        private final TextDocument document;
+        private final List<TextDocumentContentChangeEvent> contentChanges = new ArrayList<>();
+        private TextDocumentSnapshot snapshot;
+
+        AccumulatingChange(TextDocument document)
+        {
+            this.document = Objects.requireNonNull(document);
+        }
+
+        @Override
+        public TextDocument getDocument()
+        {
+            return document;
+        }
+
+        @Override
+        public TextDocumentSyncKind getSyncKind()
+        {
+            return TextDocumentSyncKind.Incremental;
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return snapshot == null;
+        }
+
+        @Override
+        public TextDocumentChangeEvent getEvent()
+        {
+            if (snapshot == null)
+                return null;
+
+            return new TextDocumentChangeEvent(snapshot, contentChanges);
+        }
+
+        @Override
+        public void add(TextDocumentChangeEvent event)
+        {
             contentChanges.addAll(event.getContentChanges());
-            version = event.getSnapshot().getVersion();
+            snapshot = event.getSnapshot();
+        }
+    }
+
+    private static class MergingChange
+        implements PendingChange
+    {
+        private final TextDocument document;
+        private final TextDocumentChangeEventMergeBuilder builder;
+
+        MergingChange(TextDocument document, TextDocumentChangeEventMergeBuilder builder)
+        {
+            this.document = Objects.requireNonNull(document);
+            this.builder = Objects.requireNonNull(builder);
+        }
+
+        @Override
+        public TextDocument getDocument()
+        {
+            return document;
+        }
+
+        @Override
+        public TextDocumentSyncKind getSyncKind()
+        {
+            return TextDocumentSyncKind.Incremental;
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return !builder.hasResult();
+        }
+
+        @Override
+        public TextDocumentChangeEvent getEvent()
+        {
+            return builder.getResult();
+        }
+
+        @Override
+        public void add(TextDocumentChangeEvent event)
+        {
+            builder.merge(event);
         }
     }
 
@@ -491,6 +644,7 @@ public final class TextDocumentSyncFeature
         private long delay = 500;
         private ScheduledChange change;
         private ScheduledExecutorService executor;
+        private TextDocumentChangeEventMergeStrategy eventMergeStrategy;
 
         PendingChangeManager(Runnable flushCallback)
         {
@@ -502,13 +656,43 @@ public final class TextDocumentSyncFeature
             this.delay = delay.toMillis();
         }
 
+        void setEventMergeStrategy(TextDocumentChangeEventMergeStrategy eventMergeStrategy)
+        {
+            this.eventMergeStrategy = eventMergeStrategy;
+        }
+
+        // note that willAddChange can be called twice in a row (for different documents)
+        // or not called at all (if the document does not support willChange notifications)
+        void willAddChange(TextDocumentChangeEvent event, TextDocumentSyncKind syncKind)
+        {
+            if (change != null)
+            {
+                change.cancel();
+
+                if (change.getDocument() != event.getDocument())
+                {
+                    flushCallback.run();
+                    change = null;
+                }
+            }
+
+            if (change == null && syncKind != TextDocumentSyncKind.Full
+                && eventMergeStrategy != null)
+            {
+                change = new ScheduledChange(new MergingChange(event.getDocument(),
+                    eventMergeStrategy.startMerging(event.getSnapshot().getText())));
+            }
+        }
+
+        // note that addChange can be called twice in a row;
+        // the corresponding willAddChange might not have been called
         void addChange(TextDocumentChangeEvent event, TextDocumentSyncKind syncKind)
         {
             if (change != null)
             {
                 change.cancel();
 
-                if (change.document != event.getDocument())
+                if (change.getDocument() != event.getDocument())
                 {
                     flushCallback.run();
                     change = null;
@@ -516,7 +700,11 @@ public final class TextDocumentSyncFeature
             }
 
             if (change == null)
-                change = new ScheduledChange(event.getDocument(), syncKind);
+            {
+                change = new ScheduledChange(
+                    syncKind == TextDocumentSyncKind.Full ? new FullChange(event.getDocument())
+                        : new AccumulatingChange(event.getDocument()));
+            }
 
             change.add(event);
 
@@ -528,6 +716,9 @@ public final class TextDocumentSyncFeature
 
         PendingChange removeChange()
         {
+            if (change == null || change.isEmpty())
+                return null;
+
             PendingChange result = change;
             change = null;
             return result;
@@ -551,13 +742,44 @@ public final class TextDocumentSyncFeature
         }
 
         private static class ScheduledChange
-            extends PendingChange
+            implements PendingChange
         {
+            private final PendingChange delegate;
             Future<?> future;
 
-            ScheduledChange(TextDocument document, TextDocumentSyncKind syncKind)
+            ScheduledChange(PendingChange delegate)
             {
-                super(document, syncKind);
+                this.delegate = Objects.requireNonNull(delegate);
+            }
+
+            @Override
+            public TextDocument getDocument()
+            {
+                return delegate.getDocument();
+            }
+
+            @Override
+            public TextDocumentSyncKind getSyncKind()
+            {
+                return delegate.getSyncKind();
+            }
+
+            @Override
+            public boolean isEmpty()
+            {
+                return delegate.isEmpty();
+            }
+
+            @Override
+            public TextDocumentChangeEvent getEvent()
+            {
+                return delegate.getEvent();
+            }
+
+            @Override
+            public void add(TextDocumentChangeEvent event)
+            {
+                delegate.add(event);
             }
 
             void cancel()

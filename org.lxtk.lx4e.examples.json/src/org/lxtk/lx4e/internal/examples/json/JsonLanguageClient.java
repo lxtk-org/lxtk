@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -42,6 +42,7 @@ import org.lxtk.client.TextDocumentSyncFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
 import org.lxtk.lx4e.EclipseLog;
+import org.lxtk.lx4e.EclipseTextDocumentChangeEventMergeStrategy;
 import org.lxtk.lx4e.diagnostics.DefaultDiagnosticConsumer;
 import org.lxtk.lx4e.diagnostics.DiagnosticAnnotations;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
@@ -99,7 +100,11 @@ public class JsonLanguageClient
     protected AbstractLanguageClient<LanguageServer> getLanguageClient()
     {
         Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
-        features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE));
+        TextDocumentSyncFeature textDocumentSyncFeature =
+            new TextDocumentSyncFeature(DOCUMENT_SERVICE);
+        textDocumentSyncFeature.setChangeEventMergeStrategy(
+            new EclipseTextDocumentChangeEventMergeStrategy());
+        features.add(textDocumentSyncFeature);
         features.add(new CompletionFeature(LANGUAGE_SERVICE));
         features.add(new DocumentFormattingFeature(LANGUAGE_SERVICE));
         features.add(new DocumentRangeFormattingFeature(LANGUAGE_SERVICE));

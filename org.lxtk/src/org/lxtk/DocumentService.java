@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -53,7 +53,8 @@ public interface DocumentService
      * <p>
      * This method must not try to acquire any kind of lock that might conflict
      * with any locks held during didAddTextDocument, didRemoveTextDocument,
-     * didChangeTextDocument, or didSaveTextDocument event notification.
+     * willChangeTextDocument, didChangeTextDocument, or didSaveTextDocument
+     * event notification.
      * </p>
      *
      * @return all text documents currently managed by the service
@@ -68,7 +69,8 @@ public interface DocumentService
      * <p>
      * This method must not try to acquire any kind of lock that might conflict
      * with any locks held during didAddTextDocument, didRemoveTextDocument,
-     * didChangeTextDocument, or didSaveTextDocument event notification.
+     * willChangeTextDocument, didChangeTextDocument, or didSaveTextDocument
+     * event notification.
      * </p>
      *
      * @param uri may be <code>null</code>, in which case <code>null</code>
@@ -94,6 +96,22 @@ public interface DocumentService
      *  (never <code>null</code>)
      */
     EventStream<TextDocument> onDidRemoveTextDocument();
+
+    /**
+     * Returns an event emitter firing when the content of a managed text document
+     * is about to be changed. Note that an event will be fired if and only if
+     * it is {@link TextDocument#onWillChange() supported} by the text document.
+     * <p>
+     * These events may be fired even before firing {@link #onDidAddTextDocument()}
+     * or after firing {@link #onDidRemoveTextDocument()} for a text document.
+     * This provision is to avoid a possibility of a blind-spot where some
+     * change events might have escaped a client due to a race condition.
+     * </p>
+     *
+     * @return an event emitter firing when the content of a managed text document
+     *  is about to be changed (never <code>null</code>)
+     */
+    EventStream<TextDocumentChangeEvent> onWillChangeTextDocument();
 
     /**
      * Returns an event emitter firing when the content of a managed text document

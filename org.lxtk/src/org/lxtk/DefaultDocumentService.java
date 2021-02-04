@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -39,6 +39,8 @@ public class DefaultDocumentService
     private final Map<URI, TextDocument> textDocuments = new ConcurrentHashMap<>();
     private final EventEmitter<TextDocument> onDidAddTextDocument = new EventEmitter<>();
     private final EventEmitter<TextDocument> onDidRemoveTextDocument = new EventEmitter<>();
+    private final EventEmitter<TextDocumentChangeEvent> onWillChangeTextDocument =
+        new EventEmitter<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChangeTextDocument =
         new EventEmitter<>();
     private final EventEmitter<TextDocumentSaveEvent> onDidSaveTextDocument = new EventEmitter<>();
@@ -54,8 +56,15 @@ public class DefaultDocumentService
         }
         Disposable result = SafeRun.runWithResult(rollback ->
         {
-            // Must subscribe to the document's didChange before onDidAddTextDocument is fired.
+            // Must subscribe to document change events before onDidAddTextDocument is fired.
             // Otherwise, it would be possible to lose some change events in a blindspot.
+            EventStream<TextDocumentChangeEvent> onWillChange = document.onWillChange();
+            if (onWillChange != null)
+            {
+                Disposable willChangeSubscription = onWillChange.subscribe(
+                    event -> onWillChangeTextDocument.fire(event, getLogger()));
+                rollback.add(willChangeSubscription::dispose);
+            }
             Disposable didChangeSubscription = document.onDidChange().subscribe(
                 event -> onDidChangeTextDocument.fire(event, getLogger()));
             rollback.add(didChangeSubscription::dispose);
@@ -101,6 +110,12 @@ public class DefaultDocumentService
     public EventStream<TextDocument> onDidRemoveTextDocument()
     {
         return onDidRemoveTextDocument;
+    }
+
+    @Override
+    public EventStream<TextDocumentChangeEvent> onWillChangeTextDocument()
+    {
+        return onWillChangeTextDocument;
     }
 
     @Override

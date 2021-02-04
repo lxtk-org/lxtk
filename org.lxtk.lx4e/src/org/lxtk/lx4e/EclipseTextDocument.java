@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -53,6 +53,7 @@ public final class EclipseTextDocument
     private final Object element;
     private final AtomicReference<EclipseTextDocumentChangeEvent> lastChange =
         new AtomicReference<>();
+    private final EventEmitter<TextDocumentChangeEvent> onWillChange = new EventEmitter<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChange = new EventEmitter<>();
     private final EventEmitter<TextDocumentSaveEvent> onDidSave = new EventEmitter<>();
     private final IDocumentListener documentListener = new IDocumentListener()
@@ -63,6 +64,7 @@ public final class EclipseTextDocument
         public void documentAboutToBeChanged(DocumentEvent event)
         {
             contentChange = newContentChangeEvent(event);
+            notifyWillChange(newChangeEvent(contentChange, event, true));
         }
 
         @Override
@@ -70,7 +72,7 @@ public final class EclipseTextDocument
         {
             try
             {
-                notifyChange(newChangeEvent(contentChange, event.getModificationStamp()));
+                notifyChange(newChangeEvent(contentChange, event, false));
             }
             finally
             {
@@ -116,7 +118,7 @@ public final class EclipseTextDocument
         lastChange.compareAndSet(null,
             new EclipseTextDocumentChangeEvent(
                 new DefaultTextDocumentSnapshot(this, 0, document.get()), Collections.emptyList(),
-                getModificationStamp()));
+                new DocumentEvent(document, 0, 0, ""))); //$NON-NLS-1$
         if ((buffer.getSupportedListenerMethods() & IBufferListener.BUFFER_SAVED) != 0)
             buffer.addListener(bufferListener);
         buffer.addRef();
@@ -217,6 +219,12 @@ public final class EclipseTextDocument
     }
 
     @Override
+    public EventStream<TextDocumentChangeEvent> onWillChange()
+    {
+        return onWillChange;
+    }
+
+    @Override
     public EventStream<TextDocumentChangeEvent> onDidChange()
     {
         return onDidChange;
@@ -226,6 +234,11 @@ public final class EclipseTextDocument
     public EventStream<TextDocumentSaveEvent> onDidSave()
     {
         return onDidSave;
+    }
+
+    private void notifyWillChange(EclipseTextDocumentChangeEvent event)
+    {
+        onWillChange.fire(event, Activator.LOGGER);
     }
 
     private void notifyChange(EclipseTextDocumentChangeEvent event)
@@ -249,16 +262,16 @@ public final class EclipseTextDocument
     }
 
     private EclipseTextDocumentChangeEvent newChangeEvent(TextDocumentContentChangeEvent event,
-        long modificationStamp)
+        DocumentEvent originalEvent, boolean unprocessed)
     {
         TextDocumentChangeEvent lastEvent = lastChange.get();
         int lastVersion = (lastEvent == null) ? 0 : lastEvent.getSnapshot().getVersion();
-        TextDocumentSnapshot snapshot =
-            new DefaultTextDocumentSnapshot(this, lastVersion + 1, document.get());
-        if (modificationStamp != getModificationStamp())
+        TextDocumentSnapshot snapshot = new DefaultTextDocumentSnapshot(this,
+            unprocessed ? lastVersion : lastVersion + 1, document.get());
+        if (originalEvent.getModificationStamp() != getModificationStamp())
             throw new AssertionError();
         return new EclipseTextDocumentChangeEvent(snapshot, Collections.singletonList(event),
-            modificationStamp);
+            originalEvent);
     }
 
     private TextDocumentSaveEvent newSaveEvent(String text)

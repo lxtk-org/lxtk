@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -14,6 +14,7 @@ package org.lxtk.lx4e;
 
 import java.util.List;
 
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
@@ -27,12 +28,14 @@ public final class EclipseTextDocumentChangeEvent
     extends TextDocumentChangeEvent
 {
     private final long modificationStamp;
+    final DocumentEvent originalEvent;
 
     EclipseTextDocumentChangeEvent(TextDocumentSnapshot snapshot,
-        List<TextDocumentContentChangeEvent> contentChanges, long modificationStamp)
+        List<TextDocumentContentChangeEvent> contentChanges, DocumentEvent originalEvent)
     {
         super(snapshot, contentChanges);
-        this.modificationStamp = modificationStamp;
+        this.modificationStamp = originalEvent.getModificationStamp();
+        this.originalEvent = originalEvent;
     }
 
     /**

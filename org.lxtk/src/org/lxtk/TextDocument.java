@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -40,14 +40,22 @@ public interface TextDocument
     String getLanguageId();
 
     /**
-     * Returns an event describing the last reported change of the document.
-     * If no change has been reported yet, the event will describe the initial
-     * content of the document.
+     * Returns an event describing the last {@link #onDidChange() reported} change
+     * of the document. If no change has been reported yet, the event will describe
+     * the initial content of the document.
      *
      * @return an event describing the last reported change of the document
      *  (never <code>null</code>)
      */
     TextDocumentChangeEvent getLastChange();
+
+    /**
+     * Returns an event emitter firing when the content of the document is about to be changed.
+     *
+     * @return an event emitter firing when the content of the document is about to be changed,
+     *  or <code>null</code> if not supported by the document
+     */
+    EventStream<TextDocumentChangeEvent> onWillChange();
 
     /**
      * Returns an event emitter firing when the content of the document changes. 
