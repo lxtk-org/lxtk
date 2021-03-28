@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,20 +12,23 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.codeaction;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
 import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
+import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
@@ -57,6 +60,7 @@ class CodeActions
     {
         doExecute(command, label, commandService).exceptionally(e ->
         {
+            e = Activator.unwrap(e);
             if (!Activator.isCancellation(e))
             {
                 StatusManager.getManager().handle(
@@ -68,6 +72,7 @@ class CodeActions
         });
     }
 
+    // This method must be called in the UI thread.
     static void execute(CodeAction codeAction, String label,
         WorkspaceEditChangeFactory workspaceEditChangeFactory, CodeActionProvider provider)
     {
@@ -87,32 +92,49 @@ class CodeActions
                 PerformRefactoringOperation operation = new PerformRefactoringOperation(refactoring,
                     CheckConditionsOperation.ALL_CONDITIONS);
 
-                WorkspaceJob job = new WorkspaceJob(label)
+                // Note that it is important to execute the refactoring's change in the UI thread.
+                // Otherwise, there might be timing issues, e.g. incorrect modification stamps.
+                // See also org.eclipse.jdt.internal.ui.refactoring.RefactoringExecutionHelper.
+                try
                 {
-                    @Override
-                    public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+                    ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
+                    // Note that WorkspaceModifyOperation is used to get EventLoopProgressMonitor.
+                    dialog.run(false, false, new WorkspaceModifyOperation()
                     {
-                        try
+                        @Override
+                        protected void execute(IProgressMonitor monitor)
+                            throws CoreException, InvocationTargetException, InterruptedException
                         {
-                            operation.run(monitor);
-                            future.complete(null);
-                        }
-                        catch (Throwable e)
-                        {
-                            future.completeExceptionally(e);
-                        }
-                        return Status.OK_STATUS;
-                    }
-                };
-                job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-                job.schedule();
-            }
+                            try
+                            {
+                                operation.run(monitor);
 
+                                RefactoringStatus status = operation.getConditionStatus();
+                                status.merge(operation.getValidationStatus());
+                                if (status.hasFatalError())
+                                    throw new CoreException(
+                                        status.getEntryWithHighestSeverity().toStatus());
+
+                                future.complete(null);
+                            }
+                            catch (Throwable e)
+                            {
+                                future.completeExceptionally(e);
+                            }
+                        }
+                    });
+                }
+                catch (InvocationTargetException | InterruptedException e) // should not happen
+                {
+                    future.completeExceptionally(e);
+                }
+            }
             return future;
 
         }).thenCompose(x -> doExecute(codeAction.getCommand(), null,
             provider.getCommandService())).exceptionally(e ->
             {
+                e = Activator.unwrap(e);
                 if (!Activator.isCancellation(e))
                 {
                     StatusManager.getManager().handle(
@@ -151,6 +173,14 @@ class CodeActions
                 MessageFormat.format(Messages.CodeActions_Command_not_available, label), null)));
         }
         return result;
+    }
+
+    private static Shell getShell()
+    {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (window == null)
+            return null;
+        return window.getShell();
     }
 
     private CodeActions()

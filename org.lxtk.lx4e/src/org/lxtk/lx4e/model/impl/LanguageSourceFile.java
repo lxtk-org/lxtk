@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -357,7 +357,8 @@ public abstract class LanguageSourceFile
         }
         catch (CompletionException e)
         {
-            throw Activator.toCoreException(e.getCause(), request.getErrorMessage());
+            throw new CoreException(
+                Activator.createErrorStatus(request.getErrorMessage(), e.getCause()));
         }
 
         if (result == null || result.isEmpty() || result.get(0).isLeft())
@@ -640,7 +641,7 @@ public abstract class LanguageSourceFile
                     Throwable cause = e.getCause();
                     if (cause instanceof CoreException)
                         throw (CoreException)cause;
-                    throw Activator.toCoreException(e, e.getMessage());
+                    throw new CoreException(Activator.createErrorStatus(e.getMessage(), e));
                 }
                 symbols = getDocumentSymbols(getDocumentUri(), monitor);
                 source = fileSnapshot.getContents();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -22,6 +22,7 @@ class Messages
     public static String AbstractItemsSelectionHandler_errorMessage;
     public static String EclipseLanguageClient_Edit_label;
     public static String EclipseLanguageClient_Message_title;
+    public static String EclipseLanguageClient_Operation_execution_error;
 
     static
     {

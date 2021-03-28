@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,6 +16,10 @@ import java.net.URI;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
+import org.eclipse.lsp4j.CreateFileOptions;
+import org.eclipse.lsp4j.DeleteFileOptions;
+import org.eclipse.lsp4j.RenameFileOptions;
+import org.eclipse.ltk.core.refactoring.Change;
 
 /**
  * Provides information about resources denoted by URIs.
@@ -63,4 +67,35 @@ public interface IUriHandler
      * @return the corresponding string, or <code>null</code> if none
      */
     String toDisplayString(URI uri);
+
+    /**
+     * Returns a change for creating the resource denoted by the given URI.
+     *
+     * @param uri not <code>null</code>
+     * @param options may be <code>null</code>
+     * @return the create file change, or <code>null</code> if none
+     * @throws CoreException if an exception occurs while creating the change
+     */
+    Change getCreateFileChange(URI uri, CreateFileOptions options) throws CoreException;
+
+    /**
+     * Returns a change for deleting the resource denoted by the given URI.
+     *
+     * @param uri not <code>null</code>
+     * @param options may be <code>null</code>
+     * @return the delete file change, or <code>null</code> if none
+     * @throws CoreException if an exception occurs while creating the change
+     */
+    Change getDeleteFileChange(URI uri, DeleteFileOptions options) throws CoreException;
+
+    /**
+     * Returns a change for renaming the resource denoted by the given URI.
+     *
+     * @param uri not <code>null</code>
+     * @param newUri not <code>null</code>
+     * @param options may be <code>null</code>
+     * @return the rename file change, or <code>null</code> if none
+     * @throws CoreException if an exception occurs while creating the change
+     */
+    Change getRenameFileChange(URI uri, URI newUri, RenameFileOptions options) throws CoreException;
 }

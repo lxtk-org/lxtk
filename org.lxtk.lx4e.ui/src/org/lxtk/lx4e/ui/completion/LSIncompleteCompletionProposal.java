@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2020 Red Hat Inc. and others.
+ * Copyright (c) 2016, 2021 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -588,6 +588,7 @@ class LSIncompleteCompletionProposal
                     command.getCommand(), command.getArguments());
                 if (future != null) {
                     future.exceptionally(e -> {
+                        e = Activator.unwrap(e);
                         if (!Activator.isCancellation(e)) {
                             StatusManager.getManager().handle(Activator.createErrorStatus(
                                 MessageFormat.format(Messages.LSIncompleteCompletionProposal_Execution_error,

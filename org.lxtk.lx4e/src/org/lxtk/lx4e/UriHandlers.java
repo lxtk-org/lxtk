@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,6 +19,10 @@ import java.util.Arrays;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
+import org.eclipse.lsp4j.CreateFileOptions;
+import org.eclipse.lsp4j.DeleteFileOptions;
+import org.eclipse.lsp4j.RenameFileOptions;
+import org.eclipse.ltk.core.refactoring.Change;
 import org.lxtk.lx4e.internal.Activator;
 
 /**
@@ -91,6 +95,45 @@ public class UriHandlers
                     String displayString = handler.toDisplayString(uri);
                     if (displayString != null)
                         return displayString;
+                }
+                return null;
+            }
+
+            @Override
+            public Change getCreateFileChange(URI uri, CreateFileOptions options)
+                throws CoreException
+            {
+                for (IUriHandler handler : handlers)
+                {
+                    Change change = handler.getCreateFileChange(uri, options);
+                    if (change != null)
+                        return change;
+                }
+                return null;
+            }
+
+            @Override
+            public Change getDeleteFileChange(URI uri, DeleteFileOptions options)
+                throws CoreException
+            {
+                for (IUriHandler handler : handlers)
+                {
+                    Change change = handler.getDeleteFileChange(uri, options);
+                    if (change != null)
+                        return change;
+                }
+                return null;
+            }
+
+            @Override
+            public Change getRenameFileChange(URI uri, URI newUri, RenameFileOptions options)
+                throws CoreException
+            {
+                for (IUriHandler handler : handlers)
+                {
+                    Change change = handler.getRenameFileChange(uri, newUri, options);
+                    if (change != null)
+                        return change;
                 }
                 return null;
             }

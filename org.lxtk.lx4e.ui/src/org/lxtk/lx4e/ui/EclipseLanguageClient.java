@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,29 +12,31 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
 import org.eclipse.lsp4j.ApplyWorkspaceEditResponse;
 import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.FailureHandlingKind;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsCapabilities;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.ResourceOperationKind;
 import org.eclipse.lsp4j.ServerInfo;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
@@ -53,11 +55,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.Feature;
 import org.lxtk.lx4e.EclipseProgressService;
+import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.util.Log;
@@ -122,10 +127,9 @@ public class EclipseLanguageClient<S extends LanguageServer>
         workspace.setApplyEdit(true);
         WorkspaceEditCapabilities workspaceEdit = new WorkspaceEditCapabilities();
         workspaceEdit.setDocumentChanges(true);
-        // TODO Support resource operations
-//        workspaceEdit.setResourceOperations(Arrays.asList(
-//            ResourceOperationKind.Create, ResourceOperationKind.Delete,
-//            ResourceOperationKind.Rename));
+        workspaceEdit.setResourceOperations(Arrays.asList(ResourceOperationKind.Create,
+            ResourceOperationKind.Delete, ResourceOperationKind.Rename));
+        workspaceEdit.setFailureHandling(FailureHandlingKind.Undo);
         workspace.setWorkspaceEdit(workspaceEdit);
         capabilities.setWorkspace(workspace);
 
@@ -148,41 +152,62 @@ public class EclipseLanguageClient<S extends LanguageServer>
         PerformRefactoringOperation operation =
             new PerformRefactoringOperation(refactoring, CheckConditionsOperation.ALL_CONDITIONS);
 
+        // Note that it is important to execute the refactoring's change in the UI thread.
+        // Otherwise, there might be timing issues, e.g. incorrect modification stamps.
+        // See also org.eclipse.jdt.internal.ui.refactoring.RefactoringExecutionHelper.
+
         CompletableFuture<ApplyWorkspaceEditResponse> future = new CompletableFuture<>();
-        WorkspaceJob job = new WorkspaceJob(label)
+        PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
         {
-            @Override
-            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+            try
             {
-                try
+                ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
+                // Note that WorkspaceModifyOperation is used to get EventLoopProgressMonitor.
+                dialog.run(false, false, new WorkspaceModifyOperation()
                 {
-                    operation.run(monitor);
+                    @Override
+                    protected void execute(IProgressMonitor monitor)
+                        throws CoreException, InvocationTargetException, InterruptedException
+                    {
+                        try
+                        {
+                            operation.run(monitor);
 
-                    RefactoringStatus status = operation.getConditionStatus();
-                    if (status != null && !status.hasFatalError())
-                        status = operation.getValidationStatus();
+                            RefactoringStatus status = operation.getConditionStatus();
+                            status.merge(operation.getValidationStatus());
 
-                    ApplyWorkspaceEditResponse response = new ApplyWorkspaceEditResponse();
-                    response.setApplied(status != null && !status.hasFatalError());
-                    // TODO Set ApplyWorkspaceEditResponse.failureReason when it becomes available in LSP4J
+                            ApplyWorkspaceEditResponse response = new ApplyWorkspaceEditResponse();
+                            response.setApplied(!status.hasFatalError());
+                            // TODO Set ApplyWorkspaceEditResponse.failureReason when it becomes available in LSP4J
 
-                    future.complete(response);
-                    return Status.OK_STATUS;
-                }
-                catch (OperationCanceledException e)
-                {
-                    future.cancel(false);
-                    throw e;
-                }
-                catch (Throwable e)
-                {
-                    future.completeExceptionally(e);
-                    throw e;
-                }
+                            future.complete(response);
+                        }
+                        catch (OperationCanceledException e) // should not happen
+                        {
+                            future.cancel(false);
+                        }
+                        catch (Throwable e)
+                        {
+                            future.completeExceptionally(e);
+                            throw new InvocationTargetException(e);
+                        }
+                    }
+                });
             }
-        };
-        job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-        job.schedule();
+            catch (InvocationTargetException e)
+            {
+                StatusManager.getManager().handle(
+                    Activator.createErrorStatus(
+                        MessageFormat.format(
+                            Messages.EclipseLanguageClient_Operation_execution_error, label),
+                        e.getCause()),
+                    StatusManager.LOG | StatusManager.SHOW);
+            }
+            catch (InterruptedException e)
+            {
+                throw new AssertionError(e); // should never happen
+            }
+        });
         return future;
     }
 

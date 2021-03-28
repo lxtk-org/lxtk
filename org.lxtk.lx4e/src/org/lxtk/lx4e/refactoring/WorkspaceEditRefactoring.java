@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -32,7 +32,6 @@ public class WorkspaceEditRefactoring
     private final String name;
     private final WorkspaceEditChangeFactory changeFactory;
     private WorkspaceEdit workspaceEdit;
-    private Change change;
 
     /**
      * Constructor.
@@ -75,14 +74,12 @@ public class WorkspaceEditRefactoring
     public RefactoringStatus checkFinalConditions(IProgressMonitor pm)
         throws CoreException, OperationCanceledException
     {
-        RefactoringStatus status = new RefactoringStatus();
-        change = changeFactory.createChange(name, workspaceEdit, status, pm);
-        return status;
+        return new RefactoringStatus();
     }
 
     @Override
     public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
-        return change;
+        return changeFactory.createChange(name, workspaceEdit, pm);
     }
 }

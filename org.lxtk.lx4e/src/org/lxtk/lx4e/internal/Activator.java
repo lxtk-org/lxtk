@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -14,7 +14,6 @@ package org.lxtk.lx4e.internal;
 
 import java.util.function.Consumer;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
@@ -69,16 +68,5 @@ public class Activator
     public static void logError(Throwable e)
     {
         logError(e.getMessage(), e);
-    }
-
-    public static CoreException toCoreException(Throwable e, String msg)
-    {
-        if (e instanceof CoreException)
-            return (CoreException)e;
-
-        if (msg == null)
-            msg = e.getMessage();
-
-        return new CoreException(createErrorStatus(msg, e));
     }
 }

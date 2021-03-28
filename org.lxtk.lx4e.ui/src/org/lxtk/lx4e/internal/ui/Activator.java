@@ -102,13 +102,20 @@ public class Activator
         logWarning(e.getMessage(), e);
     }
 
-    public static boolean isCancellation(Throwable e)
+    public static Throwable unwrap(Throwable e)
     {
         if (e instanceof CompletionException || e instanceof ExecutionException
             || e instanceof InvocationTargetException)
         {
-            return isCancellation(e.getCause());
+            Throwable cause = e.getCause();
+            if (cause != null)
+                return unwrap(cause);
         }
+        return e;
+    }
+
+    public static boolean isCancellation(Throwable e)
+    {
         return e instanceof OperationCanceledException || e instanceof CancellationException;
     }
 

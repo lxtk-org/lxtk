@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,6 +18,10 @@ import java.util.Objects;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.handly.buffer.IBuffer;
+import org.eclipse.lsp4j.CreateFileOptions;
+import org.eclipse.lsp4j.DeleteFileOptions;
+import org.eclipse.lsp4j.RenameFileOptions;
+import org.eclipse.ltk.core.refactoring.Change;
 import org.lxtk.DocumentService;
 import org.lxtk.TextDocument;
 import org.lxtk.lx4e.util.ResourceUtil;
@@ -76,6 +80,25 @@ public class TextDocumentUriHandler
         IResource resource = ResourceUtil.getResource(getCorrespondingElement(uri));
         if (resource != null)
             return resource.getFullPath().makeRelative().toString();
+        return null;
+    }
+
+    @Override
+    public Change getCreateFileChange(URI uri, CreateFileOptions options) throws CoreException
+    {
+        return null;
+    }
+
+    @Override
+    public Change getDeleteFileChange(URI uri, DeleteFileOptions options) throws CoreException
+    {
+        return null;
+    }
+
+    @Override
+    public Change getRenameFileChange(URI uri, URI newUri, RenameFileOptions options)
+        throws CoreException
+    {
         return null;
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,7 +23,15 @@ class Messages
     public static String UndoTextFileChange_Cannot_undo_stale_change;
     public static String UndoTextFileChange_File_should_exist;
     public static String UndoTextFileChange_File_should_not_exist;
+    public static String WorkspaceEditChangeFactory_Change_execution_failed;
+    public static String WorkspaceEditChangeFactory_Change_execution_failed_and_could_not_be_rolled_back;
+    public static String WorkspaceEditChangeFactory_Change_execution_failed_and_has_been_rolled_back;
+    public static String WorkspaceEditChangeFactory_File_does_not_exist;
     public static String WorkspaceEditChangeFactory_Stale_workspace_edit;
+    public static String WorkspaceEditChangeFactory_Unsupported_create_operation;
+    public static String WorkspaceEditChangeFactory_Unsupported_delete_operation;
+    public static String WorkspaceEditChangeFactory_Unsupported_rename_operation;
+    public static String WorkspaceEditChangeFactory_Unsupported_resource_operation_kind;
 
     static
     {
