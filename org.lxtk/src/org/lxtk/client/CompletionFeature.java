@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -101,6 +101,7 @@ public final class CompletionFeature
         CompletionRegistrationOptions registerOptions = new CompletionRegistrationOptions(
             capability.getTriggerCharacters(), capability.getResolveProvider());
         registerOptions.setDocumentSelector(documentSelector);
+        registerOptions.setWorkDoneProgress(capability.getWorkDoneProgress());
 
         register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }

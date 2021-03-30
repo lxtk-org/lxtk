@@ -387,7 +387,7 @@ class LSIncompleteCompletionProposal
     public int getPrefixCompletionStart(IDocument document, int completionOffset) {
         if (item.getTextEdit() != null) {
             try {
-                return DocumentUtil.toOffset(document, item.getTextEdit().getRange().getStart());
+                return DocumentUtil.toOffset(document, item.getTextEdit().getLeft().getRange().getStart());
             } catch (BadLocationException e) {
                 Activator.logError(e);
             }
@@ -416,7 +416,7 @@ class LSIncompleteCompletionProposal
 
     protected void apply(IDocument document, char trigger, int stateMask, int offset) {
         String insertText = null;
-        TextEdit textEdit = item.getTextEdit();
+        TextEdit textEdit = item.getTextEdit().getLeft();
         try {
             if (textEdit == null) {
                 insertText = getInsertText();
@@ -652,13 +652,13 @@ class LSIncompleteCompletionProposal
         case TM_DIRECTORY:
             return Path.fromPortableString(documentUri.getPath()).removeLastSegments(1).toString();
         case TM_LINE_INDEX:
-            int lineIndex = item.getTextEdit().getRange().getStart().getLine();
+            int lineIndex = item.getTextEdit().getLeft().getRange().getStart().getLine();
             return Integer.toString(lineIndex);
         case TM_LINE_NUMBER:
-            int lineNumber = item.getTextEdit().getRange().getStart().getLine();
+            int lineNumber = item.getTextEdit().getLeft().getRange().getStart().getLine();
             return Integer.toString(lineNumber + 1);
         case TM_CURRENT_LINE:
-            int currentLineIndex = item.getTextEdit().getRange().getStart().getLine();
+            int currentLineIndex = item.getTextEdit().getLeft().getRange().getStart().getLine();
             try {
                 IRegion lineInformation = document.getLineInformation(currentLineIndex);
                 String line = document.get(lineInformation.getOffset(), lineInformation.getLength());
@@ -668,7 +668,7 @@ class LSIncompleteCompletionProposal
                 return ""; //$NON-NLS-1$
             }
         case TM_SELECTED_TEXT:
-            Range selectedRange = item.getTextEdit().getRange();
+            Range selectedRange = item.getTextEdit().getLeft().getRange();
             try {
                 int startOffset = DocumentUtil.toOffset(document, selectedRange.getStart());
                 int endOffset = DocumentUtil.toOffset(document, selectedRange.getEnd());
@@ -688,7 +688,7 @@ class LSIncompleteCompletionProposal
     protected String getInsertText() {
         String insertText = item.getInsertText();
         if (item.getTextEdit() != null) {
-            insertText = item.getTextEdit().getNewText();
+            insertText = item.getTextEdit().getLeft().getNewText();
         }
         if (insertText == null) {
             insertText = item.getLabel();

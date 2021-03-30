@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,13 +19,15 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
+import org.eclipse.lsp4j.DocumentFormattingOptions;
 import org.eclipse.lsp4j.DocumentFormattingParams;
+import org.eclipse.lsp4j.DocumentFormattingRegistrationOptions;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.TextEdit;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentFormattingProvider;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
@@ -39,7 +41,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class DocumentFormattingFeature
-    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<DocumentFormattingRegistrationOptions>
 {
     private static final String METHOD = "textDocument/formatting"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -75,29 +77,40 @@ public final class DocumentFormattingFeature
         if (documentSelector == null)
             return;
 
-        Boolean capability = capabilities.getDocumentFormattingProvider();
-        if (!Boolean.TRUE.equals(capability))
+        Either<Boolean, DocumentFormattingOptions> capability =
+            capabilities.getDocumentFormattingProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new TextDocumentRegistrationOptions(documentSelector)));
+        DocumentFormattingRegistrationOptions registerOptions =
+            new DocumentFormattingRegistrationOptions();
+        registerOptions.setDocumentSelector(documentSelector);
+
+        DocumentFormattingOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+        }
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<DocumentFormattingRegistrationOptions> getRegistrationOptionsClass()
     {
-        return TextDocumentRegistrationOptions.class;
+        return DocumentFormattingRegistrationOptions.class;
     }
 
     @Override
     Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+        DocumentFormattingRegistrationOptions options)
     {
         return getLanguageService().getDocumentFormattingProviders().add(
             new DocumentFormattingProvider()
             {
                 @Override
-                public TextDocumentRegistrationOptions getRegistrationOptions()
+                public DocumentFormattingRegistrationOptions getRegistrationOptions()
                 {
                     return options;
                 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,7 +24,10 @@ import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.lsp4j.WorkspaceSymbolOptions;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
+import org.eclipse.lsp4j.WorkspaceSymbolRegistrationOptions;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkspaceSymbolProvider;
@@ -38,7 +41,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class WorkspaceSymbolFeature
-    extends LanguageFeature<Object>
+    extends LanguageFeature<WorkspaceSymbolRegistrationOptions>
 {
     private static final String METHOD = "workspace/symbol"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -74,32 +77,44 @@ public final class WorkspaceSymbolFeature
     @Override
     void initialize(ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
     {
-        Boolean capability = capabilities.getWorkspaceSymbolProvider();
-        if (!Boolean.TRUE.equals(capability))
+        Either<Boolean, WorkspaceSymbolOptions> capability =
+            capabilities.getWorkspaceSymbolProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD));
+        WorkspaceSymbolRegistrationOptions registerOptions =
+            new WorkspaceSymbolRegistrationOptions();
+
+        WorkspaceSymbolOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+        }
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<Object> getRegistrationOptionsClass()
+    Class<WorkspaceSymbolRegistrationOptions> getRegistrationOptionsClass()
     {
-        return Object.class;
+        return WorkspaceSymbolRegistrationOptions.class;
     }
 
     @Override
-    boolean checkRegistrationOptions(Object options)
+    boolean checkRegistrationOptions(WorkspaceSymbolRegistrationOptions options)
     {
-        return true;
+        return options != null;
     }
 
     @Override
-    Disposable registerLanguageFeatureProvider(String method, Object options)
+    Disposable registerLanguageFeatureProvider(String method,
+        WorkspaceSymbolRegistrationOptions options)
     {
         return getLanguageService().getWorkspaceSymbolProviders().add(new WorkspaceSymbolProvider()
         {
             @Override
-            public Object getRegistrationOptions()
+            public WorkspaceSymbolRegistrationOptions getRegistrationOptions()
             {
                 return options;
             }

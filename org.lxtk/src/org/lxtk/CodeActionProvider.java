@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,8 +17,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.CodeActionRegistrationOptions;
 import org.eclipse.lsp4j.Command;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
@@ -26,9 +26,8 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  *
  * @see LanguageService
  */
-// TODO CodeActionRegistrationOptions is missing in LSP4J
 public interface CodeActionProvider
-    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
+    extends LanguageFeatureProvider<CodeActionRegistrationOptions>
 {
     /**
      * Requests code actions for the given {@link CodeActionParams}.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentRangeFormattingParams;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
+import org.eclipse.lsp4j.DocumentRangeFormattingRegistrationOptions;
 import org.eclipse.lsp4j.TextEdit;
 
 /**
@@ -25,7 +25,7 @@ import org.eclipse.lsp4j.TextEdit;
  * @see LanguageService
  */
 public interface DocumentRangeFormattingProvider
-    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
+    extends LanguageFeatureProvider<DocumentRangeFormattingRegistrationOptions>
 {
     /**
      * Requests formatting edits for the given {@link DocumentRangeFormattingParams}.

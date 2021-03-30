@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -21,12 +21,13 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
+import org.eclipse.lsp4j.DocumentSymbolOptions;
 import org.eclipse.lsp4j.DocumentSymbolParams;
+import org.eclipse.lsp4j.DocumentSymbolRegistrationOptions;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentSymbolProvider;
 import org.lxtk.LanguageService;
@@ -41,7 +42,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class DocumentSymbolFeature
-    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<DocumentSymbolRegistrationOptions>
 {
     private static final String METHOD = "textDocument/documentSymbol"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -77,28 +78,39 @@ public final class DocumentSymbolFeature
         if (documentSelector == null)
             return;
 
-        Boolean capability = capabilities.getDocumentSymbolProvider();
-        if (!Boolean.TRUE.equals(capability))
+        Either<Boolean, DocumentSymbolOptions> capability =
+            capabilities.getDocumentSymbolProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new TextDocumentRegistrationOptions(documentSelector)));
+        DocumentSymbolRegistrationOptions registerOptions = new DocumentSymbolRegistrationOptions();
+        registerOptions.setDocumentSelector(documentSelector);
+
+        DocumentSymbolOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+            registerOptions.setLabel(options.getLabel());
+        }
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<DocumentSymbolRegistrationOptions> getRegistrationOptionsClass()
     {
-        return TextDocumentRegistrationOptions.class;
+        return DocumentSymbolRegistrationOptions.class;
     }
 
     @Override
     Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+        DocumentSymbolRegistrationOptions options)
     {
         return getLanguageService().getDocumentSymbolProviders().add(new DocumentSymbolProvider()
         {
             @Override
-            public TextDocumentRegistrationOptions getRegistrationOptions()
+            public DocumentSymbolRegistrationOptions getRegistrationOptions()
             {
                 return options;
             }

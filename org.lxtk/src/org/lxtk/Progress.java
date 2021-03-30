@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -29,7 +29,7 @@ public interface Progress
      *
      * @return the progress token (never <code>null</code>)
      */
-    Either<String, Number> getToken();
+    Either<String, Integer> getToken();
 
     /**
      * Returns the progress future.

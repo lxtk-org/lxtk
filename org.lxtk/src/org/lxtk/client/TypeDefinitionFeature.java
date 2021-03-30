@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,10 +24,10 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
-import org.eclipse.lsp4j.StaticRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionParams;
+import org.eclipse.lsp4j.TypeDefinitionRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
@@ -42,7 +42,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class TypeDefinitionFeature
-    extends TextDocumentLanguageFeature<StaticRegistrationOptions>
+    extends TextDocumentLanguageFeature<TypeDefinitionRegistrationOptions>
 {
     private static final String METHOD = "textDocument/typeDefinition"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -75,14 +75,14 @@ public final class TypeDefinitionFeature
     @Override
     void initialize(ServerCapabilities capabilities, List<DocumentFilter> documentSelector)
     {
-        Either<Boolean, StaticRegistrationOptions> capability =
+        Either<Boolean, TypeDefinitionRegistrationOptions> capability =
             capabilities.getTypeDefinitionProvider();
         if (capability == null
             || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        StaticRegistrationOptions registerOptions = new StaticRegistrationOptions();
-        StaticRegistrationOptions options = capability.getRight();
+        TypeDefinitionRegistrationOptions registerOptions = new TypeDefinitionRegistrationOptions();
+        TypeDefinitionRegistrationOptions options = capability.getRight();
         if (options == null)
         {
             registerOptions.setDocumentSelector(documentSelector);
@@ -94,24 +94,26 @@ public final class TypeDefinitionFeature
                 Optional.ofNullable(options.getDocumentSelector()).orElse(documentSelector));
             registerOptions.setId(
                 Optional.ofNullable(options.getId()).orElse(UUID.randomUUID().toString()));
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
         }
 
         register(new Registration(registerOptions.getId(), METHOD, registerOptions));
     }
 
     @Override
-    Class<StaticRegistrationOptions> getRegistrationOptionsClass()
+    Class<TypeDefinitionRegistrationOptions> getRegistrationOptionsClass()
     {
-        return StaticRegistrationOptions.class;
+        return TypeDefinitionRegistrationOptions.class;
     }
 
     @Override
-    Disposable registerLanguageFeatureProvider(String method, StaticRegistrationOptions options)
+    Disposable registerLanguageFeatureProvider(String method,
+        TypeDefinitionRegistrationOptions options)
     {
         return getLanguageService().getTypeDefinitionProviders().add(new TypeDefinitionProvider()
         {
             @Override
-            public StaticRegistrationOptions getRegistrationOptions()
+            public TypeDefinitionRegistrationOptions getRegistrationOptions()
             {
                 return options;
             }

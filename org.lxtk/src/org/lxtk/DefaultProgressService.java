@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -30,7 +30,7 @@ import org.lxtk.util.Disposable;
 public class DefaultProgressService
     implements ProgressService
 {
-    private final Map<Either<String, Number>, Consumer<? super ProgressParams>> progressConsumers =
+    private final Map<Either<String, Integer>, Consumer<? super ProgressParams>> progressConsumers =
         new ConcurrentHashMap<>();
 
     @Override
@@ -42,7 +42,7 @@ public class DefaultProgressService
     }
 
     @Override
-    public Disposable onProgress(Either<String, Number> token,
+    public Disposable onProgress(Either<String, Integer> token,
         Consumer<? super ProgressParams> consumer)
     {
         Consumer<? super ProgressParams> existing = progressConsumers.putIfAbsent(

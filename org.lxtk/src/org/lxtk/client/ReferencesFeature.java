@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -20,12 +20,14 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.ReferenceOptions;
 import org.eclipse.lsp4j.ReferenceParams;
 import org.eclipse.lsp4j.ReferenceRegistrationOptions;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
 import org.lxtk.ReferenceProvider;
@@ -74,13 +76,19 @@ public final class ReferencesFeature
         if (documentSelector == null)
             return;
 
-        Boolean capability = capabilities.getReferencesProvider();
-        if (!Boolean.TRUE.equals(capability))
+        Either<Boolean, ReferenceOptions> capability = capabilities.getReferencesProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
         ReferenceRegistrationOptions registerOptions = new ReferenceRegistrationOptions();
         registerOptions.setDocumentSelector(documentSelector);
-        // TODO registerOptions.setWorkDoneProgress(workDoneProgress);
+
+        ReferenceOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+        }
 
         register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }

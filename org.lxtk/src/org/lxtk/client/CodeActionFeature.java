@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,12 +23,12 @@ import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CodeActionOptions;
 import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.CodeActionRegistrationOptions;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
@@ -44,7 +44,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class CodeActionFeature
-    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<CodeActionRegistrationOptions>
 {
     private static final String METHOD = "textDocument/codeAction"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -90,28 +90,33 @@ public final class CodeActionFeature
 
         CodeActionRegistrationOptions registerOptions = new CodeActionRegistrationOptions();
         registerOptions.setDocumentSelector(documentSelector);
-        if (capability.isRight())
-            registerOptions.resolveProvider = capability.getRight().getResolveProvider();
+
+        CodeActionOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+            registerOptions.setCodeActionKinds(options.getCodeActionKinds());
+            registerOptions.setResolveProvider(options.getResolveProvider());
+        }
 
         register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<? extends TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<CodeActionRegistrationOptions> getRegistrationOptionsClass()
     {
         return CodeActionRegistrationOptions.class;
     }
 
     @Override
-    Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+    Disposable registerLanguageFeatureProvider(String method, CodeActionRegistrationOptions options)
     {
         return getLanguageService().getCodeActionProviders().add(new CodeActionProvider()
         {
             @Override
             public CodeActionRegistrationOptions getRegistrationOptions()
             {
-                return (CodeActionRegistrationOptions)options;
+                return options;
             }
 
             @Override
@@ -130,7 +135,7 @@ public final class CodeActionFeature
             @Override
             public boolean supportsResolveCodeAction()
             {
-                return Boolean.TRUE.equals(getRegistrationOptions().resolveProvider);
+                return Boolean.TRUE.equals(options.getResolveProvider());
             }
 
             @Override
@@ -148,12 +153,5 @@ public final class CodeActionFeature
                 return commandService;
             }
         });
-    }
-
-    // TODO workaround for missing CodeActionRegistrationOptions in LSP4J
-    static class CodeActionRegistrationOptions
-        extends TextDocumentRegistrationOptions
-    {
-        Boolean resolveProvider;
     }
 }

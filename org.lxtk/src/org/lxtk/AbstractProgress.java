@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -25,7 +25,7 @@ public abstract class AbstractProgress
     implements Progress
 {
     private final CompletableFuture<Void> future = new CompletableFuture<>();
-    private final Either<String, Number> token;
+    private final Either<String, Integer> token;
     private volatile long lastUpdated;
 
     /**
@@ -33,7 +33,7 @@ public abstract class AbstractProgress
      *
      * @param token not <code>null</code>
      */
-    public AbstractProgress(Either<String, Number> token)
+    public AbstractProgress(Either<String, Integer> token)
     {
         this.token = Objects.requireNonNull(token);
     }
@@ -45,7 +45,7 @@ public abstract class AbstractProgress
     }
 
     @Override
-    public final Either<String, Number> getToken()
+    public final Either<String, Integer> getToken()
     {
         return token;
     }

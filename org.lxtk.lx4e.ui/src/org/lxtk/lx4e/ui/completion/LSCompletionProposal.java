@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2020 Red Hat Inc. and others.
+ * Copyright (c) 2016, 2021 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -74,7 +74,7 @@ class LSCompletionProposal extends LSIncompleteCompletionProposal
             if (!documentFilter.isEmpty()) {
                 return CompletionProposalTools.isSubstringFoundOrderedInString(documentFilter, getFilterString());
             } else if (item.getTextEdit() != null) {
-                return offset == DocumentUtil.toOffset(document, item.getTextEdit().getRange().getStart());
+                return offset == DocumentUtil.toOffset(document, item.getTextEdit().getLeft().getRange().getStart());
             }
         } catch (BadLocationException e) {
             Activator.logError(e);

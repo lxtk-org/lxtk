@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -21,11 +21,13 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverCapabilities;
+import org.eclipse.lsp4j.HoverOptions;
 import org.eclipse.lsp4j.HoverParams;
+import org.eclipse.lsp4j.HoverRegistrationOptions;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.HoverProvider;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
@@ -39,7 +41,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class HoverFeature
-    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<HoverRegistrationOptions>
 {
     private static final String METHOD = "textDocument/hover"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -74,28 +76,36 @@ public final class HoverFeature
         if (documentSelector == null)
             return;
 
-        Boolean capability = capabilities.getHoverProvider();
-        if (!Boolean.TRUE.equals(capability))
+        Either<Boolean, HoverOptions> capability = capabilities.getHoverProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new TextDocumentRegistrationOptions(documentSelector)));
+        HoverRegistrationOptions registerOptions = new HoverRegistrationOptions();
+        registerOptions.setDocumentSelector(documentSelector);
+
+        HoverOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+        }
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<HoverRegistrationOptions> getRegistrationOptionsClass()
     {
-        return TextDocumentRegistrationOptions.class;
+        return HoverRegistrationOptions.class;
     }
 
     @Override
-    Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+    Disposable registerLanguageFeatureProvider(String method, HoverRegistrationOptions options)
     {
         return getLanguageService().getHoverProviders().add(new HoverProvider()
         {
             @Override
-            public TextDocumentRegistrationOptions getRegistrationOptions()
+            public HoverRegistrationOptions getRegistrationOptions()
             {
                 return options;
             }

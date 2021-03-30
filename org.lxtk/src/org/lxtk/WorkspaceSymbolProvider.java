@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
+import org.eclipse.lsp4j.WorkspaceSymbolRegistrationOptions;
 
 /**
  * Provides information about project-wide symbols matching a query string.
@@ -24,7 +25,7 @@ import org.eclipse.lsp4j.WorkspaceSymbolParams;
  * @see LanguageService
  */
 public interface WorkspaceSymbolProvider
-    extends LanguageFeatureProvider<Object>
+    extends LanguageFeatureProvider<WorkspaceSymbolRegistrationOptions>
 {
     /**
      * Requests information about project-wide symbols matching the given query string.

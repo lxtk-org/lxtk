@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -87,6 +87,7 @@ public final class CodeLensFeature
 
         CodeLensRegistrationOptions options = new CodeLensRegistrationOptions();
         options.setDocumentSelector(documentSelector);
+        options.setWorkDoneProgress(capability.getWorkDoneProgress());
         options.setResolveProvider(capability.isResolveProvider());
         register(new Registration(UUID.randomUUID().toString(), METHOD, options));
     }

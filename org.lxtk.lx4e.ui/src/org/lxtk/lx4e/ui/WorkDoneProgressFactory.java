@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -43,7 +43,7 @@ public class WorkDoneProgressFactory
      * @param token not <code>null</code>
      * @return the created progress object (never <code>null</code>)
      */
-    public static WorkDoneProgress newWorkDoneProgress(Either<String, Number> token)
+    public static WorkDoneProgress newWorkDoneProgress(Either<String, Integer> token)
     {
         return new DefaultWorkDoneProgress(token);
     }
@@ -69,7 +69,7 @@ public class WorkDoneProgressFactory
      * @param showInDialog whether to open a progress dialog on the job when it starts to run
      * @return the created progress object (never <code>null</code>)
      */
-    public static WorkDoneProgress newWorkDoneProgressWithJob(Either<String, Number> token,
+    public static WorkDoneProgress newWorkDoneProgressWithJob(Either<String, Integer> token,
         boolean showInDialog)
     {
         return new WorkDoneProgressWithJob(token)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,14 +19,15 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DefinitionCapabilities;
+import org.eclipse.lsp4j.DefinitionOptions;
 import org.eclipse.lsp4j.DefinitionParams;
+import org.eclipse.lsp4j.DefinitionRegistrationOptions;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DefinitionProvider;
 import org.lxtk.LanguageService;
@@ -41,7 +42,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class DefinitionFeature
-    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<DefinitionRegistrationOptions>
 {
     private static final String METHOD = "textDocument/definition"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -76,28 +77,36 @@ public final class DefinitionFeature
         if (documentSelector == null)
             return;
 
-        Boolean capability = capabilities.getDefinitionProvider();
-        if (!Boolean.TRUE.equals(capability))
+        Either<Boolean, DefinitionOptions> capability = capabilities.getDefinitionProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new TextDocumentRegistrationOptions(documentSelector)));
+        DefinitionRegistrationOptions registerOptions = new DefinitionRegistrationOptions();
+        registerOptions.setDocumentSelector(documentSelector);
+
+        DefinitionOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+        }
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<DefinitionRegistrationOptions> getRegistrationOptionsClass()
     {
-        return TextDocumentRegistrationOptions.class;
+        return DefinitionRegistrationOptions.class;
     }
 
     @Override
-    Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+    Disposable registerLanguageFeatureProvider(String method, DefinitionRegistrationOptions options)
     {
         return getLanguageService().getDefinitionProviders().add(new DefinitionProvider()
         {
             @Override
-            public TextDocumentRegistrationOptions getRegistrationOptions()
+            public DefinitionRegistrationOptions getRegistrationOptions()
             {
                 return options;
             }

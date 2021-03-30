@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,13 +19,15 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentFilter;
+import org.eclipse.lsp4j.DocumentRangeFormattingOptions;
 import org.eclipse.lsp4j.DocumentRangeFormattingParams;
+import org.eclipse.lsp4j.DocumentRangeFormattingRegistrationOptions;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.TextEdit;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentRangeFormattingProvider;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
@@ -40,7 +42,7 @@ import org.lxtk.util.Disposable;
  * </p>
  */
 public final class DocumentRangeFormattingFeature
-    extends TextDocumentLanguageFeature<TextDocumentRegistrationOptions>
+    extends TextDocumentLanguageFeature<DocumentRangeFormattingRegistrationOptions>
 {
     private static final String METHOD = "textDocument/rangeFormatting"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
@@ -76,29 +78,40 @@ public final class DocumentRangeFormattingFeature
         if (documentSelector == null)
             return;
 
-        Boolean capability = capabilities.getDocumentRangeFormattingProvider();
-        if (!Boolean.TRUE.equals(capability))
+        Either<Boolean, DocumentRangeFormattingOptions> capability =
+            capabilities.getDocumentRangeFormattingProvider();
+        if (capability == null
+            || !(capability.isRight() || Boolean.TRUE.equals(capability.getLeft())))
             return;
 
-        register(new Registration(UUID.randomUUID().toString(), METHOD,
-            new TextDocumentRegistrationOptions(documentSelector)));
+        DocumentRangeFormattingRegistrationOptions registerOptions =
+            new DocumentRangeFormattingRegistrationOptions();
+        registerOptions.setDocumentSelector(documentSelector);
+
+        DocumentRangeFormattingOptions options = capability.getRight();
+        if (options != null)
+        {
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
+        }
+
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override
-    Class<TextDocumentRegistrationOptions> getRegistrationOptionsClass()
+    Class<DocumentRangeFormattingRegistrationOptions> getRegistrationOptionsClass()
     {
-        return TextDocumentRegistrationOptions.class;
+        return DocumentRangeFormattingRegistrationOptions.class;
     }
 
     @Override
     Disposable registerLanguageFeatureProvider(String method,
-        TextDocumentRegistrationOptions options)
+        DocumentRangeFormattingRegistrationOptions options)
     {
         return getLanguageService().getDocumentRangeFormattingProviders().add(
             new DocumentRangeFormattingProvider()
             {
                 @Override
-                public TextDocumentRegistrationOptions getRegistrationOptions()
+                public DocumentRangeFormattingRegistrationOptions getRegistrationOptions()
                 {
                     return options;
                 }

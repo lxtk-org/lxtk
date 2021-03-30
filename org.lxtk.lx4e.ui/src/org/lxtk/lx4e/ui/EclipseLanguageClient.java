@@ -316,7 +316,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
     @Override
     public CompletableFuture<Void> createProgress(WorkDoneProgressCreateParams params)
     {
-        Either<String, Number> token = params.getToken();
+        Either<String, Integer> token = params.getToken();
         WorkDoneProgress workDoneProgress =
             WorkDoneProgressFactory.newWorkDoneProgressWithJob(token, true);
         getProgressService().attachProgress(workDoneProgress);

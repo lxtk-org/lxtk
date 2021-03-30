@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DefinitionParams;
+import org.eclipse.lsp4j.DefinitionRegistrationOptions;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
@@ -27,7 +27,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * @see LanguageService
  */
 public interface DefinitionProvider
-    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
+    extends LanguageFeatureProvider<DefinitionRegistrationOptions>
 {
     /**
      * Requests definition locations for the symbol denoted by the given text document position.

@@ -156,6 +156,7 @@ public class TypeScriptLanguageClient
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
             TypeScriptWorkspaceEditChangeFactory.INSTANCE, features)
         {
+            @SuppressWarnings("deprecation")
             @Override
             public void fillInitializeParams(InitializeParams params)
             {

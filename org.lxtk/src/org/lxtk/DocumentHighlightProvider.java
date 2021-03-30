@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.DocumentHighlightParams;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
+import org.eclipse.lsp4j.DocumentHighlightRegistrationOptions;
 
 /**
  * Provides {@link DocumentHighlight}s for a given text document position.
@@ -25,7 +25,7 @@ import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
  * @see LanguageService
  */
 public interface DocumentHighlightProvider
-    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
+    extends LanguageFeatureProvider<DocumentHighlightRegistrationOptions>
 {
     /**
      * Requests document highlights for the given text document position.

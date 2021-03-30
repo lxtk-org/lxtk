@@ -92,6 +92,7 @@ public class FoldingRangeFeature
                 Optional.ofNullable(options.getDocumentSelector()).orElse(documentSelector));
             registerOptions.setId(
                 Optional.ofNullable(options.getId()).orElse(UUID.randomUUID().toString()));
+            registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
         }
 
         register(new Registration(registerOptions.getId(), METHOD, registerOptions));

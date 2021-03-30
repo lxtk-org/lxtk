@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
-import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
+import org.eclipse.lsp4j.HoverRegistrationOptions;
 
 /**
  * Provides hover information for a given text document position.
@@ -24,7 +24,7 @@ import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
  * @see LanguageService
  */
 public interface HoverProvider
-    extends LanguageFeatureProvider<TextDocumentRegistrationOptions>
+    extends LanguageFeatureProvider<HoverRegistrationOptions>
 {
     /**
      * Requests hover information for the given text document position.

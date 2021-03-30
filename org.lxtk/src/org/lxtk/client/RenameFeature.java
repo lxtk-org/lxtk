@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -86,19 +86,15 @@ public class RenameFeature
         if (options == null)
         {
             registerOptions.setDocumentSelector(documentSelector);
-            registerOptions.setId(UUID.randomUUID().toString());
-            registerOptions.setPrepareProvider(false);
         }
         else
         {
             registerOptions.setDocumentSelector(
                 Optional.ofNullable(options.getDocumentSelector()).orElse(documentSelector));
-            registerOptions.setId(
-                Optional.ofNullable(options.getId()).orElse(UUID.randomUUID().toString()));
             registerOptions.setPrepareProvider(options.getPrepareProvider());
         }
 
-        register(new Registration(registerOptions.getId(), METHOD, registerOptions));
+        register(new Registration(UUID.randomUUID().toString(), METHOD, registerOptions));
     }
 
     @Override

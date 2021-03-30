@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -33,7 +33,7 @@ public interface ProgressService
      * @param consumer not <code>null</code>
      * @return a disposable to dissociate the consumer (never null)
      */
-    Disposable onProgress(Either<String, Number> token, Consumer<? super ProgressParams> consumer);
+    Disposable onProgress(Either<String, Integer> token, Consumer<? super ProgressParams> consumer);
 
     /**
      * Attaches the given progress object to this service.
