@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -14,12 +14,8 @@ package org.lxtk.lx4e;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.lsp4j.PartialResultParams;
-import org.eclipse.lsp4j.WorkDoneProgressParams;
 import org.lxtk.LanguageFeatureProvider;
-import org.lxtk.PartialResultProgress;
 import org.lxtk.ProgressService;
-import org.lxtk.WorkDoneProgress;
 
 abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider<?>, S, T>
     extends Request<T>
@@ -75,32 +71,7 @@ abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider<?>, S, T
 
         ProgressService progressService = provider.getProgressService();
         if (progressService != null)
-        {
-            if (params instanceof WorkDoneProgressParams)
-            {
-                WorkDoneProgress workDoneProgress = getWorkDoneProgress();
-                if (workDoneProgress != null)
-                {
-                    progressService.attachProgress(workDoneProgress);
-                    ((WorkDoneProgressParams)params).setWorkDoneToken(workDoneProgress.getToken());
-                }
-            }
-            if (params instanceof PartialResultParams)
-            {
-                PartialResultProgress partialResultProgress = getPartialResultProgress();
-                if (partialResultProgress != null)
-                {
-                    progressService.attachProgress(partialResultProgress);
-                    ((PartialResultParams)params).setPartialResultToken(
-                        partialResultProgress.getToken());
-                }
-            }
-        }
-        else
-        {
-            setWorkDoneProgress(null);
-            setPartialResultProgress(null);
-        }
+            initiateProgress(progressService);
 
         return send(provider, params);
     }
@@ -114,4 +85,8 @@ abstract class LanguageFeatureRequest<R extends LanguageFeatureProvider<?>, S, T
      * @return the response future (not <code>null</code>)
      */
     protected abstract CompletableFuture<T> send(R provider, S params);
+
+    void initiateProgress(ProgressService progressService)
+    {
+    }
 }

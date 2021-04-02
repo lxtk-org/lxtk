@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -142,7 +142,7 @@ public abstract class Request<T>
      *
      * @param workDoneProgress a work done progress or <code>null</code>
      */
-    public void setWorkDoneProgress(WorkDoneProgress workDoneProgress)
+    protected void setWorkDoneProgress(WorkDoneProgress workDoneProgress)
     {
         this.workDoneProgress = workDoneProgress;
     }
@@ -152,7 +152,7 @@ public abstract class Request<T>
      *
      * @return the work done progress or <code>null</code>
      */
-    public WorkDoneProgress getWorkDoneProgress()
+    protected WorkDoneProgress getWorkDoneProgress()
     {
         return workDoneProgress;
     }
@@ -162,7 +162,7 @@ public abstract class Request<T>
      *
      * @param partialResultProgress a partial result progress or <code>null</code>
      */
-    public void setPartialResultProgress(PartialResultProgress partialResultProgress)
+    protected void setPartialResultProgress(PartialResultProgress partialResultProgress)
     {
         this.partialResultProgress = partialResultProgress;
     }
@@ -172,7 +172,7 @@ public abstract class Request<T>
      *
      * @return the partial result progress or <code>null</code>
      */
-    public PartialResultProgress getPartialResultProgress()
+    protected PartialResultProgress getPartialResultProgress()
     {
         return partialResultProgress;
     }
@@ -392,28 +392,11 @@ public abstract class Request<T>
 
             WorkDoneProgress workDoneProgress = request.getWorkDoneProgress();
             if (workDoneProgress != null)
-            {
-                CompletableFuture<Void> progressFuture = workDoneProgress.toCompletableFuture();
-                future.whenComplete((result, thrown) -> progressFuture.complete(null));
-                progressFuture.whenComplete((result, thrown) ->
-                {
-                    if (progressFuture.isCancelled())
-                        future.cancel(true);
-                });
-            }
+                workDoneProgress.connectWith(future);
 
             PartialResultProgress partialResultProgress = request.getPartialResultProgress();
             if (partialResultProgress != null)
-            {
-                CompletableFuture<Void> progressFuture =
-                    partialResultProgress.toCompletableFuture();
-                future.whenComplete((result, thrown) -> progressFuture.complete(null));
-                progressFuture.whenComplete((result, thrown) ->
-                {
-                    if (progressFuture.isCancelled())
-                        future.cancel(true);
-                });
-            }
+                partialResultProgress.connectWith(future);
         }
 
         /**

@@ -51,6 +51,7 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemTag;
+import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.InsertTextFormat;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MarkupKind;
@@ -67,13 +68,17 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
+import org.lxtk.CommandHandler;
 import org.lxtk.CommandService;
 import org.lxtk.CompletionProvider;
+import org.lxtk.ProgressService;
+import org.lxtk.WorkDoneProgress;
 import org.lxtk.lx4e.CompletionResolveRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 import org.lxtk.lx4e.util.Markdown;
 
 @SuppressWarnings("javadoc")
@@ -586,9 +591,28 @@ class LSIncompleteCompletionProposal
         if (command != null) {
             CommandService commandService = provider.getCommandService();
             if (commandService != null) {
-                CompletableFuture<Object> future = commandService.executeCommand(
-                    command.getCommand(), command.getArguments());
-                if (future != null) {
+                CommandHandler handler = commandService.getCommandHandler(command.getCommand());
+                if (handler != null) {
+                    ExecuteCommandParams params =
+                        new ExecuteCommandParams(command.getCommand(), command.getArguments());
+
+                    WorkDoneProgress workDoneProgress = null;
+                    if (Boolean.TRUE.equals(handler.getRegistrationOptions().getWorkDoneProgress()))
+                    {
+                        ProgressService progressService = handler.getProgressService();
+                        if (progressService != null)
+                        {
+                            workDoneProgress = WorkDoneProgressFactory.newWorkDoneProgressWithJob(false);
+                            progressService.attachProgress(workDoneProgress);
+                            params.setWorkDoneToken(workDoneProgress.getToken());
+                        }
+                    }
+
+                    CompletableFuture<Object> future = handler.execute(params);
+
+                    if (workDoneProgress != null)
+                        workDoneProgress.connectWith(future);
+
                     future.exceptionally(e -> {
                         e = Activator.unwrap(e);
                         if (!Activator.isCancellation(e)) {

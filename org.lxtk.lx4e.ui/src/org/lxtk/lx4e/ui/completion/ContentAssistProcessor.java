@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -53,6 +53,7 @@ import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.SignatureHelpRequest;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.LSPImages;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Default implementation of an {@link IContentAssistProcessor} that
@@ -124,6 +125,8 @@ public class ContentAssistProcessor
             new CompletionParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
         request.setTimeout(getCompletionTimeout());
         request.setMayThrow(false);
+        request.setUpWorkDoneProgress(
+            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
 
         Either<List<CompletionItem>, CompletionList> result = request.sendAndReceive();
         errorMessage = request.getErrorMessage();
@@ -332,6 +335,8 @@ public class ContentAssistProcessor
             position, context));
         request.setTimeout(getSignatureHelpTimeout());
         request.setMayThrow(false);
+        request.setUpWorkDoneProgress(
+            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
         return request;
     }
 

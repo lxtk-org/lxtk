@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -31,6 +31,7 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DeclarationRequest;
 import org.lxtk.lx4e.Request;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Default implementation of a hyperlink detector that computes hyperlinks
@@ -56,6 +57,8 @@ public class DeclarationHyperlinkDetector
         request.setProvider(provider);
         request.setParams(
             new DeclarationParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
+        request.setUpWorkDoneProgress(
+            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
         return request;
     }
 

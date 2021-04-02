@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -26,8 +26,8 @@ import org.lxtk.CodeActionProvider;
  * Requests code actions for the given {@link CodeActionParams}.
  */
 public class CodeActionRequest
-    extends
-    LanguageFeatureRequest<CodeActionProvider, CodeActionParams, List<Either<Command, CodeAction>>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<CodeActionProvider,
+        CodeActionParams, List<Either<Command, CodeAction>>>
 {
     @Override
     protected CompletableFuture<List<Either<Command, CodeAction>>> send(CodeActionProvider provider,

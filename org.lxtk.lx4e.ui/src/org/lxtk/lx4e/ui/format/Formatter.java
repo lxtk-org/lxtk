@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -40,6 +40,7 @@ import org.lxtk.lx4e.DocumentFormattingRequest;
 import org.lxtk.lx4e.DocumentRangeFormattingRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.Request;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Formats a document selection using a <i>formatting provider</i> to compute
@@ -220,6 +221,7 @@ public final class Formatter
             DocumentRangeFormattingRequest request = newDocumentRangeFormattingRequest();
             request.setProvider(documentRangeFormattingProvider);
             request.setParams(params);
+            request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
             return request;
         }
         else if (selection.getLength() <= 0)
@@ -236,6 +238,7 @@ public final class Formatter
                 DocumentFormattingRequest request = newDocumentFormattingRequest();
                 request.setProvider(documentFormattingProvider);
                 request.setParams(params);
+                request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
                 return request;
             }
         }

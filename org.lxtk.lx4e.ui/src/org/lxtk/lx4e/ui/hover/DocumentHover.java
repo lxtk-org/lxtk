@@ -42,6 +42,7 @@ import org.lxtk.lx4e.HoverRequest;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 import org.lxtk.lx4e.util.Markdown;
 
@@ -116,6 +117,8 @@ public class DocumentHover
             new HoverParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
         request.setTimeout(getHoverTimeout());
         request.setMayThrow(false);
+        request.setUpWorkDoneProgress(
+            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
 
         Hover result = request.sendAndReceive();
         if (result == null)

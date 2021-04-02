@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,8 +24,8 @@ import org.lxtk.DocumentHighlightProvider;
  * Requests document highlights for the given text document position.
  */
 public class DocumentHighlightRequest
-    extends LanguageFeatureRequest<DocumentHighlightProvider, DocumentHighlightParams,
-        List<? extends DocumentHighlight>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<DocumentHighlightProvider,
+        DocumentHighlightParams, List<? extends DocumentHighlight>>
 {
     @Override
     protected CompletableFuture<List<? extends DocumentHighlight>> send(

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -26,8 +26,8 @@ import org.lxtk.DocumentSymbolProvider;
  * Requests information about symbols defined in the given text document.
  */
 public class DocumentSymbolRequest
-    extends LanguageFeatureRequest<DocumentSymbolProvider, DocumentSymbolParams,
-        List<Either<SymbolInformation, DocumentSymbol>>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<DocumentSymbolProvider,
+        DocumentSymbolParams, List<Either<SymbolInformation, DocumentSymbol>>>
 {
     @Override
     protected CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> send(

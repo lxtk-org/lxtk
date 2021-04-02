@@ -14,13 +14,13 @@ package org.lxtk.lx4e.refactoring.rename;
 
 import java.net.URI;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletionException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -33,6 +33,7 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.lxtk.DefaultWorkDoneProgress;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
@@ -274,14 +275,14 @@ public class RenameRefactoring
         if (status.hasFatalError())
             return status;
 
-        SubMonitor monitor = SubMonitor.convert(pm, 100);
-
         RenameRequest request = newRenameRequest();
         request.setProvider(renameProvider);
         request.setParams(
             new RenameParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
                 getPosition(), getNewName()));
-        request.setProgressMonitor(monitor.split(70));
+        request.setProgressMonitor(pm);
+        request.setUpWorkDoneProgress(
+            () -> new DefaultWorkDoneProgress(Either.forLeft(UUID.randomUUID().toString())));
 
         WorkspaceEdit workspaceEdit;
         try
@@ -298,7 +299,7 @@ public class RenameRefactoring
                 Messages.RenameRefactoring_No_workspace_edit);
 
         setWorkspaceEdit(workspaceEdit);
-        return super.checkFinalConditions(monitor.split(30));
+        return new RefactoringStatus();
     }
 
     /**

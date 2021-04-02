@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,7 +23,7 @@ import org.lxtk.HoverProvider;
  * Requests hover information for the given text document position.
  */
 public class HoverRequest
-    extends LanguageFeatureRequest<HoverProvider, HoverParams, Hover>
+    extends LanguageFeatureRequestWithWorkDoneProgress<HoverProvider, HoverParams, Hover>
 {
     @Override
     protected CompletableFuture<Hover> send(HoverProvider provider, HoverParams params)

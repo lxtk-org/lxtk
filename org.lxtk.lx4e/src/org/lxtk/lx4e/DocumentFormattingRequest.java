@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,8 +24,8 @@ import org.lxtk.DocumentFormattingProvider;
  * Requests formatting edits for the given {@link DocumentFormattingParams}.
  */
 public class DocumentFormattingRequest
-    extends LanguageFeatureRequest<DocumentFormattingProvider, DocumentFormattingParams,
-        List<? extends TextEdit>>
+    extends LanguageFeatureRequestWithWorkDoneProgress<DocumentFormattingProvider,
+        DocumentFormattingParams, List<? extends TextEdit>>
 {
     @Override
     protected CompletableFuture<List<? extends TextEdit>> send(DocumentFormattingProvider provider,

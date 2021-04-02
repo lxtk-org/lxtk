@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletionException;
 
 import org.eclipse.core.filesystem.EFS;
@@ -50,6 +51,7 @@ import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.lxtk.DefaultWorkDoneProgress;
 import org.lxtk.DocumentService;
 import org.lxtk.DocumentSymbolProvider;
 import org.lxtk.DocumentUri;
@@ -349,6 +351,8 @@ public abstract class LanguageSourceFile
             new DocumentSymbolParams(DocumentUri.toTextDocumentIdentifier(documentUri)));
         request.setTimeout(getDocumentSymbolTimeout());
         request.setProgressMonitor(monitor);
+        request.setUpWorkDoneProgress(
+            () -> new DefaultWorkDoneProgress(Either.forLeft(UUID.randomUUID().toString())));
 
         List<Either<SymbolInformation, DocumentSymbol>> result;
         try

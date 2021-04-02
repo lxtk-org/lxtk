@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -37,6 +37,7 @@ import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.CodeActionRequest;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Partial implementation of an {@link IMarkerResolutionGenerator2} that computes
@@ -83,6 +84,8 @@ public abstract class AbstractMarkerResolutionGenerator
                     Collections.singletonList(CodeActionKind.QuickFix))));
         request.setTimeout(getCodeActionTimeout());
         request.setMayThrow(false);
+        request.setUpWorkDoneProgress(
+            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
 
         List<Either<Command, CodeAction>> result = request.sendAndReceive();
         if (result == null || result.isEmpty())

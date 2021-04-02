@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,8 +24,8 @@ import org.lxtk.WorkspaceSymbolProvider;
  * Requests information about project-wide symbols matching the given query string.
  */
 public class WorkspaceSymbolRequest
-    extends LanguageFeatureRequest<WorkspaceSymbolProvider, WorkspaceSymbolParams,
-        List<? extends SymbolInformation>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<WorkspaceSymbolProvider,
+        WorkspaceSymbolParams, List<? extends SymbolInformation>>
 {
     @Override
     protected CompletableFuture<List<? extends SymbolInformation>> send(

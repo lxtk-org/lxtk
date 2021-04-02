@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DocumentFilter;
@@ -31,7 +32,9 @@ import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.lxtk.CommandHandler;
 import org.lxtk.CommandService;
+import org.lxtk.ProgressService;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
 
@@ -51,6 +54,7 @@ public final class ExecuteCommandFeature
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
     private final CommandService commandService;
+    private AbstractLanguageClient<? extends LanguageServer> languageClient;
     private LanguageServer languageServer;
     private Map<String, Disposable> registrations;
 
@@ -68,6 +72,12 @@ public final class ExecuteCommandFeature
     public Set<String> getMethods()
     {
         return METHODS;
+    }
+
+    @Override
+    public void setLanguageClient(AbstractLanguageClient<? extends LanguageServer> client)
+    {
+        languageClient = Objects.requireNonNull(client);
     }
 
     @Override
@@ -122,12 +132,31 @@ public final class ExecuteCommandFeature
         if (registrations.containsKey(registration.getId()))
             throw new IllegalArgumentException();
 
+        CommandHandler handler = new CommandHandler()
+        {
+            @Override
+            public CompletableFuture<Object> execute(ExecuteCommandParams params)
+            {
+                return languageServer.getWorkspaceService().executeCommand(params);
+            }
+
+            @Override
+            public ExecuteCommandRegistrationOptions getRegistrationOptions()
+            {
+                return options;
+            }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return languageClient.getProgressService();
+            }
+        };
+
         List<Disposable> registeredCommands = new ArrayList<>(commands.size());
         for (String command : commands)
         {
-            registeredCommands.add(commandService.addCommand(command,
-                arguments -> languageServer.getWorkspaceService().executeCommand(
-                    new ExecuteCommandParams(command, arguments))));
+            registeredCommands.add(commandService.addCommand(command, handler));
         }
 
         registrations.put(registration.getId(), () -> Disposable.disposeAll(registeredCommands));

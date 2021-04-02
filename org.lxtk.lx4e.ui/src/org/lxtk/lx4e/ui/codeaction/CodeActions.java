@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.Command;
+import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
 import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
@@ -31,12 +32,16 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.lxtk.CodeActionProvider;
+import org.lxtk.CommandHandler;
 import org.lxtk.CommandService;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
+import org.lxtk.WorkDoneProgress;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 class CodeActions
 {
@@ -149,7 +154,8 @@ class CodeActions
     private static CompletableFuture<CodeAction> resolveIfNecessary(CodeAction codeAction,
         CodeActionProvider provider)
     {
-        if (codeAction.getEdit() != null || !provider.supportsResolveCodeAction())
+        if (codeAction.getEdit() != null
+            || !Boolean.TRUE.equals(provider.getRegistrationOptions().getResolveProvider()))
             return CompletableFuture.completedFuture(codeAction);
 
         return provider.resolveCodeAction(codeAction);
@@ -164,14 +170,35 @@ class CodeActions
         if (label == null)
             label = command.getTitle();
 
-        CompletableFuture<Object> result =
-            commandService.executeCommand(command.getCommand(), command.getArguments());
-        if (result == null)
+        CommandHandler handler = commandService.getCommandHandler(command.getCommand());
+        if (handler == null)
         {
-            result = new CompletableFuture<>();
+            CompletableFuture<Object> result = new CompletableFuture<>();
             result.completeExceptionally(new CoreException(Activator.createErrorStatus(
                 MessageFormat.format(Messages.CodeActions_Command_not_available, label), null)));
+            return result;
         }
+
+        ExecuteCommandParams params =
+            new ExecuteCommandParams(command.getCommand(), command.getArguments());
+
+        WorkDoneProgress workDoneProgress = null;
+        if (Boolean.TRUE.equals(handler.getRegistrationOptions().getWorkDoneProgress()))
+        {
+            ProgressService progressService = handler.getProgressService();
+            if (progressService != null)
+            {
+                workDoneProgress = WorkDoneProgressFactory.newWorkDoneProgressWithJob(false);
+                progressService.attachProgress(workDoneProgress);
+                params.setWorkDoneToken(workDoneProgress.getToken());
+            }
+        }
+
+        CompletableFuture<Object> result = handler.execute(params);
+
+        if (workDoneProgress != null)
+            workDoneProgress.connectWith(result);
+
         return result;
     }
 

@@ -38,27 +38,14 @@ public interface CodeActionProvider
     CompletableFuture<List<Either<Command, CodeAction>>> getCodeActions(CodeActionParams params);
 
     /**
-     * Returns whether this provider supports {@link #resolveCodeAction(CodeAction)} operation.
-     *
-     * @return <code>true</code> if the operation is supported, and <code>false</code> otherwise
-     */
-    default boolean supportsResolveCodeAction()
-    {
-        return false;
-    }
-
-    /**
      * Requests additional information for the given code action.
      *
      * @param unresolved not <code>null</code>
      * @return result future (never <code>null</code>)
-     * @throws UnsupportedOperationException if this provider does not support the operation
-     * @see #supportsResolveCodeAction()
+     * @throws UnsupportedOperationException if no support for code action resolving is available
+     * @see CodeActionRegistrationOptions#getResolveProvider()
      */
-    default CompletableFuture<CodeAction> resolveCodeAction(CodeAction unresolved)
-    {
-        throw new UnsupportedOperationException();
-    }
+    CompletableFuture<CodeAction> resolveCodeAction(CodeAction unresolved);
 
     /**
      * Returns the command service associated with this provider.

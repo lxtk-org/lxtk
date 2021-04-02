@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -26,12 +26,12 @@ import org.lxtk.CompletionProvider;
  * Requests completion items for the given {@link CompletionParams}.
  */
 public class CompletionRequest
-    extends LanguageFeatureRequest<CompletionProvider, CompletionParams,
-        Either<List<CompletionItem>, CompletionList>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<CompletionProvider,
+        CompletionParams, Either<List<CompletionItem>, CompletionList>>
 {
     @Override
-    protected CompletableFuture<Either<List<CompletionItem>, CompletionList>> send(CompletionProvider provider,
-        CompletionParams params)
+    protected CompletableFuture<Either<List<CompletionItem>, CompletionList>> send(
+        CompletionProvider provider, CompletionParams params)
     {
         setTitle(MessageFormat.format(Messages.CompletionRequest_title, params));
         return provider.getCompletionItems(params);

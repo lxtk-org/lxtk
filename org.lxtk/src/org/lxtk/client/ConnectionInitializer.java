@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -153,15 +153,7 @@ public class ConnectionInitializer
             future = connection.getRemoteProxy().initialize(params);
 
             if (workDoneProgress != null)
-            {
-                CompletableFuture<Void> progressFuture = workDoneProgress.toCompletableFuture();
-                future.whenComplete((result, thrown) -> progressFuture.complete(null));
-                progressFuture.whenComplete((result, thrown) ->
-                {
-                    if (progressFuture.isCancelled())
-                        future.cancel(true);
-                });
-            }
+                workDoneProgress.connectWith(future);
         }
     }
 

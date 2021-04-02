@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -36,6 +36,9 @@ import org.lxtk.CodeLensProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
+import org.lxtk.ProgressService;
+import org.lxtk.WorkDoneProgress;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Default implementation of a code mining provider that computes code minings
@@ -61,9 +64,27 @@ public class CodeMiningProvider
         if (provider == null)
             return null;
 
-        return provider.getCodeLenses(
-            new CodeLensParams(DocumentUri.toTextDocumentIdentifier(documentUri))).thenApply(
-                codeLenses -> getCodeMinings(viewer, codeLenses, provider));
+        CodeLensParams params =
+            new CodeLensParams(DocumentUri.toTextDocumentIdentifier(documentUri));
+
+        WorkDoneProgress workDoneProgress = null;
+        if (Boolean.TRUE.equals(provider.getRegistrationOptions().getWorkDoneProgress()))
+        {
+            ProgressService progressService = provider.getProgressService();
+            if (progressService != null)
+            {
+                workDoneProgress = WorkDoneProgressFactory.newWorkDoneProgressWithJob(false);
+                progressService.attachProgress(workDoneProgress);
+                params.setWorkDoneToken(workDoneProgress.getToken());
+            }
+        }
+
+        CompletableFuture<List<? extends CodeLens>> future = provider.getCodeLenses(params);
+
+        if (workDoneProgress != null)
+            workDoneProgress.connectWith(future);
+
+        return future.thenApply(codeLenses -> getCodeMinings(viewer, codeLenses, provider));
     }
 
     /**

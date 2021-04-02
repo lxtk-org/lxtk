@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -40,6 +40,7 @@ import org.lxtk.lx4e.ResourceUriHandler;
 import org.lxtk.lx4e.UriHandlers;
 import org.lxtk.lx4e.WorkspaceSymbolRequest;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Shows a list of workspace symbols to the user with an input field for a query string
@@ -104,6 +105,7 @@ public class WorkspaceSymbolSelectionDialog
         request.setProvider(provider);
         request.setParams(new WorkspaceSymbolParams(itemsFilter.getPattern()));
         request.setProgressMonitor(monitor);
+        request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
 
         List<? extends SymbolInformation> result;
         try

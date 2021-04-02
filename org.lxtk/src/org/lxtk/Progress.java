@@ -46,4 +46,27 @@ public interface Progress
      *  has not been updated).
      */
     long getLastUpdated();
+
+    /**
+     * Connects the progress with the given future.
+     * <p>
+     * The default implementation ensures that:
+     * <ul>
+     * <li>If not already completed, the progress completes when the given future is complete.
+     * <li>If not already completed, the given future gets canceled when the progress is canceled.
+     * </ul>
+     * </p>
+     *
+     * @param future not <code>null</code>
+     */
+    default void connectWith(CompletableFuture<?> future)
+    {
+        CompletableFuture<Void> progressFuture = toCompletableFuture();
+        future.whenComplete((result, thrown) -> progressFuture.complete(null));
+        progressFuture.whenComplete((result, thrown) ->
+        {
+            if (progressFuture.isCancelled())
+                future.cancel(true);
+        });
+    }
 }

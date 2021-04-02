@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,7 +23,8 @@ import org.lxtk.SignatureHelpProvider;
  * Requests signature information for the given text document position.
  */
 public class SignatureHelpRequest
-    extends LanguageFeatureRequest<SignatureHelpProvider, SignatureHelpParams, SignatureHelp>
+    extends LanguageFeatureRequestWithWorkDoneProgress<SignatureHelpProvider, SignatureHelpParams,
+        SignatureHelp>
 {
     @Override
     protected CompletableFuture<SignatureHelp> send(SignatureHelpProvider provider,

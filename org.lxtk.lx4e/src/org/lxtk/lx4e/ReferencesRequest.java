@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,7 +24,8 @@ import org.lxtk.ReferenceProvider;
  * Requests locations for all references to the symbol denoted by the given text document position.
  */
 public class ReferencesRequest
-    extends LanguageFeatureRequest<ReferenceProvider, ReferenceParams, List<? extends Location>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<ReferenceProvider,
+        ReferenceParams, List<? extends Location>>
 {
     @Override
     protected CompletableFuture<List<? extends Location>> send(ReferenceProvider provider,

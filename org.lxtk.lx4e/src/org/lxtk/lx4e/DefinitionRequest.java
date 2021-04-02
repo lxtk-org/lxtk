@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -26,13 +26,13 @@ import org.lxtk.DefinitionProvider;
  * Requests definition locations for the symbol denoted by the given text document position.
  */
 public class DefinitionRequest
-    extends LanguageFeatureRequest<DefinitionProvider, DefinitionParams,
-        Either<List<? extends Location>, List<? extends LocationLink>>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<DefinitionProvider,
+        DefinitionParams, Either<List<? extends Location>, List<? extends LocationLink>>>
 {
     @Override
     protected CompletableFuture<
         Either<List<? extends Location>, List<? extends LocationLink>>> send(
-        DefinitionProvider provider, DefinitionParams params)
+            DefinitionProvider provider, DefinitionParams params)
     {
         setTitle(MessageFormat.format(Messages.DefinitionRequest_title, params));
         return provider.getDefinition(params);

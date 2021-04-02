@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,9 +12,7 @@
  *******************************************************************************/
 package org.lxtk;
 
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import org.lxtk.util.Disposable;
 
@@ -40,14 +38,12 @@ public interface CommandService
     Disposable addCommand(String command, CommandHandler handler);
 
     /**
-     * Executes the given command using the given arguments.
+     * Returns the handler currently associated with the given command.
      *
-     * @param command the command identifier (not <code>null</code>)
-     * @param arguments the command arguments (may be <code>null</code> or empty)
-     * @return result future, or <code>null</code> if a command with the given
-     *  identifier is not present
+     * @param command may be <code>null</code>, in which case <code>null</code> is returned
+     * @return the corresponding handler, or <code>null</code> if none
      */
-    CompletableFuture<Object> executeCommand(String command, List<Object> arguments);
+    CommandHandler getCommandHandler(String command);
 
     /**
      * Returns all commands currently known to this service.

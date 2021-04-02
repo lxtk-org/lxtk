@@ -133,15 +133,9 @@ public final class CodeActionFeature
             }
 
             @Override
-            public boolean supportsResolveCodeAction()
-            {
-                return Boolean.TRUE.equals(options.getResolveProvider());
-            }
-
-            @Override
             public CompletableFuture<CodeAction> resolveCodeAction(CodeAction unresolved)
             {
-                if (!supportsResolveCodeAction())
+                if (!Boolean.TRUE.equals(options.getResolveProvider()))
                     throw new UnsupportedOperationException();
 
                 return getLanguageServer().getTextDocumentService().resolveCodeAction(unresolved);

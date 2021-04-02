@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -26,8 +26,8 @@ import org.lxtk.TypeDefinitionProvider;
  * Requests type definition locations for the symbol denoted by the given text document position.
  */
 public class TypeDefinitionRequest
-    extends LanguageFeatureRequest<TypeDefinitionProvider, TypeDefinitionParams,
-        Either<List<? extends Location>, List<? extends LocationLink>>>
+    extends LanguageFeatureRequestWithWorkDoneAndPartialResultProgress<TypeDefinitionProvider,
+        TypeDefinitionParams, Either<List<? extends Location>, List<? extends LocationLink>>>
 {
     @Override
     protected CompletableFuture<

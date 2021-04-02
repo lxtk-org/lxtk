@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -13,11 +13,9 @@
 package org.lxtk;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.lxtk.util.Disposable;
@@ -46,12 +44,11 @@ public class DefaultCommandService
     }
 
     @Override
-    public CompletableFuture<Object> executeCommand(String command, List<Object> arguments)
+    public CommandHandler getCommandHandler(String command)
     {
-        CommandHandler handler = commands.get(command);
-        if (handler == null)
+        if (command == null)
             return null;
-        return handler.execute(arguments);
+        return commands.get(command);
     }
 
     @Override
