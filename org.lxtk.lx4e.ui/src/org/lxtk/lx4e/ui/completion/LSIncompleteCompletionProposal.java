@@ -416,7 +416,9 @@ class LSIncompleteCompletionProposal
 
     protected void apply(IDocument document, char trigger, int stateMask, int offset) {
         String insertText = null;
-        TextEdit textEdit = item.getTextEdit().getLeft();
+        TextEdit textEdit = null;
+        if (item.getTextEdit() != null)
+            textEdit = item.getTextEdit().getLeft();
         try {
             if (textEdit == null) {
                 insertText = getInsertText();
