@@ -17,7 +17,7 @@
 <!--
    Currently, the Base Platform includes:
    * Eclipse SDK 4.10 (2018-12)
-   * Eclipse LSP4J 0.11
+   * Eclipse LSP4J 0.12.0
    * Eclipse Handly 1.5
    * Eclipse Mylyn WikiText 3.0.38
    * Eclipse TM4E 0.3.4
@@ -38,19 +38,19 @@
 <unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.equinox.concurrent" version="0.0.0"/>
-<unit id="com.google.gson" version="0.0.0"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/releases/2020-12/202012161000"/>
+<repository location="http://download.eclipse.org/releases/2021-03/202103171000"/>
 <unit id="org.eclipse.xtext.xbase.lib" version="0.0.0"/>
 <unit id="org.eclipse.mylyn.wikitext" version="0.0.0"/>
 <unit id="org.eclipse.mylyn.wikitext.markdown" version="0.0.0"/>
-<unit id="com.google.guava" version="0.0.0"/> <!-- Xbase requires Guava 27.1 -->
-<unit id="com.google.guava" version="21.0.0.v20170206-1425"/> <!-- Mylyn requires Guava 21 -->
+<unit id="com.google.gson" version="0.0.0"/>
+<unit id="com.google.guava" version="21.0.0.v20170206-1425"/>
+<unit id="com.google.guava" version="30.1.0.v20210127-2300"/> <!-- Mylyn requires Guava 21 -->
 <unit id="org.jsoup" version="0.0.0"/> <!-- required by Mylyn -->
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/lsp4j/updates/releases/0.11.0"/>
+<repository location="http://download.eclipse.org/lsp4j/updates/releases/0.12.0"/>
 <unit id="org.eclipse.lsp4j" version="0.0.0"/>
 <unit id="org.eclipse.lsp4j.jsonrpc" version="0.0.0"/>
 </location>

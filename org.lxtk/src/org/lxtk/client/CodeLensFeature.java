@@ -88,7 +88,7 @@ public final class CodeLensFeature
         CodeLensRegistrationOptions options = new CodeLensRegistrationOptions();
         options.setDocumentSelector(documentSelector);
         options.setWorkDoneProgress(capability.getWorkDoneProgress());
-        options.setResolveProvider(capability.isResolveProvider());
+        options.setResolveProvider(capability.getResolveProvider());
         register(new Registration(UUID.randomUUID().toString(), METHOD, options));
     }
 

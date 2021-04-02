@@ -22,19 +22,19 @@ The source code repository is available at <https://github.com/lxtk-org/lxtk>.
 
 ## Third-party Content
 
-Google Gson 2.8.x
+Google Gson 2.8.6
 
  * License: Apache-2.0
 
-Eclipse Handly 1.5.x
+Eclipse Handly 1.5.1
 
  * License: EPL-2.0
 
-Eclipse LSP4J 0.11
+Eclipse LSP4J 0.12.0
 
  * License: EPL-2.0
 
-Eclipse Mylyn WikiText 3.0.x
+Eclipse Mylyn WikiText 3.0.38
 
  * License: EPL-2.0
 
@@ -42,6 +42,6 @@ Eclipse Platform 4.10-4.19
 
  * License: EPL-2.0
 
-Eclipse TM4E 0.3.x-0.4.x
+Eclipse TM4E 0.3.4-0.4.1
 
  * License: EPL-2.0
