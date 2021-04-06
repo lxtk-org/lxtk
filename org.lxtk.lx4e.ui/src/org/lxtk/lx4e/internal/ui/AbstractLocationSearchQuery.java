@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -74,12 +74,17 @@ public abstract class AbstractLocationSearchQuery
         AbstractTextSearchResult result = (AbstractTextSearchResult)getSearchResult();
         result.removeAll();
 
-        return execute(location ->
+        IStatus status = execute(location ->
         {
             Match match = toMatch(location);
             if (match != null)
                 result.addMatch(match);
         }, monitor);
+
+        if (status.matches(IStatus.ERROR))
+            result.removeAll(); // don't use the provided partial results in case of error (per LSP spec)
+
+        return status;
     }
 
     /**

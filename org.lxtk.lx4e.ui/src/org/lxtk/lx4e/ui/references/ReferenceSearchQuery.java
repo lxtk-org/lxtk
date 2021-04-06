@@ -26,6 +26,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.ReferenceContext;
 import org.eclipse.lsp4j.ReferenceParams;
 import org.eclipse.search.ui.ISearchQuery;
+import org.lxtk.AbstractPartialResultProgress;
 import org.lxtk.DocumentService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
@@ -88,6 +89,16 @@ public class ReferenceSearchQuery
         request.setParams(params);
         request.setProgressMonitor(monitor);
         request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+        request.setUpPartialResultProgress(
+            () -> new AbstractPartialResultProgress<List<? extends Location>>()
+            {
+                @Override
+                protected void onAccept(List<? extends Location> locations)
+                {
+                    for (Location location : locations)
+                        acceptor.accept(location);
+                }
+            });
 
         List<? extends Location> locations;
         try
