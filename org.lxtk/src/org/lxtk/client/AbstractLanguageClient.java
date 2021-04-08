@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -104,6 +105,17 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     /**
+     * Returns the locale the client currently displays the user interface in.
+     * This need not necessarily be the locale of the operating system.
+     *
+     * @return the client locale (never <code>null</code>)
+     */
+    public Locale getLocale()
+    {
+        return Locale.getDefault(Locale.Category.DISPLAY);
+    }
+
+    /**
      * Returns the client info.
      *
      * @return the client info, or <code>null</code> if none
@@ -146,6 +158,8 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     @Override
     public void fillInitializeParams(InitializeParams params)
     {
+        params.setLocale(getLocale().toLanguageTag());
+
         params.setClientInfo(getClientInfo());
 
         for (Feature<? super S> feature : featureSet)
