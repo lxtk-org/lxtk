@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -93,7 +93,8 @@ public class ProtoLanguageClient
     protected AbstractLanguageClient<LanguageServer> getLanguageClient()
     {
         Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
-        features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE));
+        features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE,
+            Activator.getDefault().getDocumentProvider()));
         features.add(new CompletionFeature(LANGUAGE_SERVICE));
         features.add(new WorkspaceFoldersFeature(WORKSPACE_SERVICE));
         return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,

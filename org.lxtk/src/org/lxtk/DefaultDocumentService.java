@@ -43,7 +43,6 @@ public class DefaultDocumentService
         new EventEmitter<>();
     private final EventEmitter<TextDocumentChangeEvent> onDidChangeTextDocument =
         new EventEmitter<>();
-    private final EventEmitter<TextDocumentSaveEvent> onDidSaveTextDocument = new EventEmitter<>();
 
     @Override
     public Disposable addTextDocument(TextDocument document)
@@ -75,10 +74,6 @@ public class DefaultDocumentService
                 if (textDocuments.remove(uri, document))
                     onDidRemoveTextDocument.fire(document, getLogger());
             });
-
-            Disposable didSaveSubscription = document.onDidSave().subscribe(
-                event -> onDidSaveTextDocument.fire(event, getLogger()));
-            rollback.add(didSaveSubscription::dispose);
 
             rollback.setLogger(getLogger());
             return rollback::run;
@@ -122,12 +117,6 @@ public class DefaultDocumentService
     public EventStream<TextDocumentChangeEvent> onDidChangeTextDocument()
     {
         return onDidChangeTextDocument;
-    }
-
-    @Override
-    public EventStream<TextDocumentSaveEvent> onDidSaveTextDocument()
-    {
-        return onDidSaveTextDocument;
     }
 
     /**

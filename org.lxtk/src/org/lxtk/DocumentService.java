@@ -53,8 +53,7 @@ public interface DocumentService
      * <p>
      * This method must not try to acquire any kind of lock that might conflict
      * with any locks held during didAddTextDocument, didRemoveTextDocument,
-     * willChangeTextDocument, didChangeTextDocument, or didSaveTextDocument
-     * event notification.
+     * willChangeTextDocument, or didChangeTextDocument event notification.
      * </p>
      *
      * @return all text documents currently managed by the service
@@ -69,8 +68,7 @@ public interface DocumentService
      * <p>
      * This method must not try to acquire any kind of lock that might conflict
      * with any locks held during didAddTextDocument, didRemoveTextDocument,
-     * willChangeTextDocument, didChangeTextDocument, or didSaveTextDocument
-     * event notification.
+     * willChangeTextDocument, or didChangeTextDocument event notification.
      * </p>
      *
      * @param uri may be <code>null</code>, in which case <code>null</code>
@@ -127,12 +125,4 @@ public interface DocumentService
      *  changes (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onDidChangeTextDocument();
-
-    /**
-     * Returns an event emitter firing when a managed text document is saved.
-     *
-     * @return an event emitter firing when a managed text document is saved
-     *  (never <code>null</code>)
-     */
-    EventStream<TextDocumentSaveEvent> onDidSaveTextDocument();
 }

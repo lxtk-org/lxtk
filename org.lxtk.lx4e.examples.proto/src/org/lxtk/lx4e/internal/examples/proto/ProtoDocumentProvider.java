@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,10 +16,16 @@ import static org.lxtk.lx4e.examples.proto.ProtoCore.DOCUMENT_SERVICE;
 import static org.lxtk.lx4e.examples.proto.ProtoCore.LANGUAGE_ID;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.handly.buffer.TextFileBuffer;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
+import org.lxtk.TextDocument;
+import org.lxtk.TextDocumentSaveEvent;
+import org.lxtk.TextDocumentSaveEventSource;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.util.Disposable;
+import org.lxtk.util.EventEmitter;
+import org.lxtk.util.EventStream;
 import org.lxtk.util.SafeRun;
 
 /**
@@ -27,7 +33,16 @@ import org.lxtk.util.SafeRun;
  */
 public class ProtoDocumentProvider
     extends TextFileDocumentProvider
+    implements TextDocumentSaveEventSource
 {
+    private final EventEmitter<TextDocumentSaveEvent> onDidSaveTextDocument = new EventEmitter<>();
+
+    @Override
+    public EventStream<TextDocumentSaveEvent> onDidSaveTextDocument()
+    {
+        return onDidSaveTextDocument;
+    }
+
     @Override
     protected FileInfo createEmptyFileInfo()
     {
@@ -76,6 +91,21 @@ public class ProtoDocumentProvider
         {
             super.disposeFileInfo(element, info);
         }
+    }
+
+    @Override
+    protected void commitFileBuffer(IProgressMonitor monitor, FileInfo info, boolean overwrite)
+        throws CoreException
+    {
+        TextDocument document =
+            DOCUMENT_SERVICE.getTextDocument(info.fTextFileBuffer.getFileStore().toURI());
+
+        super.commitFileBuffer(monitor, info, overwrite);
+
+        if (document != null)
+            onDidSaveTextDocument.fire(
+                new TextDocumentSaveEvent(document, info.fTextFileBuffer.getDocument().get()),
+                e -> Activator.logError(e));
     }
 
     private static class XFileInfo

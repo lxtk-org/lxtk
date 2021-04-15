@@ -59,6 +59,7 @@ import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.TextDocumentChangeEventMergeBuilder;
 import org.lxtk.TextDocumentChangeEventMergeStrategy;
 import org.lxtk.TextDocumentSaveEvent;
+import org.lxtk.TextDocumentSaveEventSource;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
@@ -83,6 +84,7 @@ public final class TextDocumentSyncFeature
         new HashSet<>(Arrays.asList(DID_OPEN, DID_CLOSE, DID_CHANGE, DID_SAVE)));
 
     private final DocumentService documentService;
+    private final TextDocumentSaveEventSource saveEventSource;
     private LanguageServer languageServer;
     private Map<String, Map<String, TextDocumentRegistrationOptions>> registrations;
     private final Map<String, Disposable> subscriptions = new HashMap<>();
@@ -97,7 +99,20 @@ public final class TextDocumentSyncFeature
      */
     public TextDocumentSyncFeature(DocumentService documentService)
     {
+        this(documentService, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param documentService not <code>null</code>
+     * @param saveEventSource may be <code>null</code>
+     */
+    public TextDocumentSyncFeature(DocumentService documentService,
+        TextDocumentSaveEventSource saveEventSource)
+    {
         this.documentService = Objects.requireNonNull(documentService);
+        this.saveEventSource = saveEventSource;
     }
 
     /**
@@ -133,7 +148,8 @@ public final class TextDocumentSyncFeature
             ClientCapabilitiesUtil.getOrCreateSynchronization(
                 ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities));
         syncronization.setDynamicRegistration(true);
-        syncronization.setDidSave(true);
+        if (saveEventSource != null)
+            syncronization.setDidSave(true);
     }
 
     @Override
@@ -250,9 +266,9 @@ public final class TextDocumentSyncFeature
                     documentService.onDidChangeTextDocument().subscribe(this::onDidChange);
                 subsription = () -> Disposable.disposeAll(willChange, didChange);
             }
-            else if (DID_SAVE.equals(registrationMethod))
+            else if (DID_SAVE.equals(registrationMethod) && saveEventSource != null)
             {
-                subsription = documentService.onDidSaveTextDocument().subscribe(this::onDidSave);
+                subsription = saveEventSource.onDidSaveTextDocument().subscribe(this::onDidSave);
             }
             if (subsription != null)
                 subscriptions.put(registrationMethod, subsription);

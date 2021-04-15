@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.lxtk.lx4e.WorkspaceFoldersManager;
 import org.lxtk.util.SafeRun;
 import org.lxtk.util.connect.Connectable;
@@ -44,9 +43,9 @@ public class Activator
 
     private Runnable stopRunnable;
     private ProtoLanguageClient languageClient;
-    private IDocumentProvider documentProvider;
+    private ProtoDocumentProvider documentProvider;
 
-    public IDocumentProvider getDocumentProvider()
+    public ProtoDocumentProvider getDocumentProvider()
     {
         return documentProvider;
     }
@@ -63,6 +62,8 @@ public class Activator
                 new WorkspaceFoldersManager(WORKSPACE_SERVICE);
             workspaceFoldersManager.startup();
             rollback.add(() -> workspaceFoldersManager.shutdown());
+
+            documentProvider = new ProtoDocumentProvider();
 
             languageClient = new ProtoLanguageClient();
             languageClient.connect();
@@ -111,8 +112,6 @@ public class Activator
                     }
                 }
             });
-
-            documentProvider = new ProtoDocumentProvider();
 
             rollback.setLogger(e -> logError(e));
             stopRunnable = rollback;

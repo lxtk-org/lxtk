@@ -64,12 +64,4 @@ public interface TextDocument
      *  (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onDidChange();
-
-    /**
-     * Returns an event emitter firing when the document is saved.
-     *
-     * @return an event emitter firing when the document is saved
-     *  (never <code>null</code>)
-     */
-    EventStream<TextDocumentSaveEvent> onDidSave();
 }
