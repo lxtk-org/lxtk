@@ -155,6 +155,9 @@ public class Activator
 
     public static void logError(Throwable e)
     {
-        logError(e.getMessage(), e);
+        String msg = e.getMessage();
+        if (msg == null)
+            msg = "An error has occurred";
+        logError(msg, e);
     }
 }

@@ -15,13 +15,28 @@ package org.lxtk.lx4e.internal.examples.proto;
 import static org.lxtk.lx4e.examples.proto.ProtoCore.DOCUMENT_SERVICE;
 import static org.lxtk.lx4e.examples.proto.ProtoCore.LANGUAGE_ID;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.handly.buffer.TextFileBuffer;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.lsp4j.TextDocumentSaveReason;
+import org.eclipse.lsp4j.TextEdit;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSaveEventSource;
+import org.lxtk.TextDocumentWillSaveEvent;
+import org.lxtk.TextDocumentWillSaveEventEmitter;
+import org.lxtk.TextDocumentWillSaveEventSource;
+import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.EventEmitter;
@@ -33,9 +48,23 @@ import org.lxtk.util.SafeRun;
  */
 public class ProtoDocumentProvider
     extends TextFileDocumentProvider
-    implements TextDocumentSaveEventSource
+    implements TextDocumentWillSaveEventSource, TextDocumentSaveEventSource
 {
+    private final TextDocumentWillSaveEventEmitter onWillSaveTextDocument =
+        new TextDocumentWillSaveEventEmitter();
     private final EventEmitter<TextDocumentSaveEvent> onDidSaveTextDocument = new EventEmitter<>();
+
+    @Override
+    public EventStream<TextDocumentWillSaveEvent> onWillSaveTextDocument()
+    {
+        return onWillSaveTextDocument;
+    }
+
+    @Override
+    public boolean supportsWaitUntil()
+    {
+        return true;
+    }
 
     @Override
     public EventStream<TextDocumentSaveEvent> onDidSaveTextDocument()
@@ -99,6 +128,34 @@ public class ProtoDocumentProvider
     {
         TextDocument document =
             DOCUMENT_SERVICE.getTextDocument(info.fTextFileBuffer.getFileStore().toURI());
+
+        if (document != null)
+        {
+            CompletableFuture<List<List<TextEdit>>> future = onWillSaveTextDocument.fire(document,
+                TextDocumentSaveReason.Manual, e -> Activator.logError(e));
+            List<List<TextEdit>> result = null;
+            try
+            {
+                result = future.get(1500, TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException | ExecutionException | TimeoutException e)
+            {
+                Activator.logError(e);
+            }
+            if (result != null && !result.isEmpty())
+            {
+                List<TextEdit> edits = new ArrayList<>();
+                result.forEach(edits::addAll);
+                try
+                {
+                    DocumentUtil.applyEdits(info.fTextFileBuffer.getDocument(), edits);
+                }
+                catch (MalformedTreeException | BadLocationException e)
+                {
+                    Activator.logError(e);
+                }
+            }
+        }
 
         super.commitFileBuffer(monitor, info, overwrite);
 

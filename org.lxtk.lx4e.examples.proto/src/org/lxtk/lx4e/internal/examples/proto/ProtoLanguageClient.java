@@ -94,6 +94,7 @@ public class ProtoLanguageClient
     {
         Collection<Feature<? super LanguageServer>> features = new ArrayList<>();
         features.add(new TextDocumentSyncFeature(DOCUMENT_SERVICE,
+            Activator.getDefault().getDocumentProvider(),
             Activator.getDefault().getDocumentProvider()));
         features.add(new CompletionFeature(LANGUAGE_SERVICE));
         features.add(new WorkspaceFoldersFeature(WORKSPACE_SERVICE));
