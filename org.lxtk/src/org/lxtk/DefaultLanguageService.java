@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -14,6 +14,7 @@ package org.lxtk;
 
 import java.util.function.Consumer;
 
+import org.eclipse.lsp4j.CallHierarchyCapabilities;
 import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CodeLensCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
@@ -42,6 +43,7 @@ import org.lxtk.util.Registry;
 public class DefaultLanguageService
     implements LanguageService
 {
+    private final Registry<CallHierarchyProvider> callHierarchyProviders = newRegistry();
     private final Registry<CodeActionProvider> codeActionProviders = newRegistry();
     private final Registry<CodeLensProvider> codeLensProviders = newRegistry();
     private final Registry<CompletionProvider> completionProviders = newRegistry();
@@ -60,6 +62,18 @@ public class DefaultLanguageService
     private final Registry<SignatureHelpProvider> signatureHelpProviders = newRegistry();
     private final Registry<TypeDefinitionProvider> typeDefinitionProviders = newRegistry();
     private final Registry<WorkspaceSymbolProvider> workspaceSymbolProviders = newRegistry();
+
+    @Override
+    public CallHierarchyCapabilities getCallHierarchyCapabilities()
+    {
+        return new CallHierarchyCapabilities();
+    }
+
+    @Override
+    public Registry<CallHierarchyProvider> getCallHierarchyProviders()
+    {
+        return callHierarchyProviders;
+    }
 
     @Override
     public CodeActionCapabilities getCodeActionCapabilities()

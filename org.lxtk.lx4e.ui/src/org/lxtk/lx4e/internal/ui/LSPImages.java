@@ -177,6 +177,53 @@ public class LSPImages {
         }
     }
 
+    public static ImageDescriptor imageDescriptorFromSymbolKind(SymbolKind kind) {
+        if (kind == null) {
+            return null;
+        }
+        switch (kind) {
+        case Array:
+            return getImageDescriptor(IMG_ARRAY);
+        case Boolean:
+            return getImageDescriptor(IMG_BOOLEAN);
+        case Class:
+            return getImageDescriptor(IMG_CLASS);
+        case Constant:
+            return getImageDescriptor(IMG_CONSTANT);
+        case Constructor:
+            return getImageDescriptor(IMG_CONSTRUCTOR);
+        case Enum:
+            return getImageDescriptor(IMG_ENUM);
+        case Field:
+            return getImageDescriptor(IMG_FIELD);
+        case File:
+            return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE);
+        case Function:
+            return getImageDescriptor(IMG_FUNCTION);
+        case Interface:
+            return getImageDescriptor(IMG_INTERACE);
+        case Method:
+            return getImageDescriptor(IMG_METHOD);
+        case Module:
+            return getImageDescriptor(IMG_MODULE);
+        case Namespace:
+            return getImageDescriptor(IMG_NAMESPACE);
+        case Number:
+            return getImageDescriptor(IMG_NUMBER);
+        case Package:
+            return getImageDescriptor(IMG_PACKAGE);
+        case Property:
+            return getImageDescriptor(IMG_PROPERTY);
+        case String:
+            return getImageDescriptor(IMG_STRING);
+        case Variable:
+            return getImageDescriptor(IMG_VARIABLE);
+        default:
+            // when the SymbolKind is out the cases above
+            return null;
+        }
+    }
+
     public static Image imageFromCompletionItem(CompletionItem completionItem) {
         CompletionItemKind kind = completionItem.getKind();
         switch (kind) {

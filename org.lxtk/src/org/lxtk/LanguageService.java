@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.lxtk;
 
+import org.eclipse.lsp4j.CallHierarchyCapabilities;
 import org.eclipse.lsp4j.CodeActionCapabilities;
 import org.eclipse.lsp4j.CodeLensCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
@@ -48,6 +49,21 @@ public interface LanguageService
     {
         return DefaultDocumentMatcher.INSTANCE;
     }
+
+    /**
+     * Returns call hierarchy capabilities provided by this service.
+     *
+     * @return call hierarchy capabilities (never <code>null</code>).
+     *  Clients may modify the returned object
+     */
+    CallHierarchyCapabilities getCallHierarchyCapabilities();
+
+    /**
+     * Returns the registry of call hierarchy providers for this service.
+     *
+     * @return the registry of call hierarchy providers (never <code>null</code>)
+     */
+    Registry<CallHierarchyProvider> getCallHierarchyProviders();
 
     /**
      * Returns code action capabilities provided by this service.

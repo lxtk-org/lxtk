@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,6 +19,8 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.messages"; //$NON-NLS-1$
 
+    public static String CallHierarchyIncomingCallsRequest_title;
+    public static String CallHierarchyOutgoingCallsRequest_title;
     public static String CodeActionRequest_title;
     public static String CompletionRequest_title;
     public static String CompletionResolveRequest_title;
@@ -31,6 +33,7 @@ class Messages
     public static String FoldingRangeRequest_title;
     public static String HoverRequest_title;
     public static String ImplementationRequest_title;
+    public static String PrepareCallHierarchyRequest_title;
     public static String PrepareRenameRequest_title;
     public static String ReferencesRequest_title;
     public static String RenameRequest_title;
