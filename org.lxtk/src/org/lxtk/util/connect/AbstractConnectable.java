@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -236,7 +236,7 @@ public abstract class AbstractConnectable
 
         /**
          * Closes the current connection, if any.
-         * <p></p>
+         * <p>
          * <ul>
          * <li>This method may not be called more than once.</li>
          * <li>This method may not be called before the {@link #connect()} method.</li>

@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * A label provider for {@link CallHierarchyElement}s.
+ * Default implementation of a label provider for {@link CallHierarchyElement}s.
  */
 public class CallHierarchyElementLabelProvider
     extends LabelProvider

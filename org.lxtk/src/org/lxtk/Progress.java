@@ -55,7 +55,6 @@ public interface Progress
      * <li>If not already completed, the progress completes when the given future is complete.
      * <li>If not already completed, the given future gets canceled when the progress is canceled.
      * </ul>
-     * </p>
      *
      * @param future not <code>null</code>
      */

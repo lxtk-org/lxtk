@@ -28,8 +28,8 @@ import org.eclipse.ui.IEditorPart;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 
 /**
- * Partial implementation of a call hierarchy view. The view expects input elements of type
- * {@link CallHierarchyElement}.
+ * Partial implementation of LXTK-based call hierarchy view.
+ * The view expects input elements of type {@link CallHierarchyElement}.
  */
 public abstract class AbstractCallHierarchyView
     extends CallHierarchyViewPart

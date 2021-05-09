@@ -23,7 +23,7 @@ import org.lxtk.DocumentUri;
 import org.lxtk.lx4e.internal.ui.LSPImages;
 
 /**
- * Represents a model element of the call hierarchy view.
+ * Represents a model element of LXTK-based call hierarchy view.
  */
 public final class CallHierarchyElement
     implements IAdaptable

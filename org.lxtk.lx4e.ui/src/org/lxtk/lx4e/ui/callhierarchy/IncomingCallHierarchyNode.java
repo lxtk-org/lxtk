@@ -25,7 +25,7 @@ import org.eclipse.lsp4j.CallHierarchyIncomingCall;
 import org.lxtk.DocumentUri;
 
 /**
- * Represents an incoming node of a call hierarchy.
+ * Represents an incoming node of LXTK-based call hierarchy.
  */
 public final class IncomingCallHierarchyNode
     extends CallHierarchyNode

@@ -42,8 +42,8 @@ import org.lxtk.lx4e.ui.EditorHelper;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
- * Partial implementation of a handler that opens a call hierarchy for the current text selection
- * in the active editor.
+ * Partial implementation of a handler that opens LXTK-based call hierarchy for the current
+ * text selection in the active editor.
  */
 public abstract class AbstractOpenCallHierarchyHandler
     extends AbstractHandler
