@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
+package org.lxtk.lx4e.requests;
 
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.lxtk.PartialResultProgress;
 import org.lxtk.WorkDoneProgress;
+import org.lxtk.lx4e.ProgressSupport;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.util.FutureSupport;
 

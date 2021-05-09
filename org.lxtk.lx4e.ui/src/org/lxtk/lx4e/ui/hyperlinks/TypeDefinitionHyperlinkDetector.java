@@ -29,8 +29,8 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.TypeDefinitionProvider;
-import org.lxtk.lx4e.Request;
-import org.lxtk.lx4e.TypeDefinitionRequest;
+import org.lxtk.lx4e.requests.Request;
+import org.lxtk.lx4e.requests.TypeDefinitionRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**

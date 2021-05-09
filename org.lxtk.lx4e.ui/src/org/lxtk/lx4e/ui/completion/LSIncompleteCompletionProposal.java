@@ -73,11 +73,11 @@ import org.lxtk.CommandService;
 import org.lxtk.CompletionProvider;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
-import org.lxtk.lx4e.CompletionResolveRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
+import org.lxtk.lx4e.requests.CompletionResolveRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 import org.lxtk.lx4e.util.Markdown;
 

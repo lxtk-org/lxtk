@@ -39,11 +39,11 @@ import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.CallHierarchyProvider;
 import org.lxtk.DefaultWorkDoneProgress;
-import org.lxtk.lx4e.CallHierarchyIncomingCallsRequest;
-import org.lxtk.lx4e.CallHierarchyOutgoingCallsRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.IUriHandler;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.requests.CallHierarchyIncomingCallsRequest;
+import org.lxtk.lx4e.requests.CallHierarchyOutgoingCallsRequest;
 
 /**
  * Serves as a basis for the implementation of {@link IncomingCallHierarchyNode} and

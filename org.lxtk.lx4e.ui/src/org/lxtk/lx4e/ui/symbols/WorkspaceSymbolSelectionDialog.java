@@ -38,8 +38,8 @@ import org.lxtk.lx4e.EfsUriHandler;
 import org.lxtk.lx4e.IUriHandler;
 import org.lxtk.lx4e.ResourceUriHandler;
 import org.lxtk.lx4e.UriHandlers;
-import org.lxtk.lx4e.WorkspaceSymbolRequest;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.requests.WorkspaceSymbolRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**

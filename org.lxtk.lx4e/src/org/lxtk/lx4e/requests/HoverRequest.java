@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -10,24 +10,25 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
+package org.lxtk.lx4e.requests;
 
 import java.text.MessageFormat;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.lsp4j.CompletionItem;
-import org.lxtk.CompletionProvider;
+import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.HoverParams;
+import org.lxtk.HoverProvider;
 
 /**
- * Requests additional information for the given completion item.
+ * Requests hover information for the given text document position.
  */
-public class CompletionResolveRequest
-    extends LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>
+public class HoverRequest
+    extends LanguageFeatureRequestWithWorkDoneProgress<HoverProvider, HoverParams, Hover>
 {
     @Override
-    protected CompletableFuture<CompletionItem> send(CompletionProvider provider, CompletionItem item)
+    protected CompletableFuture<Hover> send(HoverProvider provider, HoverParams params)
     {
-        setTitle(MessageFormat.format(Messages.CompletionResolveRequest_title, item));
-        return provider.resolveCompletionItem(item);
+        setTitle(MessageFormat.format(Messages.HoverRequest_title, params));
+        return provider.getHover(params);
     }
 }

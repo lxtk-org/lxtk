@@ -57,12 +57,12 @@ import org.lxtk.DocumentSymbolProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageService;
 import org.lxtk.TextDocumentChangeEvent;
-import org.lxtk.lx4e.DocumentSymbolRequest;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.lx4e.EclipseTextDocumentChangeEvent;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.model.ILanguageSourceFile;
 import org.lxtk.lx4e.model.ILanguageSymbol;
+import org.lxtk.lx4e.requests.DocumentSymbolRequest;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.SafeRun;
 

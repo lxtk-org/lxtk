@@ -32,9 +32,9 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.ReferenceProvider;
-import org.lxtk.lx4e.ReferencesRequest;
 import org.lxtk.lx4e.internal.ui.AbstractLocationSearchQuery;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.requests.ReferencesRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**

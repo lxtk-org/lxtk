@@ -34,7 +34,7 @@ import org.lxtk.DocumentUri;
 import org.lxtk.FoldingRangeProvider;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
-import org.lxtk.lx4e.FoldingRangeRequest;
+import org.lxtk.lx4e.requests.FoldingRangeRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 import org.lxtk.util.Disposable;
 

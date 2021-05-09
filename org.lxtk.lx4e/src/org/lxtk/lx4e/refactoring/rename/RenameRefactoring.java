@@ -39,11 +39,11 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.RenameProvider;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.PrepareRenameRequest;
-import org.lxtk.lx4e.RenameRequest;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
+import org.lxtk.lx4e.requests.PrepareRenameRequest;
+import org.lxtk.lx4e.requests.RenameRequest;
 
 /**
  * Default implementation of a rename refactoring that uses a {@link

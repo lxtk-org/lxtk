@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -38,10 +38,10 @@ import org.lxtk.HoverProvider;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.HoverRequest;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.FocusableInformationControlCreator;
 import org.lxtk.lx4e.internal.ui.StyledBrowserInformationControlInput;
+import org.lxtk.lx4e.requests.HoverRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 import org.lxtk.lx4e.util.Markdown;

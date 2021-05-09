@@ -31,8 +31,8 @@ import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.Request;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.requests.Request;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**

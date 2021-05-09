@@ -36,10 +36,10 @@ import org.lxtk.DocumentRangeFormattingProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
-import org.lxtk.lx4e.DocumentFormattingRequest;
-import org.lxtk.lx4e.DocumentRangeFormattingRequest;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.Request;
+import org.lxtk.lx4e.requests.DocumentFormattingRequest;
+import org.lxtk.lx4e.requests.DocumentRangeFormattingRequest;
+import org.lxtk.lx4e.requests.Request;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**

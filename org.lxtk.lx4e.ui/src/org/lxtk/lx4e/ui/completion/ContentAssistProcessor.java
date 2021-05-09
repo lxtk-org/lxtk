@@ -48,11 +48,11 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.SignatureHelpProvider;
-import org.lxtk.lx4e.CompletionRequest;
 import org.lxtk.lx4e.DocumentUtil;
-import org.lxtk.lx4e.SignatureHelpRequest;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.LSPImages;
+import org.lxtk.lx4e.requests.CompletionRequest;
+import org.lxtk.lx4e.requests.SignatureHelpRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**

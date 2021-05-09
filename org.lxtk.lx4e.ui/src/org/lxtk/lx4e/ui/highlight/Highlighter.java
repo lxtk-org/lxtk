@@ -53,9 +53,9 @@ import org.lxtk.DocumentHighlightProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
-import org.lxtk.lx4e.DocumentHighlightRequest;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.requests.DocumentHighlightRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**

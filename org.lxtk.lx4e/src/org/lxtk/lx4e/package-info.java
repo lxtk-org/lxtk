@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -50,13 +50,6 @@
  * text documents managed by a given {@link org.lxtk.DocumentService}</li>
  * <li>{@link org.lxtk.lx4e.UriHandlers} provides static methods for operating on
  * <code>IUriHandler</code>s</li>
- * </ul>
- *
- * <h2>Requests</h2>
- * <ul>
- * <li>A hierarchy of {@link org.lxtk.lx4e.Request} classes is provided for making synchronous
- * requests to asynchronous {@linkplain org.lxtk.LanguageFeatureProvider language feature providers}
- * </li>
  * </ul>
  *
  * <h2>Utilities</h2>

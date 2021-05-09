@@ -10,25 +10,24 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e;
+package org.lxtk.lx4e.requests;
 
 import java.text.MessageFormat;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.lsp4j.Hover;
-import org.eclipse.lsp4j.HoverParams;
-import org.lxtk.HoverProvider;
+import org.eclipse.lsp4j.CompletionItem;
+import org.lxtk.CompletionProvider;
 
 /**
- * Requests hover information for the given text document position.
+ * Requests additional information for the given completion item.
  */
-public class HoverRequest
-    extends LanguageFeatureRequestWithWorkDoneProgress<HoverProvider, HoverParams, Hover>
+public class CompletionResolveRequest
+    extends LanguageFeatureRequest<CompletionProvider, CompletionItem, CompletionItem>
 {
     @Override
-    protected CompletableFuture<Hover> send(HoverProvider provider, HoverParams params)
+    protected CompletableFuture<CompletionItem> send(CompletionProvider provider, CompletionItem item)
     {
-        setTitle(MessageFormat.format(Messages.HoverRequest_title, params));
-        return provider.getHover(params);
+        setTitle(MessageFormat.format(Messages.CompletionResolveRequest_title, item));
+        return provider.resolveCompletionItem(item);
     }
 }
