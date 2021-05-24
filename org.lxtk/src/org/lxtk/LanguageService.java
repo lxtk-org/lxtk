@@ -24,6 +24,7 @@ import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ImplementationCapabilities;
+import org.eclipse.lsp4j.LinkedEditingRangeCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
@@ -246,6 +247,21 @@ public interface LanguageService
      * @return the registry of implementation providers (never <code>null</code>)
      */
     Registry<ImplementationProvider> getImplementationProviders();
+
+    /**
+     * Returns linked editing range capabilities provided by this service.
+     *
+     * @return linked editing range capabilities (never <code>null</code>).
+     *  Clients may modify the returned object
+     */
+    LinkedEditingRangeCapabilities getLinkedEditingRangeCapabilities();
+
+    /**
+     * Returns the registry of linked editing range providers for this service.
+     *
+     * @return the registry of linked editing range providers (never <code>null</code>)
+     */
+    Registry<LinkedEditingRangeProvider> getLinkedEditingRangeProviders();
 
     /**
      * Returns references capabilities provided by this service.

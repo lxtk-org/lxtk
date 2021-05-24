@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -25,8 +25,10 @@ import org.lxtk.lx4e.refactoring.rename.RenameRefactoring;
 
 /**
  * Refactoring wizard for {@link RenameRefactoring}.
+ *
+ * @noextend This class is not intended to be subclassed by clients.
  */
-public final class RenameRefactoringWizard
+public class RenameRefactoringWizard
     extends RefactoringWizard
 {
     /**

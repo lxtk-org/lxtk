@@ -33,6 +33,7 @@ class Messages
     public static String FoldingRangeRequest_title;
     public static String HoverRequest_title;
     public static String ImplementationRequest_title;
+    public static String LinkedEditingRangeRequest_title;
     public static String PrepareCallHierarchyRequest_title;
     public static String PrepareRenameRequest_title;
     public static String ReferencesRequest_title;

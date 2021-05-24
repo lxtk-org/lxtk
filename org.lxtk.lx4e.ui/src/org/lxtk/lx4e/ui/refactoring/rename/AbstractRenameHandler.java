@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,7 +18,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -38,20 +37,20 @@ public abstract class AbstractRenameHandler
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException
     {
-        RenameRefactoring refactoring = createRefactoring(HandlerUtil.getActiveEditor(event));
-        if (refactoring != null)
-        {
-            RefactoringWizardOpenOperation op =
-                new RefactoringWizardOpenOperation(new RenameRefactoringWizard(refactoring));
-            try
-            {
-                op.run(HandlerUtil.getActiveShell(event), refactoring.getName());
-            }
-            catch (InterruptedException e)
-            {
-                // do nothing: got canceled by the user
-            }
-        }
+        IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
+        if (activeEditor == null)
+            return null;
+
+        RenameRefactoring refactoring = createRefactoring(activeEditor);
+        if (refactoring == null)
+            return null;
+
+        RenameRefactoringStarter starter = getRefactoringStarter(refactoring);
+        ITextEditor textEditor = getEditorHelper().getTextEditor(activeEditor);
+        if (textEditor != null && linkedModePreferred())
+            starter.startLinkedEditing(textEditor);
+        else
+            starter.startRefactoringWithDialog(HandlerUtil.getActiveShell(event), true);
         return null;
     }
 
@@ -71,8 +70,7 @@ public abstract class AbstractRenameHandler
     }
 
     /**
-     * Given a context object, creates and returns the corresponding
-     * {@link RenameRefactoring}.
+     * Given a context object, creates and returns the corresponding {@link RenameRefactoring}.
      *
      * @param context may be <code>null</code>
      * @return the created refactoring object, or <code>null</code>
@@ -115,8 +113,7 @@ public abstract class AbstractRenameHandler
     }
 
     /**
-     * Returns the corresponding {@link LanguageOperationTarget}
-     * for the given editor.
+     * Returns the corresponding {@link LanguageOperationTarget} for the given editor.
      *
      * @param editor never <code>null</code>
      * @return the corresponding <code>LanguageOperationTarget</code>,
@@ -125,7 +122,7 @@ public abstract class AbstractRenameHandler
     protected abstract LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor);
 
     /**
-     * Returns the {@link WorkspaceEditChangeFactory} for the refactoring.
+     * Returns the {@link WorkspaceEditChangeFactory} to be used by the rename refactoring.
      *
      * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
      */
@@ -139,5 +136,27 @@ public abstract class AbstractRenameHandler
     protected EditorHelper getEditorHelper()
     {
         return DefaultEditorHelper.INSTANCE;
+    }
+
+    /**
+     * Returns a starter for the given refactoring.
+     *
+     * @param refactoring never <code>null</code>
+     * @return the refactoring starter (not <code>null</code>)
+     */
+    protected RenameRefactoringStarter getRefactoringStarter(RenameRefactoring refactoring)
+    {
+        return new RenameRefactoringStarter(refactoring);
+    }
+
+    /**
+     * Returns whether this handler should start refactoring in linked editing mode,
+     * if available.
+     *
+     * @return <code>true</code> if linked mode should be used, and <code>false</code> otherwise
+     */
+    protected boolean linkedModePreferred()
+    {
+        return true;
     }
 }

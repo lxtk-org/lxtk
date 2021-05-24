@@ -26,6 +26,7 @@ import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ImplementationCapabilities;
+import org.eclipse.lsp4j.LinkedEditingRangeCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
@@ -57,6 +58,7 @@ public class DefaultLanguageService
     private final Registry<FoldingRangeProvider> foldingRangeProviders = newRegistry();
     private final Registry<HoverProvider> hoverProviders = newRegistry();
     private final Registry<ImplementationProvider> implementationProviders = newRegistry();
+    private final Registry<LinkedEditingRangeProvider> linkedEditingRangeProviders = newRegistry();
     private final Registry<ReferenceProvider> referenceProviders = newRegistry();
     private final Registry<RenameProvider> renameProviders = newRegistry();
     private final Registry<SignatureHelpProvider> signatureHelpProviders = newRegistry();
@@ -217,6 +219,18 @@ public class DefaultLanguageService
     public Registry<ImplementationProvider> getImplementationProviders()
     {
         return implementationProviders;
+    }
+
+    @Override
+    public LinkedEditingRangeCapabilities getLinkedEditingRangeCapabilities()
+    {
+        return new LinkedEditingRangeCapabilities();
+    }
+
+    @Override
+    public Registry<LinkedEditingRangeProvider> getLinkedEditingRangeProviders()
+    {
+        return linkedEditingRangeProviders;
     }
 
     @Override

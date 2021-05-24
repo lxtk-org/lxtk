@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -94,6 +94,10 @@ public class TypeScriptEditor
             if (outlinePage == null)
                 outlinePage = new TypeScriptOutlinePage(this);
             return adapter.cast(outlinePage);
+        }
+        else if (adapter == Highlighter.class)
+        {
+            return adapter.cast(highlighter);
         }
         return super.getAdapter(adapter);
     }

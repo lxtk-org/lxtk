@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -20,6 +20,7 @@ class Messages
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.refactoring.rename.messages"; //$NON-NLS-1$
 
     public static String AbstractRenameHandler_Refactoring_name;
+    public static String RenameRefactoringStarter_Refactoring_execution_error;
     public static String RenameRefactoringWizard_New_name_label;
 
     static
