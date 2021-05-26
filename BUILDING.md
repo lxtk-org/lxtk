@@ -3,7 +3,7 @@
 The build is based on [Apache Maven][1] and [Eclipse Tycho][2]
 and is easy to run on a local machine:
 
- 1. Make sure you have JDK 8 and Maven 3.5 or above installed.
+ 1. Make sure you have JDK 11 and Maven 3.6.3 or above installed.
  Both should be on the path.
 
  2. Make sure you have a local clone of the LXTK Git repository.

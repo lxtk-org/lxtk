@@ -10,6 +10,7 @@
 
    Contributors:
        Vladimir Piskarev (1C) - initial API and implementation
+       George Suaridze (1C) - build with tycho 2.3
 -->
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -27,13 +28,14 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.eclipse.tycho.extras</groupId>
-        <artifactId>tycho-source-feature-plugin</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
         <executions>
           <execution>
+            <id>feature-source</id>
             <phase>package</phase>
             <goals>
-              <goal>source-feature</goal>
+              <goal>feature-source</goal>
             </goals>
           </execution>
         </executions>
@@ -43,6 +45,7 @@
         <artifactId>tycho-p2-plugin</artifactId>
         <executions>
           <execution>
+            <id>attach-p2-metadata</id>
             <phase>package</phase>
             <goals>
               <goal>p2-metadata</goal>
