@@ -10,7 +10,7 @@
 
    Contributors:
        Vladimir Piskarev (1C) - initial API and implementation
-       George Suaridze (1C) - build with tycho 2.3
+       George Suaridze (1C)
 -->
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
