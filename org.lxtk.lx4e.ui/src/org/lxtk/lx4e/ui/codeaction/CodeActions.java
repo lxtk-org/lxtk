@@ -77,7 +77,6 @@ class CodeActions
         });
     }
 
-    // This method must be called in the UI thread.
     static void execute(CodeAction codeAction, String label,
         WorkspaceEditChangeFactory workspaceEditChangeFactory, CodeActionProvider provider)
     {
@@ -100,39 +99,42 @@ class CodeActions
                 // Note that it is important to execute the refactoring's change in the UI thread.
                 // Otherwise, there might be timing issues, e.g. incorrect modification stamps.
                 // See also org.eclipse.jdt.internal.ui.refactoring.RefactoringExecutionHelper.
-                try
+                PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
                 {
-                    ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
-                    // Note that WorkspaceModifyOperation is used to get EventLoopProgressMonitor.
-                    dialog.run(false, false, new WorkspaceModifyOperation()
+                    try
                     {
-                        @Override
-                        protected void execute(IProgressMonitor monitor)
-                            throws CoreException, InvocationTargetException, InterruptedException
+                        ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
+                        // Note that WorkspaceModifyOperation is used to get EventLoopProgressMonitor.
+                        dialog.run(false, false, new WorkspaceModifyOperation()
                         {
-                            try
+                            @Override
+                            protected void execute(IProgressMonitor monitor) throws CoreException,
+                                InvocationTargetException, InterruptedException
                             {
-                                operation.run(monitor);
+                                try
+                                {
+                                    operation.run(monitor);
 
-                                RefactoringStatus status = operation.getConditionStatus();
-                                status.merge(operation.getValidationStatus());
-                                if (status.hasFatalError())
-                                    throw new CoreException(
-                                        status.getEntryWithHighestSeverity().toStatus());
+                                    RefactoringStatus status = operation.getConditionStatus();
+                                    status.merge(operation.getValidationStatus());
+                                    if (status.hasFatalError())
+                                        throw new CoreException(
+                                            status.getEntryWithHighestSeverity().toStatus());
 
-                                future.complete(null);
+                                    future.complete(null);
+                                }
+                                catch (Throwable e)
+                                {
+                                    future.completeExceptionally(e);
+                                }
                             }
-                            catch (Throwable e)
-                            {
-                                future.completeExceptionally(e);
-                            }
-                        }
-                    });
-                }
-                catch (InvocationTargetException | InterruptedException e) // should not happen
-                {
-                    future.completeExceptionally(e);
-                }
+                        });
+                    }
+                    catch (InvocationTargetException | InterruptedException e) // should not happen
+                    {
+                        future.completeExceptionally(e);
+                    }
+                });
             }
             return future;
 
