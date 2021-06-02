@@ -28,10 +28,14 @@ class Messages
     public static String WorkspaceEditChangeFactory_Change_execution_failed_and_has_been_rolled_back;
     public static String WorkspaceEditChangeFactory_File_does_not_exist;
     public static String WorkspaceEditChangeFactory_Stale_workspace_edit;
+    public static String WorkspaceEditChangeFactory_Text_edit_group_default;
+    public static String WorkspaceEditChangeFactory_Text_edit_group_exact;
+    public static String WorkspaceEditChangeFactory_Text_edit_group_potential;
     public static String WorkspaceEditChangeFactory_Unsupported_create_operation;
     public static String WorkspaceEditChangeFactory_Unsupported_delete_operation;
     public static String WorkspaceEditChangeFactory_Unsupported_rename_operation;
     public static String WorkspaceEditChangeFactory_Unsupported_resource_operation_kind;
+    public static String WorkspaceEditRefactoring_Needs_confirmation;
 
     static
     {

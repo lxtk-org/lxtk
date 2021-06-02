@@ -299,7 +299,8 @@ public class RenameRefactoring
                 Messages.RenameRefactoring_No_workspace_edit);
 
         setWorkspaceEdit(workspaceEdit);
-        return new RefactoringStatus();
+
+        return super.checkFinalConditions(null);
     }
 
     /**

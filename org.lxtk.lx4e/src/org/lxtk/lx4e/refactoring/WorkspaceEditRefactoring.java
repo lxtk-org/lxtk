@@ -21,6 +21,7 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.lxtk.WorkspaceEditUtil;
 
 /**
  * A refactoring that performs the workspace transformation described by
@@ -74,6 +75,10 @@ public class WorkspaceEditRefactoring
     public RefactoringStatus checkFinalConditions(IProgressMonitor pm)
         throws CoreException, OperationCanceledException
     {
+        if (WorkspaceEditUtil.needsConfirmation(workspaceEdit))
+            return RefactoringStatus.createWarningStatus(
+                Messages.WorkspaceEditRefactoring_Needs_confirmation);
+
         return new RefactoringStatus();
     }
 

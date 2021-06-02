@@ -22,7 +22,6 @@ class Messages
     public static String AbstractItemsSelectionHandler_errorMessage;
     public static String EclipseLanguageClient_Edit_label;
     public static String EclipseLanguageClient_Message_title;
-    public static String EclipseLanguageClient_Operation_execution_error;
 
     static
     {

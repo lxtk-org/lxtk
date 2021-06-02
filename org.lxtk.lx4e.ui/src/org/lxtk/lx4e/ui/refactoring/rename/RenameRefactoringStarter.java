@@ -19,17 +19,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
-import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
-import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.ui.refactoring.RefactoringUI;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
@@ -43,10 +38,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
 import org.lxtk.lx4e.refactoring.rename.RenameRefactoring;
 import org.lxtk.lx4e.ui.highlight.Highlighter;
 import org.lxtk.lx4e.ui.highlight.HighlightingSynchronizer;
@@ -151,7 +146,7 @@ public class RenameRefactoringStarter
     }
 
     /**
-     * Starts refactoring directly. Throws {@link IllegalStateException} if refactoring needs
+     * Starts refactoring directly. Throws a runtime exception if refactoring needs
      * additional input from the user.
      *
      * @param parent the parent shell, or <code>null</code> to create a top-level shell
@@ -164,21 +159,14 @@ public class RenameRefactoringStarter
         if (newName.equals(refactoring.getCurrentName()))
             return;
 
-        PerformRefactoringOperation operation =
-            new PerformRefactoringOperation(refactoring, CheckConditionsOperation.ALL_CONDITIONS);
-        ProgressMonitorDialog dialog = new ProgressMonitorDialog(parent);
-        // Note that WorkspaceModifyOperation is used to get EventLoopProgressMonitor.
         try
         {
-            dialog.run(false, false, new WorkspaceModifyOperation()
+            RefactoringStatus status = RefactoringExecutor.execute(refactoring, parent);
+            if (status.hasFatalError())
             {
-                @Override
-                protected void execute(IProgressMonitor monitor)
-                    throws CoreException, InvocationTargetException, InterruptedException
-                {
-                    operation.run(monitor);
-                }
-            });
+                RefactoringUI.createRefactoringStatusDialog(status, parent, refactoring.getName(),
+                    false).open();
+            }
         }
         catch (InvocationTargetException e)
         {
@@ -186,19 +174,10 @@ public class RenameRefactoringStarter
                 MessageFormat.format(Messages.RenameRefactoringStarter_Refactoring_execution_error,
                     refactoring.getName()),
                 e.getCause()), StatusManager.LOG | StatusManager.SHOW);
-            return;
         }
         catch (InterruptedException e)
         {
-            return;
-        }
-
-        RefactoringStatus status = operation.getConditionStatus();
-        status.merge(operation.getValidationStatus());
-        if (status.hasFatalError())
-        {
-            RefactoringUI.createRefactoringStatusDialog(status, parent, refactoring.getName(),
-                false).open();
+            // do nothing: got canceled by the user
         }
     }
 

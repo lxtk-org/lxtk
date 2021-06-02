@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -116,7 +116,8 @@ public class Activator
 
     public static boolean isCancellation(Throwable e)
     {
-        return e instanceof OperationCanceledException || e instanceof CancellationException;
+        return e instanceof OperationCanceledException || e instanceof CancellationException
+            || e instanceof InterruptedException;
     }
 
     public static Image getImage(String symbolicName)

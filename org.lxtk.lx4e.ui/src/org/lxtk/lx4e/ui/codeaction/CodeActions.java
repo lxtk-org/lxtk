@@ -12,24 +12,18 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.codeaction;
 
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
-import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
-import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandHandler;
@@ -39,6 +33,7 @@ import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
@@ -93,44 +88,19 @@ class CodeActions
                     new WorkspaceEditRefactoring(label, workspaceEditChangeFactory);
                 refactoring.setWorkspaceEdit(edit);
 
-                PerformRefactoringOperation operation = new PerformRefactoringOperation(refactoring,
-                    CheckConditionsOperation.ALL_CONDITIONS);
-
-                // Note that it is important to execute the refactoring's change in the UI thread.
-                // Otherwise, there might be timing issues, e.g. incorrect modification stamps.
-                // See also org.eclipse.jdt.internal.ui.refactoring.RefactoringExecutionHelper.
                 PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
                 {
                     try
                     {
-                        ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
-                        // Note that WorkspaceModifyOperation is used to get EventLoopProgressMonitor.
-                        dialog.run(false, false, new WorkspaceModifyOperation()
-                        {
-                            @Override
-                            protected void execute(IProgressMonitor monitor) throws CoreException,
-                                InvocationTargetException, InterruptedException
-                            {
-                                try
-                                {
-                                    operation.run(monitor);
+                        RefactoringStatus status =
+                            RefactoringExecutor.execute(refactoring, getShell());
+                        if (status.hasFatalError())
+                            throw new CoreException(
+                                status.getEntryWithHighestSeverity().toStatus());
 
-                                    RefactoringStatus status = operation.getConditionStatus();
-                                    status.merge(operation.getValidationStatus());
-                                    if (status.hasFatalError())
-                                        throw new CoreException(
-                                            status.getEntryWithHighestSeverity().toStatus());
-
-                                    future.complete(null);
-                                }
-                                catch (Throwable e)
-                                {
-                                    future.completeExceptionally(e);
-                                }
-                            }
-                        });
+                        future.complete(null);
                     }
-                    catch (InvocationTargetException | InterruptedException e) // should not happen
+                    catch (Throwable e)
                     {
                         future.completeExceptionally(e);
                     }
