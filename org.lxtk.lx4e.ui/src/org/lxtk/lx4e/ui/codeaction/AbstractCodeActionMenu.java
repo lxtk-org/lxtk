@@ -38,7 +38,7 @@ import org.lxtk.CodeActionProvider;
 import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
@@ -150,11 +150,11 @@ public abstract class AbstractCodeActionMenu
     protected abstract LanguageOperationTarget getLanguageOperationTarget();
 
     /**
-     * Returns the {@link WorkspaceEditChangeFactory} for this menu.
+     * Returns the workspace edit change factory for this menu.
      *
-     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
+     * @return the workspace edit change factory (not <code>null</code>)
      */
-    protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
+    protected abstract IWorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
      * Returns the kinds of code actions to request.

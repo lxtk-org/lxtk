@@ -58,9 +58,9 @@ import org.lxtk.WorkDoneProgress;
 import org.lxtk.client.AbstractLanguageClient;
 import org.lxtk.client.Feature;
 import org.lxtk.lx4e.EclipseProgressService;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.util.Log;
 
@@ -73,7 +73,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
     extends AbstractLanguageClient<S>
 {
     private final ProgressService progressService = createProgressService();
-    private final WorkspaceEditChangeFactory workspaceEditChangeFactory;
+    private final IWorkspaceEditChangeFactory workspaceEditChangeFactory;
 
     /**
      * Constructor.
@@ -81,14 +81,14 @@ public class EclipseLanguageClient<S extends LanguageServer>
      * @param log the client's log (not <code>null</code>)
      * @param diagnosticConsumer the client's diagnostic consumer
      *  (not <code>null</code>)
-     * @param workspaceEditChangeFactory the {@link WorkspaceEditChangeFactory}
-     *  for the client (not <code>null</code>)
+     * @param workspaceEditChangeFactory the workspace edit change factory for the client
+     *  (not <code>null</code>)
      * @param features the client's features (not <code>null</code>).
      *  Subsequent modifications of the given collection will have no effect
      *  on the constructed instance
      */
     public EclipseLanguageClient(Log log, Consumer<PublishDiagnosticsParams> diagnosticConsumer,
-        WorkspaceEditChangeFactory workspaceEditChangeFactory,
+        IWorkspaceEditChangeFactory workspaceEditChangeFactory,
         Collection<Feature<? super S>> features)
     {
         super(log, diagnosticConsumer, features);

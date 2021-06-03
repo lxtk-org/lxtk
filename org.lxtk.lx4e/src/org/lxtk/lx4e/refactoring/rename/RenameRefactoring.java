@@ -39,8 +39,8 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.RenameProvider;
 import org.lxtk.lx4e.DocumentUtil;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.internal.Activator;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.lx4e.requests.PrepareRenameRequest;
 import org.lxtk.lx4e.requests.RenameRequest;
@@ -69,11 +69,11 @@ public class RenameRefactoring
      * @param document the target {@link IDocument} for the refactoring
      *  (not <code>null</code>)
      * @param offset the target document offset for the refactoring (0-based)
-     * @param changeFactory the {@link WorkspaceEditChangeFactory}
-     *  for the refactoring (not <code>null</code>)
+     * @param changeFactory the workspace edit change factory for the refactoring
+     *  (not <code>null</code>)
      */
     public RenameRefactoring(String name, LanguageOperationTarget target, IDocument document,
-        int offset, WorkspaceEditChangeFactory changeFactory)
+        int offset, IWorkspaceEditChangeFactory changeFactory)
     {
         super(name, changeFactory);
         this.target = Objects.requireNonNull(target);

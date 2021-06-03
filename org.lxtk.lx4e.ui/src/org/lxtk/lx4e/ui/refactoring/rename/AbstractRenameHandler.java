@@ -23,7 +23,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.rename.RenameRefactoring;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
 import org.lxtk.lx4e.ui.EditorHelper;
@@ -122,11 +122,11 @@ public abstract class AbstractRenameHandler
     protected abstract LanguageOperationTarget getLanguageOperationTarget(IEditorPart editor);
 
     /**
-     * Returns the {@link WorkspaceEditChangeFactory} to be used by the rename refactoring.
+     * Returns the workspace edit change factory to be used by the rename refactoring.
      *
-     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
+     * @return the workspace edit change factory (not <code>null</code>)
      */
-    protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
+    protected abstract IWorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
      * Returns the {@link EditorHelper} for this handler.

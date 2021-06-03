@@ -32,9 +32,9 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
@@ -73,7 +73,7 @@ class CodeActions
     }
 
     static void execute(CodeAction codeAction, String label,
-        WorkspaceEditChangeFactory workspaceEditChangeFactory, CodeActionProvider provider)
+        IWorkspaceEditChangeFactory workspaceEditChangeFactory, CodeActionProvider provider)
     {
         resolveIfNecessary(codeAction, provider).thenCompose(resolvedCodeAction ->
         {

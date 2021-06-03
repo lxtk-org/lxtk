@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,10 +17,10 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.ui.IEditorPart;
 import org.lxtk.LanguageOperationTarget;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.internal.examples.typescript.Activator;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptOperationTargetProvider;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptWorkspaceEditChangeFactory;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.refactoring.rename.RenameRefactoring;
 import org.lxtk.lx4e.ui.refactoring.rename.AbstractRenameHandler;
 import org.lxtk.lx4e.util.DefaultWordFinder;
@@ -62,7 +62,7 @@ public class RenameHandler
     }
 
     @Override
-    protected WorkspaceEditChangeFactory getWorkspaceEditChangeFactory()
+    protected IWorkspaceEditChangeFactory getWorkspaceEditChangeFactory()
     {
         return TypeScriptWorkspaceEditChangeFactory.INSTANCE;
     }

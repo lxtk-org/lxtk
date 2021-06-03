@@ -70,15 +70,17 @@ import org.lxtk.WorkspaceEditUtil;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EfsUriHandler;
 import org.lxtk.lx4e.IUriHandler;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ResourceUriHandler;
 import org.lxtk.lx4e.TextDocumentUriHandler;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.internal.util.ChangeUtil;
 
 /**
- * Creates a {@link Change} object for a given {@link WorkspaceEdit}.
+ * Default implementation of {@link IWorkspaceEditChangeFactory}.
  */
 public class WorkspaceEditChangeFactory
+    implements IWorkspaceEditChangeFactory
 {
     /**
      * The associated {@link DocumentService} (never <code>null</code>).
@@ -114,21 +116,7 @@ public class WorkspaceEditChangeFactory
         this.uriHandler = Objects.requireNonNull(uriHandler);
     }
 
-    /**
-     * Creates a {@link Change} object that performs the workspace transformation
-     * described by the given {@link WorkspaceEdit}.
-     *
-     * @param name the human readable name of the change. Will
-     *  be used to display the change in the user interface
-     * @param workspaceEdit a {@link WorkspaceEdit} describing the workspace
-     *  transformation that will be performed by the change (not <code>null</code>)
-     * @param pm a progress monitor, or <code>null</code>
-     *  if progress reporting is not desired. The caller must not rely on
-     *  {@link IProgressMonitor#done()} having been called by the receiver
-     * @return the created change (never <code>null</code>)
-     * @throws CoreException if this method could not create a change
-     * @throws OperationCanceledException if this method is canceled
-     */
+    @Override
     public Change createChange(String name, WorkspaceEdit workspaceEdit, IProgressMonitor pm)
         throws CoreException
     {

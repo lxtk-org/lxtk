@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.codeaction.AbstractMarkerResolutionGenerator;
 
 /**
@@ -38,7 +38,7 @@ public class TypeScriptMarkerResolutionGenerator
     }
 
     @Override
-    protected WorkspaceEditChangeFactory getWorkspaceEditChangeFactory()
+    protected IWorkspaceEditChangeFactory getWorkspaceEditChangeFactory()
     {
         return TypeScriptWorkspaceEditChangeFactory.INSTANCE;
     }

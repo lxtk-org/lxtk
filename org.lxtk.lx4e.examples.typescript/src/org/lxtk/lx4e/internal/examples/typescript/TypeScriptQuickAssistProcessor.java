@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.lxtk.LanguageOperationTarget;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.codeaction.AbstractQuickAssistProcessor;
 
 /**
@@ -44,7 +44,7 @@ public class TypeScriptQuickAssistProcessor
     }
 
     @Override
-    protected WorkspaceEditChangeFactory getWorkspaceEditChangeFactory()
+    protected IWorkspaceEditChangeFactory getWorkspaceEditChangeFactory()
     {
         return TypeScriptWorkspaceEditChangeFactory.INSTANCE;
     }

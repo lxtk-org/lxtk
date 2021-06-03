@@ -49,10 +49,10 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.DocumentUtil;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.AnnotationInvocationContext;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
@@ -180,11 +180,11 @@ public abstract class AbstractQuickAssistProcessor
     protected abstract LanguageOperationTarget getLanguageOperationTarget();
 
     /**
-     * Returns the {@link WorkspaceEditChangeFactory} for this processor.
+     * Returns the workspace edit change factory for this processor.
      *
-     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
+     * @return the workspace edit change factory (not <code>null</code>)
      */
-    protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
+    protected abstract IWorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
      * Returns a new instance of {@link CodeActionRequest}.

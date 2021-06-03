@@ -34,8 +34,8 @@ import org.lxtk.CommandService;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.jsonrpc.DefaultGson;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
-import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
@@ -117,11 +117,11 @@ public abstract class AbstractMarkerResolutionGenerator
     protected abstract LanguageOperationTarget getLanguageOperationTarget(IMarker marker);
 
     /**
-     * Returns the {@link WorkspaceEditChangeFactory} for this generator.
+     * Returns the workspace edit change factory for this generator.
      *
-     * @return the <code>WorkspaceEditChangeFactory</code> (not <code>null</code>)
+     * @return the workspace edit change factory (not <code>null</code>)
      */
-    protected abstract WorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
+    protected abstract IWorkspaceEditChangeFactory getWorkspaceEditChangeFactory();
 
     /**
      * Returns the timeout for a code action request.

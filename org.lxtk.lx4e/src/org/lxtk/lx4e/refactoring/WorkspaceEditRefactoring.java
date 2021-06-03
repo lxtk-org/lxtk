@@ -22,6 +22,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.lxtk.WorkspaceEditUtil;
+import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 
 /**
  * A refactoring that performs the workspace transformation described by
@@ -31,17 +32,17 @@ public class WorkspaceEditRefactoring
     extends Refactoring
 {
     private final String name;
-    private final WorkspaceEditChangeFactory changeFactory;
+    private final IWorkspaceEditChangeFactory changeFactory;
     private WorkspaceEdit workspaceEdit;
 
     /**
      * Constructor.
      *
      * @param name the name of the refactoring (not <code>null</code>)
-     * @param changeFactory the {@link WorkspaceEditChangeFactory}
-     *  for the refactoring (not <code>null</code>)
+     * @param changeFactory the workspace edit change factory for the refactoring
+     *  (not <code>null</code>)
      */
-    public WorkspaceEditRefactoring(String name, WorkspaceEditChangeFactory changeFactory)
+    public WorkspaceEditRefactoring(String name, IWorkspaceEditChangeFactory changeFactory)
     {
         this.name = Objects.requireNonNull(name);
         this.changeFactory = Objects.requireNonNull(changeFactory);
