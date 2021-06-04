@@ -37,6 +37,7 @@ import org.eclipse.lsp4j.ServerInfo;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.WindowClientCapabilities;
+import org.eclipse.lsp4j.WindowShowMessageRequestCapabilities;
 import org.eclipse.lsp4j.WorkDoneProgressCancelParams;
 import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
@@ -135,6 +136,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
 
         WindowClientCapabilities window = new WindowClientCapabilities();
         window.setWorkDoneProgress(true);
+        window.setShowMessage(new WindowShowMessageRequestCapabilities());
         capabilities.setWindow(window);
 
         super.fillClientCapabilities(capabilities);
@@ -217,14 +219,25 @@ public class EclipseLanguageClient<S extends LanguageServer>
         CompletableFuture<MessageActionItem> future = new CompletableFuture<>();
         PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
         {
-            List<MessageActionItem> actions = params.getActions();
-            MessageDialog dialog = new MessageDialog(getShell(), getMessageTitle(params), null,
-                params.getMessage(), getDialogImageType(params), 0, getDialogButtonLabels(actions));
-            int index = dialog.open();
-            if (index == SWT.DEFAULT || actions == null || actions.isEmpty())
-                future.complete(null);
-            else
-                future.complete(actions.get(index));
+            try
+            {
+                List<MessageActionItem> actions = params.getActions();
+                MessageDialog dialog = new MessageDialog(getShell(), getMessageTitle(params), null,
+                    params.getMessage(), getDialogImageType(params), 0,
+                    getDialogButtonLabels(actions));
+                int index = dialog.open();
+                if (index == SWT.DEFAULT || actions == null || actions.isEmpty())
+                    future.complete(null);
+                else
+                    future.complete(actions.get(index));
+            }
+            catch (Throwable e)
+            {
+                future.completeExceptionally(new ResponseErrorException(
+                    new ResponseError(ResponseErrorCode.InternalError, e.toString(), null)));
+
+                Activator.logError(e);
+            }
         });
         return future;
     }
