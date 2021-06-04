@@ -13,6 +13,8 @@
 package org.lxtk.lx4e.ui;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +23,12 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
@@ -32,8 +39,12 @@ import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsCapabilities;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ResourceOperationKind;
 import org.eclipse.lsp4j.ServerInfo;
+import org.eclipse.lsp4j.ShowDocumentCapabilities;
+import org.eclipse.lsp4j.ShowDocumentParams;
+import org.eclipse.lsp4j.ShowDocumentResult;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.WindowClientCapabilities;
@@ -51,9 +62,16 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.lxtk.DocumentUri;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
 import org.lxtk.client.AbstractLanguageClient;
@@ -137,6 +155,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
         WindowClientCapabilities window = new WindowClientCapabilities();
         window.setWorkDoneProgress(true);
         window.setShowMessage(new WindowShowMessageRequestCapabilities());
+        window.setShowDocument(new ShowDocumentCapabilities(true));
         capabilities.setWindow(window);
 
         super.fillClientCapabilities(capabilities);
@@ -307,5 +326,107 @@ public class EclipseLanguageClient<S extends LanguageServer>
                 getLanguageServer().cancelProgress(new WorkDoneProgressCancelParams(token));
         });
         return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public CompletableFuture<ShowDocumentResult> showDocument(ShowDocumentParams params)
+    {
+        CompletableFuture<ShowDocumentResult> future = new CompletableFuture<>();
+        PlatformUI.getWorkbench().getDisplay().asyncExec(() ->
+        {
+            try
+            {
+                boolean success = false;
+                boolean external = Boolean.TRUE.equals(params.getExternal());
+                URI uri = DocumentUri.convert(params.getUri());
+                IFileStore fileStore = null;
+                try
+                {
+                    fileStore = EFS.getStore(uri);
+                }
+                catch (CoreException e)
+                {
+                    // fall through
+                }
+                if (fileStore != null)
+                {
+                    IFileInfo fileInfo = fileStore.fetchInfo();
+                    if (fileInfo.exists() && !fileInfo.isDirectory())
+                    {
+                        if (external)
+                        {
+                            IPath path = URIUtil.toPath(uri);
+                            success =
+                                Program.launch(path != null ? path.toOSString() : uri.toString());
+                        }
+                        else
+                        {
+                            IWorkbenchWindow window =
+                                PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                            if (window != null)
+                            {
+                                IWorkbenchPage page = window.getActivePage();
+                                if (page != null)
+                                {
+                                    EditorHelper editorHelper = getEditorHelper();
+                                    IEditorPart editor = null;
+                                    try
+                                    {
+                                        // TODO params.getTakeFocus() is ignored; fix requires Eclipse 4.13 (https://bugs.eclipse.org/516470)
+                                        editor = editorHelper.openEditor(page, uri);
+                                        success = true;
+                                    }
+                                    catch (PartInitException e)
+                                    {
+                                        Activator.logError(e);
+                                    }
+                                    if (editor != null)
+                                    {
+                                        Range range = params.getSelection();
+                                        if (range != null)
+                                            editorHelper.selectTextRange(editor, range);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else // no file store
+                {
+                    try
+                    {
+                        IWorkbenchBrowserSupport browserSupport =
+                            PlatformUI.getWorkbench().getBrowserSupport();
+                        IWebBrowser browser = external ? browserSupport.getExternalBrowser()
+                            : browserSupport.createBrowser(null);
+                        browser.openURL(uri.toURL());
+                        success = true;
+                    }
+                    catch (PartInitException | MalformedURLException e)
+                    {
+                        Activator.logError(e);
+                    }
+                }
+                future.complete(new ShowDocumentResult(success));
+            }
+            catch (Throwable e)
+            {
+                future.completeExceptionally(new ResponseErrorException(
+                    new ResponseError(ResponseErrorCode.InternalError, e.toString(), null)));
+
+                Activator.logError(e);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Returns the {@link EditorHelper} for this client.
+     *
+     * @return the editor helper (not <code>null</code>)
+     */
+    protected EditorHelper getEditorHelper()
+    {
+        return DefaultEditorHelper.INSTANCE;
     }
 }
