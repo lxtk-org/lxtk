@@ -20,7 +20,7 @@
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/releases/2021-03/202103171000"/>
+<repository location="http://download.eclipse.org/releases/2021-06/202106161001"/>
 <unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.ecf" version="0.0.0"/>
 <unit id="org.eclipse.ecf.filetransfer" version="0.0.0"/>
