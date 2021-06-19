@@ -372,8 +372,8 @@ public class EclipseLanguageClient<S extends LanguageServer>
                                     IEditorPart editor = null;
                                     try
                                     {
-                                        // TODO params.getTakeFocus() is ignored; fix requires Eclipse 4.13 (https://bugs.eclipse.org/516470)
-                                        editor = editorHelper.openEditor(page, uri);
+                                        editor = editorHelper.openEditor(page, uri,
+                                            !Boolean.FALSE.equals(params.getTakeFocus()));
                                         success = true;
                                     }
                                     catch (PartInitException e)

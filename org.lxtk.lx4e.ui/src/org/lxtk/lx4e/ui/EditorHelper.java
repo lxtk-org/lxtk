@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -66,18 +66,20 @@ public class EditorHelper
      *
      * @param page not <code>null</code>
      * @param location not <code>null</code>
+     * @param activate if <code>true</code> the editor will be activated
      * @return an open editor or <code>null</code> if an external editor
      *  was opened
      * @throws PartInitException if the editor could not be initialized
      */
-    public IEditorPart openEditor(IWorkbenchPage page, Location location) throws PartInitException
+    public IEditorPart openEditor(IWorkbenchPage page, Location location, boolean activate)
+        throws PartInitException
     {
         if (page == null)
             throw new IllegalArgumentException();
         if (location == null)
             throw new IllegalArgumentException();
 
-        IEditorPart editor = openEditor(page, DocumentUri.convert(location.getUri()));
+        IEditorPart editor = openEditor(page, DocumentUri.convert(location.getUri()), activate);
         if (editor != null)
             selectTextRange(editor, location.getRange());
 
@@ -93,11 +95,13 @@ public class EditorHelper
      *
      * @param page not <code>null</code>
      * @param uri not <code>null</code>
+     * @param activate if <code>true</code> the editor will be activated
      * @return an open editor or <code>null</code> if an external editor
      *  was opened
      * @throws PartInitException if the editor could not be initialized
      */
-    public IEditorPart openEditor(IWorkbenchPage page, URI uri) throws PartInitException
+    public IEditorPart openEditor(IWorkbenchPage page, URI uri, boolean activate)
+        throws PartInitException
     {
         if (page == null)
             throw new IllegalArgumentException();
@@ -113,7 +117,8 @@ public class EditorHelper
         {
             throw new PartInitException(e.getMessage(), e);
         }
-        return IDE.openEditorOnFileStore(page, fileStore);
+        return IDE.openEditor(page, uri,
+            IDE.getEditorDescriptorForFileStore(fileStore, true).getId(), activate);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -65,7 +65,7 @@ public class LocationHyperlink
         EditorHelper editorHelper = getEditorHelper();
         try
         {
-            editorHelper.openEditor(page, location);
+            editorHelper.openEditor(page, location, true);
         }
         catch (PartInitException e)
         {
