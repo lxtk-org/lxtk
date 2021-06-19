@@ -38,7 +38,7 @@ Eclipse Mylyn WikiText 3.0.38
 
  * License: EPL-2.0
 
-Eclipse Platform 4.10-4.20
+Eclipse Platform 4.13-4.20
 
  * License: EPL-2.0
 

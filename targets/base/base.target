@@ -16,7 +16,7 @@
 <target name="Base Platform">
 <!--
    Currently, the Base Platform includes:
-   * Eclipse SDK 4.10 (2018-12)
+   * Eclipse SDK 4.13 (2019-09)
    * Eclipse LSP4J 0.12.0
    * Eclipse Handly 1.5
    * Eclipse Mylyn WikiText 3.0.38
@@ -29,7 +29,7 @@
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/releases/2018-12/201812191000"/>
+<repository location="http://download.eclipse.org/releases/2019-09/201909181001"/>
 <unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.ecf" version="0.0.0"/>
 <unit id="org.eclipse.ecf.filetransfer" version="0.0.0"/>

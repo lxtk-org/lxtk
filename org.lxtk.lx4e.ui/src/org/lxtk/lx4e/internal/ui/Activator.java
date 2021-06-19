@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.ltk.ui.refactoring.RefactoringUI;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -144,6 +145,6 @@ public class Activator
     private static ImageDescriptor imageDescriptorFromSymbolicName(String symbolicName)
     {
         String path = "$nl$/icons/full" + symbolicName.substring(PLUGIN_ID.length()); //$NON-NLS-1$
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+        return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path).orElse(null);
     }
 }
