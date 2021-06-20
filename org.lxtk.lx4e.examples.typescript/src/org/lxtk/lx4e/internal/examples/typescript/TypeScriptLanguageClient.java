@@ -153,7 +153,7 @@ public class TypeScriptLanguageClient
         features.add(new SignatureHelpFeature(LANGUAGE_SERVICE));
         features.add(new TypeDefinitionFeature(LANGUAGE_SERVICE));
         features.add(new WorkspaceSymbolFeature(LANGUAGE_SERVICE, project));
-        return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
+        return new EclipseLanguageClient<>(log(), diagnosticConsumer,
             TypeScriptWorkspaceEditChangeFactory.INSTANCE, features)
         {
             @SuppressWarnings("deprecation")
@@ -177,7 +177,7 @@ public class TypeScriptLanguageClient
     @Override
     protected JsonRpcConnectionFactory<LanguageServer> getConnectionFactory()
     {
-        return new AbstractJsonRpcConnectionFactory<LanguageServer>()
+        return new AbstractJsonRpcConnectionFactory<>()
         {
             @Override
             protected StreamBasedConnection newStreamBasedConnection()

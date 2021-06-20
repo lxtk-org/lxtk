@@ -98,7 +98,7 @@ public class ProtoLanguageClient
             Activator.getDefault().getDocumentProvider()));
         features.add(new CompletionFeature(LANGUAGE_SERVICE));
         features.add(new WorkspaceFoldersFeature(WORKSPACE_SERVICE));
-        return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
+        return new EclipseLanguageClient<>(log(), diagnosticConsumer,
             new WorkspaceEditChangeFactory(DOCUMENT_SERVICE), features)
         {
             @Override
@@ -126,7 +126,7 @@ public class ProtoLanguageClient
     @Override
     protected JsonRpcConnectionFactory<LanguageServer> getConnectionFactory()
     {
-        return new AbstractJsonRpcConnectionFactory<LanguageServer>()
+        return new AbstractJsonRpcConnectionFactory<>()
         {
             @Override
             protected StreamBasedConnection newStreamBasedConnection()

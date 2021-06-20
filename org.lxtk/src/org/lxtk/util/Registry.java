@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -63,7 +63,7 @@ public interface Registry<E>
      */
     static <E> Registry<E> newInstance(Consumer<Throwable> logger)
     {
-        return new Registry<E>()
+        return new Registry<>()
         {
             private final Set<E> elements = new CopyOnWriteArraySet<>();
             private final EventEmitter<E> onDidAdd = new EventEmitter<>();
@@ -72,7 +72,7 @@ public interface Registry<E>
             @Override
             public Iterator<E> iterator()
             {
-                return new Iterator<E>() // "unmodifiable" iterator
+                return new Iterator<>() // "unmodifiable" iterator
                 {
                     private final Iterator<E> it = elements.iterator();
 

@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.lxtk
 Automatic-Module-Name: org.lxtk
 Bundle-Version: 0.3.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: org.lxtk;version="0.3.0",
  org.lxtk.client;version="0.3.0",
  org.lxtk.jsonrpc;version="0.3.0",

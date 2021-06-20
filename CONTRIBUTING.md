@@ -34,8 +34,7 @@ or suggest an enhancement:
 for LXTK. The recommended IDE configuration is described in the
 [tools/tools.p2f](tools/tools.p2f) file.
 
-LXTK currently uses `JavaSE-1.8` for compilation. Please add a matching JRE.
-Perfect match (i.e. Java SE 8) is recommended to avoid build warnings.
+LXTK currently uses `JavaSE-11` for compilation. Please add a matching JRE.
 
 LXTK uses specific code formatting conventions for Java. Please import and use
 the formatter profile provided in [tools/formatter.xml](tools/formatter.xml).

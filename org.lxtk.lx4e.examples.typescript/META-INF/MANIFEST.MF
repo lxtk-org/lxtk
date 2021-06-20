@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.lxtk.lx4e.examples.typescript;singleton:=true
 Automatic-Module-Name: org.lxtk.lx4e.examples.typescript
 Bundle-Version: 0.3.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Activator: org.lxtk.lx4e.internal.examples.typescript.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,

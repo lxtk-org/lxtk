@@ -111,7 +111,7 @@ public class JsonLanguageClient
         features.add(new DocumentSymbolFeature(LANGUAGE_SERVICE));
         features.add(new FoldingRangeFeature(LANGUAGE_SERVICE));
         features.add(new HoverFeature(LANGUAGE_SERVICE));
-        return new EclipseLanguageClient<LanguageServer>(log(), diagnosticConsumer,
+        return new EclipseLanguageClient<>(log(), diagnosticConsumer,
             JsonWorkspaceEditChangeFactory.INSTANCE, features)
         {
             @Override
@@ -162,7 +162,7 @@ public class JsonLanguageClient
     @Override
     protected JsonRpcConnectionFactory<LanguageServer> getConnectionFactory()
     {
-        return new AbstractJsonRpcConnectionFactory<LanguageServer>()
+        return new AbstractJsonRpcConnectionFactory<>()
         {
             @Override
             protected StreamBasedConnection newStreamBasedConnection()
