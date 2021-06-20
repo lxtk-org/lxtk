@@ -24,7 +24,7 @@
   <packaging>eclipse-repository</packaging>
   <properties>
     <lxtk.version.major>0</lxtk.version.major>
-    <lxtk.version.minor>2</lxtk.version.minor>
+    <lxtk.version.minor>3</lxtk.version.minor>
     <lxtk.version.service>0</lxtk.version.service>
     <lxtk.version>${lxtk.version.major}.${lxtk.version.minor}.${lxtk.version.service}.${buildQualifier}</lxtk.version>
     <ant-optional.version>1.5.3-1</ant-optional.version>
