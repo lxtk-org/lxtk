@@ -158,8 +158,8 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     @Override
     public void fillInitializeParams(InitializeParams params)
     {
+        params.setProcessId((int)ProcessHandle.current().pid());
         params.setLocale(getLocale().toLanguageTag());
-
         params.setClientInfo(getClientInfo());
 
         for (Feature<? super S> feature : featureSet)

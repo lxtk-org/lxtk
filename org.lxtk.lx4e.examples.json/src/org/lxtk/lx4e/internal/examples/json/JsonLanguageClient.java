@@ -119,7 +119,6 @@ public class JsonLanguageClient
             {
                 super.fillInitializeParams(params);
 
-                //params.setProcessId((int)ProcessHandle.current().pid()); // requires Java 9
                 params.setInitializationOptions(new Object()); // workaround for a bug in JSON LS
             }
 

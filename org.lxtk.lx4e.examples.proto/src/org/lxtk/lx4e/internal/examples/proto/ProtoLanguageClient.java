@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.lsp4j.DocumentFilter;
-import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.WorkspaceService;
@@ -105,14 +104,6 @@ public class ProtoLanguageClient
             public WorkspaceService getWorkspaceService()
             {
                 return WORKSPACE_SERVICE;
-            }
-
-            @Override
-            public void fillInitializeParams(InitializeParams params)
-            {
-                super.fillInitializeParams(params);
-
-                //params.setProcessId((int)ProcessHandle.current().pid()); // requires Java 9
             }
 
             @Override

@@ -162,7 +162,6 @@ public class TypeScriptLanguageClient
             {
                 super.fillInitializeParams(params);
 
-                //params.setProcessId((int)ProcessHandle.current().pid()); // requires Java 9
                 params.setRootUri(rootUri);
             }
 
