@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,30 +12,39 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.completion;
 
-import java.util.Comparator;
-
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalSorter;
 
 /**
- * An implementation of {@link ICompletionProposalSorter} for sorting proposals
- * created by {@link ContentAssistProcessor}.
+ * A sorter for completion proposals.
  */
-public class CompletionProposalSorter
-    implements ICompletionProposalSorter, Comparator<ICompletionProposal>
+public final class CompletionProposalSorter
+    implements ICompletionProposalSorter
 {
-    private static final Comparator<LSCompletionProposal> COMPARATOR =
-        new LSCompletionProposalComparator();
-
     @Override
     public int compare(ICompletionProposal p1, ICompletionProposal p2)
     {
-        if (p1 instanceof LSCompletionProposal && p2 instanceof LSCompletionProposal)
-            return COMPARATOR.compare((LSCompletionProposal)p1, (LSCompletionProposal)p2);
-        if (p1 instanceof LSCompletionProposal)
-            return -1;
-        if (p2 instanceof LSCompletionProposal)
-            return 1;
+        int s1 = getScore(p1);
+        int s2 = getScore(p2);
+        int scoreDiff = s2 - s1;
+        if (scoreDiff != 0)
+        {
+            return scoreDiff;
+        }
+        return getSortString(p1).compareToIgnoreCase(getSortString(p2));
+    }
+
+    private int getScore(ICompletionProposal p)
+    {
+        if (p instanceof IScoredCompletionProposal)
+            return ((IScoredCompletionProposal)p).getScore();
         return 0;
+    }
+
+    private String getSortString(ICompletionProposal p)
+    {
+        if (p instanceof IScoredCompletionProposal)
+            return ((IScoredCompletionProposal)p).getSortString();
+        return p.getDisplayString();
     }
 }

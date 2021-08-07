@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.CodeActionLiteralSupportCapabilities;
 import org.eclipse.lsp4j.CodeActionResolveSupportCapabilities;
 import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.CompletionItemCapabilities;
+import org.eclipse.lsp4j.CompletionItemInsertTextModeSupportCapabilities;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.CompletionItemTag;
@@ -32,6 +33,7 @@ import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ImplementationCapabilities;
+import org.eclipse.lsp4j.InsertTextMode;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.ParameterInformationCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
@@ -92,6 +94,10 @@ public class EclipseLanguageService
             Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         completionItem.setDeprecatedSupport(true);
         completionItem.setTagSupport(tagSupport);
+        completionItem.setCommitCharactersSupport(true);
+        completionItem.setInsertReplaceSupport(true);
+        completionItem.setInsertTextModeSupport(new CompletionItemInsertTextModeSupportCapabilities(
+            Arrays.asList(InsertTextMode.AsIs)));
 
         CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
         completionItemKind.setValueSet(Arrays.asList(CompletionItemKind.values()));

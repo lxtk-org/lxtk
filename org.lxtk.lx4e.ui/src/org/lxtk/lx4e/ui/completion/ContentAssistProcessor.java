@@ -50,7 +50,6 @@ import org.lxtk.LanguageService;
 import org.lxtk.SignatureHelpProvider;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
-import org.lxtk.lx4e.internal.ui.LSPImages;
 import org.lxtk.lx4e.requests.CompletionRequest;
 import org.lxtk.lx4e.requests.SignatureHelpRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
@@ -134,6 +133,12 @@ public class ContentAssistProcessor
         if (result == null)
             return null;
 
+        CompletionContext context = newCompletionContext();
+        context.setTextViewer(viewer);
+        context.setDocumentUri(documentUri);
+        context.setInvocationOffset(offset);
+        context.setCompletionProvider(provider);
+
         List<CompletionItem> items;
         boolean isIncomplete = false;
         if (result.isLeft())
@@ -146,12 +151,9 @@ public class ContentAssistProcessor
         List<ICompletionProposal> proposals = new ArrayList<>(items.size());
         for (CompletionItem item : items)
         {
-            ICompletionProposal proposal = isIncomplete
-                ? new LSIncompleteCompletionProposal(documentUri, document, offset, item, provider,
-                    getImage(item))
-                : new LSCompletionProposal(documentUri, document, offset, item, provider,
-                    getImage(item));
-            proposals.add(proposal);
+            ICompletionProposal proposal = toCompletionProposal(item, context, isIncomplete);
+            if (proposal != null)
+                proposals.add(proposal);
         }
         return proposals.toArray(NO_PROPOSALS);
     }
@@ -226,14 +228,30 @@ public class ContentAssistProcessor
     }
 
     /**
-     * Returns the image that corresponds to the given completion item.
+     * Returns a new instance of {@link CompletionContext}.
      *
-     * @param item never <code>null</code>
-     * @return the corresponding image, or <code>null</code> if none
+     * @return the created context (not <code>null</code>
      */
-    protected Image getImage(CompletionItem item)
+    protected CompletionContext newCompletionContext()
     {
-        return LSPImages.imageFromCompletionItem(item);
+        return new CompletionContext();
+    }
+
+    /**
+     * Converts the given completion item to a completion proposal.
+     *
+     * @param completionItem never <code>null</code>
+     * @param completionContext never <code>null</code>
+     * @param isCompletionListIncomplete indicates whether the computed list of completion items
+     *  is note complete
+     * @return the corresponding completion proposal, or <code>null</code> if none
+     */
+    protected ICompletionProposal toCompletionProposal(CompletionItem completionItem,
+        CompletionContext completionContext, boolean isCompletionListIncomplete)
+    {
+        return isCompletionListIncomplete
+            ? new BaseCompletionProposal(completionItem, completionContext)
+            : new CompletionProposal(completionItem, completionContext);
     }
 
     /**

@@ -35,6 +35,7 @@
   </properties>
   <modules>
     <module>../org.lxtk</module>
+    <module>../org.lxtk.tests</module>
     <module>../org.lxtk.lx4e</module>
     <module>../org.lxtk.lx4e.ui</module>
     <module>../org.lxtk.lx4e.examples.json</module>

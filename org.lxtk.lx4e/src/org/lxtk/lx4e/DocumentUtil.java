@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -173,6 +173,21 @@ public class DocumentUtil
     }
 
     /**
+     * Returns the replace edit corresponding to the given LSP text edit for the given document.
+     *
+     * @param document not <code>null</code>
+     * @param edit LSP text edit for the document (not <code>null</code>)
+     * @return the created {@link ReplaceEdit} (never <code>null</code>)
+     * @throws BadLocationException if the edit's range is invalid in the document
+     */
+    public static ReplaceEdit toReplaceEdit(IDocument document, TextEdit edit)
+        throws BadLocationException
+    {
+        IRegion r = toRegion(document, edit.getRange());
+        return new ReplaceEdit(r.getOffset(), r.getLength(), edit.getNewText());
+    }
+
+    /**
      * Returns the multi-text edit corresponding to the given sequence
      * of LSP text edits for the given document.
      *
@@ -189,8 +204,7 @@ public class DocumentUtil
         MultiTextEdit result = new MultiTextEdit();
         for (TextEdit edit : edits)
         {
-            IRegion r = toRegion(document, edit.getRange());
-            result.addChild(new ReplaceEdit(r.getOffset(), r.getLength(), edit.getNewText()));
+            result.addChild(toReplaceEdit(document, edit));
         }
         return result;
     }

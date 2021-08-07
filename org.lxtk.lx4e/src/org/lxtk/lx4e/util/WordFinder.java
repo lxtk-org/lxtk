@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2020 IBM Corporation and others.
+ * Copyright (c) 2000, 2021 IBM Corporation and others.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -72,7 +72,9 @@ public class WordFinder
 
         try
         {
-            if (!strict && offset > 0 && !isWordPart(document.getChar(offset)))
+            int length = document.getLength();
+            if (!strict && offset > 0
+                && (offset == length || !isWordPart(document.getChar(offset))))
                 --offset;
 
             int pos = offset;
@@ -84,9 +86,11 @@ public class WordFinder
             }
             while (pos >= 0);
 
-            start = pos;
+            if (pos == offset)
+                return null;
 
-            int length = document.getLength();
+            start = pos + 1;
+
             pos = offset;
             do
             {
@@ -103,13 +107,7 @@ public class WordFinder
             return null;
         }
 
-        if (start == offset && end == offset)
-            return null;
-
-        if (start == offset)
-            return new Region(start, end - start);
-
-        return new Region(start + 1, end - start - 1);
+        return new Region(start, end - start);
     }
 
     /**

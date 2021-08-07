@@ -19,8 +19,8 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.completion.messages"; //$NON-NLS-1$
 
-    public static String LSIncompleteCompletionProposal_Execution_error;
-    public static String LSIncompleteCompletionProposal_Tooltip_affordance_string;
+    public static String Execution_error;
+    public static String Tooltip_affordance_string;
 
     static
     {
