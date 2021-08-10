@@ -44,7 +44,7 @@ class SnippetParser
         SnippetDescription rootDesc = parseAny();
         try
         {
-            return new Evaluator(rootDesc).evaluate();
+            return new Evaluator(rootDesc, context).evaluate();
         }
         catch (SnippetException e)
         {
@@ -56,7 +56,8 @@ class SnippetParser
 
     private SnippetDescription parseAny()
     {
-        SnippetDescriptionBuilder builder = new SnippetDescriptionBuilder();
+        List<Node> nodes = new ArrayList<>();
+        StringBuilder text = new StringBuilder();
         boolean nested = cursor > 0;
         while (hasNextChar())
         {
@@ -67,8 +68,17 @@ class SnippetParser
             {
                 int savedCursor = cursor;
                 nextChar(); // eat '$'
-                if (parseTabStopOrVariable(builder))
+                Node node = parseTabStopOrVariable();
+                if (node != null)
+                {
+                    if (text.length() > 0)
+                    {
+                        nodes.add(new TextNode(text.toString()));
+                        text = new StringBuilder();
+                    }
+                    nodes.add(node);
                     continue;
+                }
                 cursor = savedCursor; // backtrack
             }
             nextChar();
@@ -77,61 +87,55 @@ class SnippetParser
                 char nextCh = peekNextChar();
                 if (nextCh == '$' || nextCh == '}' || nextCh == '\\')
                 {
-                    builder.text.append(nextCh);
+                    text.append(nextCh);
                     nextChar();
                     continue;
                 }
             }
-            builder.text.append(ch);
+            text.append(ch);
         }
-        return builder.toSnippetDescription();
+        if (text.length() > 0)
+            nodes.add(new TextNode(text.toString()));
+        return new SnippetDescription(Collections.unmodifiableList(nodes));
     }
 
-    private boolean parseTabStopOrVariable(SnippetDescriptionBuilder builder)
+    private Node parseTabStopOrVariable()
     {
-        return nextChar('{') ? parseComplexTabStopOrVariable(builder)
-            : parseSimpleTabStopOrVariable(builder);
+        return nextChar('{') ? parseComplexTabStopOrVariable() : parseSimpleTabStopOrVariable();
     }
 
-    private boolean parseSimpleTabStopOrVariable(SnippetDescriptionBuilder builder)
+    private Node parseSimpleTabStopOrVariable()
     {
         String number = parseInt();
         if (number != null)
         {
-            builder.tabStops.add(new TabStopDescription(number, builder.text.length()));
-            return true;
+            return new TabStopNode(number);
         }
         String name = parseIdent();
         if (name != null)
         {
-            if (context.isKnownVariable(name))
-                builder.text.append(context.resolveVariable(name, "")); //$NON-NLS-1$
-            else
-                builder.tabStops.add(new PlaceholderDescription(name, builder.text.length(),
-                    new SnippetDescription(name, Collections.emptyList())));
-            return true;
+            return context.isKnownVariable(name) ? new VariableNode(name, null)
+                : new PlaceholderNode(name,
+                    new SnippetDescription(Collections.singletonList(new TextNode(name))));
         }
-        return false;
+        return null;
     }
 
-    private boolean parseComplexTabStopOrVariable(SnippetDescriptionBuilder builder)
+    private Node parseComplexTabStopOrVariable()
     {
         String number = parseInt();
         if (number != null)
         {
             if (nextChar('}'))
             {
-                builder.tabStops.add(new TabStopDescription(number, builder.text.length()));
-                return true;
+                return new TabStopNode(number);
             }
             else if (nextChar(':'))
             {
                 SnippetDescription defaultValue = parseAny();
                 if (nextChar('}'))
                 {
-                    builder.tabStops.add(
-                        new PlaceholderDescription(number, builder.text.length(), defaultValue));
-                    return true;
+                    return new PlaceholderNode(number, defaultValue);
                 }
             }
             else if (nextChar('|'))
@@ -145,9 +149,7 @@ class SnippetParser
 
                 if (nextChar('|') && nextChar('}'))
                 {
-                    builder.tabStops.add(new ChoiceDescription(number, builder.text.length(),
-                        Collections.unmodifiableList(values)));
-                    return true;
+                    return new ChoiceNode(number, Collections.unmodifiableList(values));
                 }
             }
         }
@@ -158,35 +160,21 @@ class SnippetParser
             {
                 if (nextChar('}'))
                 {
-                    if (context.isKnownVariable(name))
-                        builder.text.append(context.resolveVariable(name, "")); //$NON-NLS-1$
-                    else
-                        builder.tabStops.add(new PlaceholderDescription(name, builder.text.length(),
-                            new SnippetDescription(name, Collections.emptyList())));
-                    return true;
+                    return context.isKnownVariable(name) ? new VariableNode(name, null)
+                        : new PlaceholderNode(name,
+                            new SnippetDescription(Collections.singletonList(new TextNode(name))));
                 }
                 else if (nextChar(':'))
                 {
                     SnippetDescription defaultValue = parseAny();
                     if (nextChar('}'))
                     {
-                        String value = context.resolveVariable(name);
-                        if (value != null)
-                            builder.text.append(value);
-                        else
-                        {
-                            for (TabStopDescription tabStop : defaultValue.tabStops)
-                            {
-                                builder.tabStops.add(tabStop.adjust(builder.text.length()));
-                            }
-                            builder.text.append(defaultValue.text);
-                        }
-                        return true;
+                        return new VariableNode(name, defaultValue);
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 
     private String parseChoiceValue()
@@ -286,91 +274,90 @@ class SnippetParser
         return false;
     }
 
-    private static class SnippetDescriptionBuilder
-    {
-        final StringBuilder text = new StringBuilder();
-        final List<TabStopDescription> tabStops = new ArrayList<>();
-
-        SnippetDescription toSnippetDescription()
-        {
-            return new SnippetDescription(text.toString(), Collections.unmodifiableList(tabStops));
-        }
-    }
-
     private static class SnippetDescription
     {
-        final String text;
-        final List<TabStopDescription> tabStops;
+        final List<Node> nodes;
 
-        SnippetDescription(String text, List<TabStopDescription> tabStops)
+        SnippetDescription(List<Node> nodes)
+        {
+            this.nodes = Objects.requireNonNull(nodes);
+        }
+    }
+
+    private interface Node
+    {
+    }
+
+    private static class TextNode
+        implements Node
+    {
+        final String text;
+
+        TextNode(String text)
         {
             this.text = Objects.requireNonNull(text);
-            this.tabStops = Objects.requireNonNull(tabStops);
         }
     }
 
-    private static class TabStopDescription
+    private static class TabStopNode
+        implements Node
     {
         final String id;
-        final int offset;
 
-        TabStopDescription(String id, int offset)
+        TabStopNode(String id)
         {
             this.id = Objects.requireNonNull(id);
-            this.offset = offset;
-        }
-
-        TabStopDescription adjust(int offsetDelta)
-        {
-            return new TabStopDescription(id, offset + offsetDelta);
         }
     }
 
-    private static class PlaceholderDescription
-        extends TabStopDescription
+    private static class PlaceholderNode
+        extends TabStopNode
     {
         final SnippetDescription defaultValue;
 
-        PlaceholderDescription(String id, int offset, SnippetDescription defaultValue)
+        PlaceholderNode(String id, SnippetDescription defaultValue)
         {
-            super(id, offset);
+            super(id);
             this.defaultValue = Objects.requireNonNull(defaultValue);
-        }
-
-        @Override
-        PlaceholderDescription adjust(int offsetDelta)
-        {
-            return new PlaceholderDescription(id, offset + offsetDelta, defaultValue);
         }
     }
 
-    private static class ChoiceDescription
-        extends TabStopDescription
+    private static class ChoiceNode
+        extends TabStopNode
     {
         final List<String> values;
 
-        ChoiceDescription(String id, int offset, List<String> values)
+        ChoiceNode(String id, List<String> values)
         {
-            super(id, offset);
+            super(id);
             this.values = Objects.requireNonNull(values);
         }
+    }
 
-        @Override
-        ChoiceDescription adjust(int offsetDelta)
+    private static class VariableNode
+        implements Node
+    {
+        final String name;
+        final SnippetDescription defaultValue;
+
+        VariableNode(String name, SnippetDescription defaultValue)
         {
-            return new ChoiceDescription(id, offset + offsetDelta, values);
+            this.name = Objects.requireNonNull(name);
+            this.defaultValue = defaultValue;
         }
     }
 
     private static class Evaluator
     {
         private final SnippetDescription rootDesc;
+        private final SnippetContext context;
         private final SnippetBuilder snippetBuilder = new SnippetBuilder();
-        private final Map<String, TabStopDescription> placeholdersOrChoices = new HashMap<>();
+        private final Map<String, TabStopNode> placeholdersOrChoices = new HashMap<>();
 
-        Evaluator(SnippetDescription rootDesc)
+        Evaluator(SnippetDescription rootDesc, SnippetContext context)
         {
             this.rootDesc = Objects.requireNonNull(rootDesc);
+            this.context = Objects.requireNonNull(context);
         }
 
         Snippet evaluate() throws SnippetException
@@ -381,25 +368,29 @@ class SnippetParser
 
         private void expand(SnippetDescription desc, TraversalState state) throws SnippetException
         {
-            int offset = 0;
-            for (TabStopDescription tabStop : desc.tabStops)
+            for (Node node : desc.nodes)
             {
-                snippetBuilder.text.append(desc.text.substring(offset, tabStop.offset));
-                offset = tabStop.offset;
-
-                expand(tabStop, state);
+                if (node instanceof TextNode)
+                    expand((TextNode)node);
+                else if (node instanceof TabStopNode)
+                    expand((TabStopNode)node, state);
+                else if (node instanceof VariableNode)
+                    expand((VariableNode)node, state);
             }
-            snippetBuilder.text.append(desc.text.substring(offset));
         }
 
-        private void expand(TabStopDescription tabStop, TraversalState state)
-            throws SnippetException
+        private void expand(TextNode node)
+        {
+            snippetBuilder.text.append(node.text);
+        }
+
+        private void expand(TabStopNode tabStop, TraversalState state) throws SnippetException
         {
             if (state == null)
                 state = new TraversalState();
 
             TabStopBuilder tabStopBuilder = snippetBuilder.getTabStopBuilder(tabStop.id);
-            TabStopDescription placeholderOrChoice = getPlaceholderOrChoice(tabStop.id);
+            TabStopNode placeholderOrChoice = getPlaceholderOrChoice(tabStop.id);
             state.mirror |= tabStop != placeholderOrChoice;
             int length = snippetBuilder.text.length();
 
@@ -408,9 +399,9 @@ class SnippetParser
             else
                 tabStopBuilder.offsets.add(length);
 
-            if (placeholderOrChoice instanceof PlaceholderDescription)
+            if (placeholderOrChoice instanceof PlaceholderNode)
             {
-                PlaceholderDescription placeholder = (PlaceholderDescription)placeholderOrChoice;
+                PlaceholderNode placeholder = (PlaceholderNode)placeholderOrChoice;
                 if (!state.visited.add(placeholder))
                     throw new SnippetException(MessageFormat.format(
                         Messages.getString("SnippetParser.EvaluationError.CyclicReference"), //$NON-NLS-1$
@@ -419,34 +410,48 @@ class SnippetParser
                 if (tabStopBuilder.values.isEmpty())
                     tabStopBuilder.values.add(snippetBuilder.text.substring(length));
             }
-            else if (placeholderOrChoice instanceof ChoiceDescription)
+            else if (placeholderOrChoice instanceof ChoiceNode)
             {
-                ChoiceDescription choice = (ChoiceDescription)placeholderOrChoice;
+                ChoiceNode choice = (ChoiceNode)placeholderOrChoice;
                 snippetBuilder.text.append(choice.values.get(0));
                 if (tabStopBuilder.values.isEmpty())
                     tabStopBuilder.values.addAll(choice.values);
             }
         }
 
-        private TabStopDescription getPlaceholderOrChoice(String id)
+        private void expand(VariableNode var, TraversalState state) throws SnippetException
+        {
+            String value = context.resolveVariable(var.name);
+            if (value != null)
+                snippetBuilder.text.append(value);
+            else if (var.defaultValue != null)
+                expand(var.defaultValue, state);
+
+        }
+
+        private TabStopNode getPlaceholderOrChoice(String id)
         {
             return placeholdersOrChoices.computeIfAbsent(id,
                 x -> findPlaceholderOrChoice(id, rootDesc));
         }
 
-        private static TabStopDescription findPlaceholderOrChoice(String id,
-            SnippetDescription desc)
+        private static TabStopNode findPlaceholderOrChoice(String id, SnippetDescription desc)
         {
-            for (TabStopDescription tabStop : desc.tabStops)
+            for (Node node : desc.nodes)
             {
-                if (tabStop.id.equals(id) && (tabStop instanceof PlaceholderDescription
-                    || tabStop instanceof ChoiceDescription))
-                    return tabStop;
+                if ((node instanceof PlaceholderNode || node instanceof ChoiceNode)
+                    && ((TabStopNode)node).id.equals(id))
+                    return (TabStopNode)node;
 
-                if (tabStop instanceof PlaceholderDescription)
+                SnippetDescription nestedDesc = null;
+                if (node instanceof PlaceholderNode)
+                    nestedDesc = ((PlaceholderNode)node).defaultValue;
+                else if (node instanceof VariableNode)
+                    nestedDesc = ((VariableNode)node).defaultValue;
+
+                if (nestedDesc != null)
                 {
-                    TabStopDescription result =
-                        findPlaceholderOrChoice(id, ((PlaceholderDescription)tabStop).defaultValue);
+                    TabStopNode result = findPlaceholderOrChoice(id, nestedDesc);
                     if (result != null)
                         return result;
                 }
@@ -501,7 +506,7 @@ class SnippetParser
         private static class TraversalState
         {
             boolean mirror;
-            Set<PlaceholderDescription> visited = new HashSet<>();
+            Set<PlaceholderNode> visited = new HashSet<>();
         }
     }
 }
