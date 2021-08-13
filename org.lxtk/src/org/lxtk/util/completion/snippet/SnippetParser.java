@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.lxtk.util.completion.snippet;
 
+import java.nio.CharBuffer;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,51 +23,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
-// Note: variable transformations are yet to be supported
 class SnippetParser
 {
-    private final String source;
-    private final int sourceLength;
+    private final CharBuffer source;
     private final SnippetContext context;
-    private int cursor;
 
-    SnippetParser(String source, SnippetContext context)
+    SnippetParser(CharBuffer source, SnippetContext context)
     {
         this.source = Objects.requireNonNull(source);
-        this.sourceLength = source.length();
         this.context = Objects.requireNonNull(context);
     }
 
-    Snippet parse() throws SnippetException
+    Snippet parse(Character stopChar) throws SnippetException
     {
-        cursor = 0;
-        SnippetDescription rootDesc = parseAny();
-        try
-        {
-            return new Evaluator(rootDesc, context).evaluate();
-        }
-        catch (SnippetException e)
-        {
-            throw new SnippetException(
-                MessageFormat.format(Messages.getString("SnippetParser.EvaluationError"), source), //$NON-NLS-1$
-                e);
-        }
+        SnippetDescription rootDesc = parseAny(stopChar);
+        return new Evaluator(rootDesc, context).evaluate();
     }
 
-    private SnippetDescription parseAny()
+    private SnippetDescription parseAny(Character stopChar)
     {
         List<Node> nodes = new ArrayList<>();
         StringBuilder text = new StringBuilder();
-        boolean nested = cursor > 0;
         while (hasNextChar())
         {
             char ch = peekNextChar();
-            if (ch == '}' && nested)
+            if (stopChar != null && ch == stopChar)
                 break;
             if (ch == '$')
             {
-                int savedCursor = cursor;
+                int position = source.position();
                 nextChar(); // eat '$'
                 Node node = parseTabStopOrVariable();
                 if (node != null)
@@ -79,7 +66,7 @@ class SnippetParser
                     nodes.add(node);
                     continue;
                 }
-                cursor = savedCursor; // backtrack
+                source.position(position); // backtrack
             }
             nextChar();
             if (ch == '\\' && hasNextChar())
@@ -114,9 +101,8 @@ class SnippetParser
         String name = parseIdent();
         if (name != null)
         {
-            return context.isKnownVariable(name) ? new VariableNode(name, null)
-                : new PlaceholderNode(name,
-                    new SnippetDescription(Collections.singletonList(new TextNode(name))));
+            return context.isKnownVariable(name) ? new VariableNode(name) : new PlaceholderNode(
+                name, new SnippetDescription(Collections.singletonList(new TextNode(name))));
         }
         return null;
     }
@@ -132,7 +118,7 @@ class SnippetParser
             }
             else if (nextChar(':'))
             {
-                SnippetDescription defaultValue = parseAny();
+                SnippetDescription defaultValue = parseAny('}');
                 if (nextChar('}'))
                 {
                     return new PlaceholderNode(number, defaultValue);
@@ -160,16 +146,32 @@ class SnippetParser
             {
                 if (nextChar('}'))
                 {
-                    return context.isKnownVariable(name) ? new VariableNode(name, null)
+                    return context.isKnownVariable(name) ? new VariableNode(name)
                         : new PlaceholderNode(name,
                             new SnippetDescription(Collections.singletonList(new TextNode(name))));
                 }
                 else if (nextChar(':'))
                 {
-                    SnippetDescription defaultValue = parseAny();
+                    SnippetDescription defaultValue = parseAny('}');
                     if (nextChar('}'))
                     {
-                        return new VariableNode(name, defaultValue);
+                        return new VariableNodeWithDefault(name, defaultValue);
+                    }
+                }
+                else if (nextChar('/'))
+                {
+                    String regex = parseRegex();
+                    if (nextChar('/'))
+                    {
+                        FormatString format = parseFormatString();
+                        if (nextChar('/'))
+                        {
+                            String flags = parseRegexFlags();
+                            if (nextChar('}'))
+                            {
+                                return new VariableTransformNode(name, regex, format, flags);
+                            }
+                        }
                     }
                 }
             }
@@ -199,6 +201,48 @@ class SnippetParser
             value.append(ch);
         }
         return value.toString();
+    }
+
+    private String parseRegex()
+    {
+        StringBuilder text = new StringBuilder();
+        while (hasNextChar())
+        {
+            char ch = peekNextChar();
+            if (ch == '/')
+                break;
+            nextChar();
+            if (ch == '\\' && hasNextChar())
+            {
+                char nextCh = peekNextChar();
+                if (nextCh == '/' || nextCh == '\\')
+                {
+                    text.append(nextCh);
+                    nextChar();
+                    continue;
+                }
+            }
+            text.append(ch);
+        }
+        return text.toString();
+    }
+
+    private FormatString parseFormatString()
+    {
+        return FormatString.parse(source, '/');
+    }
+
+    private String parseRegexFlags()
+    {
+        StringBuilder sb = new StringBuilder();
+        while (hasNextChar() && isRegexFlag(peekNextChar()))
+            sb.append(nextChar());
+        return sb.toString();
+    }
+
+    private static boolean isRegexFlag(char ch)
+    {
+        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'); // intentionally loose
     }
 
     private String parseInt()
@@ -251,17 +295,17 @@ class SnippetParser
 
     private boolean hasNextChar()
     {
-        return cursor < sourceLength;
+        return source.position() < source.limit();
     }
 
     private char peekNextChar()
     {
-        return source.charAt(cursor);
+        return source.get(source.position());
     }
 
     private char nextChar()
     {
-        return source.charAt(cursor++);
+        return source.get();
     }
 
     private boolean nextChar(char ch)
@@ -338,12 +382,37 @@ class SnippetParser
         implements Node
     {
         final String name;
-        final SnippetDescription defaultValue;
 
-        VariableNode(String name, SnippetDescription defaultValue)
+        VariableNode(String name)
         {
             this.name = Objects.requireNonNull(name);
-            this.defaultValue = defaultValue;
+        }
+    }
+
+    private static class VariableNodeWithDefault
+        extends VariableNode
+    {
+        final SnippetDescription defaultValue;
+
+        VariableNodeWithDefault(String name, SnippetDescription defaultValue)
+        {
+            super(name);
+            this.defaultValue = Objects.requireNonNull(defaultValue);
+        }
+    }
+
+    private static class VariableTransformNode
+        extends VariableNode
+    {
+        final String regex, flags;
+        final FormatString format;
+
+        VariableTransformNode(String name, String regex, FormatString format, String flags)
+        {
+            super(name);
+            this.regex = Objects.requireNonNull(regex);
+            this.format = Objects.requireNonNull(format);
+            this.flags = Objects.requireNonNull(flags);
         }
     }
 
@@ -422,11 +491,30 @@ class SnippetParser
         private void expand(VariableNode var, TraversalState state) throws SnippetException
         {
             String value = context.resolveVariable(var.name);
-            if (value != null)
+            if (value == null && var instanceof VariableNodeWithDefault)
+            {
+                expand(((VariableNodeWithDefault)var).defaultValue, state);
+            }
+            else
+            {
+                if (value == null)
+                    value = ""; //$NON-NLS-1$
+                if (var instanceof VariableTransformNode)
+                {
+                    VariableTransformNode vt = (VariableTransformNode)var;
+                    Transformer transformer;
+                    try
+                    {
+                        transformer = Transformer.compile(vt.regex, vt.format, vt.flags);
+                    }
+                    catch (PatternSyntaxException e)
+                    {
+                        throw new SnippetException(e);
+                    }
+                    value = transformer.transform(value);
+                }
                 snippetBuilder.text.append(value);
-            else if (var.defaultValue != null)
-                expand(var.defaultValue, state);
-
+            }
         }
 
         private TabStopNode getPlaceholderOrChoice(String id)
@@ -446,8 +534,8 @@ class SnippetParser
                 SnippetDescription nestedDesc = null;
                 if (node instanceof PlaceholderNode)
                     nestedDesc = ((PlaceholderNode)node).defaultValue;
-                else if (node instanceof VariableNode)
-                    nestedDesc = ((VariableNode)node).defaultValue;
+                else if (node instanceof VariableNodeWithDefault)
+                    nestedDesc = ((VariableNodeWithDefault)node).defaultValue;
 
                 if (nestedDesc != null)
                 {

@@ -12,8 +12,5 @@
  *******************************************************************************/
 /**
  * Provides support for parsing and evaluating completion snippets in LXTK.
- * <p>
- * Note: <a href="https://microsoft.github.io/language-server-protocol/specifications/specification-current/#snippet_syntax">
- * variable transformations</a> are yet to be supported.
  */
 package org.lxtk.util.completion.snippet;

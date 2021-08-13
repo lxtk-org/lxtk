@@ -151,6 +151,43 @@ public class SnippetParserTest
             parse("${abc:${1:foo ${2:bar}} $1}"));
     }
 
+    public void testVariableTransform() throws Exception
+    {
+        assertEquals(new Snippet("foo"), parse("${TM_FILENAME_BASE///}"));
+        assertEquals(new Snippet("${TM_FILENAME_BASE//}"), parse("${TM_FILENAME_BASE//}"));
+        assertEquals(new Snippet("foo"), parse("${TM_SELECTED_TEXT//foo/}"));
+        assertEquals(new Snippet("/foo"), parse("${TM_FILENAME_BASE//\\//}"));
+        assertEquals(new Snippet("/f/o/o/"), parse("${TM_FILENAME_BASE//\\//g}"));
+        assertEquals(new Snippet("${TM_FILENAME_BASE/// }"), parse("${TM_FILENAME_BASE/// }"));
+        assertEquals(new Snippet(""), parse("${TM_FILENAME_BASE/.oo//}"));
+        assertEquals(new Snippet("foo"), parse("${TM_FILENAME_BASE/bar//}"));
+        assertEquals(new Snippet("foo"), parse("${TM_FILENAME_BASE/\\///}"));
+        assertEquals(new Snippet("foo"), parse("${TM_FILENAME_BASE/.oo/$0/}"));
+        assertEquals(new Snippet("$0"), parse("${TM_FILENAME_BASE/.oo/\\$0/}"));
+        assertEquals(new Snippet("\\foo"), parse("${TM_FILENAME_BASE/.oo/\\\\$0/}"));
+        assertEquals(new Snippet("foo bar"), parse("${TM_FILENAME_BASE/(.oo)/$1 bar/}"));
+        assertEquals(new Snippet(" bar"), parse("${TM_FILENAME_BASE/.oo/$1 bar/}"));
+        assertEquals(new Snippet("FOO"), parse("${TM_FILENAME_BASE/.oo/${0:/upcase}/}"));
+        assertEquals(new Snippet("Foo"), parse("${TM_FILENAME_BASE/.oo/${0:/capitalize}/}"));
+        assertEquals(new Snippet("foo"), parse("${TM_FILENAME_BASE/.oo/${0:/ignore_123}/}"));
+        assertEquals(
+            new Snippet("${TM_FILENAME_BASE/.oo//ignore 123/}",
+                new TabStop("0", new int[] { 23 }, "/ignore 123")),
+            parse("${TM_FILENAME_BASE/.oo/${0:/ignore 123}/}"));
+        assertEquals(new Snippet("bar}"), parse("${TM_FILENAME_BASE/(foo)|(.*)/${1:+bar}}/}"));
+        assertEquals(new Snippet("}"), parse("${TM_FILENAME_BASE/(abc)|(.*)/${1:+bar}}/}"));
+        assertEquals(new Snippet(""), parse("${TM_FILENAME_BASE/(foo)|(.*)/${1:-bar\\}}/}"));
+        assertEquals(new Snippet("bar}"), parse("${TM_FILENAME_BASE/(abc)|(.*)/${1:bar\\}}/}"));
+        assertEquals(new Snippet("bar:}"),
+            parse("${TM_FILENAME_BASE/(foo)|(.*)/${1:?bar\\:}:baz:\\}}/}"));
+        assertEquals(new Snippet("baz:}"),
+            parse("${TM_FILENAME_BASE/(abc)|(.*)/${1:?bar\\:}:baz:\\}}/}"));
+        assertEquals(new Snippet("bar"), parse("${TM_FILENAME_BASE/foo/${1:-bar}/}"));
+        assertEquals(new Snippet("foo"), parse("${TM_FILENAME_BASE/abc/${1:-bar}/}")); // same as in TextMate; it would have been "bar" in VSCode
+        assertEquals(new Snippet(""),
+            parse("${TM_SELECTED_TEXT/(\\w+)\\W*(.+)?/$1${2:?...:!!!}/}")); // same as in TextMate; it would have been "!!!" in VSCode
+    }
+
     public void testComplex() throws Exception
     {
         assertEquals(

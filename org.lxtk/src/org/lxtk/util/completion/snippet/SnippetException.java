@@ -40,4 +40,14 @@ public class SnippetException
     {
         super(message, cause);
     }
+
+    /**
+     * Constructs a new exception with the specified cause.
+     *
+     * @param cause
+     */
+    public SnippetException(Throwable cause)
+    {
+        super(cause);
+    }
 }

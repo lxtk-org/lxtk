@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.lxtk.util.completion.snippet;
 
+import java.nio.CharBuffer;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -33,8 +35,17 @@ public final class Snippet
      */
     public static Snippet parse(String source, SnippetContext context) throws SnippetException
     {
-        SnippetParser parser = new SnippetParser(source, context);
-        return parser.parse();
+        SnippetParser parser = new SnippetParser(CharBuffer.wrap(source), context);
+        try
+        {
+            return parser.parse(null);
+        }
+        catch (SnippetException e)
+        {
+            throw new SnippetException(
+                MessageFormat.format(Messages.getString("Snippet.ProcessingError"), source), //$NON-NLS-1$
+                e);
+        }
     }
 
     Snippet(String text, TabStop... tabStops)
