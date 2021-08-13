@@ -186,6 +186,8 @@ public class SnippetParserTest
         assertEquals(new Snippet("foo"), parse("${TM_FILENAME_BASE/abc/${1:-bar}/}")); // same as in TextMate; it would have been "bar" in VSCode
         assertEquals(new Snippet(""),
             parse("${TM_SELECTED_TEXT/(\\w+)\\W*(.+)?/$1${2:?...:!!!}/}")); // same as in TextMate; it would have been "!!!" in VSCode
+        assertEquals(new Snippet("FOO"),
+            parse("${TM_FILENAME_BASE/(foo)|(FOO)/${1:?${1:/upcase}:${2:/downcase}}/}")); // same as in TextMate; VSCode does not currently support nested format strings
     }
 
     public void testComplex() throws Exception
