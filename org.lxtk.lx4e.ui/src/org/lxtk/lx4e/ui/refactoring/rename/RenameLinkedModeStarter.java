@@ -22,6 +22,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
@@ -40,6 +41,7 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.LinkedEditingRangeProvider;
 import org.lxtk.lx4e.DocumentUtil;
+import org.lxtk.lx4e.internal.ui.LinkedEditingPubSub;
 import org.lxtk.lx4e.requests.LinkedEditingRangeRequest;
 
 /**
@@ -130,6 +132,26 @@ public class RenameLinkedModeStarter
             ui.setExitPolicy(exitPolicy);
         ui.enter();
         viewer.setSelectedRange(originalSelection.x, originalSelection.y); // by default, full word is selected; restore original selection
+
+        LinkedEditingPubSub.INSTANCE.fireLinkedEditingStarted(viewer);
+        model.addLinkingListener(new ILinkedModeListener()
+        {
+            @Override
+            public void left(LinkedModeModel model, int flags)
+            {
+                LinkedEditingPubSub.INSTANCE.fireLinkedEditingStopped(viewer);
+            }
+
+            @Override
+            public void suspend(LinkedModeModel model)
+            {
+            }
+
+            @Override
+            public void resume(LinkedModeModel model, int flags)
+            {
+            }
+        });
 
         return new RenameLinkedMode(viewer, model, group);
     }

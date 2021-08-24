@@ -32,18 +32,12 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.RewriteSessionEditProcessor;
 import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.ContextInformation;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension7;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.link.LinkedModeModel;
-import org.eclipse.jface.text.link.LinkedModeUI;
-import org.eclipse.jface.text.link.LinkedPosition;
-import org.eclipse.jface.text.link.LinkedPositionGroup;
-import org.eclipse.jface.text.link.ProposalPosition;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.Command;
@@ -288,7 +282,8 @@ public class BaseCompletionProposal
         applyEditTree(editTree, document);
         selectedRegion = new Region(textEdit.getOffset() + edit.cursorPosition, 0);
         executeCommand();
-        setUpLinkedMode(viewer, textEdit.getOffset(), edit.cursorPosition, edit.tabStops);
+        if (!edit.tabStops.isEmpty())
+            startLinkedMode(viewer, textEdit.getOffset(), edit.cursorPosition, edit.tabStops);
     }
 
     /**
@@ -657,69 +652,11 @@ public class BaseCompletionProposal
         });
     }
 
-    private void setUpLinkedMode(ITextViewer viewer, int start, int exitOffset,
+    private void startLinkedMode(ITextViewer viewer, int start, int exitOffset,
         List<TabStop> tabStops) throws BadLocationException
     {
-        List<LinkedPositionGroup> groups =
-            getLinkedPositionGroups(viewer.getDocument(), start, tabStops);
-        if (groups.isEmpty())
-            return;
-        LinkedModeModel model = new LinkedModeModel();
-        for (LinkedPositionGroup group : groups)
-        {
-            try
-            {
-                model.addGroup(group);
-            }
-            catch (BadLocationException e)
-            {
-                // ignore: non-disjoint (e.g. nested) tabstops are currently not supported
-            }
-        }
-        model.forceInstall();
-        LinkedModeUI ui = new LinkedModeUI(model, viewer);
-        ui.setExitPosition(viewer, start + exitOffset, 0, Integer.MAX_VALUE);
-        ui.enter();
-        selectedRegion = ui.getSelectedRegion();
-    }
-
-    private List<LinkedPositionGroup> getLinkedPositionGroups(IDocument document, int start,
-        List<TabStop> tabStops) throws BadLocationException
-    {
-        List<LinkedPositionGroup> result = new ArrayList<>(tabStops.size());
-        int sequenceNumber = 0;
-        for (TabStop tabStop : tabStops)
-        {
-            LinkedPositionGroup group = new LinkedPositionGroup();
-            List<LinkedPosition> positions =
-                getLinkedPositions(document, start, tabStop, sequenceNumber++);
-            for (LinkedPosition position : positions)
-            {
-                group.addPosition(position);
-            }
-            result.add(group);
-        }
-        return result;
-    }
-
-    private List<LinkedPosition> getLinkedPositions(IDocument document, int start, TabStop tabStop,
-        int sequenceNumber)
-    {
-        int[] offsets = tabStop.getOffsets();
-        int offsetsLength = offsets.length;
-        String[] values = tabStop.getValues();
-        int valuesLength = values.length;
-        int length = valuesLength > 0 ? values[0].length() : 0;
-        List<LinkedPosition> result = new ArrayList<>(offsetsLength);
-        for (int i = 0; i < offsetsLength; i++)
-        {
-            result.add(i == 0 && valuesLength > 1
-                ? new LazyProposalPosition(document, start + offsets[i], length, sequenceNumber,
-                    values)
-                : new LinkedPosition(document, start + offsets[i], length, sequenceNumber));
-            sequenceNumber = LinkedPositionGroup.NO_STOP;
-        }
-        return result;
+        selectedRegion =
+            TabStopLinkedMode.start(viewer, start, exitOffset, tabStops).getSelectedRegion();
     }
 
     private static class MatchResultCache
@@ -749,95 +686,9 @@ public class BaseCompletionProposal
         {
             this.replacementOffset = replacementOffset;
             this.replacementLength = replacementLength;
-            this.replacementString = replacementString;
+            this.replacementString = Objects.requireNonNull(replacementString);
             this.cursorPosition = cursorPosition;
             this.tabStops = Objects.requireNonNull(tabStops);
-        }
-    }
-
-    private static class LazyProposalPosition
-        extends ProposalPosition
-    {
-        private final String[] values;
-
-        LazyProposalPosition(IDocument document, int offset, int length, int sequenceNumber,
-            String[] values)
-        {
-            super(document, offset, length, sequenceNumber, null);
-            this.values = Objects.requireNonNull(values);
-        }
-
-        @Override
-        public ICompletionProposal[] getChoices()
-        {
-            int length = values.length;
-            ICompletionProposal[] result = new ICompletionProposal[length];
-            for (int i = 0; i < length; i++)
-            {
-                result[i] = new ChoiceProposal(values[i]);
-            }
-            return result;
-        }
-
-        private class ChoiceProposal
-            implements ICompletionProposal
-        {
-            private final String value;
-
-            ChoiceProposal(String value)
-            {
-                this.value = Objects.requireNonNull(value);
-            }
-
-            @Override
-            public String getDisplayString()
-            {
-                return value;
-            }
-
-            @Override
-            public void apply(IDocument document)
-            {
-                try
-                {
-                    replace(document, getOffset(), getLength(), value);
-                }
-                catch (BadLocationException e)
-                {
-                    Activator.logError(e); // should never happen
-                }
-            }
-
-            private void replace(IDocument document, int offset, int length, String string)
-                throws BadLocationException
-            {
-                if (!document.get(offset, length).equals(string))
-                    document.replace(offset, length, string);
-            }
-
-            @Override
-            public Point getSelection(IDocument document)
-            {
-                return null;
-            }
-
-            @Override
-            public String getAdditionalProposalInfo()
-            {
-                return null;
-            }
-
-            @Override
-            public Image getImage()
-            {
-                return null;
-            }
-
-            @Override
-            public IContextInformation getContextInformation()
-            {
-                return null;
-            }
         }
     }
 }

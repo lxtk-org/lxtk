@@ -43,8 +43,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
 import org.lxtk.lx4e.refactoring.rename.RenameRefactoring;
-import org.lxtk.lx4e.ui.highlight.Highlighter;
-import org.lxtk.lx4e.ui.highlight.HighlightingSynchronizer;
 import org.lxtk.util.Disposable;
 
 /**
@@ -268,10 +266,6 @@ public class RenameRefactoringStarter
             }
         });
 
-        Highlighter highlighter = getHighlighter(editor);
-        if (highlighter != null)
-            renameLinkedMode.addLinkingListener(new HighlightingSynchronizer(highlighter));
-
         return renameLinkedMode;
     }
 
@@ -294,17 +288,6 @@ public class RenameRefactoringStarter
     protected ITextViewer getTextViewer(ITextEditor editor)
     {
         return Adapters.adapt(editor, ITextViewer.class);
-    }
-
-    /**
-     * Returns the highlighter of the given text editor.
-     *
-     * @param editor may be <code>null</code>
-     * @return the highlighter, or <code>null</code> if none
-     */
-    protected Highlighter getHighlighter(ITextEditor editor)
-    {
-        return Adapters.adapt(editor, Highlighter.class);
     }
 
     private static class Freezer

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <!--
-   Copyright (c) 2020 1C-Soft LLC.
+   Copyright (c) 2020, 2021 1C-Soft LLC.
 
    This program and the accompanying materials are made available under
    the terms of the Eclipse Public License 2.0 which is available at
@@ -16,6 +16,9 @@
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
+            name="org.lxtk.lx4e.ui.completion.tabStop">
+      </type>
+      <type
             name="org.lxtk.lx4e.ui.highlight.textOccurrence">
       </type>
       <type
@@ -27,6 +30,31 @@
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.lxtk.lx4e.ui.completion.tabStop"
+            label="%TabStopAnnotation.label"
+            textPreferenceKey="lxtkTabStopIndication"
+            textPreferenceValue="false"
+            highlightPreferenceKey="lxtkTabStopHighlighting"
+            highlightPreferenceValue="true"
+            contributesToHeader="false"
+            overviewRulerPreferenceKey="lxtkTabStopIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="false"
+            verticalRulerPreferenceKey="lxtkTabStopIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false"
+            colorPreferenceKey="lxtkTabStopIndicationColor"
+            colorPreferenceValue="222,222,222"
+            presentationLayer="3"
+            showInNextPrevDropdownToolbarActionKey="showLxtkTabStopInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="false"
+            isGoToNextNavigationTargetKey="isLxtkTabStopGoToNextNavigationTarget"
+	        isGoToNextNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="isLxtkTabStopGoToPreviousNavigationTarget"
+	        isGoToPreviousNavigationTarget="false"
+            textStylePreferenceKey="lxtkTabStopTextStyle"
+            textStylePreferenceValue="NONE"
+            includeOnPreferencePage="false">
+      </specification>
       <specification
             annotationType="org.lxtk.lx4e.ui.highlight.textOccurrence"
             label="%OccurrenceAnnotation.label"

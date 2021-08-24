@@ -37,6 +37,7 @@ import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ISelectionValidator;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -55,18 +56,24 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.ILinkedEditingListener;
+import org.lxtk.lx4e.internal.ui.LinkedEditingPubSub;
 import org.lxtk.lx4e.requests.DocumentHighlightRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
+import org.lxtk.util.Disposable;
 
 /**
  * Highlights document ranges computed using a {@link DocumentHighlightProvider}.
  */
 public class Highlighter
+    implements Disposable
 {
     private final ISourceViewer viewer;
     private final ISelectionProvider selectionProvider;
     private final Supplier<LanguageOperationTarget> targetSupplier;
-    private final ISelectionChangedListener listener = e -> scheduleHighlighting(e.getSelection());
+    private final ILinkedEditingListener linkedEditingListener = new LinkedEditingListener();
+    private final ISelectionChangedListener selectionChangedListener =
+        e -> scheduleHighlighting(e.getSelection());
     private final Object jobLock = new Object();
     private HighlightingJob job;
     private ISelection forcedSelection;
@@ -91,6 +98,13 @@ public class Highlighter
         this.viewer = Objects.requireNonNull(viewer);
         this.selectionProvider = Objects.requireNonNull(selectionProvider);
         this.targetSupplier = Objects.requireNonNull(targetSupplier);
+        LinkedEditingPubSub.INSTANCE.addLinkedEditingListener(linkedEditingListener);
+    }
+
+    @Override
+    public void dispose()
+    {
+        LinkedEditingPubSub.INSTANCE.removeLinkedEditingListener(linkedEditingListener);
     }
 
     /**
@@ -100,9 +114,10 @@ public class Highlighter
     public final void install()
     {
         if (selectionProvider instanceof IPostSelectionProvider)
-            ((IPostSelectionProvider)selectionProvider).addPostSelectionChangedListener(listener);
+            ((IPostSelectionProvider)selectionProvider).addPostSelectionChangedListener(
+                selectionChangedListener);
         else
-            selectionProvider.addSelectionChangedListener(listener);
+            selectionProvider.addSelectionChangedListener(selectionChangedListener);
 
         forcedSelection = selectionProvider.getSelection();
         scheduleHighlighting(forcedSelection);
@@ -117,9 +132,9 @@ public class Highlighter
     {
         if (selectionProvider instanceof IPostSelectionProvider)
             ((IPostSelectionProvider)selectionProvider).removePostSelectionChangedListener(
-                listener);
+                selectionChangedListener);
         else
-            selectionProvider.removeSelectionChangedListener(listener);
+            selectionProvider.removeSelectionChangedListener(selectionChangedListener);
 
         if (job != null)
         {
@@ -190,6 +205,11 @@ public class Highlighter
     protected DocumentHighlightRequest newDocumentHighlightRequest()
     {
         return new DocumentHighlightRequest();
+    }
+
+    final ITextViewer getViewer()
+    {
+        return viewer;
     }
 
     private void scheduleHighlighting(ISelection selection)
@@ -381,6 +401,26 @@ public class Highlighter
             request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
             request.setMayThrow(false);
             return request.sendAndReceive();
+        }
+    }
+
+    private class LinkedEditingListener
+        implements ILinkedEditingListener
+    {
+        private boolean wasInstalled;
+
+        @Override
+        public void linkedEditingStarted(ITextViewer viewer)
+        {
+            if (viewer == getViewer() && (wasInstalled = isInstalled()))
+                uninstall();
+        }
+
+        @Override
+        public void linkedEditingStopped(ITextViewer viewer)
+        {
+            if (viewer == getViewer() && wasInstalled)
+                install();
         }
     }
 }
