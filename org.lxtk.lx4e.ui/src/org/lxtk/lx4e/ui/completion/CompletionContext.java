@@ -30,6 +30,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.swt.graphics.Point;
 import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.util.DefaultWordFinder;
@@ -43,6 +44,7 @@ public class CompletionContext
     private URI documentUri;
     private int invocationOffset;
     private CompletionProvider completionProvider;
+    private IContentAssistProcessor contentAssistProcessor;
 
     /**
      * Returns the text viewer.
@@ -175,6 +177,18 @@ public class CompletionContext
     void setCompletionProvider(CompletionProvider completionProvider)
     {
         this.completionProvider = completionProvider;
+    }
+
+    void setContentAssistProcessor(IContentAssistProcessor contentAssistProcessor)
+    {
+        this.contentAssistProcessor = contentAssistProcessor;
+    }
+
+    IContentAssistProcessor getContentAssistProcessor()
+    {
+        if (contentAssistProcessor == null)
+            throw new IllegalStateException();
+        return contentAssistProcessor;
     }
 
     private String getSelectedText()

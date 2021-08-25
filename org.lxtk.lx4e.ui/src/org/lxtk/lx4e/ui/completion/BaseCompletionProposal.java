@@ -31,7 +31,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.RewriteSessionEditProcessor;
 import org.eclipse.jface.text.contentassist.BoldStylerProvider;
-import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
@@ -205,12 +204,14 @@ public class BaseCompletionProposal
     @Override
     public IContextInformation getContextInformation()
     {
-        String detail = completionItem.getDetail();
-        if (detail == null)
-            detail = getResolvedCompletionItem(null).getDetail();
-        if (detail == null)
-            return null;
-        return new ContextInformation(getImage(), null, detail);
+        IContextInformation[] result = computeContextInformation(getContextInformationPosition());
+        return result != null && result.length == 1 ? result[0] : null;
+    }
+
+    public int getContextInformationPosition()
+    {
+        Point selection = completionContext.getTextViewer().getSelectedRange();
+        return selection.x + selection.y;
     }
 
     @Override
@@ -454,6 +455,19 @@ public class BaseCompletionProposal
     protected Duration getCompletionResolveTimeout()
     {
         return Duration.ofSeconds(1);
+    }
+
+    /**
+     * Computes context information for the given offset.
+     *
+     * @param offset an offset for which context information should be computed
+     * @return an array of context information objects, or <code>null</code>
+     *  if no context could be found
+     */
+    protected final IContextInformation[] computeContextInformation(int offset)
+    {
+        return completionContext.getContentAssistProcessor().computeContextInformation(
+            completionContext.getTextViewer(), offset);
     }
 
     private CompletionItem resolveCompletionItem(IProgressMonitor monitor)

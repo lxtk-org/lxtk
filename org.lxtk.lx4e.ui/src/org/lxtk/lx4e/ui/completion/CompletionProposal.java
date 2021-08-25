@@ -23,7 +23,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.swt.graphics.Point;
 import org.lxtk.lx4e.internal.ui.Activator;
 
 /**
@@ -104,13 +103,6 @@ public class CompletionProposal
         if (triggerCharacters == null)
             triggerCharacters = computeTriggerCharacters();
         return triggerCharacters;
-    }
-
-    @Override
-    public int getContextInformationPosition()
-    {
-        Point selection = completionContext.getTextViewer().getSelectedRange();
-        return selection.x + selection.y;
     }
 
     @Override

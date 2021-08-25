@@ -138,6 +138,7 @@ public class ContentAssistProcessor
         context.setDocumentUri(documentUri);
         context.setInvocationOffset(offset);
         context.setCompletionProvider(provider);
+        context.setContentAssistProcessor(this);
 
         List<CompletionItem> items;
         boolean isIncomplete = false;
