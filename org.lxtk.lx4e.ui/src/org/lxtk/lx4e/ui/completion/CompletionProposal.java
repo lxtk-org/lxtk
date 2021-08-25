@@ -26,7 +26,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.lxtk.lx4e.internal.ui.Activator;
 
 /**
- * Default implementation of a completion proposal.
+ * Default implementation of a {@link CompletionItem}-based completion proposal.
  */
 public class CompletionProposal
     extends BaseCompletionProposal

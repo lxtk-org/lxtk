@@ -60,7 +60,6 @@ import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
  * context information using a {@link SignatureHelpProvider}.
  */
 // Implementation limits:
-// - Snippet support is ad hoc (inherited from LSP4E)
 // - Aggregation of completion providers is not supported
 //   (the best matching provider is used)
 // - Auto-activation by trigger characters specified in the server options

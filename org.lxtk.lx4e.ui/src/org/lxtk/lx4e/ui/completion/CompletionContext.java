@@ -36,7 +36,7 @@ import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
- * A shared context for completion proposals.
+ * A shared context for completion proposals created by {@link ContentAssistProcessor}.
  */
 public class CompletionContext
 {

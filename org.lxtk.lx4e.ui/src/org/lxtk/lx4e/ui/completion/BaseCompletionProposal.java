@@ -79,7 +79,7 @@ import org.lxtk.util.completion.snippet.SnippetException;
 import org.lxtk.util.completion.snippet.TabStop;
 
 /**
- * Basic implementation of a completion proposal.
+ * Basic implementation of a {@link CompletionItem}-based completion proposal.
  */
 public class BaseCompletionProposal
     implements IScoredCompletionProposal, ICompletionProposalExtension3,
