@@ -33,7 +33,10 @@ public class CompletionProposal
     extends BaseCompletionProposal
     implements ICompletionProposalExtension, ICompletionProposalExtension2
 {
+    private static final char[] NO_CHARS = new char[0];
+
     private int editingDelta;
+    private char[] triggerCharacters;
 
     /**
      * Constructor.
@@ -98,20 +101,9 @@ public class CompletionProposal
     @Override
     public char[] getTriggerCharacters()
     {
-        List<String> commitCharacters = completionItem.getCommitCharacters();
-        if (commitCharacters == null || commitCharacters.isEmpty())
-            return null;
-
-        Set<String> commitCharactersWithoutDuplicates = new HashSet<>(commitCharacters);
-        int size = commitCharactersWithoutDuplicates.size();
-        char[] result = new char[size];
-        int i = 0;
-        for (String each : commitCharactersWithoutDuplicates)
-        {
-            result[i] = each.charAt(i);
-            ++i;
-        }
-        return result;
+        if (triggerCharacters == null)
+            triggerCharacters = computeTriggerCharacters();
+        return triggerCharacters;
     }
 
     @Override
@@ -125,5 +117,26 @@ public class CompletionProposal
     protected int getEditingDelta()
     {
         return editingDelta;
+    }
+
+    private char[] computeTriggerCharacters()
+    {
+        List<String> commitCharacters = completionItem.getCommitCharacters();
+        if (commitCharacters == null || commitCharacters.isEmpty())
+            return NO_CHARS;
+
+        Set<Character> commitCharactersWithoutDuplicates = new HashSet<>();
+        for (String each : commitCharacters)
+        {
+            if (each.length() == 1)
+                commitCharactersWithoutDuplicates.add(each.charAt(0));
+        }
+        char[] result = new char[commitCharactersWithoutDuplicates.size()];
+        int i = 0;
+        for (Character ch : commitCharactersWithoutDuplicates)
+        {
+            result[i++] = ch;
+        }
+        return result;
     }
 }
