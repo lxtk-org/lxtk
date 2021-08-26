@@ -502,8 +502,8 @@ public class BaseCompletionProposal
             if (replacementString == null)
                 replacementString = completionItem.getLabel();
             IRegion wordRegion = completionContext.getCurrentWordRegion();
-            replacementOffset = replacementString.startsWith(getFilterString())
-                ? wordRegion.getOffset() : completionContext.getInvocationOffset();
+            replacementOffset = guessReplacementOffset(document, replacementString,
+                wordRegion.getOffset(), completionContext.getInvocationOffset());
             replacementEndOffset = overwrite ? wordRegion.getOffset() + wordRegion.getLength()
                 : selectedRange.x + selectedRange.y;
         }
@@ -570,6 +570,25 @@ public class BaseCompletionProposal
         }
         return new ProposedEdit(replacementOffset, replacementEndOffset - replacementOffset,
             replacementString, cursorPosition, tabStops);
+    }
+
+    private int guessReplacementOffset(IDocument document, String replacementString, int wordOffset,
+        int invocationOffset)
+    {
+        int result = wordOffset;
+        if (invocationOffset > wordOffset)
+        {
+            try
+            {
+                String prefix = document.get(wordOffset, invocationOffset - wordOffset);
+                if (getFilterString().startsWith(prefix + replacementString)) // case of `con<invocation offset>`, filterText `console` and insertText `sole()`
+                    result = invocationOffset;
+            }
+            catch (BadLocationException e)
+            {
+            }
+        }
+        return result;
     }
 
     private TextEdit[] computeAdditionalEdits(IDocument document)
