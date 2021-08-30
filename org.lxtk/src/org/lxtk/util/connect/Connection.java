@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -32,11 +32,11 @@ public interface Connection
     boolean isClosed();
 
     /**
-     * Returns a stage that completes when this connection gets closed.
+     * Returns a future that completes when this connection gets closed.
      * The given executor is used to run a connection monitor.
      *
      * @param executor not <code>null</code>
-     * @return a stage that completes when the connection gets closed
+     * @return a future that completes when the connection gets closed
      *  (never <code>null</code>)
      */
     default CompletableFuture<?> monitor(Executor executor)

@@ -24,13 +24,10 @@ public final class CompletionProposalSorter
     @Override
     public int compare(ICompletionProposal p1, ICompletionProposal p2)
     {
-        int s1 = getScore(p1);
-        int s2 = getScore(p2);
-        int scoreDiff = s2 - s1;
+        int scoreDiff = getScore(p2) - getScore(p1);
         if (scoreDiff != 0)
-        {
             return scoreDiff;
-        }
+
         return getSortString(p1).compareToIgnoreCase(getSortString(p2));
     }
 
@@ -38,6 +35,7 @@ public final class CompletionProposalSorter
     {
         if (p instanceof IScoredCompletionProposal)
             return ((IScoredCompletionProposal)p).getScore();
+
         return 0;
     }
 
@@ -45,6 +43,7 @@ public final class CompletionProposalSorter
     {
         if (p instanceof IScoredCompletionProposal)
             return ((IScoredCompletionProposal)p).getSortString();
+
         return p.getDisplayString();
     }
 }

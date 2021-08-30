@@ -60,7 +60,7 @@ import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
  * context information using a {@link SignatureHelpProvider}.
  */
 // Implementation limits:
-// - Aggregation of completion providers is not supported
+// - Aggregation of completion or signature help providers is not supported
 //   (the best matching provider is used)
 // - Auto-activation by trigger characters specified in the server options
 //   is not supported (a subclass can explicitly specify auto-activation
