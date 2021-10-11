@@ -47,6 +47,7 @@ import org.eclipse.lsp4j.TextDocumentRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentSaveRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.TextDocumentSyncOptions;
+import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 import org.eclipse.lsp4j.WillSaveTextDocumentParams;
@@ -64,8 +65,10 @@ import org.lxtk.TextDocumentSaveEventSource;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.TextDocumentWillSaveEvent;
 import org.lxtk.TextDocumentWillSaveEventSource;
+import org.lxtk.TextDocumentWillSaveWaitUntilEventSource;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
+import org.lxtk.util.WaitUntilEvent;
 
 import com.google.gson.JsonElement;
 
@@ -90,6 +93,7 @@ public final class TextDocumentSyncFeature
 
     private final DocumentService documentService;
     private final TextDocumentWillSaveEventSource willSaveEventSource;
+    private final TextDocumentWillSaveWaitUntilEventSource willSaveWaitUntilEventSource;
     private final TextDocumentSaveEventSource saveEventSource;
     private LanguageServer languageServer;
     private Map<String, Map<String, TextDocumentRegistrationOptions>> registrations;
@@ -99,13 +103,39 @@ public final class TextDocumentSyncFeature
         new PendingChangeManager(this::flushPendingChange);
 
     /**
+     * Convenience factory method.
+     *
+     * @param documentService not <code>null</code>
+     * @param eventSource may be <code>null</code>
+     * @return a new {@link TextDocumentSyncFeature} (never <code>null</code>)
+     */
+    public static TextDocumentSyncFeature newInstance(DocumentService documentService,
+        Object eventSource)
+    {
+        TextDocumentWillSaveEventSource willSaveEventSource = null;
+        if (eventSource instanceof TextDocumentWillSaveEventSource)
+            willSaveEventSource = (TextDocumentWillSaveEventSource)eventSource;
+
+        TextDocumentWillSaveWaitUntilEventSource willSaveWaitUntilEventSource = null;
+        if (eventSource instanceof TextDocumentWillSaveWaitUntilEventSource)
+            willSaveWaitUntilEventSource = (TextDocumentWillSaveWaitUntilEventSource)eventSource;
+
+        TextDocumentSaveEventSource saveEventSource = null;
+        if (eventSource instanceof TextDocumentSaveEventSource)
+            saveEventSource = (TextDocumentSaveEventSource)eventSource;
+
+        return new TextDocumentSyncFeature(documentService, willSaveEventSource,
+            willSaveWaitUntilEventSource, saveEventSource);
+    }
+
+    /**
      * Constructor.
      *
      * @param documentService not <code>null</code>
      */
     public TextDocumentSyncFeature(DocumentService documentService)
     {
-        this(documentService, null, null);
+        this(documentService, null, null, null);
     }
 
     /**
@@ -113,14 +143,17 @@ public final class TextDocumentSyncFeature
      *
      * @param documentService not <code>null</code>
      * @param willSaveEventSource may be <code>null</code>
+     * @param willSaveWaitUntilEventSource may be <code>null</code>
      * @param saveEventSource may be <code>null</code>
      */
     public TextDocumentSyncFeature(DocumentService documentService,
         TextDocumentWillSaveEventSource willSaveEventSource,
+        TextDocumentWillSaveWaitUntilEventSource willSaveWaitUntilEventSource,
         TextDocumentSaveEventSource saveEventSource)
     {
         this.documentService = Objects.requireNonNull(documentService);
         this.willSaveEventSource = willSaveEventSource;
+        this.willSaveWaitUntilEventSource = willSaveWaitUntilEventSource;
         this.saveEventSource = saveEventSource;
     }
 
@@ -158,11 +191,9 @@ public final class TextDocumentSyncFeature
                 ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities));
         syncronization.setDynamicRegistration(true);
         if (willSaveEventSource != null)
-        {
             syncronization.setWillSave(true);
-            if (willSaveEventSource.supportsWaitUntil())
-                syncronization.setWillSaveWaitUntil(true);
-        }
+        if (willSaveWaitUntilEventSource != null)
+            syncronization.setWillSaveWaitUntil(true);
         if (saveEventSource != null)
             syncronization.setDidSave(true);
     }
@@ -298,10 +329,12 @@ public final class TextDocumentSyncFeature
                 subsription =
                     willSaveEventSource.onWillSaveTextDocument().subscribe(this::onWillSave);
             }
-            else if (WILL_SAVE_WAIT_UNTIL.equals(registrationMethod) && willSaveEventSource != null)
+            else if (WILL_SAVE_WAIT_UNTIL.equals(registrationMethod)
+                && willSaveWaitUntilEventSource != null)
             {
-                subsription = willSaveEventSource.onWillSaveTextDocument().subscribe(
-                    this::onWillSaveWaitUntil);
+                subsription =
+                    willSaveWaitUntilEventSource.onWillSaveTextDocumentWaitUntil().subscribe(
+                        this::onWillSaveWaitUntil);
             }
             else if (DID_SAVE.equals(registrationMethod) && saveEventSource != null)
             {
@@ -511,8 +544,11 @@ public final class TextDocumentSyncFeature
         languageServer.getTextDocumentService().willSave(params);
     }
 
-    private synchronized void onWillSaveWaitUntil(TextDocumentWillSaveEvent event)
+    private synchronized void onWillSaveWaitUntil(
+        WaitUntilEvent<TextDocumentWillSaveEvent, List<TextEdit>> waitUntilEvent)
     {
+        TextDocumentWillSaveEvent event = waitUntilEvent.get();
+
         TextDocument document = event.getDocument();
 
         TextDocumentRegistrationOptions registrationOptions =
@@ -524,7 +560,7 @@ public final class TextDocumentSyncFeature
         params.setTextDocument(DocumentUri.toTextDocumentIdentifier(document.getUri()));
         params.setReason(event.getReason());
 
-        event.waitUntil(languageServer.getTextDocumentService().willSaveWaitUntil(params));
+        waitUntilEvent.accept(languageServer.getTextDocumentService().willSaveWaitUntil(params));
     }
 
     private synchronized void onDidSave(TextDocumentSaveEvent event)

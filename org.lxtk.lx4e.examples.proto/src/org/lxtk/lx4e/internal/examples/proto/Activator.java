@@ -38,6 +38,8 @@ public class Activator
     // The plug-in ID
     public static final String PLUGIN_ID = "org.lxtk.lx4e.examples.proto"; //$NON-NLS-1$
 
+    public static final Consumer<Throwable> LOGGER = e -> logError(e);
+
     // The shared instance
     private static Activator plugin;
 
@@ -113,7 +115,7 @@ public class Activator
                 }
             });
 
-            rollback.setLogger(e -> logError(e));
+            rollback.setLogger(LOGGER);
             stopRunnable = rollback;
         });
     }

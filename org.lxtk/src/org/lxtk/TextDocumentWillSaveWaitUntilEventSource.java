@@ -12,12 +12,20 @@
  *******************************************************************************/
 package org.lxtk;
 
+import java.util.List;
+
+import org.eclipse.lsp4j.TextEdit;
 import org.lxtk.util.EventStream;
+import org.lxtk.util.WaitUntilEvent;
 
 /**
- * Represents a source of {@link TextDocumentWillSaveEvent}s.
+ * Represents a source of {@link WaitUntilEvent}s that wrap {@link TextDocumentWillSaveEvent}s.
+ * Event consumer can asynchronously compute text edits that need to be applied to the text document
+ * before it is saved and pass the future representing the computation result to the event's {@link
+ * WaitUntilEvent#accept(java.util.concurrent.CompletableFuture) accept} method. Text edits must not
+ * overlap with each other.
  */
-public interface TextDocumentWillSaveEventSource
+public interface TextDocumentWillSaveWaitUntilEventSource
 {
     /**
      * Returns an event emitter firing when a text document is going to be saved.
@@ -25,5 +33,6 @@ public interface TextDocumentWillSaveEventSource
      * @return an event emitter firing when a text document is going to be saved
      *  (never <code>null</code>)
      */
-    EventStream<TextDocumentWillSaveEvent> onWillSaveTextDocument();
+    EventStream<WaitUntilEvent<TextDocumentWillSaveEvent,
+        List<TextEdit>>> onWillSaveTextDocumentWaitUntil();
 }

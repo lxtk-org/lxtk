@@ -34,24 +34,29 @@ import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentSaveEvent;
 import org.lxtk.TextDocumentSaveEventSource;
 import org.lxtk.TextDocumentWillSaveEvent;
-import org.lxtk.TextDocumentWillSaveEventEmitter;
 import org.lxtk.TextDocumentWillSaveEventSource;
+import org.lxtk.TextDocumentWillSaveWaitUntilEventSource;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.EclipseTextDocument;
 import org.lxtk.util.Disposable;
 import org.lxtk.util.EventEmitter;
 import org.lxtk.util.EventStream;
 import org.lxtk.util.SafeRun;
+import org.lxtk.util.WaitUntilEvent;
+import org.lxtk.util.WaitUntilEventEmitter;
 
 /**
  * Proto document provider.
  */
 public class ProtoDocumentProvider
     extends TextFileDocumentProvider
-    implements TextDocumentWillSaveEventSource, TextDocumentSaveEventSource
+    implements TextDocumentWillSaveEventSource, TextDocumentWillSaveWaitUntilEventSource,
+    TextDocumentSaveEventSource
 {
-    private final TextDocumentWillSaveEventEmitter onWillSaveTextDocument =
-        new TextDocumentWillSaveEventEmitter();
+    private final EventEmitter<TextDocumentWillSaveEvent> onWillSaveTextDocument =
+        new EventEmitter<>();
+    private final WaitUntilEventEmitter<TextDocumentWillSaveEvent,
+        List<TextEdit>> onWillSaveTextDocumentWaitUntil = new WaitUntilEventEmitter<>();
     private final EventEmitter<TextDocumentSaveEvent> onDidSaveTextDocument = new EventEmitter<>();
 
     @Override
@@ -61,9 +66,10 @@ public class ProtoDocumentProvider
     }
 
     @Override
-    public boolean supportsWaitUntil()
+    public EventStream<
+        WaitUntilEvent<TextDocumentWillSaveEvent, List<TextEdit>>> onWillSaveTextDocumentWaitUntil()
     {
-        return true;
+        return onWillSaveTextDocumentWaitUntil;
     }
 
     @Override
@@ -100,7 +106,7 @@ public class ProtoDocumentProvider
                 Disposable registration = DOCUMENT_SERVICE.addTextDocument(document);
                 rollback.add(registration::dispose);
 
-                rollback.setLogger(e -> Activator.logError(e));
+                rollback.setLogger(Activator.LOGGER);
                 info.disposeRunnable = rollback;
             });
         }
@@ -131,8 +137,13 @@ public class ProtoDocumentProvider
 
         if (document != null)
         {
-            CompletableFuture<List<List<TextEdit>>> future = onWillSaveTextDocument.fire(document,
-                TextDocumentSaveReason.Manual, e -> Activator.logError(e));
+            TextDocumentWillSaveEvent event =
+                new TextDocumentWillSaveEvent(document, TextDocumentSaveReason.Manual);
+
+            onWillSaveTextDocument.fire(event, Activator.LOGGER);
+
+            CompletableFuture<List<List<TextEdit>>> future =
+                onWillSaveTextDocumentWaitUntil.fire(event, Activator.LOGGER);
             List<List<TextEdit>> result = null;
             try
             {
@@ -162,7 +173,7 @@ public class ProtoDocumentProvider
         if (document != null)
             onDidSaveTextDocument.fire(
                 new TextDocumentSaveEvent(document, info.fTextFileBuffer.getDocument().get()),
-                e -> Activator.logError(e));
+                Activator.LOGGER);
     }
 
     private static class XFileInfo
