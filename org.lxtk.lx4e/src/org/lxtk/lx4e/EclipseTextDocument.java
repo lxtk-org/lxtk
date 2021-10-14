@@ -212,12 +212,12 @@ public final class EclipseTextDocument
 
     private void notifyWillChange(EclipseTextDocumentChangeEvent event)
     {
-        onWillChange.fire(event, Activator.LOGGER);
+        onWillChange.emit(event, Activator.LOGGER);
     }
 
     private void notifyChange(EclipseTextDocumentChangeEvent event)
     {
-        onDidChange.fire(event, Activator.LOGGER);
+        onDidChange.emit(event, Activator.LOGGER);
         lastChange.set(event);
     }
 

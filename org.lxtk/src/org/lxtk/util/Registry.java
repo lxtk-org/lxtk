@@ -94,11 +94,11 @@ public interface Registry<E>
             public Disposable add(E e)
             {
                 if (elements.add(e))
-                    onDidAdd.fire(e, logger);
+                    onDidAdd.emit(e, logger);
                 return () ->
                 {
                     if (elements.remove(e))
-                        onDidRemove.fire(e, logger);
+                        onDidRemove.emit(e, logger);
                 };
             }
 

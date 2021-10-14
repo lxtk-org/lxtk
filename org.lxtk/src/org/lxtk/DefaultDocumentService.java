@@ -61,18 +61,18 @@ public class DefaultDocumentService
             if (onWillChange != null)
             {
                 Disposable willChangeSubscription = onWillChange.subscribe(
-                    event -> onWillChangeTextDocument.fire(event, getLogger()));
+                    event -> onWillChangeTextDocument.emit(event, getLogger()));
                 rollback.add(willChangeSubscription::dispose);
             }
             Disposable didChangeSubscription = document.onDidChange().subscribe(
-                event -> onDidChangeTextDocument.fire(event, getLogger()));
+                event -> onDidChangeTextDocument.emit(event, getLogger()));
             rollback.add(didChangeSubscription::dispose);
 
-            onDidAddTextDocument.fire(document, getLogger());
+            onDidAddTextDocument.emit(document, getLogger());
             rollback.add(() ->
             {
                 if (textDocuments.remove(uri, document))
-                    onDidRemoveTextDocument.fire(document, getLogger());
+                    onDidRemoveTextDocument.emit(document, getLogger());
             });
 
             rollback.setLogger(getLogger());

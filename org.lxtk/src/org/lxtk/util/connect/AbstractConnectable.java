@@ -182,7 +182,7 @@ public abstract class AbstractConnectable
     private void setConnectionState(ConnectionState connectionState)
     {
         this.connectionState = connectionState;
-        ForkJoinPool.commonPool().execute(() -> onDidChangeConnectionState.fire(this,
+        ForkJoinPool.commonPool().execute(() -> onDidChangeConnectionState.emit(this,
             thrown -> log().error(thrown.getMessage(), thrown)));
     }
 

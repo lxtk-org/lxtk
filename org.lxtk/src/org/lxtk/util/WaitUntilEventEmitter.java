@@ -50,10 +50,10 @@ public class WaitUntilEventEmitter<E, T>
      *  the event's {@link WaitUntilEvent#accept(CompletableFuture) accept} method complete
      *  (never <code>null</code>)
      */
-    public CompletableFuture<List<T>> fire(E event, Consumer<Throwable> exceptionHandler)
+    public CompletableFuture<List<T>> emit(E event, Consumer<Throwable> exceptionHandler)
     {
         List<CompletableFuture<T>> futureList = new ArrayList<>();
-        delegate.fire(new WaitUntilEvent<>(event, futureList::add), exceptionHandler);
+        delegate.emit(new WaitUntilEvent<>(event, futureList::add), exceptionHandler);
         @SuppressWarnings("unchecked")
         CompletableFuture<T>[] futures = (CompletableFuture<T>[])futureList.toArray(NO_FUTURES);
         return CompletableFuture.allOf(futures).thenCompose(x ->

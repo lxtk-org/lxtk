@@ -140,10 +140,10 @@ public class ProtoDocumentProvider
             TextDocumentWillSaveEvent event =
                 new TextDocumentWillSaveEvent(document, TextDocumentSaveReason.Manual);
 
-            onWillSaveTextDocument.fire(event, Activator.LOGGER);
+            onWillSaveTextDocument.emit(event, Activator.LOGGER);
 
             CompletableFuture<List<List<TextEdit>>> future =
-                onWillSaveTextDocumentWaitUntil.fire(event, Activator.LOGGER);
+                onWillSaveTextDocumentWaitUntil.emit(event, Activator.LOGGER);
             List<List<TextEdit>> result = null;
             try
             {
@@ -171,7 +171,7 @@ public class ProtoDocumentProvider
         super.commitFileBuffer(monitor, info, overwrite);
 
         if (document != null)
-            onDidSaveTextDocument.fire(
+            onDidSaveTextDocument.emit(
                 new TextDocumentSaveEvent(document, info.fTextFileBuffer.getDocument().get()),
                 Activator.LOGGER);
     }

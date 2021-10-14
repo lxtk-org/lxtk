@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -45,7 +45,7 @@ public class EventEmitter<E>
      * @param exceptionHandler may be <code>null</code>, in which case
      *  any exception thrown by an event consumer is suppressed
      */
-    public void fire(E event, Consumer<Throwable> exceptionHandler)
+    public void emit(E event, Consumer<Throwable> exceptionHandler)
     {
         Objects.requireNonNull(event);
         for (Consumer<? super E> consumer : consumers)
@@ -62,6 +62,20 @@ public class EventEmitter<E>
                     t.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Notify all subscribers about the given event; the given exception handler
+     * is used to handle any exception thrown by an event consumer.
+     *
+     * @param event not <code>null</code>
+     * @param exceptionHandler may be <code>null</code>, in which case
+     *  any exception thrown by an event consumer is suppressed
+     * @deprecated Replaced with {@link #emit(Object, Consumer)}
+     */
+    public void fire(E event, Consumer<Throwable> exceptionHandler)
+    {
+        emit(event, exceptionHandler);
     }
 
     @Override
