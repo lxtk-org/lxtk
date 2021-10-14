@@ -50,17 +50,18 @@ public interface TextDocument
     TextDocumentChangeEvent getLastChange();
 
     /**
-     * Returns an event emitter firing when the content of the document is about to be changed.
+     * Returns a stream of events that are emitted when the content of the document
+     * is about to be changed.
      *
-     * @return an event emitter firing when the content of the document is about to be changed,
-     *  or <code>null</code> if not supported by the document
+     * @return a stream of events that are emitted when the content of the document
+     *  is about to be changed, or <code>null</code> if not supported by the document
      */
     EventStream<TextDocumentChangeEvent> onWillChange();
 
     /**
-     * Returns an event emitter firing when the content of the document changes. 
+     * Returns a stream of events that are emitted when the content of the document changes.
      *
-     * @return an event emitter firing when the content of the document changes
+     * @return a stream of events that are emitted when the content of the document changes
      *  (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onDidChange();

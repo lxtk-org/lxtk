@@ -19,18 +19,22 @@ import org.lxtk.util.EventStream;
 import org.lxtk.util.WaitUntilEvent;
 
 /**
- * Represents a source of {@link WaitUntilEvent}s that wrap {@link TextDocumentWillSaveEvent}s.
- * Event consumer can asynchronously compute text edits that need to be applied to the text document
- * before it is saved and pass the future representing the computation result to the event's {@link
- * WaitUntilEvent#accept(java.util.concurrent.CompletableFuture) accept} method. Text edits must not
- * overlap with each other.
+ * Represents a source of events that are emitted when a text document is going to be saved,
+ * allowing an event consumer to asynchronously compute text edits that will be applied to the
+ * text document before it is saved.
  */
 public interface TextDocumentWillSaveWaitUntilEventSource
 {
     /**
-     * Returns an event emitter firing when a text document is going to be saved.
+     * Returns a stream of events that are emitted when a text document is going to be saved.
+     * <p>
+     * An event consumer can asynchronously compute text edits that will be applied to the text
+     * document before it is saved. A future representing the computation result needs to be passed
+     * to the event's {@link WaitUntilEvent#accept(java.util.concurrent.CompletableFuture) accept}
+     * method. Text edits computed by consumers of the event must not overlap with each other.
+     * </p>
      *
-     * @return an event emitter firing when a text document is going to be saved
+     * @return a stream of events that are emitted when a text document is going to be saved
      *  (never <code>null</code>)
      */
     EventStream<WaitUntilEvent<TextDocumentWillSaveEvent,

@@ -15,14 +15,14 @@ package org.lxtk;
 import org.lxtk.util.EventStream;
 
 /**
- * Represents a source of {@link TextDocumentWillSaveEvent}s.
+ * Represents a source of events that are emitted when a text document is going to be saved.
  */
 public interface TextDocumentWillSaveEventSource
 {
     /**
-     * Returns an event emitter firing when a text document is going to be saved.
+     * Returns a stream of events that are emitted when a text document is going to be saved.
      *
-     * @return an event emitter firing when a text document is going to be saved
+     * @return a stream of events that are emitted when a text document is going to be saved
      *  (never <code>null</code>)
      */
     EventStream<TextDocumentWillSaveEvent> onWillSaveTextDocument();

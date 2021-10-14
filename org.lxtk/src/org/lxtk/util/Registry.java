@@ -34,18 +34,18 @@ public interface Registry<E>
     Disposable add(E e);
 
     /**
-     * Returns an event emitter firing when an element is added
+     * Returns a stream of events that are emitted when an element is added
      * to this registry.
      *
-     * @return an event emitter firing when an element is added
+     * @return a stream of events that are emitted when an element is added
      */
     EventStream<E> onDidAdd();
 
     /**
-     * Returns an event emitter firing when an element is removed
+     * Returns a stream of events that are emitted when an element is removed
      * from this registry.
      *
-     * @return an event emitter firing when an element is removed
+     * @return a stream of events that are emitted when an element is removed
      */
     EventStream<E> onDidRemove();
 

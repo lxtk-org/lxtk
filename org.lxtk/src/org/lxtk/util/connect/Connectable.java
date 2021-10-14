@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -101,10 +101,10 @@ public interface Connectable
     }
 
     /**
-     * Returns an event emitter firing when the connection state changes
+     * Returns a stream of events that are emitted when the connection state changes
      * for this object.
      *
-     * @return an event emitter firing when the connection state changes
+     * @return a stream of events that are emitted when the connection state changes
      *  (never <code>null</code>)
      */
     EventStream<Connectable> onDidChangeConnectionState();

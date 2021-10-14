@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -73,10 +73,10 @@ public interface WorkspaceService
     WorkspaceFolder getOutermostWorkspaceFolder(URI uri);
 
     /**
-     * Returns an event emitter firing when there is a change to the collection
+     * Returns a stream of events that are emitted when there is a change to the collection
      * of workspace folders managed by this service.
      *
-     * @return an event emitter firing when there is a change to the collection
+     * @return a stream of events that are emitted when there is a change to the collection
      *  of workspace folders (never <code>null</code>)
      */
     EventStream<WorkspaceFoldersChangeEvent> onDidChangeWorkspaceFolders();

@@ -78,50 +78,50 @@ public interface DocumentService
     TextDocument getTextDocument(URI uri);
 
     /**
-     * Returns an event emitter firing when a text document is added
+     * Returns a stream of events that are emitted when a text document is added
      * to the collection of documents managed by this service.
      *
-     * @return an event emitter firing when a text document is added
+     * @return a stream of events that are emitted when a text document is added
      *  (never <code>null</code>)
      */
     EventStream<TextDocument> onDidAddTextDocument();
 
     /**
-     * Returns an event emitter firing when a text document is removed
+     * Returns a stream of events that are emitted when a text document is removed
      * from the collection of documents managed by this service.
      *
-     * @return an event emitter firing when a text document is removed
+     * @return a stream of events that are emitted when a text document is removed
      *  (never <code>null</code>)
      */
     EventStream<TextDocument> onDidRemoveTextDocument();
 
     /**
-     * Returns an event emitter firing when the content of a managed text document
-     * is about to be changed. Note that an event will be fired if and only if
+     * Returns a stream of events that are emitted when the content of a managed text document
+     * is about to be changed. Note that an event will be emitted if and only if
      * it is {@link TextDocument#onWillChange() supported} by the text document.
      * <p>
-     * These events may be fired even before firing {@link #onDidAddTextDocument()}
+     * These events may be emitted even before firing {@link #onDidAddTextDocument()}
      * or after firing {@link #onDidRemoveTextDocument()} for a text document.
      * This provision is to avoid a possibility of a blind-spot where some
      * change events might have escaped a client due to a race condition.
      * </p>
      *
-     * @return an event emitter firing when the content of a managed text document
+     * @return a stream of events that are emitted when the content of a managed text document
      *  is about to be changed (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onWillChangeTextDocument();
 
     /**
-     * Returns an event emitter firing when the content of a managed text document
+     * Returns a stream of events that are emitted when the content of a managed text document
      * changes.
      * <p>
-     * These events may be fired even before firing {@link #onDidAddTextDocument()}
+     * These events may be emitted even before firing {@link #onDidAddTextDocument()}
      * or after firing {@link #onDidRemoveTextDocument()} for a text document.
      * This provision is to avoid a possibility of a blind-spot where some
      * change events might have escaped a client due to a race condition.
      * </p>
      *
-     * @return an event emitter firing when the content of a managed text document
+     * @return a stream of events that are emitted when the content of a managed text document
      *  changes (never <code>null</code>)
      */
     EventStream<TextDocumentChangeEvent> onDidChangeTextDocument();
