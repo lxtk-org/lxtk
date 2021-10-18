@@ -55,7 +55,8 @@ public interface LanguageService
      * Returns call hierarchy capabilities provided by this service.
      *
      * @return call hierarchy capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     CallHierarchyCapabilities getCallHierarchyCapabilities();
 
@@ -70,7 +71,8 @@ public interface LanguageService
      * Returns code action capabilities provided by this service.
      *
      * @return code action capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     CodeActionCapabilities getCodeActionCapabilities();
 
@@ -85,7 +87,8 @@ public interface LanguageService
      * Returns code lens capabilities provided by this service.
      *
      * @return code lens capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     CodeLensCapabilities getCodeLensCapabilities();
 
@@ -100,7 +103,8 @@ public interface LanguageService
      * Returns completion capabilities provided by this service.
      *
      * @return completion capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     CompletionCapabilities getCompletionCapabilities();
 
@@ -115,7 +119,8 @@ public interface LanguageService
      * Returns declaration capabilities provided by this service.
      *
      * @return declaration capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     DeclarationCapabilities getDeclarationCapabilities();
 
@@ -130,7 +135,8 @@ public interface LanguageService
      * Returns definition capabilities provided by this service.
      *
      * @return definition capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     DefinitionCapabilities getDefinitionCapabilities();
 
@@ -145,7 +151,8 @@ public interface LanguageService
      * Returns document formatting capabilities provided by this service.
      *
      * @return document formatting capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     FormattingCapabilities getDocumentFormattingCapabilities();
 
@@ -160,7 +167,8 @@ public interface LanguageService
      * Returns document highlight capabilities provided by this service.
      *
      * @return document highlight capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     DocumentHighlightCapabilities getDocumentHighlightCapabilities();
 
@@ -175,7 +183,8 @@ public interface LanguageService
      * Returns document range formatting capabilities provided by this service.
      *
      * @return document range formatting capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     RangeFormattingCapabilities getDocumentRangeFormattingCapabilities();
 
@@ -192,7 +201,8 @@ public interface LanguageService
      * Returns document symbol capabilities provided by this service.
      *
      * @return document symbol capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     DocumentSymbolCapabilities getDocumentSymbolCapabilities();
 
@@ -207,7 +217,8 @@ public interface LanguageService
      * Returns folding range capabilities provided by this service.
      *
      * @return folding range capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     FoldingRangeCapabilities getFoldingRangeCapabilities();
 
@@ -222,7 +233,8 @@ public interface LanguageService
      * Returns hover capabilities provided by this service.
      *
      * @return hover capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     HoverCapabilities getHoverCapabilities();
 
@@ -237,7 +249,8 @@ public interface LanguageService
      * Returns implementation capabilities provided by this service.
      *
      * @return implementation capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     ImplementationCapabilities getImplementationCapabilities();
 
@@ -252,7 +265,8 @@ public interface LanguageService
      * Returns linked editing range capabilities provided by this service.
      *
      * @return linked editing range capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     LinkedEditingRangeCapabilities getLinkedEditingRangeCapabilities();
 
@@ -267,7 +281,8 @@ public interface LanguageService
      * Returns references capabilities provided by this service.
      *
      * @return references capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     ReferencesCapabilities getReferencesCapabilities();
 
@@ -282,7 +297,8 @@ public interface LanguageService
      * Returns rename capabilities provided by this service.
      *
      * @return rename capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     RenameCapabilities getRenameCapabilities();
 
@@ -297,7 +313,8 @@ public interface LanguageService
      * Returns signature help capabilities provided by this service.
      *
      * @return signature help capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     SignatureHelpCapabilities getSignatureHelpCapabilities();
 
@@ -312,7 +329,8 @@ public interface LanguageService
      * Returns type definition capabilities provided by this service.
      *
      * @return type definition capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     TypeDefinitionCapabilities getTypeDefinitionCapabilities();
 
@@ -327,7 +345,8 @@ public interface LanguageService
      * Returns workspace symbol capabilities provided by this service.
      *
      * @return workspace symbol capabilities (never <code>null</code>).
-     *  Clients may modify the returned object
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
      */
     SymbolCapabilities getWorkspaceSymbolCapabilities();
 
