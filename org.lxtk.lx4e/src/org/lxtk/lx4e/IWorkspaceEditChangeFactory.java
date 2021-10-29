@@ -40,5 +40,4 @@ public interface IWorkspaceEditChangeFactory
      */
     Change createChange(String name, WorkspaceEdit workspaceEdit, IProgressMonitor pm)
         throws CoreException;
-
 }

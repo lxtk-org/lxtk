@@ -19,6 +19,9 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.refactoring.messages"; //$NON-NLS-1$
 
+    public static String FileOperationParticipantSupport_Computing_pre_create_changes;
+    public static String FileOperationParticipantSupport_Computing_pre_delete_changes;
+    public static String FileOperationParticipantSupport_Computing_pre_rename_changes;
     public static String TextFileChange_Cannot_apply_stale_change;
     public static String UndoTextFileChange_Cannot_undo_stale_change;
     public static String UndoTextFileChange_File_should_exist;

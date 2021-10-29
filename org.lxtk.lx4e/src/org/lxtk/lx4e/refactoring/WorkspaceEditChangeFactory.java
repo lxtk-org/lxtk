@@ -64,6 +64,9 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.lxtk.DocumentService;
 import org.lxtk.DocumentUri;
+import org.lxtk.FileCreate;
+import org.lxtk.FileDelete;
+import org.lxtk.FileRename;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentSnapshot;
 import org.lxtk.WorkspaceEditUtil;
@@ -75,6 +78,7 @@ import org.lxtk.lx4e.ResourceUriHandler;
 import org.lxtk.lx4e.TextDocumentUriHandler;
 import org.lxtk.lx4e.internal.Activator;
 import org.lxtk.lx4e.internal.util.ChangeUtil;
+import org.lxtk.util.Disposable;
 
 /**
  * Default implementation of {@link IWorkspaceEditChangeFactory}.
@@ -90,6 +94,8 @@ public class WorkspaceEditChangeFactory
      * The associated {@link IUriHandler} (never <code>null</code>).
      */
     protected final IUriHandler uriHandler;
+
+    private IFileOperationParticipantSupport participantSupport;
 
     /**
      * Creates a new factory instance with the given {@link DocumentService} and a
@@ -114,6 +120,27 @@ public class WorkspaceEditChangeFactory
     {
         this.documentService = Objects.requireNonNull(documentService);
         this.uriHandler = Objects.requireNonNull(uriHandler);
+    }
+
+    /**
+     * Sets the file operation participant support.
+     *
+     * @param participantSupport may be <code>null</code>
+     */
+    public void setFileOperationParticipantSupport(
+        IFileOperationParticipantSupport participantSupport)
+    {
+        this.participantSupport = participantSupport;
+    }
+
+    /**
+     * Returns the file operation participant support.
+     *
+     * @return the file operation participant support, or <code>null</code> if there is none
+     */
+    protected IFileOperationParticipantSupport getFileOperationParticipantSupport()
+    {
+        return participantSupport;
     }
 
     @Override
@@ -523,62 +550,36 @@ public class WorkspaceEditChangeFactory
             @Override
             public Change perform(IProgressMonitor pm) throws CoreException
             {
-                List<Either<TextDocumentEdit, ResourceOperation>> documentChanges =
-                    workspaceEdit.getDocumentChanges();
-                List<Change> undos = new ArrayList<>();
+                ChangeExecutor changeExecutor = new ChangeExecutor();
                 try
                 {
-                    SubMonitor subMonitor = SubMonitor.convert(pm, documentChanges.size());
+                    List<Either<TextDocumentEdit, ResourceOperation>> documentChanges =
+                        workspaceEdit.getDocumentChanges();
+                    SubMonitor subMonitor = SubMonitor.convert(pm, documentChanges.size() * 5);
                     for (Either<TextDocumentEdit,
                         ResourceOperation> documentChange : documentChanges)
                     {
-                        Change change = createChange(documentChange);
-                        Change undo;
-                        try
-                        {
-                            undo = ChangeUtil.executeChange(change, true, undos != null,
-                                subMonitor.split(1));
-                        }
-                        catch (OperationCanceledException e)
-                        {
-                            rollback(undos);
-                            throw e;
-                        }
-                        catch (Exception | LinkageError | AssertionError e) // same as in SafeRunner
-                        {
-                            Activator.logError(e);
+                        Change preChange = createPreChange(documentChange, subMonitor.split(1));
+                        if (preChange != null)
+                            changeExecutor.executeChange(preChange, subMonitor.split(1));
+                        else
+                            subMonitor.worked(1);
 
-                            Boolean rollbackResult = rollback(undos);
+                        changeExecutor.executeChange(createChange(documentChange),
+                            subMonitor.split(1));
 
-                            throw newChangeExecutionFailedException(name, e, rollbackResult);
-                        }
-                        finally
-                        {
-                            ChangeUtil.safelyDisposeChange(change);
-                        }
-                        if (undo != null)
-                        {
-                            if (undos != null)
-                                undos.add(undo);
-                            else
-                                ChangeUtil.safelyDisposeChange(undo);
-                        }
-                        else if (undos != null)
-                        {
-                            ChangeUtil.safelyDisposeChanges(undos);
-                            undos = null;
-                        }
+                        Change postChange = createPostChange(documentChange, subMonitor.split(1));
+                        if (postChange != null)
+                            changeExecutor.executeChange(postChange, subMonitor.split(1));
+                        else
+                            subMonitor.worked(1);
+
                     }
-                    if (undos == null)
-                        return null;
-                    Collections.reverse(undos);
-                    Change result = new WorkspaceEditUndoChange(name, undos);
-                    undos = null; // transfer ownership
-                    return result;
+                    return changeExecutor.getUndoChange();
                 }
                 finally
                 {
-                    ChangeUtil.safelyDisposeChanges(undos);
+                    changeExecutor.dispose();
                 }
             }
 
@@ -586,6 +587,150 @@ public class WorkspaceEditChangeFactory
             public Object getModifiedElement()
             {
                 return null;
+            }
+
+            private Change createPreChange(
+                Either<TextDocumentEdit, ResourceOperation> documentChange,
+                IProgressMonitor monitor) throws CoreException
+            {
+                if (documentChange.isLeft())
+                    return null;
+
+                IFileOperationParticipantSupport participantSupport =
+                    getFileOperationParticipantSupport();
+                if (participantSupport == null)
+                    return null;
+
+                ResourceOperation operation = documentChange.getRight();
+
+                if (operation instanceof CreateFile)
+                {
+                    CreateFile createFile = (CreateFile)operation;
+                    URI uri = DocumentUri.convert(createFile.getUri());
+                    return participantSupport.computePreCreateChange(
+                        Collections.singletonList(new FileCreate(uri)), monitor);
+                }
+
+                if (operation instanceof DeleteFile)
+                {
+                    DeleteFile deleteFile = (DeleteFile)operation;
+                    URI uri = DocumentUri.convert(deleteFile.getUri());
+                    return participantSupport.computePreDeleteChange(
+                        Collections.singletonList(new FileDelete(uri)), monitor);
+                }
+
+                if (operation instanceof RenameFile)
+                {
+                    RenameFile renameFile = (RenameFile)operation;
+                    URI oldUri = DocumentUri.convert(renameFile.getOldUri());
+                    URI newUri = DocumentUri.convert(renameFile.getNewUri());
+                    return participantSupport.computePreRenameChange(
+                        Collections.singletonList(new FileRename(oldUri, newUri)), monitor);
+                }
+
+                return null;
+            }
+
+            private Change createPostChange(
+                Either<TextDocumentEdit, ResourceOperation> documentChange,
+                IProgressMonitor monitor) throws CoreException
+            {
+                if (documentChange.isLeft())
+                    return null;
+
+                IFileOperationParticipantSupport participantSupport =
+                    getFileOperationParticipantSupport();
+                if (participantSupport == null)
+                    return null;
+
+                ResourceOperation operation = documentChange.getRight();
+
+                if (operation instanceof CreateFile)
+                {
+                    CreateFile createFile = (CreateFile)operation;
+                    URI uri = DocumentUri.convert(createFile.getUri());
+                    return participantSupport.computePostCreateChange(
+                        Collections.singletonList(new FileCreate(uri)), monitor);
+                }
+
+                if (operation instanceof DeleteFile)
+                {
+                    DeleteFile deleteFile = (DeleteFile)operation;
+                    URI uri = DocumentUri.convert(deleteFile.getUri());
+                    return participantSupport.computePostDeleteChange(
+                        Collections.singletonList(new FileDelete(uri)), monitor);
+                }
+
+                if (operation instanceof RenameFile)
+                {
+                    RenameFile renameFile = (RenameFile)operation;
+                    URI oldUri = DocumentUri.convert(renameFile.getOldUri());
+                    URI newUri = DocumentUri.convert(renameFile.getNewUri());
+                    return participantSupport.computePostRenameChange(
+                        Collections.singletonList(new FileRename(oldUri, newUri)), monitor);
+                }
+
+                return null;
+            }
+
+            private class ChangeExecutor
+                implements Disposable
+            {
+                private List<Change> undos = new ArrayList<>();
+
+                public void executeChange(Change change, IProgressMonitor pm) throws CoreException
+                {
+                    Change undo;
+                    try
+                    {
+                        undo = ChangeUtil.executeChange(change, true, undos != null, pm);
+                    }
+                    catch (OperationCanceledException e)
+                    {
+                        rollback(undos);
+                        throw e;
+                    }
+                    catch (Exception | LinkageError | AssertionError e) // same as in SafeRunner
+                    {
+                        Activator.logError(e);
+
+                        Boolean rollbackResult = rollback(undos);
+
+                        throw newChangeExecutionFailedException(name, e, rollbackResult);
+                    }
+                    finally
+                    {
+                        ChangeUtil.safelyDisposeChange(change);
+                    }
+                    if (undo != null)
+                    {
+                        if (undos != null)
+                            undos.add(undo);
+                        else
+                            ChangeUtil.safelyDisposeChange(undo);
+                    }
+                    else if (undos != null)
+                    {
+                        ChangeUtil.safelyDisposeChanges(undos);
+                        undos = null;
+                    }
+                }
+
+                public Change getUndoChange()
+                {
+                    if (undos == null)
+                        return null;
+                    Collections.reverse(undos);
+                    Change result = new WorkspaceEditUndoChange(name, undos);
+                    undos = null; // transfer ownership
+                    return result;
+                }
+
+                @Override
+                public void dispose()
+                {
+                    ChangeUtil.safelyDisposeChanges(undos);
+                }
             }
         }
     }
