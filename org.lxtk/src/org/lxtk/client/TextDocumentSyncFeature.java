@@ -14,11 +14,9 @@ package org.lxtk.client;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,6 +37,7 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.SaveOptions;
+import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SynchronizationCapabilities;
 import org.eclipse.lsp4j.TextDocumentChangeRegistrationOptions;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
@@ -88,8 +87,8 @@ public final class TextDocumentSyncFeature
     private static final String WILL_SAVE = "textDocument/willSave"; //$NON-NLS-1$
     private static final String WILL_SAVE_WAIT_UNTIL = "textDocument/willSaveWaitUntil"; //$NON-NLS-1$
     private static final String DID_SAVE = "textDocument/didSave"; //$NON-NLS-1$
-    private static final Set<String> METHODS = Collections.unmodifiableSet(new HashSet<>(
-        Arrays.asList(DID_OPEN, DID_CLOSE, DID_CHANGE, WILL_SAVE, WILL_SAVE_WAIT_UNTIL, DID_SAVE)));
+    private static final Set<String> METHODS =
+        Set.of(DID_OPEN, DID_CLOSE, DID_CHANGE, WILL_SAVE, WILL_SAVE_WAIT_UNTIL, DID_SAVE);
 
     private final DocumentService documentService;
     private final TextDocumentWillSaveEventSource willSaveEventSource;
@@ -186,16 +185,21 @@ public final class TextDocumentSyncFeature
     @Override
     public void fillClientCapabilities(ClientCapabilities capabilities)
     {
-        SynchronizationCapabilities syncronization =
-            ClientCapabilitiesUtil.getOrCreateSynchronization(
-                ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities));
-        syncronization.setDynamicRegistration(true);
+        SynchronizationCapabilities synchronization = new SynchronizationCapabilities();
+
+        synchronization.setDynamicRegistration(true);
+
         if (willSaveEventSource != null)
-            syncronization.setWillSave(true);
+            synchronization.setWillSave(true);
+
         if (willSaveWaitUntilEventSource != null)
-            syncronization.setWillSaveWaitUntil(true);
+            synchronization.setWillSaveWaitUntil(true);
+
         if (saveEventSource != null)
-            syncronization.setDidSave(true);
+            synchronization.setDidSave(true);
+
+        ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities).setSynchronization(
+            synchronization);
     }
 
     @Override
@@ -230,7 +234,7 @@ public final class TextDocumentSyncFeature
             return;
 
         TextDocumentSyncOptions syncOptions =
-            ServerCapabilitiesUtil.getTextDocumentSyncOptions(initializeResult.getCapabilities());
+            getTextDocumentSyncOptions(initializeResult.getCapabilities());
 
         if (Boolean.TRUE.equals(syncOptions.getOpenClose()))
         {
@@ -532,9 +536,7 @@ public final class TextDocumentSyncFeature
     {
         TextDocument document = event.getDocument();
 
-        TextDocumentRegistrationOptions registrationOptions =
-            getRegistrationOptions(document, WILL_SAVE);
-        if (registrationOptions == null)
+        if (!hasMatchingRegistration(document, WILL_SAVE))
             return;
 
         WillSaveTextDocumentParams params = new WillSaveTextDocumentParams();
@@ -551,9 +553,7 @@ public final class TextDocumentSyncFeature
 
         TextDocument document = event.getDocument();
 
-        TextDocumentRegistrationOptions registrationOptions =
-            getRegistrationOptions(document, WILL_SAVE_WAIT_UNTIL);
-        if (registrationOptions == null)
+        if (!hasMatchingRegistration(document, WILL_SAVE_WAIT_UNTIL))
             return;
 
         WillSaveTextDocumentParams params = new WillSaveTextDocumentParams();
@@ -613,6 +613,25 @@ public final class TextDocumentSyncFeature
         TextDocument document = snapshot.getDocument();
         return new TextDocumentItem(DocumentUri.convert(document.getUri()),
             document.getLanguageId(), snapshot.getVersion(), snapshot.getText());
+    }
+
+    private static TextDocumentSyncOptions getTextDocumentSyncOptions(
+        ServerCapabilities capabilities)
+    {
+        Either<TextDocumentSyncKind, TextDocumentSyncOptions> either =
+            capabilities.getTextDocumentSync();
+        if (either == null)
+            return new TextDocumentSyncOptions();
+
+        if (either.isRight())
+            return either.getRight();
+
+        TextDocumentSyncOptions options = new TextDocumentSyncOptions();
+        TextDocumentSyncKind syncKind = either.getLeft();
+        options.setChange(syncKind);
+        if (syncKind != null && syncKind != TextDocumentSyncKind.None)
+            options.setOpenClose(true);
+        return options;
     }
 
     private interface PendingChange

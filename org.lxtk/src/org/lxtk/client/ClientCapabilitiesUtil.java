@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2021 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,7 +15,6 @@ package org.lxtk.client;
 import java.util.Optional;
 
 import org.eclipse.lsp4j.ClientCapabilities;
-import org.eclipse.lsp4j.SynchronizationCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 
@@ -28,17 +27,6 @@ class ClientCapabilitiesUtil
             TextDocumentClientCapabilities textDocument = new TextDocumentClientCapabilities();
             capabilities.setTextDocument(textDocument);
             return textDocument;
-        });
-    }
-
-    static SynchronizationCapabilities getOrCreateSynchronization(
-        TextDocumentClientCapabilities capabilities)
-    {
-        return Optional.ofNullable(capabilities.getSynchronization()).orElseGet(() ->
-        {
-            SynchronizationCapabilities synchronization = new SynchronizationCapabilities();
-            capabilities.setSynchronization(synchronization);
-            return synchronization;
         });
     }
 
