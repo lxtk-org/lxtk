@@ -39,4 +39,5 @@ Export-Package: org.lxtk.lx4e.internal.ui;x-internal:=true,
  org.lxtk.lx4e.ui.hyperlinks,
  org.lxtk.lx4e.ui.refactoring.rename,
  org.lxtk.lx4e.ui.references,
- org.lxtk.lx4e.ui.symbols
+ org.lxtk.lx4e.ui.symbols,
+ org.lxtk.lx4e.ui.tokens

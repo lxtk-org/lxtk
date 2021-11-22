@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.LinkedEditingRangeCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
+import org.eclipse.lsp4j.SemanticTokensCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
@@ -196,6 +197,22 @@ public interface LanguageService
      *  (never <code>null</code>)
      */
     Registry<DocumentRangeFormattingProvider> getDocumentRangeFormattingProviders();
+
+    /**
+     * Returns document semantic tokens capabilities provided by this service.
+     *
+     * @return document semantic tokens capabilities (never <code>null</code>).
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
+     */
+    SemanticTokensCapabilities getDocumentSemanticTokensCapabilities();
+
+    /**
+     * Returns the registry of document semantic tokens' providers for this service.
+     *
+     * @return the registry of document semantic tokens' providers (never <code>null</code>)
+     */
+    Registry<DocumentSemanticTokensProvider> getDocumentSemanticTokensProviders();
 
     /**
      * Returns document symbol capabilities provided by this service.

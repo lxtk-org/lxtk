@@ -37,6 +37,7 @@ import org.eclipse.lsp4j.InsertTextMode;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.ParameterInformationCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
+import org.eclipse.lsp4j.SemanticTokensCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SignatureInformationCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
@@ -122,6 +123,14 @@ public class EclipseLanguageService
         DefinitionCapabilities definition = new DefinitionCapabilities();
         definition.setLinkSupport(true);
         return definition;
+    }
+
+    @Override
+    public SemanticTokensCapabilities getDocumentSemanticTokensCapabilities()
+    {
+        SemanticTokensCapabilities semanticTokens = super.getDocumentSemanticTokensCapabilities();
+        semanticTokens.setMultilineTokenSupport(true);
+        return semanticTokens;
     }
 
     @Override

@@ -12,6 +12,41 @@
  *******************************************************************************/
 package org.lxtk;
 
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Abstract;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Async;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Declaration;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.DefaultLibrary;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Definition;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Deprecated;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Documentation;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Modification;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Readonly;
+import static org.eclipse.lsp4j.SemanticTokenModifiers.Static;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Class;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Comment;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Enum;
+import static org.eclipse.lsp4j.SemanticTokenTypes.EnumMember;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Event;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Function;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Interface;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Keyword;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Macro;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Method;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Modifier;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Namespace;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Number;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Operator;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Parameter;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Property;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Regexp;
+import static org.eclipse.lsp4j.SemanticTokenTypes.String;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Struct;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Type;
+import static org.eclipse.lsp4j.SemanticTokenTypes.TypeParameter;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Variable;
+import static org.eclipse.lsp4j.TokenFormat.Relative;
+
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.CallHierarchyCapabilities;
@@ -30,6 +65,8 @@ import org.eclipse.lsp4j.LinkedEditingRangeCapabilities;
 import org.eclipse.lsp4j.RangeFormattingCapabilities;
 import org.eclipse.lsp4j.ReferencesCapabilities;
 import org.eclipse.lsp4j.RenameCapabilities;
+import org.eclipse.lsp4j.SemanticTokensCapabilities;
+import org.eclipse.lsp4j.SemanticTokensClientCapabilitiesRequests;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
@@ -53,6 +90,8 @@ public class DefaultLanguageService
     private final Registry<DocumentFormattingProvider> documentFormattingProviders = newRegistry();
     private final Registry<DocumentHighlightProvider> documentHighlightProviders = newRegistry();
     private final Registry<DocumentRangeFormattingProvider> documentRangeFormattingProviders =
+        newRegistry();
+    private final Registry<DocumentSemanticTokensProvider> documentSemanticTokensProviders =
         newRegistry();
     private final Registry<DocumentSymbolProvider> documentSymbolProviders = newRegistry();
     private final Registry<FoldingRangeProvider> foldingRangeProviders = newRegistry();
@@ -171,6 +210,24 @@ public class DefaultLanguageService
     public Registry<DocumentRangeFormattingProvider> getDocumentRangeFormattingProviders()
     {
         return documentRangeFormattingProviders;
+    }
+
+    @Override
+    public SemanticTokensCapabilities getDocumentSemanticTokensCapabilities()
+    {
+        return new SemanticTokensCapabilities(new SemanticTokensClientCapabilitiesRequests(),
+            List.of(Namespace, Type, Class, Enum, Interface, Struct, TypeParameter, Parameter,
+                Variable, Property, EnumMember, Event, Function, Method, Macro, Keyword, Modifier,
+                Comment, String, Number, Regexp, Operator),
+            List.of(Declaration, Definition, Readonly, Static, Deprecated, Abstract, Async,
+                Modification, Documentation, DefaultLibrary),
+            List.of(Relative));
+    }
+
+    @Override
+    public Registry<DocumentSemanticTokensProvider> getDocumentSemanticTokensProviders()
+    {
+        return documentSemanticTokensProviders;
     }
 
     @Override
