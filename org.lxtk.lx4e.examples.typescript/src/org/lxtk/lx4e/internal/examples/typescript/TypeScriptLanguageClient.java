@@ -27,6 +27,7 @@ import java.util.Objects;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.MessageParams;
@@ -70,6 +71,9 @@ import org.lxtk.util.connect.StreamBasedConnection;
 public class TypeScriptLanguageClient
     extends EclipseLanguageClientController<LanguageServer>
 {
+    private static final String NPX =
+        Platform.getOS().toLowerCase().startsWith("win") ? "npx.cmd" : "npx"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
     static final String MARKER_TYPE = "org.lxtk.lx4e.examples.typescript.problem"; //$NON-NLS-1$
 
     private final IProject project;
@@ -184,7 +188,7 @@ public class TypeScriptLanguageClient
                 Process process;
                 try
                 {
-                    process = new ProcessBuilder("npx", "typescript-language-server", //$NON-NLS-1$ //$NON-NLS-2$
+                    process = new ProcessBuilder(NPX, "typescript-language-server", //$NON-NLS-1$
                         "--stdio").start(); //$NON-NLS-1$
                 }
                 catch (IOException e)

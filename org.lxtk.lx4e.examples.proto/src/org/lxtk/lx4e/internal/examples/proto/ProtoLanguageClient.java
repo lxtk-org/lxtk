@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -53,6 +54,9 @@ import org.lxtk.util.connect.StreamBasedConnection;
 public class ProtoLanguageClient
     extends EclipseLanguageClientController<LanguageServer>
 {
+    private static final String NPX =
+        Platform.getOS().toLowerCase().startsWith("win") ? "npx.cmd" : "npx"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
     private static final Log LOG =
         new EclipseLog(Activator.getDefault().getBundle(), "proto-language-client"); //$NON-NLS-1$
 
@@ -124,7 +128,7 @@ public class ProtoLanguageClient
                 Process process;
                 try
                 {
-                    process = new ProcessBuilder("npx", "--node-arg=--nolazy", //$NON-NLS-1$ //$NON-NLS-2$
+                    process = new ProcessBuilder(NPX, "--node-arg=--nolazy", //$NON-NLS-1$
                         "--node-arg=--inspect=6009", "proto-language-server", "--stdio").start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 }
                 catch (IOException e)

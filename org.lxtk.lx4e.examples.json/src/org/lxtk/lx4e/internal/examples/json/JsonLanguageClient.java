@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
@@ -61,6 +62,9 @@ import com.google.gson.JsonObject;
 public class JsonLanguageClient
     extends EclipseLanguageClientController<LanguageServer>
 {
+    private static final String NPX =
+        Platform.getOS().toLowerCase().startsWith("win") ? "npx.cmd" : "npx"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
     private static final Log LOG =
         new EclipseLog(Activator.getDefault().getBundle(), "json-language-client"); //$NON-NLS-1$
 
@@ -169,7 +173,7 @@ public class JsonLanguageClient
                 Process process;
                 try
                 {
-                    process = new ProcessBuilder("npx", "vscode-json-languageserver", //$NON-NLS-1$ //$NON-NLS-2$
+                    process = new ProcessBuilder(NPX, "vscode-json-languageserver", //$NON-NLS-1$
                         "--stdio").start(); //$NON-NLS-1$
                 }
                 catch (IOException e)
