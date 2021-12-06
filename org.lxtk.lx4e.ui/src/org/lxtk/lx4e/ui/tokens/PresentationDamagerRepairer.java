@@ -19,10 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
 
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -119,19 +117,9 @@ public abstract class PresentationDamagerRepairer
                     request.setParams(new SemanticTokensRangeParams(
                         DocumentUri.toTextDocumentIdentifier(documentUri), range));
                     request.setTimeout(getSemanticTokensRequestTimeout());
+                    request.setMayThrow(false);
 
-                    SemanticTokens tokens = null;
-                    try
-                    {
-                        tokens = request.sendAndReceive();
-                    }
-                    catch (CompletionException e)
-                    {
-                        Activator.logError(e.getCause());
-                    }
-                    catch (OperationCanceledException e)
-                    {
-                    }
+                    SemanticTokens tokens = request.sendAndReceive();
                     if (tokens != null)
                     {
                         List<Integer> data = tokens.getData();
