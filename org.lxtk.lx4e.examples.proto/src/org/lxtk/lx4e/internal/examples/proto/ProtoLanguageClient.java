@@ -128,8 +128,8 @@ public class ProtoLanguageClient
                 Process process;
                 try
                 {
-                    process = new ProcessBuilder(NPX, "--node-arg=--nolazy", //$NON-NLS-1$
-                        "--node-arg=--inspect=6009", "proto-language-server", "--stdio").start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    process = new ProcessBuilder(NPX, "proto-language-server", //$NON-NLS-1$
+                        "--stdio").start(); //$NON-NLS-1$
                 }
                 catch (IOException e)
                 {
