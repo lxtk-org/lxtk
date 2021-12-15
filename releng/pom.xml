@@ -23,8 +23,8 @@
     <maven>3.6.3</maven>
   </prerequisites>
   <properties>
-    <tycho.version>2.3.0</tycho.version>
-    <tycho.extras.version>2.3.0</tycho.extras.version>
+    <tycho.version>2.5.0</tycho.version>
+    <tycho.extras.version>2.5.0</tycho.extras.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
