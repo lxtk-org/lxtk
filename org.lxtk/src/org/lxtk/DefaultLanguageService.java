@@ -56,6 +56,7 @@ import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
+import org.eclipse.lsp4j.DocumentLinkCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
@@ -89,6 +90,7 @@ public class DefaultLanguageService
     private final Registry<DefinitionProvider> definitionProviders = newRegistry();
     private final Registry<DocumentFormattingProvider> documentFormattingProviders = newRegistry();
     private final Registry<DocumentHighlightProvider> documentHighlightProviders = newRegistry();
+    private final Registry<DocumentLinkProvider> documentLinkProviders = newRegistry();
     private final Registry<DocumentRangeFormattingProvider> documentRangeFormattingProviders =
         newRegistry();
     private final Registry<DocumentSemanticTokensProvider> documentSemanticTokensProviders =
@@ -198,6 +200,18 @@ public class DefaultLanguageService
     public Registry<DocumentHighlightProvider> getDocumentHighlightProviders()
     {
         return documentHighlightProviders;
+    }
+
+    @Override
+    public DocumentLinkCapabilities getDocumentLinkCapabilities()
+    {
+        return new DocumentLinkCapabilities();
+    }
+
+    @Override
+    public Registry<DocumentLinkProvider> getDocumentLinkProviders()
+    {
+        return documentLinkProviders;
     }
 
     @Override

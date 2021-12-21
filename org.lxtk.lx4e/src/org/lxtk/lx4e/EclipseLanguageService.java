@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.CompletionItemTag;
 import org.eclipse.lsp4j.CompletionItemTagSupportCapabilities;
 import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
+import org.eclipse.lsp4j.DocumentLinkCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
@@ -123,6 +124,14 @@ public class EclipseLanguageService
         DefinitionCapabilities definition = new DefinitionCapabilities();
         definition.setLinkSupport(true);
         return definition;
+    }
+
+    @Override
+    public DocumentLinkCapabilities getDocumentLinkCapabilities()
+    {
+        DocumentLinkCapabilities documentLink = new DocumentLinkCapabilities();
+        documentLink.setTooltipSupport(true);
+        return documentLink;
     }
 
     @Override

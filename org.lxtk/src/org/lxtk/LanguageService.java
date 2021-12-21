@@ -19,6 +19,7 @@ import org.eclipse.lsp4j.CompletionCapabilities;
 import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentHighlightCapabilities;
+import org.eclipse.lsp4j.DocumentLinkCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
 import org.eclipse.lsp4j.FormattingCapabilities;
@@ -179,6 +180,22 @@ public interface LanguageService
      * @return the registry of document highlight providers (never <code>null</code>)
      */
     Registry<DocumentHighlightProvider> getDocumentHighlightProviders();
+
+    /**
+     * Returns document link capabilities provided by this service.
+     *
+     * @return document link capabilities (never <code>null</code>).
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
+     */
+    DocumentLinkCapabilities getDocumentLinkCapabilities();
+
+    /**
+     * Returns the registry of document link providers for this service.
+     *
+     * @return the registry of document link providers (never <code>null</code>)
+     */
+    Registry<DocumentLinkProvider> getDocumentLinkProviders();
 
     /**
      * Returns document range formatting capabilities provided by this service.

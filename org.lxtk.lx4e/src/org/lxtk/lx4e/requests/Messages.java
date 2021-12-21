@@ -28,6 +28,8 @@ class Messages
     public static String DefinitionRequest_title;
     public static String DocumentFormattingRequest_title;
     public static String DocumentHighlightRequest_title;
+    public static String DocumentLinkRequest_title;
+    public static String DocumentLinkResolveRequest_title;
     public static String DocumentRangeFormattingRequest_title;
     public static String DocumentRangeSemanticTokensRequest_title;
     public static String DocumentSemanticTokensDeltaRequest_title;
