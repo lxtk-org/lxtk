@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DocumentFilter;
@@ -30,12 +31,16 @@ import org.eclipse.lsp4j.SemanticTokensParams;
 import org.eclipse.lsp4j.SemanticTokensRangeParams;
 import org.eclipse.lsp4j.SemanticTokensServerFull;
 import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
+import org.eclipse.lsp4j.SemanticTokensWorkspaceCapabilities;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentSemanticTokensProvider;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
 import org.lxtk.util.Disposable;
+import org.lxtk.util.EventEmitter;
+import org.lxtk.util.EventStream;
+import org.lxtk.util.SafeRun;
 
 /**
  * Participates in a given {@link LanguageService} by implementing and dynamically contributing
@@ -77,6 +82,8 @@ public final class DocumentSemanticTokensFeature
         semanticTokens.getRequests().setRange(true);
         ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities).setSemanticTokens(
             semanticTokens);
+        ClientCapabilitiesUtil.getOrCreateWorkspace(capabilities).setSemanticTokens(
+            new SemanticTokensWorkspaceCapabilities(true));
     }
 
     @Override
@@ -112,56 +119,83 @@ public final class DocumentSemanticTokensFeature
     Disposable registerLanguageFeatureProvider(String method,
         SemanticTokensWithRegistrationOptions options)
     {
-        return getLanguageService().getDocumentSemanticTokensProviders().add(
-            new DocumentSemanticTokensProvider()
-            {
-                @Override
-                public SemanticTokensWithRegistrationOptions getRegistrationOptions()
+        EventEmitter<Void> onDidChangeSemanticTokens = new EventEmitter<>();
+        return SafeRun.runWithResult(rollback ->
+        {
+            Disposable registration = getLanguageService().getDocumentSemanticTokensProviders().add(
+                new DocumentSemanticTokensProvider()
                 {
-                    return options;
-                }
+                    @Override
+                    public SemanticTokensWithRegistrationOptions getRegistrationOptions()
+                    {
+                        return options;
+                    }
 
-                @Override
-                public ProgressService getProgressService()
-                {
-                    return getLanguageClient().getProgressService();
-                }
+                    @Override
+                    public ProgressService getProgressService()
+                    {
+                        return getLanguageClient().getProgressService();
+                    }
 
-                @Override
-                public CompletableFuture<SemanticTokens> getDocumentSemanticTokens(
-                    SemanticTokensParams params)
-                {
-                    Either<Boolean, SemanticTokensServerFull> full = options.getFull();
-                    if (full == null || !(full.isRight() || Boolean.TRUE.equals(full.getLeft())))
-                        throw new UnsupportedOperationException();
+                    @Override
+                    public CompletableFuture<SemanticTokens> getDocumentSemanticTokens(
+                        SemanticTokensParams params)
+                    {
+                        Either<Boolean, SemanticTokensServerFull> full = options.getFull();
+                        if (full == null
+                            || !(full.isRight() || Boolean.TRUE.equals(full.getLeft())))
+                            throw new UnsupportedOperationException();
 
-                    return getLanguageServer().getTextDocumentService().semanticTokensFull(params);
-                }
+                        return getLanguageServer().getTextDocumentService().semanticTokensFull(
+                            params);
+                    }
 
-                @Override
-                public CompletableFuture<
-                    Either<SemanticTokens, SemanticTokensDelta>> getDocumentSemanticTokensDelta(
-                        SemanticTokensDeltaParams params)
-                {
-                    Either<Boolean, SemanticTokensServerFull> full = options.getFull();
-                    if (full == null
-                        || !(full.isRight() && Boolean.TRUE.equals(full.getRight().getDelta())))
-                        throw new UnsupportedOperationException();
+                    @Override
+                    public CompletableFuture<
+                        Either<SemanticTokens, SemanticTokensDelta>> getDocumentSemanticTokensDelta(
+                            SemanticTokensDeltaParams params)
+                    {
+                        Either<Boolean, SemanticTokensServerFull> full = options.getFull();
+                        if (full == null
+                            || !(full.isRight() && Boolean.TRUE.equals(full.getRight().getDelta())))
+                            throw new UnsupportedOperationException();
 
-                    return getLanguageServer().getTextDocumentService().semanticTokensFullDelta(
-                        params);
-                }
+                        return getLanguageServer().getTextDocumentService().semanticTokensFullDelta(
+                            params);
+                    }
 
-                @Override
-                public CompletableFuture<SemanticTokens> getDocumentRangeSemanticTokens(
-                    SemanticTokensRangeParams params)
-                {
-                    Either<Boolean, Object> range = options.getRange();
-                    if (range == null || !(range.isRight() || Boolean.TRUE.equals(range.getLeft())))
-                        throw new UnsupportedOperationException();
+                    @Override
+                    public CompletableFuture<SemanticTokens> getDocumentRangeSemanticTokens(
+                        SemanticTokensRangeParams params)
+                    {
+                        Either<Boolean, Object> range = options.getRange();
+                        if (range == null
+                            || !(range.isRight() || Boolean.TRUE.equals(range.getLeft())))
+                            throw new UnsupportedOperationException();
 
-                    return getLanguageServer().getTextDocumentService().semanticTokensRange(params);
-                }
-            });
+                        return getLanguageServer().getTextDocumentService().semanticTokensRange(
+                            params);
+                    }
+
+                    @Override
+                    public EventStream<Void> onDidChangeSemanticTokens()
+                    {
+                        return onDidChangeSemanticTokens;
+                    }
+                });
+            rollback.add(registration::dispose);
+
+            Disposable subscription = getLanguageClient().onDidChangeSemanticTokens().subscribe(
+                e -> onDidChangeSemanticTokens.emit(e, getLogger()));
+            rollback.add(subscription::dispose);
+
+            rollback.setLogger(getLogger());
+            return rollback::run;
+        });
+    }
+
+    private Consumer<Throwable> getLogger()
+    {
+        return thrown -> getLanguageClient().log().error(thrown.getMessage(), thrown);
     }
 }

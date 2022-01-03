@@ -45,6 +45,8 @@ import org.lxtk.ProgressService;
 import org.lxtk.WorkspaceService;
 import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.util.Disposable;
+import org.lxtk.util.EventEmitter;
+import org.lxtk.util.EventStream;
 import org.lxtk.util.Log;
 
 import com.google.gson.JsonElement;
@@ -65,6 +67,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private final Consumer<PublishDiagnosticsParams> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures = new HashMap<>();
+    private final EventEmitter<Void> onDidChangeSemanticTokens = new EventEmitter<>();
     private S languageServer;
     private ServerInfo serverInfo;
     private List<DocumentFilter> documentSelector;
@@ -153,6 +156,18 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     public ProgressService getProgressService()
     {
         return null;
+    }
+
+    /**
+     * Returns a stream of events that are emitted when semantic tokens provided by
+     * the language server have changed.
+     *
+     * @return a stream of events that are emitted when semantic tokens provided by
+     *  the language server have changed (never <code>null</code>)
+     */
+    public EventStream<Void> onDidChangeSemanticTokens()
+    {
+        return onDidChangeSemanticTokens;
     }
 
     @Override
@@ -288,6 +303,16 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         ProgressService progressService = getProgressService();
         if (progressService != null)
             progressService.accept(params);
+    }
+
+    @Override
+    public CompletableFuture<Void> refreshSemanticTokens()
+    {
+        return CompletableFuture.runAsync(() ->
+        {
+            onDidChangeSemanticTokens.emit(null,
+                thrown -> log().error(thrown.getMessage(), thrown));
+        });
     }
 
     @Override

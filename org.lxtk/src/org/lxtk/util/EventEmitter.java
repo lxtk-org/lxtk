@@ -41,13 +41,12 @@ public class EventEmitter<E>
      * Notify all subscribers about the given event; the given exception handler
      * is used to handle any exception thrown by an event consumer.
      *
-     * @param event not <code>null</code>
+     * @param event may be <code>null</code>
      * @param exceptionHandler may be <code>null</code>, in which case
      *  any exception thrown by an event consumer is suppressed
      */
     public void emit(E event, Consumer<Throwable> exceptionHandler)
     {
-        Objects.requireNonNull(event);
         for (Consumer<? super E> consumer : consumers)
         {
             try

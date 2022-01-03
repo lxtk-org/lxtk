@@ -34,6 +34,15 @@ public interface Registry<E>
     Disposable add(E e);
 
     /**
+     * Returns whether this registry contains the given element.
+     *
+     * @param e the element whose presence in this registry is to be tested
+     * @return <code>true</code> if the registry contains the given element,
+     *  and <code>false</code> otherwise
+     */
+    boolean contains(Object e);
+
+    /**
      * Returns a stream of events that are emitted when an element is added
      * to this registry.
      *
@@ -100,6 +109,12 @@ public interface Registry<E>
                     if (elements.remove(e))
                         onDidRemove.emit(e, logger);
                 };
+            }
+
+            @Override
+            public boolean contains(Object e)
+            {
+                return elements.contains(e);
             }
 
             @Override

@@ -24,6 +24,7 @@ import org.eclipse.lsp4j.SemanticTokensRangeParams;
 import org.eclipse.lsp4j.SemanticTokensServerFull;
 import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.lxtk.util.EventStream;
 
 /**
  * Provides {@link SemanticTokens} for a given text document.
@@ -74,4 +75,13 @@ public interface DocumentSemanticTokensProvider
      */
     CompletableFuture<SemanticTokens> getDocumentRangeSemanticTokens(
         SemanticTokensRangeParams params);
+
+    /**
+     * Returns a stream of events that are emitted when semantic tokens from this provider
+     * have changed.
+     *
+     * @return a stream of events that are emitted when semantic tokens from this provider
+     *  have changed (never <code>null</code>)
+     */
+    EventStream<Void> onDidChangeSemanticTokens();
 }
