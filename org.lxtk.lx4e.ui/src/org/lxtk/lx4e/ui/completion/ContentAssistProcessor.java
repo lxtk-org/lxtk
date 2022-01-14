@@ -132,27 +132,22 @@ public class ContentAssistProcessor
         if (result == null)
             return null;
 
+        CompletionList list =
+            result.isLeft() ? new CompletionList(result.getLeft()) : result.getRight();
+        if (list == null)
+            return null;
+
         CompletionContext context = newCompletionContext();
         context.setTextViewer(viewer);
         context.setDocumentUri(documentUri);
         context.setInvocationOffset(offset);
         context.setContentAssistProcessor(this);
 
-        List<CompletionItem> items;
-        boolean isIncomplete = false;
-        if (result.isLeft())
-            items = result.getLeft();
-        else
-        {
-            CompletionList list = result.getRight();
-            isIncomplete = list.isIncomplete();
-            items = list.getItems();
-        }
+        List<CompletionItem> items = list.getItems();
         List<ICompletionProposal> proposals = new ArrayList<>(items.size());
         for (CompletionItem item : items)
         {
-            ICompletionProposal proposal =
-                toCompletionProposal(item, provider, context, isIncomplete);
+            ICompletionProposal proposal = toCompletionProposal(item, list, provider, context);
             if (proposal != null)
                 proposals.add(proposal);
         }
@@ -242,17 +237,16 @@ public class ContentAssistProcessor
      * Converts the given completion item to a completion proposal.
      *
      * @param completionItem never <code>null</code>
+     * @param completionList never <code>null</code>
      * @param completionProvider never <code>null</code>
      * @param completionContext never <code>null</code>
-     * @param isCompletionListIncomplete indicates whether the computed list of completion items
-     *  is not complete
      * @return the corresponding completion proposal, or <code>null</code> if none
      */
     protected ICompletionProposal toCompletionProposal(CompletionItem completionItem,
-        CompletionProvider completionProvider, CompletionContext completionContext,
-        boolean isCompletionListIncomplete)
+        CompletionList completionList, CompletionProvider completionProvider,
+        CompletionContext completionContext)
     {
-        return isCompletionListIncomplete
+        return completionList.isIncomplete()
             ? new BaseCompletionProposal(completionItem, completionProvider, completionContext)
             : new CompletionProposal(completionItem, completionProvider, completionContext);
     }
