@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -90,6 +90,8 @@ public class BaseCompletionProposal
 
     /** The given completion item. */
     protected final CompletionItem completionItem;
+    /** The given completion provider. */
+    protected final CompletionProvider completionProvider;
     /** The given completion context. */
     protected final CompletionContext completionContext;
 
@@ -102,12 +104,14 @@ public class BaseCompletionProposal
      * Constructor.
      *
      * @param completionItem not <code>null</code>
+     * @param completionProvider not <code>null</code>
      * @param completionContext not <code>null</code>
      */
     public BaseCompletionProposal(CompletionItem completionItem,
-        CompletionContext completionContext)
+        CompletionProvider completionProvider, CompletionContext completionContext)
     {
         this.completionItem = Objects.requireNonNull(completionItem);
+        this.completionProvider = Objects.requireNonNull(completionProvider);
         this.completionContext = Objects.requireNonNull(completionContext);
     }
 
@@ -472,7 +476,6 @@ public class BaseCompletionProposal
 
     private CompletionItem resolveCompletionItem(IProgressMonitor monitor)
     {
-        CompletionProvider completionProvider = completionContext.getCompletionProvider();
         if (!Boolean.TRUE.equals(completionProvider.getRegistrationOptions().getResolveProvider()))
             return completionItem;
 
@@ -642,8 +645,7 @@ public class BaseCompletionProposal
         if (command == null)
             return;
 
-        CommandService commandService =
-            completionContext.getCompletionProvider().getCommandService();
+        CommandService commandService = completionProvider.getCommandService();
         if (commandService == null)
             return;
 

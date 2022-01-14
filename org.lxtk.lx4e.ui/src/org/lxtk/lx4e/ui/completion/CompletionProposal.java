@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,6 +23,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.lsp4j.CompletionItem;
+import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.internal.ui.Activator;
 
 /**
@@ -41,11 +42,13 @@ public class CompletionProposal
      * Constructor.
      *
      * @param completionItem not <code>null</code>
+     * @param completionProvider not <code>null</code>
      * @param completionContext not <code>null</code>
      */
-    public CompletionProposal(CompletionItem completionItem, CompletionContext completionContext)
+    public CompletionProposal(CompletionItem completionItem, CompletionProvider completionProvider,
+        CompletionContext completionContext)
     {
-        super(completionItem, completionContext);
+        super(completionItem, completionProvider, completionContext);
     }
 
     @Override

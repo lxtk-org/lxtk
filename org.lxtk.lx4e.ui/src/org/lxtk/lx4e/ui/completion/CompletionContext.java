@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -32,7 +32,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.swt.graphics.Point;
-import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
 /**
@@ -43,7 +42,6 @@ public class CompletionContext
     private ITextViewer textViewer;
     private URI documentUri;
     private int invocationOffset;
-    private CompletionProvider completionProvider;
     private IContentAssistProcessor contentAssistProcessor;
 
     /**
@@ -104,18 +102,6 @@ public class CompletionContext
     }
 
     /**
-     * Return the completion provider.
-     *
-     * @return the completion provider (never <code>null</code>)
-     */
-    public final CompletionProvider getCompletionProvider()
-    {
-        if (completionProvider == null)
-            throw new IllegalStateException();
-        return completionProvider;
-    }
-
-    /**
      * Returns whether the overwrite mode is on.
      *
      * @return <code>true</code> if the overwrite mode is on,
@@ -172,11 +158,6 @@ public class CompletionContext
     void setInvocationOffset(int invocationOffset)
     {
         this.invocationOffset = invocationOffset;
-    }
-
-    void setCompletionProvider(CompletionProvider completionProvider)
-    {
-        this.completionProvider = completionProvider;
     }
 
     void setContentAssistProcessor(IContentAssistProcessor contentAssistProcessor)
