@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
+import org.lxtk.AbstractPartialResultProgress;
 import org.lxtk.DocumentUri;
 import org.lxtk.WorkspaceSymbolProvider;
 import org.lxtk.lx4e.EfsUriHandler;
@@ -106,6 +107,16 @@ public class WorkspaceSymbolSelectionDialog
         request.setParams(new WorkspaceSymbolParams(itemsFilter.getPattern()));
         request.setProgressMonitor(monitor);
         request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+        request.setUpPartialResultProgress((
+            () -> new AbstractPartialResultProgress<List<? extends SymbolInformation>>()
+            {
+                @Override
+                protected void onAccept(List<? extends SymbolInformation> items)
+                {
+                    for (SymbolInformation item : items)
+                        contentProvider.add(item, itemsFilter);
+                }
+            }));
 
         List<? extends SymbolInformation> result;
         try
