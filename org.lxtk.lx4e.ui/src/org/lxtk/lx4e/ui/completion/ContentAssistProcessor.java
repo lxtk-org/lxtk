@@ -15,10 +15,15 @@ package org.lxtk.lx4e.ui.completion;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -56,12 +61,10 @@ import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Default implementation of an {@link IContentAssistProcessor} that
- * computes completion proposals using a {@link CompletionProvider} and
- * context information using a {@link SignatureHelpProvider}.
+ * computes completion proposals using {@link CompletionProvider}(s)
+ * and context information using {@link SignatureHelpProvider}(s).
  */
 // Implementation limits:
-// - Aggregation of completion or signature help providers is not supported
-//   (the best matching provider is used)
 // - Auto-activation by trigger characters specified in the server options
 //   is not supported (a subclass can explicitly specify auto-activation
 //   characters by overriding the corresponding methods)
@@ -72,7 +75,6 @@ public class ContentAssistProcessor
     private static final IContextInformation[] NO_INFOS = new IContextInformation[0];
 
     private final Supplier<LanguageOperationTarget> targetSupplier;
-    private String errorMessage;
     private IContextInformationValidator contextInformationValidator;
 
     /**
@@ -86,22 +88,28 @@ public class ContentAssistProcessor
         this.targetSupplier = Objects.requireNonNull(targetSupplier);
     }
 
+    /**
+     * Returns the {@link LanguageOperationTarget} for this processor.
+     * <p>
+     * There is no requirement that the same result be returned each time this method is invoked.
+     * </p>
+     *
+     * @return the language operation target, or <code>null</code> if none
+     */
+    public LanguageOperationTarget getLanguageOperationTarget()
+    {
+        return targetSupplier.get();
+    }
+
     @Override
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
     {
-        errorMessage = null;
-
-        LanguageOperationTarget target = targetSupplier.get();
+        LanguageOperationTarget target = getLanguageOperationTarget();
         if (target == null)
             return null;
 
-        URI documentUri = target.getDocumentUri();
-        LanguageService languageService = target.getLanguageService();
-
-        CompletionProvider provider = languageService.getDocumentMatcher().getBestMatch(
-            languageService.getCompletionProviders(), CompletionProvider::getDocumentSelector,
-            documentUri, target.getLanguageId());
-        if (provider == null)
+        CompletionProvider[][] providerGroups = getCompletionProviderGroups(target);
+        if (providerGroups == null || providerGroups.length == 0)
             return null;
 
         IDocument document = viewer.getDocument();
@@ -117,68 +125,50 @@ public class ContentAssistProcessor
             return null;
         }
 
-        CompletionRequest request = newCompletionRequest();
-        request.setProvider(provider);
-        request.setParams(
-            new CompletionParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
-        request.setTimeout(getCompletionTimeout());
-        request.setMayThrow(false);
-        request.setUpWorkDoneProgress(
-            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
-
-        Either<List<CompletionItem>, CompletionList> result = request.sendAndReceive();
-        errorMessage = request.getErrorMessage();
-
-        if (result == null)
-            return null;
-
-        CompletionList list =
-            result.isLeft() ? new CompletionList(result.getLeft()) : result.getRight();
-        if (list == null)
-            return null;
+        CompletionParams params = new CompletionParams(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), position);
 
         CompletionContext context = newCompletionContext();
         context.setTextViewer(viewer);
-        context.setDocumentUri(documentUri);
+        context.setDocumentUri(target.getDocumentUri());
         context.setInvocationOffset(offset);
         context.setContentAssistProcessor(this);
 
-        List<CompletionItem> items = list.getItems();
-        List<ICompletionProposal> proposals = new ArrayList<>(items.size());
-        for (CompletionItem item : items)
+        for (CompletionProvider[] providerGroup : providerGroups)
         {
-            ICompletionProposal proposal = toCompletionProposal(item, list, provider, context);
-            if (proposal != null)
-                proposals.add(proposal);
+            CompletionResults results = computeCompletionResults(providerGroup, params);
+            if (results != null)
+            {
+                ICompletionProposal[] proposals = getCompletionProposals(results, context);
+                if (proposals != null && proposals.length > 0)
+                    return proposals;
+            }
         }
-        return proposals.toArray(NO_PROPOSALS);
+
+        return null;
     }
 
     @Override
     public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
     {
-        errorMessage = null;
-
-        SignatureHelpRequest request = getSignatureHelpRequest(viewer, offset, null);
-        if (request == null)
-            return NO_INFOS;
-
-        SignatureHelp result = request.sendAndReceive();
-        errorMessage = request.getErrorMessage();
-
+        SignatureHelpResult result = computeSignatureHelpResult(viewer, offset, null);
         if (result == null)
-            return NO_INFOS;
+            return null;
 
-        normalize(result);
+        SignatureHelp signatureHelp = result.getSignatureHelp();
+        if (signatureHelp == null)
+            return null;
 
-        int size = result.getSignatures().size();
+        normalize(signatureHelp);
+
+        int size = signatureHelp.getSignatures().size();
         List<IContextInformation> infos = new ArrayList<>(size);
         for (int index = 0; index < size; index++)
         {
-            IContextInformation info = toContextInformation(result, index);
+            IContextInformation info = toContextInformation(signatureHelp, index);
             if (info != null)
             {
-                if (index == result.getActiveSignature())
+                if (index == signatureHelp.getActiveSignature())
                     infos.add(0, info);
                 else
                     infos.add(info);
@@ -202,7 +192,7 @@ public class ContentAssistProcessor
     @Override
     public String getErrorMessage()
     {
-        return errorMessage;
+        return null;
     }
 
     @Override
@@ -234,6 +224,130 @@ public class ContentAssistProcessor
     }
 
     /**
+     * Returns completion providers that match the given target, grouped by their match score,
+     * in descending order.
+     *
+     * @param target never <code>null</code>
+     * @return the matching completion providers, grouped by their match score, in descending order,
+     *  or <code>null</code> if none
+     */
+    protected CompletionProvider[][] getCompletionProviderGroups(LanguageOperationTarget target)
+    {
+        List<CompletionProvider[]> result = new ArrayList<>();
+
+        LanguageService languageService = target.getLanguageService();
+
+        NavigableMap<Integer, List<CompletionProvider>> groupedMatches =
+            languageService.getDocumentMatcher().getGroupedMatches(
+                languageService.getCompletionProviders(), CompletionProvider::getDocumentSelector,
+                target.getDocumentUri(), target.getLanguageId());
+
+        for (List<CompletionProvider> group : groupedMatches.values())
+        {
+            result.add(group.toArray(CompletionProvider[]::new));
+        }
+
+        return result.toArray(CompletionProvider[][]::new);
+    }
+
+    /**
+     * Asks each of the given completion providers to compute a result for the given
+     * {@link CompletionParams} and returns the computed results.
+     *
+     * @param completionProviders never <code>null</code>
+     * @param completionParams never <code>null</code>
+     * @return the computed completion results, or <code>null</code> if none
+     */
+    protected CompletionResults computeCompletionResults(CompletionProvider[] completionProviders,
+        CompletionParams completionParams)
+    {
+        if (completionProviders.length == 0)
+            return null;
+
+        Map<CompletionProvider, CompletionResult> results = new LinkedHashMap<>();
+
+        for (CompletionProvider completionProvider : completionProviders)
+            results.put(completionProvider, null); // initialize iteration order
+
+        JobGroup jobGroup =
+            new JobGroup(Messages.Computing_completion_proposals, 0, completionProviders.length);
+
+        for (CompletionProvider completionProvider : completionProviders)
+        {
+            Job job = Job.create(Messages.Computing_completion_proposals, monitor ->
+            {
+                CompletionRequest request = newCompletionRequest();
+                request.setProvider(completionProvider);
+                request.setParams(completionParams);
+                request.setTimeout(getCompletionTimeout());
+                request.setMayThrow(false);
+                request.setProgressMonitor(monitor);
+                request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+
+                Either<List<CompletionItem>, CompletionList> response = request.sendAndReceive();
+
+                CompletionList completionList = response == null ? null : response.isLeft()
+                    ? new CompletionList(response.getLeft()) : response.getRight();
+
+                synchronized (results)
+                {
+                    results.put(completionProvider, new CompletionResult(completionList));
+                }
+            });
+            job.setJobGroup(jobGroup);
+            job.schedule();
+        }
+
+        try
+        {
+            jobGroup.join(0, null);
+        }
+        catch (InterruptedException e)
+        {
+            // ignore
+        }
+
+        return new CompletionResults(results);
+    }
+
+    /**
+     * Returns completion proposals for the given completion results.
+     *
+     * @param completionResults never <code>null</code>
+     * @param completionContext never <code>null</code>
+     * @return the completion proposals, or <code>null</code> if none
+     */
+    protected ICompletionProposal[] getCompletionProposals(CompletionResults completionResults,
+        CompletionContext completionContext)
+    {
+        List<ICompletionProposal> result = new ArrayList<>();
+
+        for (Map.Entry<CompletionProvider,
+            CompletionResult> entry : completionResults.asMap().entrySet())
+        {
+            CompletionResult completionResult = entry.getValue();
+            if (completionResult != null)
+            {
+                CompletionList completionList = completionResult.getCompletionList();
+                if (completionList != null)
+                {
+                    CompletionProvider completionProvider = entry.getKey();
+
+                    for (CompletionItem completionItem : completionList.getItems())
+                    {
+                        ICompletionProposal completionProposal = toCompletionProposal(
+                            completionItem, completionList, completionProvider, completionContext);
+                        if (completionProposal != null)
+                            result.add(completionProposal);
+                    }
+                }
+            }
+        }
+
+        return result.toArray(NO_PROPOSALS);
+    }
+
+    /**
      * Converts the given completion item to a completion proposal.
      *
      * @param completionItem never <code>null</code>
@@ -249,6 +363,65 @@ public class ContentAssistProcessor
         return completionList.isIncomplete()
             ? new BaseCompletionProposal(completionItem, completionProvider, completionContext)
             : new CompletionProposal(completionItem, completionProvider, completionContext);
+    }
+
+    /**
+     * Computes a signature help result for the given offset in the given text viewer.
+     *
+     * @param viewer never <code>null</code>
+     * @param offset a zero-based offset
+     * @param context may be <code>null</code>
+     * @return the computed signature help result, or <code>null</code> if none
+     */
+    protected SignatureHelpResult computeSignatureHelpResult(ITextViewer viewer, int offset,
+        SignatureHelpContext context)
+    {
+        LanguageOperationTarget target = getLanguageOperationTarget();
+        if (target == null)
+            return null;
+
+        URI documentUri = target.getDocumentUri();
+        LanguageService languageService = target.getLanguageService();
+
+        List<SignatureHelpProvider> providers =
+            languageService.getDocumentMatcher().getSortedMatches(
+                languageService.getSignatureHelpProviders(),
+                SignatureHelpProvider::getDocumentSelector, documentUri, target.getLanguageId());
+        if (providers.isEmpty())
+            return null;
+
+        IDocument document = viewer.getDocument();
+
+        Position position;
+        try
+        {
+            position = DocumentUtil.toPosition(document, offset);
+        }
+        catch (BadLocationException e)
+        {
+            Activator.logError(e);
+            return null;
+        }
+
+        SignatureHelpParams params = new SignatureHelpParams(
+            DocumentUri.toTextDocumentIdentifier(documentUri), position, context);
+
+        for (SignatureHelpProvider provider : providers)
+        {
+            SignatureHelpRequest request = newSignatureHelpRequest();
+            request.setProvider(provider);
+            request.setParams(params);
+            request.setTimeout(getSignatureHelpTimeout());
+            request.setMayThrow(false);
+            request.setUpWorkDoneProgress(
+                () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
+
+            SignatureHelp signatureHelp = request.sendAndReceive();
+            if (signatureHelp != null)
+                return new SignatureHelpResult(signatureHelp);
+        }
+
+        return null;
     }
 
     /**
@@ -315,46 +488,6 @@ public class ContentAssistProcessor
         return MarkSignatureActiveParameterOptions.DEFAULT;
     }
 
-    private SignatureHelpRequest getSignatureHelpRequest(ITextViewer viewer, int offset,
-        SignatureHelpContext context)
-    {
-        LanguageOperationTarget target = targetSupplier.get();
-        if (target == null)
-            return null;
-
-        URI documentUri = target.getDocumentUri();
-        LanguageService languageService = target.getLanguageService();
-
-        SignatureHelpProvider provider = languageService.getDocumentMatcher().getBestMatch(
-            languageService.getSignatureHelpProviders(), SignatureHelpProvider::getDocumentSelector,
-            documentUri, target.getLanguageId());
-        if (provider == null)
-            return null;
-
-        IDocument document = viewer.getDocument();
-
-        Position position;
-        try
-        {
-            position = DocumentUtil.toPosition(document, offset);
-        }
-        catch (BadLocationException e)
-        {
-            Activator.logError(e);
-            return null;
-        }
-
-        SignatureHelpRequest request = newSignatureHelpRequest();
-        request.setProvider(provider);
-        request.setParams(new SignatureHelpParams(DocumentUri.toTextDocumentIdentifier(documentUri),
-            position, context));
-        request.setTimeout(getSignatureHelpTimeout());
-        request.setMayThrow(false);
-        request.setUpWorkDoneProgress(
-            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
-        return request;
-    }
-
     private static void normalize(SignatureHelp signatureHelp)
     {
         if (signatureHelp.getActiveSignature() == null)
@@ -400,6 +533,90 @@ public class ContentAssistProcessor
                 return signature;
         }
         return null;
+    }
+
+    /**
+     * Represents completion results.
+     */
+    protected static class CompletionResults
+    {
+        private final Map<CompletionProvider, CompletionResult> results;
+
+        /**
+         * Constructor.
+         *
+         * @param results not <code>null</code>
+         */
+        public CompletionResults(Map<CompletionProvider, CompletionResult> results)
+        {
+            this.results = Objects.requireNonNull(results);
+        }
+
+        /**
+         * Returns the completion results as a map.
+         *
+         * @return the completion results as a map (never <code>null</code>)
+         */
+        public Map<CompletionProvider, CompletionResult> asMap()
+        {
+            return results;
+        }
+    }
+
+    /**
+     * Represents a completion result.
+     */
+    protected static class CompletionResult
+    {
+        private final CompletionList completionList;
+
+        /**
+         * Constructor.
+         *
+         * @param completionList may be <code>null</code>
+         */
+        public CompletionResult(CompletionList completionList)
+        {
+            this.completionList = completionList;
+        }
+
+        /**
+         * Returns the completion list.
+         *
+         * @return the completion list, or <code>null</code> if none
+         */
+        public CompletionList getCompletionList()
+        {
+            return completionList;
+        }
+    }
+
+    /**
+     * Represents a signature help result.
+     */
+    protected static class SignatureHelpResult
+    {
+        private final SignatureHelp signatureHelp;
+
+        /**
+         * Constructor.
+         *
+         * @param signatureHelp may be <code>null</code>
+         */
+        public SignatureHelpResult(SignatureHelp signatureHelp)
+        {
+            this.signatureHelp = signatureHelp;
+        }
+
+        /**
+         * Returns the signature help.
+         *
+         * @return the signature help, or <code>null</code> if none
+         */
+        public SignatureHelp getSignatureHelp()
+        {
+            return signatureHelp;
+        }
     }
 
     /**
@@ -605,14 +822,15 @@ public class ContentAssistProcessor
             context.setActiveSignatureHelp(info.signatureHelp);
             info.signatureHelp.setActiveSignature(info.signatureIndex);
 
-            SignatureHelpRequest request = getSignatureHelpRequest(viewer, offset, context);
-            if (request == null)
+            SignatureHelpResult result = computeSignatureHelpResult(viewer, offset, context);
+            if (result == null)
                 return null;
 
-            SignatureHelp result = request.sendAndReceive();
-            if (result != null)
-                normalize(result);
-            return result;
+            SignatureHelp signatureHelp = result.getSignatureHelp();
+            if (signatureHelp != null)
+                normalize(signatureHelp);
+
+            return signatureHelp;
         }
 
         private Two<Integer, Integer> getOffsets(ParameterInformation parameter)

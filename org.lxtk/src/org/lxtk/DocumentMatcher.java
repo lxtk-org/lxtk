@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -190,6 +190,34 @@ public interface DocumentMatcher
             {
                 result.add(candidate);
             }
+        }
+        return result;
+    }
+
+    /**
+     * Given a collection of candidate elements and a function for computing
+     * the corresponding document selectors, returns all elements that match
+     * a document with the given URI and language identifier, sorted by
+     * their match score, in descending order.
+     *
+     * @param <T> element type
+     * @param candidates not <code>null</code>
+     * @param selectorExtractor not  <code>null</code>
+     * @param documentUri not <code>null</code>
+     * @param documentLanguageId not <code>null</code>
+     * @return the matching elements, sorted by their match score,
+     *  in descending order (never <code>null</code>)
+     */
+    default <T> List<T> getSortedMatches(Iterable<T> candidates,
+        Function<T, Iterable<DocumentFilter>> selectorExtractor, URI documentUri,
+        String documentLanguageId)
+    {
+        List<T> result = new ArrayList<>();
+        NavigableMap<Integer, List<T>> groupedMatches =
+            getGroupedMatches(candidates, selectorExtractor, documentUri, documentLanguageId);
+        for (List<T> group : groupedMatches.values())
+        {
+            result.addAll(group);
         }
         return result;
     }

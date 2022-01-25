@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,6 +19,7 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.completion.messages"; //$NON-NLS-1$
 
+    public static String Computing_completion_proposals;
     public static String Execution_error;
     public static String Tooltip_affordance_string;
 
