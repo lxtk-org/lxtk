@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IMarker;
@@ -55,23 +56,18 @@ import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.AnnotationInvocationContext;
-import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Partial implementation of an {@link IQuickAssistProcessor} that computes
- * quick fixes and quick assists using a {@link CodeActionProvider}.
+ * quick fixes and quick assists using {@link CodeActionProvider}(s).
  */
 public abstract class AbstractQuickAssistProcessor
     implements IQuickAssistProcessor
 {
-    private String errorMessage;
-
     @Override
     public ICompletionProposal[] computeQuickAssistProposals(
         IQuickAssistInvocationContext invocationContext)
     {
-        errorMessage = null;
-
         LanguageOperationTarget target = getLanguageOperationTarget();
         if (target == null)
             return null;
@@ -105,44 +101,18 @@ public abstract class AbstractQuickAssistProcessor
             return null;
         }
 
-        CodeActionProvider provider = CodeActions.getCodeActionProvider(target);
-        if (provider == null)
-            return null;
-
         Annotation annotation = null;
         if (invocationContext instanceof AnnotationInvocationContext)
             annotation = ((AnnotationInvocationContext)invocationContext).getAnnotation();
 
-        CodeActionRequest request = newCodeActionRequest();
-        request.setProvider(provider);
-        request.setParams(
+        CodeActionResults results = computeCodeActionResults(getCodeActionProviders(target),
             new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
                 range, getCodeActionContext(
                     new AnnotationInvocationContext(viewer, offset, length, annotation))));
-        request.setTimeout(getCodeActionTimeout());
-        request.setMayThrow(false);
-        request.setUpWorkDoneProgress(
-            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
-
-        List<Either<Command, CodeAction>> result = request.sendAndReceive();
-        errorMessage = request.getErrorMessage();
-
-        if (result == null || result.isEmpty())
+        if (results == null)
             return null;
 
-        List<ICompletionProposal> proposals = new ArrayList<>(result.size());
-        for (Either<Command, CodeAction> item : result)
-        {
-            if (item.isLeft())
-                proposals.add(newProposal(item.getLeft(), provider));
-            else if (item.isRight())
-            {
-                CodeAction codeAction = item.getRight();
-                if (codeAction.getDisabled() == null)
-                    proposals.add(newProposal(codeAction, provider));
-            }
-        }
-        return proposals.toArray(new ICompletionProposal[proposals.size()]);
+        return getProposals(results, invocationContext);
     }
 
     @Override
@@ -168,7 +138,7 @@ public abstract class AbstractQuickAssistProcessor
     @Override
     public String getErrorMessage()
     {
-        return errorMessage;
+        return null;
     }
 
     /**
@@ -330,6 +300,73 @@ public abstract class AbstractQuickAssistProcessor
         if (value == null)
             return null;
         return DefaultGson.INSTANCE.fromJson(value, Diagnostic.class);
+    }
+
+    /**
+     * Returns code action providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching code action providers (not <code>null</code>)
+     */
+    protected CodeActionProvider[] getCodeActionProviders(LanguageOperationTarget target)
+    {
+        return CodeActions.getCodeActionProviders(target);
+    }
+
+    /**
+     * Asks each of the given code action providers to compute a result for the given
+     * {@link CodeActionParams} and returns the computed results.
+     *
+     * @param providers never <code>null</code>
+     * @param params never <code>null</code>
+     * @return the computed code action results, or <code>null</code> if none
+     */
+    protected CodeActionResults computeCodeActionResults(CodeActionProvider[] providers,
+        CodeActionParams params)
+    {
+        return CodeActions.computeCodeActionResults(providers, params, this::newCodeActionRequest,
+            getCodeActionTimeout());
+    }
+
+    /**
+     * Returns quick assist proposals for the given code action results computed for
+     * the given invocation context.
+     *
+     * @param results never <code>null</code>
+     * @param context never <code>null</code>
+     * @return the quick assist proposals, or <code>null</code> if none
+     */
+    protected ICompletionProposal[] getProposals(CodeActionResults results,
+        IQuickAssistInvocationContext context)
+    {
+        List<ICompletionProposal> proposals = new ArrayList<>();
+
+        for (Map.Entry<CodeActionProvider, CodeActionResult> entry : results.asMap().entrySet())
+        {
+            CodeActionResult result = entry.getValue();
+            if (result != null)
+            {
+                List<Either<Command, CodeAction>> codeActions = result.getCodeActions();
+                if (codeActions != null)
+                {
+                    CodeActionProvider provider = entry.getKey();
+
+                    for (Either<Command, CodeAction> commandOrCodeAction : codeActions)
+                    {
+                        if (commandOrCodeAction.isLeft())
+                            proposals.add(newProposal(commandOrCodeAction.getLeft(), provider));
+                        else if (commandOrCodeAction.isRight())
+                        {
+                            CodeAction codeAction = commandOrCodeAction.getRight();
+                            if (codeAction.getDisabled() == null)
+                                proposals.add(newProposal(codeAction, provider));
+                        }
+                    }
+                }
+            }
+        }
+
+        return proposals.toArray(new ICompletionProposal[proposals.size()]);
     }
 
     /**

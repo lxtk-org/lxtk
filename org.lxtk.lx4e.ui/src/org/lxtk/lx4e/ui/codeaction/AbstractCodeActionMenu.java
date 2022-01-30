@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jface.action.Action;
@@ -41,16 +42,17 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.DefaultEditorHelper;
-import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Partial implementation of a menu consisting of a dynamic list of
- * code actions computed using a {@link CodeActionProvider}.
+ * code actions computed using {@link CodeActionProvider}(s).
  */
 public abstract class AbstractCodeActionMenu
     extends CompoundContributionItem
     implements IWorkbenchContribution
 {
+    private static final IContributionItem[] NO_ITEMS = new IContributionItem[0];
+
     private IServiceLocator serviceLocator;
 
     @Override
@@ -75,42 +77,19 @@ public abstract class AbstractCodeActionMenu
     {
         LanguageOperationTarget target = getLanguageOperationTarget();
         if (target == null)
-            return noItems();
+            return NO_ITEMS;
 
         Range range = getSelectedTextRange();
         if (range == null)
-            return noItems();
+            return NO_ITEMS;
 
-        CodeActionProvider provider = CodeActions.getCodeActionProvider(target);
-        if (provider == null)
-            return noItems();
-
-        CodeActionRequest request = newCodeActionRequest();
-        request.setProvider(provider);
-        request.setParams(
+        CodeActionResults results = computeCodeActionResults(getCodeActionProviders(target),
             new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
                 range, new CodeActionContext(Collections.emptyList(), getCodeActionKinds())));
-        request.setTimeout(getCodeActionTimeout());
-        request.setMayThrow(false);
-        request.setUpWorkDoneProgress(
-            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
+        if (results == null)
+            return NO_ITEMS;
 
-        List<Either<Command, CodeAction>> result = request.sendAndReceive();
-        if (result == null || result.isEmpty())
-            return noItems();
-
-        List<IContributionItem> items = new ArrayList<>(result.size());
-        for (Either<Command, CodeAction> item : result)
-        {
-            IAction action = null;
-            if (item.isLeft())
-                action = getAction(item.getLeft(), provider);
-            else if (item.isRight())
-                action = getAction(item.getRight(), provider);
-            if (action != null)
-                items.add(new ActionContributionItem(action));
-        }
-        return items.toArray(new IContributionItem[items.size()]);
+        return getContributionItems(results);
     }
 
     /**
@@ -185,6 +164,69 @@ public abstract class AbstractCodeActionMenu
     }
 
     /**
+     * Returns code action providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching code action providers (not <code>null</code>)
+     */
+    protected CodeActionProvider[] getCodeActionProviders(LanguageOperationTarget target)
+    {
+        return CodeActions.getCodeActionProviders(target);
+    }
+
+    /**
+     * Asks each of the given code action providers to compute a result for the given
+     * {@link CodeActionParams} and returns the computed results.
+     *
+     * @param providers never <code>null</code>
+     * @param params never <code>null</code>
+     * @return the computed code action results, or <code>null</code> if none
+     */
+    protected CodeActionResults computeCodeActionResults(CodeActionProvider[] providers,
+        CodeActionParams params)
+    {
+        return CodeActions.computeCodeActionResults(providers, params, this::newCodeActionRequest,
+            getCodeActionTimeout());
+    }
+
+    /**
+     * Returns contribution items for the given code action results.
+     *
+     * @param results never <code>null</code>
+     * @return the contribution items (not <code>null</code>)
+     */
+    protected IContributionItem[] getContributionItems(CodeActionResults results)
+    {
+        List<IContributionItem> items = new ArrayList<>();
+
+        for (Map.Entry<CodeActionProvider, CodeActionResult> entry : results.asMap().entrySet())
+        {
+            CodeActionResult result = entry.getValue();
+            if (result != null)
+            {
+                List<Either<Command, CodeAction>> codeActions = result.getCodeActions();
+                if (codeActions != null)
+                {
+                    CodeActionProvider provider = entry.getKey();
+
+                    for (Either<Command, CodeAction> commandOrCodeAction : codeActions)
+                    {
+                        IAction action = null;
+                        if (commandOrCodeAction.isLeft())
+                            action = getAction(commandOrCodeAction.getLeft(), provider);
+                        else if (commandOrCodeAction.isRight())
+                            action = getAction(commandOrCodeAction.getRight(), provider);
+                        if (action != null)
+                            items.add(new ActionContributionItem(action));
+                    }
+                }
+            }
+        }
+
+        return items.toArray(NO_ITEMS);
+    }
+
+    /**
      * Returns an {@link IAction} that executes the given {@link Command}.
      *
      * @param command never <code>null</code>
@@ -206,21 +248,6 @@ public abstract class AbstractCodeActionMenu
     protected IAction getAction(CodeAction codeAction, CodeActionProvider provider)
     {
         return new CodeActionAction(codeAction, provider);
-    }
-
-    /**
-     * Returns the text to be set for the "no actions available" item.
-     *
-     * @return the requested text (not <code>null</code>)
-     */
-    protected String getNoActionsText()
-    {
-        return Messages.AbstractCodeActionMenu_noActions;
-    }
-
-    private IContributionItem[] noItems()
-    {
-        return new IContributionItem[] { new ActionContributionItem(new NoActionsAction()) };
     }
 
     /**
@@ -287,16 +314,6 @@ public abstract class AbstractCodeActionMenu
         public void run()
         {
             CodeActions.execute(codeAction, getText(), getWorkspaceEditChangeFactory(), provider);
-        }
-    }
-
-    private class NoActionsAction
-        extends Action
-    {
-        NoActionsAction()
-        {
-            setText(getNoActionsText());
-            setEnabled(false);
         }
     }
 }

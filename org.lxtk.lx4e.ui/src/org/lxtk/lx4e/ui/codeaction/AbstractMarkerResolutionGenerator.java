@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IMarker;
@@ -37,11 +38,10 @@ import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.requests.CodeActionRequest;
-import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Partial implementation of an {@link IMarkerResolutionGenerator2} that computes
- * resolutions for a diagnostic marker using a {@link CodeActionProvider}.
+ * resolutions for a diagnostic marker using {@link CodeActionProvider}(s).
  *
  * @see DiagnosticMarkers
  */
@@ -72,38 +72,14 @@ public abstract class AbstractMarkerResolutionGenerator
         if (target == null)
             return NO_RESOLUTIONS;
 
-        CodeActionProvider provider = CodeActions.getCodeActionProvider(target);
-        if (provider == null)
-            return NO_RESOLUTIONS;
-
-        CodeActionRequest request = newCodeActionRequest();
-        request.setProvider(provider);
-        request.setParams(
+        CodeActionResults results = computeCodeActionResults(getCodeActionProviders(target),
             new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
                 diagnostic.getRange(), new CodeActionContext(Collections.singletonList(diagnostic),
                     Collections.singletonList(CodeActionKind.QuickFix))));
-        request.setTimeout(getCodeActionTimeout());
-        request.setMayThrow(false);
-        request.setUpWorkDoneProgress(
-            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
-
-        List<Either<Command, CodeAction>> result = request.sendAndReceive();
-        if (result == null || result.isEmpty())
+        if (results == null)
             return NO_RESOLUTIONS;
 
-        List<IMarkerResolution> resolutions = new ArrayList<>(result.size());
-        for (Either<Command, CodeAction> item : result)
-        {
-            if (item.isLeft())
-                resolutions.add(newMarkerResolution(item.getLeft(), provider));
-            else if (item.isRight())
-            {
-                CodeAction codeAction = item.getRight();
-                if (codeAction.getDisabled() == null)
-                    resolutions.add(newMarkerResolution(codeAction, provider));
-            }
-        }
-        return resolutions.toArray(NO_RESOLUTIONS);
+        return getResolutions(results, marker);
     }
 
     /**
@@ -141,6 +117,72 @@ public abstract class AbstractMarkerResolutionGenerator
     protected CodeActionRequest newCodeActionRequest()
     {
         return new CodeActionRequest();
+    }
+
+    /**
+     * Returns code action providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching code action providers (not <code>null</code>)
+     */
+    protected CodeActionProvider[] getCodeActionProviders(LanguageOperationTarget target)
+    {
+        return CodeActions.getCodeActionProviders(target);
+    }
+
+    /**
+     * Asks each of the given code action providers to compute a result for the given
+     * {@link CodeActionParams} and returns the computed results.
+     *
+     * @param providers never <code>null</code>
+     * @param params never <code>null</code>
+     * @return the computed code action results, or <code>null</code> if none
+     */
+    protected CodeActionResults computeCodeActionResults(CodeActionProvider[] providers,
+        CodeActionParams params)
+    {
+        return CodeActions.computeCodeActionResults(providers, params, this::newCodeActionRequest,
+            getCodeActionTimeout());
+    }
+
+    /**
+     * Returns marker resolutions for the given code action results computed for the given marker.
+     *
+     * @param results never <code>null</code>
+     * @param marker never <code>null</code>
+     * @return the marker resolutions (not <code>null</code>)
+     */
+    protected IMarkerResolution[] getResolutions(CodeActionResults results, IMarker marker)
+    {
+        List<IMarkerResolution> resolutions = new ArrayList<>();
+
+        for (Map.Entry<CodeActionProvider, CodeActionResult> entry : results.asMap().entrySet())
+        {
+            CodeActionResult result = entry.getValue();
+            if (result != null)
+            {
+                List<Either<Command, CodeAction>> codeActions = result.getCodeActions();
+                if (codeActions != null)
+                {
+                    CodeActionProvider provider = entry.getKey();
+
+                    for (Either<Command, CodeAction> commandOrCodeAction : codeActions)
+                    {
+                        if (commandOrCodeAction.isLeft())
+                            resolutions.add(
+                                newMarkerResolution(commandOrCodeAction.getLeft(), provider));
+                        else if (commandOrCodeAction.isRight())
+                        {
+                            CodeAction codeAction = commandOrCodeAction.getRight();
+                            if (codeAction.getDisabled() == null)
+                                resolutions.add(newMarkerResolution(codeAction, provider));
+                        }
+                    }
+                }
+            }
+        }
+
+        return resolutions.toArray(NO_RESOLUTIONS);
     }
 
     /**

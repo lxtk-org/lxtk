@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -19,8 +19,8 @@ class Messages
 {
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.codeaction.messages"; //$NON-NLS-1$
 
-    public static String AbstractCodeActionMenu_noActions;
     public static String CodeActions_Command_not_available;
+    public static String CodeActions_Computing_code_actions;
     public static String CodeActions_Execution_error;
 
     static

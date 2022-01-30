@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -13,13 +13,22 @@
 package org.lxtk.lx4e.ui.codeaction;
 
 import java.text.MessageFormat;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -36,6 +45,7 @@ import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
+import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 class CodeActions
@@ -48,12 +58,61 @@ class CodeActions
             target.getDocumentUri(), target.getLanguageId()) != null;
     }
 
-    static CodeActionProvider getCodeActionProvider(LanguageOperationTarget target)
+    static CodeActionProvider[] getCodeActionProviders(LanguageOperationTarget target)
     {
         LanguageService languageService = target.getLanguageService();
-        return languageService.getDocumentMatcher().getBestMatch(
+        return languageService.getDocumentMatcher().getSortedMatches(
             languageService.getCodeActionProviders(), CodeActionProvider::getDocumentSelector,
-            target.getDocumentUri(), target.getLanguageId());
+            target.getDocumentUri(), target.getLanguageId()).toArray(CodeActionProvider[]::new);
+    }
+
+    static CodeActionResults computeCodeActionResults(CodeActionProvider[] providers,
+        CodeActionParams params, Supplier<CodeActionRequest> requestSupplier, Duration timeout)
+    {
+        if (providers.length == 0)
+            return null;
+
+        Map<CodeActionProvider, CodeActionResult> results = new LinkedHashMap<>();
+
+        for (CodeActionProvider provider : providers)
+            results.put(provider, null); // initialize iteration order
+
+        JobGroup jobGroup =
+            new JobGroup(Messages.CodeActions_Computing_code_actions, 0, providers.length);
+
+        for (CodeActionProvider provider : providers)
+        {
+            Job job = Job.create(Messages.CodeActions_Computing_code_actions, monitor ->
+            {
+                CodeActionRequest request = requestSupplier.get();
+                request.setProvider(provider);
+                request.setParams(params);
+                request.setTimeout(timeout);
+                request.setMayThrow(false);
+                request.setProgressMonitor(monitor);
+                request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+
+                List<Either<Command, CodeAction>> codeActions = request.sendAndReceive();
+
+                synchronized (results)
+                {
+                    results.put(provider, new CodeActionResult(codeActions));
+                }
+            });
+            job.setJobGroup(jobGroup);
+            job.schedule();
+        }
+
+        try
+        {
+            jobGroup.join(0, null);
+        }
+        catch (InterruptedException e)
+        {
+            // ignore
+        }
+
+        return new CodeActionResults(results);
     }
 
     static void execute(Command command, String label, CommandService commandService)
