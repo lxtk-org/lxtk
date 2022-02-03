@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IMarker;
@@ -341,16 +340,13 @@ public abstract class AbstractQuickAssistProcessor
     {
         List<ICompletionProposal> proposals = new ArrayList<>();
 
-        for (Map.Entry<CodeActionProvider, CodeActionResult> entry : results.asMap().entrySet())
+        results.asMap().forEach((provider, result) ->
         {
-            CodeActionResult result = entry.getValue();
             if (result != null)
             {
                 List<Either<Command, CodeAction>> codeActions = result.getCodeActions();
                 if (codeActions != null)
                 {
-                    CodeActionProvider provider = entry.getKey();
-
                     for (Either<Command, CodeAction> commandOrCodeAction : codeActions)
                     {
                         if (commandOrCodeAction.isLeft())
@@ -364,7 +360,7 @@ public abstract class AbstractQuickAssistProcessor
                     }
                 }
             }
-        }
+        });
 
         return proposals.toArray(new ICompletionProposal[proposals.size()]);
     }

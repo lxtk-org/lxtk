@@ -325,17 +325,13 @@ public class ContentAssistProcessor
     {
         List<ICompletionProposal> result = new ArrayList<>();
 
-        for (Map.Entry<CompletionProvider,
-            CompletionResult> entry : completionResults.asMap().entrySet())
+        completionResults.asMap().forEach((completionProvider, completionResult) ->
         {
-            CompletionResult completionResult = entry.getValue();
             if (completionResult != null)
             {
                 CompletionList completionList = completionResult.getCompletionList();
                 if (completionList != null)
                 {
-                    CompletionProvider completionProvider = entry.getKey();
-
                     for (CompletionItem completionItem : completionList.getItems())
                     {
                         ICompletionProposal completionProposal = toCompletionProposal(
@@ -345,7 +341,7 @@ public class ContentAssistProcessor
                     }
                 }
             }
-        }
+        });
 
         return result.toArray(NO_PROPOSALS);
     }
