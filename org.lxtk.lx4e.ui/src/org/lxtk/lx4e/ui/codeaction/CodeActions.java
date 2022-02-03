@@ -41,6 +41,7 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
+import org.lxtk.jsonrpc.JsonUtil;
 import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
@@ -86,7 +87,9 @@ class CodeActions
             {
                 CodeActionRequest request = requestSupplier.get();
                 request.setProvider(provider);
-                request.setParams(params);
+                // note that request params can get modified as part of request processing
+                // (e.g. a progress token can be set); therefore we need to copy the given params
+                request.setParams(JsonUtil.deepCopy(params));
                 request.setTimeout(timeout);
                 request.setMayThrow(false);
                 request.setProgressMonitor(monitor);

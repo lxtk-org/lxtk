@@ -53,6 +53,7 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.SignatureHelpProvider;
+import org.lxtk.jsonrpc.JsonUtil;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.requests.CompletionRequest;
@@ -278,7 +279,9 @@ public class ContentAssistProcessor
             {
                 CompletionRequest request = newCompletionRequest();
                 request.setProvider(completionProvider);
-                request.setParams(completionParams);
+                // note that request params can get modified as part of request processing
+                // (e.g. a progress token can be set); therefore we need to copy the given params
+                request.setParams(JsonUtil.deepCopy(completionParams));
                 request.setTimeout(getCompletionTimeout());
                 request.setMayThrow(false);
                 request.setProgressMonitor(monitor);
@@ -410,7 +413,9 @@ public class ContentAssistProcessor
         {
             SignatureHelpRequest request = newSignatureHelpRequest();
             request.setProvider(provider);
-            request.setParams(params);
+            // note that request params can get modified as part of request processing
+            // (e.g. a progress token can be set); therefore we need to copy the original params
+            request.setParams(JsonUtil.deepCopy(params));
             request.setTimeout(getSignatureHelpTimeout());
             request.setMayThrow(false);
             request.setUpWorkDoneProgress(
