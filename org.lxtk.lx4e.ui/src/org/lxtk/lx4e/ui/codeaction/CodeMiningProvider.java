@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,10 +12,10 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.codeaction;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -38,11 +38,13 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
+import org.lxtk.jsonrpc.JsonUtil;
+import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Default implementation of a code mining provider that computes code minings
- * using a {@link CodeLensProvider}.
+ * using {@link CodeLensProvider}(s).
  */
 public class CodeMiningProvider
     extends AbstractCodeMiningProvider
@@ -55,18 +57,88 @@ public class CodeMiningProvider
         if (target == null)
             return null;
 
+        return provideCodeLensResults(getCodeLensProviders(target), new CodeLensParams(
+            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()))).thenApply(results ->
+            {
+                if (results == null)
+                    return null;
+
+                return getCodeMinings(results, viewer);
+            });
+    };
+
+    /**
+     * Returns the current {@link LanguageOperationTarget}.
+     *
+     * @return the current <code>LanguageOperationTarget</code>,
+     *  or <code>null</code> if none
+     */
+    protected LanguageOperationTarget getLanguageOperationTarget()
+    {
+        return getAdapter(LanguageOperationTarget.class);
+    }
+
+    /**
+     * Returns code lens providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching code lens providers (not <code>null</code>)
+     */
+    protected CodeLensProvider[] getCodeLensProviders(LanguageOperationTarget target)
+    {
         LanguageService languageService = target.getLanguageService();
-        URI documentUri = target.getDocumentUri();
-
-        CodeLensProvider provider = languageService.getDocumentMatcher().getBestMatch(
+        return languageService.getDocumentMatcher().getSortedMatches(
             languageService.getCodeLensProviders(), CodeLensProvider::getDocumentSelector,
-            documentUri, target.getLanguageId());
-        if (provider == null)
-            return null;
+            target.getDocumentUri(), target.getLanguageId()).toArray(CodeLensProvider[]::new);
+    }
 
-        CodeLensParams params =
-            new CodeLensParams(DocumentUri.toTextDocumentIdentifier(documentUri));
+    /**
+     * Asks each of the given code lens providers to compute a result for the given
+     * {@link CodeLensParams} and returns a future of the code lens results.
+     *
+     * @param providers never <code>null</code>
+     * @param params never <code>null</code>
+     * @return a future of the code lens results (not <code>null</code>)
+     */
+    protected CompletableFuture<CodeLensResults> provideCodeLensResults(
+        CodeLensProvider[] providers, CodeLensParams params)
+    {
+        Map<CodeLensProvider, CompletableFuture<CodeLensResult>> futures = new LinkedHashMap<>();
 
+        for (CodeLensProvider provider : providers)
+        {
+            // note that request params can get modified as part of request processing
+            // (e.g. a progress token can be set); therefore we need to copy the given params
+            futures.put(provider,
+                provideCodeLensResult(provider, JsonUtil.deepCopy(params)).exceptionally(e ->
+                {
+                    e = Activator.unwrap(e);
+                    if (!Activator.isCancellation(e))
+                        Activator.logError(e);
+                    return null;
+                }));
+        }
+
+        return CompletableFuture.allOf(
+            futures.values().toArray(CompletableFuture[]::new)).thenApply(x ->
+            {
+                Map<CodeLensProvider, CodeLensResult> results = new LinkedHashMap<>();
+                futures.forEach((provider, future) -> results.put(provider, future.join()));
+                return new CodeLensResults(results);
+            });
+    }
+
+    /**
+     * Ask the given code lens provider to compute a result for the given {@link CodeLensParams}
+     * and returns a future of the result.
+     *
+     * @param provider never <code>null</code>
+     * @param params never <code>null</code>
+     * @return a future of the code lens result (not <code>null</code>)
+     */
+    protected CompletableFuture<CodeLensResult> provideCodeLensResult(CodeLensProvider provider,
+        CodeLensParams params)
+    {
         WorkDoneProgress workDoneProgress = null;
         if (Boolean.TRUE.equals(provider.getRegistrationOptions().getWorkDoneProgress()))
         {
@@ -84,18 +156,39 @@ public class CodeMiningProvider
         if (workDoneProgress != null)
             workDoneProgress.connectWith(future);
 
-        return future.thenApply(codeLenses -> getCodeMinings(viewer, codeLenses, provider));
+        return future.thenApply(codeLenses -> new CodeLensResult(codeLenses));
     }
 
     /**
-     * Returns the current {@link LanguageOperationTarget}.
+     * Returns code minings for the given code lens results.
      *
-     * @return the current <code>LanguageOperationTarget</code>,
-     *  or <code>null</code> if none
+     * @param results never <code>null</code>
+     * @param viewer never <code>null</code>
+     * @return the code minings
      */
-    protected LanguageOperationTarget getLanguageOperationTarget()
+    protected List<? extends ICodeMining> getCodeMinings(CodeLensResults results,
+        ITextViewer viewer)
     {
-        return getAdapter(LanguageOperationTarget.class);
+        List<ICodeMining> codeMinings = new ArrayList<>();
+
+        results.asMap().forEach((provider, result) ->
+        {
+            if (result != null)
+            {
+                List<? extends CodeLens> codeLenses = result.getCodeLenses();
+                if (codeLenses != null)
+                {
+                    for (CodeLens codeLens : codeLenses)
+                    {
+                        ICodeMining codeMining = getCodeMining(viewer, codeLens, provider);
+                        if (codeMining != null)
+                            codeMinings.add(codeMining);
+                    }
+                }
+            }
+        });
+
+        return codeMinings;
     }
 
     /**
@@ -120,20 +213,60 @@ public class CodeMiningProvider
         }
     }
 
-    private List<? extends ICodeMining> getCodeMinings(ITextViewer viewer,
-        List<? extends CodeLens> codeLenses, CodeLensProvider codeLensProvider)
+    /**
+     * Represents a group of {@link CodeLensResult}s.
+     */
+    protected static class CodeLensResults
     {
-        if (codeLenses == null || codeLenses.isEmpty())
-            return Collections.emptyList();
+        private final Map<CodeLensProvider, CodeLensResult> results;
 
-        List<ICodeMining> result = new ArrayList<>(codeLenses.size());
-        for (CodeLens codeLens : codeLenses)
+        /**
+         * Constructor.
+         *
+         * @param results not <code>null</code>
+         */
+        public CodeLensResults(Map<CodeLensProvider, CodeLensResult> results)
         {
-            ICodeMining codeMining = getCodeMining(viewer, codeLens, codeLensProvider);
-            if (codeMining != null)
-                result.add(codeMining);
+            this.results = Objects.requireNonNull(results);
         }
-        return result;
+
+        /**
+         * Returns the code lens results as a map.
+         *
+         * @return the code lens results as a map (never <code>null</code>)
+         */
+        public Map<CodeLensProvider, CodeLensResult> asMap()
+        {
+            return results;
+        }
+    }
+
+    /**
+     * Represents the result of a code lens request.
+     */
+    protected static class CodeLensResult
+    {
+        private final List<? extends CodeLens> codeLenses;
+
+        /**
+         * Constructor.
+         *
+         * @param codeLenses may be <code>null</code>
+         */
+        public CodeLensResult(List<? extends CodeLens> codeLenses)
+        {
+            this.codeLenses = codeLenses;
+        }
+
+        /**
+         * Returns a list of code lenses.
+         *
+         * @return a list of code lenses, or <code>null</code> if none
+         */
+        public List<? extends CodeLens> getCodeLenses()
+        {
+            return codeLenses;
+        }
     }
 
     private static class CodeMining
