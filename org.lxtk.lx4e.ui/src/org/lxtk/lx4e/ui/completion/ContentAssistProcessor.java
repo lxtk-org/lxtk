@@ -15,15 +15,13 @@ package org.lxtk.lx4e.ui.completion;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobGroup;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -56,6 +54,7 @@ import org.lxtk.SignatureHelpProvider;
 import org.lxtk.jsonrpc.JsonUtil;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.requests.CompletionRequest;
 import org.lxtk.lx4e.requests.SignatureHelpRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
@@ -265,52 +264,42 @@ public class ContentAssistProcessor
         if (completionProviders.length == 0)
             return null;
 
-        Map<CompletionProvider, CompletionResult> results = new LinkedHashMap<>();
+        return new CompletionResults(TaskExecutor.parallelCompute(completionProviders,
+            (completionProvider, monitor) -> computeCompletionResult(completionProvider,
+                completionParams, monitor),
+            Messages.Computing_completion_proposals, getCompletionTimeout(), null));
+    }
 
-        for (CompletionProvider completionProvider : completionProviders)
-            results.put(completionProvider, null); // initialize iteration order
+    /**
+     * Asks the given completion provider to compute a result for the given
+     * {@link CompletionParams} and returns the computed result.
+     *
+     * @param completionProvider never <code>null</code>
+     * @param completionParams never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the computed completion result, or <code>null</code> if none
+     */
+    protected CompletionResult computeCompletionResult(CompletionProvider completionProvider,
+        CompletionParams completionParams, IProgressMonitor monitor)
+    {
+        CompletionRequest request = newCompletionRequest();
+        request.setProvider(completionProvider);
+        // note that request params can get modified as part of request processing
+        // (e.g. a progress token can be set); therefore we need to copy the given params
+        request.setParams(JsonUtil.deepCopy(completionParams));
+        request.setTimeout(getCompletionTimeout());
+        request.setMayThrow(false);
+        request.setProgressMonitor(monitor);
+        request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
 
-        JobGroup jobGroup =
-            new JobGroup(Messages.Computing_completion_proposals, 0, completionProviders.length);
+        Either<List<CompletionItem>, CompletionList> response = request.sendAndReceive();
 
-        for (CompletionProvider completionProvider : completionProviders)
-        {
-            Job job = Job.create(Messages.Computing_completion_proposals, monitor ->
-            {
-                CompletionRequest request = newCompletionRequest();
-                request.setProvider(completionProvider);
-                // note that request params can get modified as part of request processing
-                // (e.g. a progress token can be set); therefore we need to copy the given params
-                request.setParams(JsonUtil.deepCopy(completionParams));
-                request.setTimeout(getCompletionTimeout());
-                request.setMayThrow(false);
-                request.setProgressMonitor(monitor);
-                request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+        CompletionList completionList = response == null ? null
+            : response.isLeft() ? new CompletionList(response.getLeft()) : response.getRight();
 
-                Either<List<CompletionItem>, CompletionList> response = request.sendAndReceive();
-
-                CompletionList completionList = response == null ? null : response.isLeft()
-                    ? new CompletionList(response.getLeft()) : response.getRight();
-
-                synchronized (results)
-                {
-                    results.put(completionProvider, new CompletionResult(completionList));
-                }
-            });
-            job.setJobGroup(jobGroup);
-            job.schedule();
-        }
-
-        try
-        {
-            jobGroup.join(0, null);
-        }
-        catch (InterruptedException e)
-        {
-            // ignore
-        }
-
-        return new CompletionResults(results);
+        return new CompletionResult(completionList);
     }
 
     /**

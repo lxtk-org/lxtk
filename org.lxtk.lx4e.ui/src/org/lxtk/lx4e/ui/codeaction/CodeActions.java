@@ -14,21 +14,16 @@ package org.lxtk.lx4e.ui.codeaction;
 
 import java.text.MessageFormat;
 import java.time.Duration;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobGroup;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -45,6 +40,7 @@ import org.lxtk.jsonrpc.JsonUtil;
 import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.RefactoringExecutor;
+import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.refactoring.WorkspaceEditRefactoring;
 import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
@@ -73,49 +69,27 @@ class CodeActions
         if (providers.length == 0)
             return null;
 
-        Map<CodeActionProvider, CodeActionResult> results = new LinkedHashMap<>();
+        return new CodeActionResults(TaskExecutor.parallelCompute(
+            providers, (provider, monitor) -> computeCodeActionResult(provider, params,
+                requestSupplier, timeout, monitor),
+            Messages.CodeActions_Computing_code_actions, timeout, null));
+    }
 
-        for (CodeActionProvider provider : providers)
-            results.put(provider, null); // initialize iteration order
+    private static CodeActionResult computeCodeActionResult(CodeActionProvider provider,
+        CodeActionParams params, Supplier<CodeActionRequest> requestSupplier, Duration timeout,
+        IProgressMonitor monitor)
+    {
+        CodeActionRequest request = requestSupplier.get();
+        request.setProvider(provider);
+        // note that request params can get modified as part of request processing
+        // (e.g. a progress token can be set); therefore we need to copy the given params
+        request.setParams(JsonUtil.deepCopy(params));
+        request.setTimeout(timeout);
+        request.setMayThrow(false);
+        request.setProgressMonitor(monitor);
+        request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
 
-        JobGroup jobGroup =
-            new JobGroup(Messages.CodeActions_Computing_code_actions, 0, providers.length);
-
-        for (CodeActionProvider provider : providers)
-        {
-            Job job = Job.create(Messages.CodeActions_Computing_code_actions, monitor ->
-            {
-                CodeActionRequest request = requestSupplier.get();
-                request.setProvider(provider);
-                // note that request params can get modified as part of request processing
-                // (e.g. a progress token can be set); therefore we need to copy the given params
-                request.setParams(JsonUtil.deepCopy(params));
-                request.setTimeout(timeout);
-                request.setMayThrow(false);
-                request.setProgressMonitor(monitor);
-                request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-
-                List<Either<Command, CodeAction>> codeActions = request.sendAndReceive();
-
-                synchronized (results)
-                {
-                    results.put(provider, new CodeActionResult(codeActions));
-                }
-            });
-            job.setJobGroup(jobGroup);
-            job.schedule();
-        }
-
-        try
-        {
-            jobGroup.join(0, null);
-        }
-        catch (InterruptedException e)
-        {
-            // ignore
-        }
-
-        return new CodeActionResults(results);
+        return new CodeActionResult(request.sendAndReceive());
     }
 
     static void execute(Command command, String label, CommandService commandService)
