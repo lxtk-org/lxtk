@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,10 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -28,10 +31,13 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.requests.Request;
 import org.lxtk.lx4e.util.DefaultWordFinder;
 
@@ -39,15 +45,17 @@ import org.lxtk.lx4e.util.DefaultWordFinder;
  * Partial implementation of a hyperlink detector that computes a list
  * of {@link Location}s corresponding to a given document range and creates
  * hyperlinks for the computed locations.
+ *
+ * @param <LocationLinkProvider> the type of a location link provider
  */
-public abstract class AbstractLocationHyperlinkDetector
+public abstract class AbstractLocationHyperlinkDetector<LocationLinkProvider>
     extends AbstractHyperlinkDetector
 {
     @Override
     public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region,
         boolean canShowMultipleHyperlinks)
     {
-        LanguageOperationTarget target = getAdapter(LanguageOperationTarget.class);
+        LanguageOperationTarget target = getLanguageOperationTarget();
         if (target == null)
             return null;
 
@@ -62,64 +70,125 @@ public abstract class AbstractLocationHyperlinkDetector
             return null;
         }
 
-        Request<Either<List<? extends Location>, List<? extends LocationLink>>> request =
-            createHyperlinkRequest(target, position);
-        if (request == null)
+        LocationLinkResults<LocationLinkProvider> results =
+            computeLocationLinkResults(getLocationLinkProviders(target), new LocationLinkContext(
+                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), position));
+        if (results == null)
             return null;
 
-        request.setTimeout(getHyperlinkTimeout());
-        request.setMayThrow(false);
-
-        Either<List<? extends Location>, List<? extends LocationLink>> result =
-            request.sendAndReceive();
-        if (result == null)
-            return null;
-
-        return createHyperlinks(result, textViewer, region, canShowMultipleHyperlinks);
+        return createHyperlinks(results, textViewer, region, canShowMultipleHyperlinks);
     }
 
-    private IHyperlink[] createHyperlinks(
-        Either<List<? extends Location>, List<? extends LocationLink>> locationsOrLinks,
+    /**
+     * Returns the current {@link LanguageOperationTarget}.
+     *
+     * @return the language operation target, or <code>null</code> if none
+     */
+    public LanguageOperationTarget getLanguageOperationTarget()
+    {
+        return getAdapter(LanguageOperationTarget.class);
+    }
+
+    /**
+     * Returns location link providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching location link providers (not <code>null</code>)
+     */
+    protected abstract LocationLinkProvider[] getLocationLinkProviders(
+        LanguageOperationTarget target);
+
+    /**
+     * Asks each of the given location link providers to compute a result for the given context
+     * and returns the computed results.
+     *
+     * @param providers never <code>null</code>
+     * @param context never <code>null</code>
+     * @return the computed location link results, or <code>null</code> if none
+     */
+    protected LocationLinkResults<LocationLinkProvider> computeLocationLinkResults(
+        LocationLinkProvider[] providers, LocationLinkContext context)
+    {
+        if (providers.length == 0)
+            return null;
+
+        return new LocationLinkResults<>(TaskExecutor.parallelCompute(providers,
+            (provider, monitor) -> computeLocationLinkResult(provider, context, monitor),
+            Messages.Computing_links, getHyperlinkTimeout(), null));
+    }
+
+    /**
+     * Asks the given location link provider to compute a result for the given context
+     * and returns the computed result.
+     *
+     * @param provider never <code>null</code>
+     * @param context never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the computed location link result, or <code>null</code> if none
+     */
+    protected abstract LocationLinkResult computeLocationLinkResult(LocationLinkProvider provider,
+        LocationLinkContext context, IProgressMonitor monitor);
+
+    /**
+     * Creates and returns hyperlinks for the given location link results that have been computed
+     * for the given region in the given text viewer.
+     *
+     * @param results never <code>null</code>
+     * @param textViewer the text viewer on which the hover popup should be shown
+     *  (never <code>null</code>)
+     * @param region the hyperlink region (never <code>null</code>)
+     * @param canShowMultipleHyperlinks tells whether the caller is able to show multiple hyperlinks
+     * @return the created hyperlinks, or <code>null</code> if none
+     */
+    protected IHyperlink[] createHyperlinks(LocationLinkResults<LocationLinkProvider> results,
         ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks)
     {
         IDocument document = textViewer.getDocument();
         IRegion hyperlinkRegion = null;
-        List<? extends Location> locations;
-        if (locationsOrLinks.isLeft())
+        List<Location> locations = new ArrayList<>();
+
+        for (Map.Entry<LocationLinkProvider, LocationLinkResult> entry : results.asMap().entrySet())
         {
-            locations = locationsOrLinks.getLeft();
-            if (locations.isEmpty())
-                return null;
-        }
-        else if (locationsOrLinks.isRight())
-        {
-            List<? extends LocationLink> links = locationsOrLinks.getRight();
-            if (links.isEmpty())
-                return null;
-            List<Location> locationList = new ArrayList<>(links.size());
-            for (LocationLink link : links)
+            LocationLinkResult result = entry.getValue();
+            if (result != null)
             {
-                if (hyperlinkRegion == null)
+                Either<List<? extends Location>, List<? extends LocationLink>> locationsOrLinks =
+                    result.getLocationsOrLinks();
+                if (locationsOrLinks != null)
                 {
-                    Range originSelectionRange = link.getOriginSelectionRange();
-                    if (originSelectionRange != null)
+                    if (locationsOrLinks.isLeft())
                     {
-                        try
+                        locations.addAll(locationsOrLinks.getLeft());
+                    }
+                    else if (locationsOrLinks.isRight())
+                    {
+                        for (LocationLink link : locationsOrLinks.getRight())
                         {
-                            hyperlinkRegion = DocumentUtil.toRegion(document, originSelectionRange);
-                        }
-                        catch (BadLocationException e)
-                        {
-                            Activator.logWarning(e);
+                            if (hyperlinkRegion == null)
+                            {
+                                Range originSelectionRange = link.getOriginSelectionRange();
+                                if (originSelectionRange != null)
+                                {
+                                    try
+                                    {
+                                        hyperlinkRegion =
+                                            DocumentUtil.toRegion(document, originSelectionRange);
+                                    }
+                                    catch (BadLocationException e)
+                                    {
+                                        Activator.logWarning(e);
+                                    }
+                                }
+                            }
+                            locations.add(
+                                new Location(link.getTargetUri(), link.getTargetSelectionRange()));
                         }
                     }
                 }
-                locationList.add(new Location(link.getTargetUri(), link.getTargetSelectionRange()));
             }
-            locations = locationList;
         }
-        else
-            return null;
 
         if (hyperlinkRegion == null)
             hyperlinkRegion = findWord(document, region.getOffset());
@@ -173,10 +242,16 @@ public abstract class AbstractLocationHyperlinkDetector
      * @param target never <code>null</code>
      * @param position never <code>null</code>
      * @return the created request object, or <code>null</code> if none
+     * @deprecated This formerly abstract method is no longer used by the framework
+     *  and will be removed in a next release.
      */
-    protected abstract Request<
+    @Deprecated
+    protected Request<
         Either<List<? extends Location>, List<? extends LocationLink>>> createHyperlinkRequest(
-            LanguageOperationTarget target, Position position);
+            LanguageOperationTarget target, Position position)
+    {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Creates and returns a hyperlink that covers the given region and
@@ -273,5 +348,106 @@ public abstract class AbstractLocationHyperlinkDetector
     protected Duration getHyperlinkTimeout()
     {
         return Duration.ofSeconds(1);
+    }
+
+    /**
+     * Represents the context of a location link request.
+     */
+    protected static class LocationLinkContext
+    {
+        private final TextDocumentIdentifier textDocument;
+        private final Position position;
+
+        /**
+         * Constructor.
+         *
+         * @param textDocument not <code>null</code>
+         * @param position not <code>null</code>
+         */
+        public LocationLinkContext(TextDocumentIdentifier textDocument, Position position)
+        {
+            this.textDocument = Objects.requireNonNull(textDocument);
+            this.position = Objects.requireNonNull(position);
+        }
+
+        /**
+         * Returns the text document.
+         *
+         * @return the text document (never <code>null</code>)
+         */
+        public TextDocumentIdentifier getTextDocument()
+        {
+            return textDocument;
+        }
+
+        /**
+         * Returns the position in the text document.
+         *
+         * @return the text document position (never <code>null</code>)
+         */
+        public Position getPosition()
+        {
+            return position;
+        }
+    }
+
+    /**
+     * Represents a group of {@link LocationLinkResult}s.
+     *
+     * @param <LocationLinkProvider> the type of a location link provider
+     */
+    protected static class LocationLinkResults<LocationLinkProvider>
+    {
+        private final Map<LocationLinkProvider, LocationLinkResult> results;
+
+        /**
+         * Constructor.
+         *
+         * @param results not <code>null</code>
+         */
+        public LocationLinkResults(Map<LocationLinkProvider, LocationLinkResult> results)
+        {
+            this.results = Objects.requireNonNull(results);
+        }
+
+        /**
+         * Returns the location link results as a map.
+         *
+         * @return the location link results as a map (never <code>null</code>)
+         */
+        public Map<LocationLinkProvider, LocationLinkResult> asMap()
+        {
+            return results;
+        }
+    }
+
+    /**
+     * Represents the result of a location link request.
+     */
+    protected static class LocationLinkResult
+    {
+        private final Either<List<? extends Location>,
+            List<? extends LocationLink>> locationsOrLinks;
+
+        /**
+         * Constructor.
+         *
+         * @param locationsOrLinks may be <code>null</code>
+         */
+        public LocationLinkResult(
+            Either<List<? extends Location>, List<? extends LocationLink>> locationsOrLinks)
+        {
+            this.locationsOrLinks = locationsOrLinks;
+        }
+
+        /**
+         * Returns either the location list or the location link list.
+         *
+         * @return either the location list or the location link list, or <code>null</code> if none
+         */
+        public Either<List<? extends Location>, List<? extends LocationLink>> getLocationsOrLinks()
+        {
+            return locationsOrLinks;
+        }
     }
 }

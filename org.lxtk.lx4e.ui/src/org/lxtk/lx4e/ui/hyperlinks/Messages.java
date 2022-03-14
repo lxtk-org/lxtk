@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -20,6 +20,7 @@ class Messages
     private static final String BUNDLE_NAME = "org.lxtk.lx4e.ui.hyperlinks.messages"; //$NON-NLS-1$
 
     public static String AbstractLocationHyperlinkDetector_Result_label;
+    public static String Computing_links;
     public static String DeclarationHyperlinkDetector_Hyperlink_text;
     public static String DeclarationHyperlinkDetector_Hyperlink_text2;
     public static String DeclarationHyperlinkDetector_Hyperlink_text3;

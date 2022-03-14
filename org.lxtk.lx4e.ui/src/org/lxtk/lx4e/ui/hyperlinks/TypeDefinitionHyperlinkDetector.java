@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,54 +12,52 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.hyperlinks;
 
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.LocationLink;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.TypeDefinitionParams;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentService;
-import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.TypeDefinitionProvider;
-import org.lxtk.lx4e.requests.Request;
 import org.lxtk.lx4e.requests.TypeDefinitionRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
  * Default implementation of a hyperlink detector that computes hyperlinks
- * using a {@link TypeDefinitionProvider}.
+ * using {@link TypeDefinitionProvider}(s).
  */
 public class TypeDefinitionHyperlinkDetector
-    extends AbstractLocationHyperlinkDetector
+    extends AbstractLocationHyperlinkDetector<TypeDefinitionProvider>
 {
     @Override
-    protected Request<
-        Either<List<? extends Location>, List<? extends LocationLink>>> createHyperlinkRequest(
-            LanguageOperationTarget target, Position position)
+    protected TypeDefinitionProvider[] getLocationLinkProviders(LanguageOperationTarget target)
     {
-        URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
-        TypeDefinitionProvider provider = languageService.getDocumentMatcher().getBestMatch(
+        return languageService.getDocumentMatcher().getSortedMatches(
             languageService.getTypeDefinitionProviders(),
-            TypeDefinitionProvider::getDocumentSelector, documentUri, target.getLanguageId());
-        if (provider == null)
-            return null;
+            TypeDefinitionProvider::getDocumentSelector, target.getDocumentUri(),
+            target.getLanguageId()).toArray(TypeDefinitionProvider[]::new);
+    }
 
+    @Override
+    protected LocationLinkResult computeLocationLinkResult(TypeDefinitionProvider provider,
+        LocationLinkContext context, IProgressMonitor monitor)
+    {
         TypeDefinitionRequest request = newTypeDefinitionRequest();
         request.setProvider(provider);
         request.setParams(
-            new TypeDefinitionParams(DocumentUri.toTextDocumentIdentifier(documentUri), position));
-        request.setUpWorkDoneProgress(
-            () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
-        return request;
+            new TypeDefinitionParams(context.getTextDocument(), context.getPosition()));
+        request.setTimeout(getHyperlinkTimeout());
+        request.setMayThrow(false);
+        request.setProgressMonitor(monitor);
+        request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+        return new LocationLinkResult(request.sendAndReceive());
     }
 
     @Override
