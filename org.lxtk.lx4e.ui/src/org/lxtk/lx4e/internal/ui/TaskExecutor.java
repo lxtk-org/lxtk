@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -61,6 +62,30 @@ public class TaskExecutor
         catch (InterruptedException e)
         {
             // ignore
+        }
+
+        return results;
+    }
+
+    public static <P, R> Map<P, R> sequentialCompute(P[] inputElements,
+        BiFunction<P, Duration, R> taskFunction, Predicate<R> stopPredicate, Duration timeout)
+    {
+        Map<P, R> results = new LinkedHashMap<>();
+
+        for (P inputElement : inputElements)
+        {
+            long startTimeMillis = System.currentTimeMillis();
+
+            R result = taskFunction.apply(inputElement, timeout);
+
+            results.put(inputElement, result);
+
+            if (stopPredicate.test(result))
+                break;
+
+            timeout = timeout.minusMillis(System.currentTimeMillis() - startTimeMillis);
+            if (timeout.isNegative() || timeout.isZero())
+                break;
         }
 
         return results;
