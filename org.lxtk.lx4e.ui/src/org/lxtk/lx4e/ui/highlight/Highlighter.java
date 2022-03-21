@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -14,12 +14,12 @@ package org.lxtk.lx4e.ui.highlight;
 
 import static org.lxtk.lx4e.internal.util.AnnotationUtil.replaceAnnotations;
 
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.handly.snapshot.DocumentSnapshot;
 import org.eclipse.handly.snapshot.ISnapshot;
@@ -54,6 +55,7 @@ import org.lxtk.DocumentHighlightProvider;
 import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
+import org.lxtk.jsonrpc.JsonUtil;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.internal.ui.ILinkedEditingListener;
@@ -63,7 +65,7 @@ import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 import org.lxtk.util.Disposable;
 
 /**
- * Highlights document ranges computed using a {@link DocumentHighlightProvider}.
+ * Highlights document ranges computed using {@link DocumentHighlightProvider}s.
  */
 public class Highlighter
     implements Disposable
@@ -181,6 +183,88 @@ public class Highlighter
     public final void setSticky(boolean sticky)
     {
         this.sticky = sticky;
+    }
+
+    /**
+     * Returns the document highlight providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching document highlight providers (not <code>null</code>)
+     */
+    protected DocumentHighlightProvider[] getDocumentHighlightProviders(
+        LanguageOperationTarget target)
+    {
+        LanguageService languageService = target.getLanguageService();
+        return languageService.getDocumentMatcher().getSortedMatches(
+            languageService.getDocumentHighlightProviders(),
+            DocumentHighlightProvider::getDocumentSelector, target.getDocumentUri(),
+            target.getLanguageId()).toArray(DocumentHighlightProvider[]::new);
+    }
+
+    /**
+     * Computes the document highlight results for the given {@link DocumentHighlightParams}
+     * using the given document highlight providers.
+     *
+     * @param providers never <code>null</code>
+     * @param params never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the computed document highlight results, or <code>null</code> if none
+     */
+    protected DocumentHighlightResults computeDocumentHighlightResults(
+        DocumentHighlightProvider[] providers, DocumentHighlightParams params,
+        IProgressMonitor monitor)
+    {
+        if (providers.length == 0)
+            return null;
+
+        SubMonitor subMonitor = SubMonitor.convert(monitor, providers.length);
+
+        Map<DocumentHighlightProvider, DocumentHighlightResult> results = new LinkedHashMap<>();
+
+        for (DocumentHighlightProvider provider : providers)
+        {
+            DocumentHighlightResult result =
+                computeDocumentHighlightResult(provider, params, subMonitor.split(1));
+
+            results.put(provider, result);
+
+            if (result != null)
+            {
+                List<? extends DocumentHighlight> highlights = result.getDocumentHighlights();
+                if (highlights != null && !highlights.isEmpty())
+                    break;
+            }
+        }
+
+        return new DocumentHighlightResults(results);
+    }
+
+    /**
+     * Computes a document highlight result for the given {@link DocumentHighlightParams}
+     * using the given document highlight provider.
+     *
+     * @param provider never <code>null</code>
+     * @param params never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the computed document highlight result, or <code>null</code> if none
+     */
+    protected DocumentHighlightResult computeDocumentHighlightResult(
+        DocumentHighlightProvider provider, DocumentHighlightParams params,
+        IProgressMonitor monitor)
+    {
+        DocumentHighlightRequest request = newDocumentHighlightRequest();
+        request.setProvider(provider);
+        // note that request params can get modified as part of request processing
+        // (e.g. a progress token can be set); therefore we need to copy the given params
+        request.setParams(JsonUtil.deepCopy(params));
+        request.setProgressMonitor(monitor);
+        request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+        request.setMayThrow(false);
+        return new DocumentHighlightResult(request.sendAndReceive());
     }
 
     /**
@@ -332,6 +416,63 @@ public class Highlighter
             ? (ISelectionValidator)selectionProvider : null;
     }
 
+    /**
+     * Represents a group of {@link DocumentHighlightResult}s.
+     */
+    protected static class DocumentHighlightResults
+    {
+        private final Map<DocumentHighlightProvider, DocumentHighlightResult> results;
+
+        /**
+         * Constructor.
+         *
+         * @param results not <code>null</code>
+         */
+        public DocumentHighlightResults(
+            Map<DocumentHighlightProvider, DocumentHighlightResult> results)
+        {
+            this.results = Objects.requireNonNull(results);
+        }
+
+        /**
+         * Returns the document highlight results as a map.
+         *
+         * @return the document highlight results as a map (never <code>null</code>)
+         */
+        public Map<DocumentHighlightProvider, DocumentHighlightResult> asMap()
+        {
+            return results;
+        }
+    }
+
+    /**
+     * Represents the result of a document highlight request.
+     */
+    protected static class DocumentHighlightResult
+    {
+        private final List<? extends DocumentHighlight> documentHighlights;
+
+        /**
+         * Constructor.
+         *
+         * @param documentHighlights may be <code>null</code>
+         */
+        public DocumentHighlightResult(List<? extends DocumentHighlight> documentHighlights)
+        {
+            this.documentHighlights = documentHighlights;
+        }
+
+        /**
+         * Returns the document highlights for this result.
+         *
+         * @return the document highlights, or <code>null</code> if none
+         */
+        public List<? extends DocumentHighlight> getDocumentHighlights()
+        {
+            return documentHighlights;
+        }
+    }
+
     private class HighlightingJob
         extends Job
     {
@@ -385,22 +526,28 @@ public class Highlighter
 
         private List<? extends DocumentHighlight> computeHighlights(IProgressMonitor monitor)
         {
-            URI documentUri = target.getDocumentUri();
-            LanguageService languageService = target.getLanguageService();
-            DocumentHighlightProvider provider = languageService.getDocumentMatcher().getBestMatch(
-                languageService.getDocumentHighlightProviders(),
-                DocumentHighlightProvider::getDocumentSelector, documentUri,
-                target.getLanguageId());
-            if (provider == null)
+            DocumentHighlightResults results =
+                computeDocumentHighlightResults(getDocumentHighlightProviders(target),
+                    new DocumentHighlightParams(
+                        DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), position),
+                    monitor);
+
+            if (results == null)
                 return null;
-            DocumentHighlightRequest request = newDocumentHighlightRequest();
-            request.setProvider(provider);
-            request.setParams(new DocumentHighlightParams(
-                DocumentUri.toTextDocumentIdentifier(documentUri), position));
-            request.setProgressMonitor(monitor);
-            request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-            request.setMayThrow(false);
-            return request.sendAndReceive();
+
+            for (Map.Entry<DocumentHighlightProvider,
+                DocumentHighlightResult> entry : results.asMap().entrySet())
+            {
+                DocumentHighlightResult result = entry.getValue();
+                if (result != null)
+                {
+                    List<? extends DocumentHighlight> highlights = result.getDocumentHighlights();
+                    if (highlights != null && !highlights.isEmpty())
+                        return highlights;
+                }
+            }
+
+            return null;
         }
     }
 
