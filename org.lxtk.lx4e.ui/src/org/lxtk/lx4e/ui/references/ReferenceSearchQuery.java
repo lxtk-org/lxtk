@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,7 +15,6 @@ package org.lxtk.lx4e.ui.references;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,13 +31,14 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.ReferenceProvider;
+import org.lxtk.jsonrpc.JsonUtil;
 import org.lxtk.lx4e.internal.ui.AbstractLocationSearchQuery;
-import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.requests.ReferencesRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
- * Default implementation of an {@link ISearchQuery} that uses a {@link ReferenceProvider}
+ * Default implementation of an {@link ISearchQuery} that uses {@link ReferenceProvider}s
  * to find references to the symbol denoted by a given text document position.
  */
 public class ReferenceSearchQuery
@@ -69,14 +69,14 @@ public class ReferenceSearchQuery
 
     public boolean canRun()
     {
-        return getReferenceProvider() != null;
+        return getReferenceProviders(target).length > 0;
     }
 
     @Override
     protected IStatus execute(Consumer<? super Location> acceptor, IProgressMonitor monitor)
     {
-        ReferenceProvider provider = getReferenceProvider();
-        if (provider == null)
+        ReferenceProvider[] providers = getReferenceProviders(target);
+        if (providers.length == 0)
             return Status.OK_STATUS;
 
         ReferenceParams params = new ReferenceParams();
@@ -84,9 +84,65 @@ public class ReferenceSearchQuery
         params.setPosition(position);
         params.setContext(new ReferenceContext(includeDeclaration));
 
+        return findReferences(providers, params, acceptor, monitor);
+    }
+
+    /**
+     * Returns the reference providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching reference providers (not <code>null</code>)
+     */
+    protected ReferenceProvider[] getReferenceProviders(LanguageOperationTarget target)
+    {
+        LanguageService languageService = target.getLanguageService();
+        return languageService.getDocumentMatcher().getMatches(
+            languageService.getReferenceProviders(), ReferenceProvider::getDocumentSelector,
+            target.getDocumentUri(), target.getLanguageId()).toArray(ReferenceProvider[]::new);
+    }
+
+    /**
+     * Finds references for the given {@link ReferenceParams} using the given reference providers
+     * and reports the search results to the given acceptor.
+     *
+     * @param providers never <code>null</code>
+     * @param params never <code>null</code>
+     * @param acceptor never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the status after completion of the search
+     */
+    protected IStatus findReferences(ReferenceProvider[] providers, ReferenceParams params,
+        Consumer<? super Location> acceptor, IProgressMonitor monitor)
+    {
+        TaskExecutor.parallelExecute(providers,
+            (provider, taskMonitor) -> findReferences(provider, params, acceptor, taskMonitor),
+            getLabel(), null, monitor);
+
+        return Status.OK_STATUS;
+    }
+
+    /**
+     * Finds references for the given {@link ReferenceParams} using the given reference provider
+     * and reports the search results to the given acceptor.
+     *
+     * @param provider never <code>null</code>
+     * @param params never <code>null</code>
+     * @param acceptor never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the status after completion of the search
+     */
+    protected IStatus findReferences(ReferenceProvider provider, ReferenceParams params,
+        Consumer<? super Location> acceptor, IProgressMonitor monitor)
+    {
         ReferencesRequest request = newReferencesRequest();
         request.setProvider(provider);
-        request.setParams(params);
+        // note that request params can get modified as part of request processing
+        // (e.g. a progress token can be set); therefore we need to copy the given params
+        request.setParams(JsonUtil.deepCopy(params));
         request.setProgressMonitor(monitor);
         request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
         request.setUpPartialResultProgress(
@@ -99,16 +155,9 @@ public class ReferenceSearchQuery
                         acceptor.accept(location);
                 }
             });
+        request.setMayThrow(false);
 
-        List<? extends Location> locations;
-        try
-        {
-            locations = request.sendAndReceive();
-        }
-        catch (CompletionException e)
-        {
-            return Activator.createErrorStatus(request.getErrorMessage(), e.getCause());
-        }
+        List<? extends Location> locations = request.sendAndReceive();
 
         if (locations == null)
             return Status.OK_STATUS;
@@ -127,14 +176,6 @@ public class ReferenceSearchQuery
     protected ReferencesRequest newReferencesRequest()
     {
         return new ReferencesRequest();
-    }
-
-    private ReferenceProvider getReferenceProvider()
-    {
-        LanguageService languageService = target.getLanguageService();
-        return languageService.getDocumentMatcher().getBestMatch(
-            languageService.getReferenceProviders(), ReferenceProvider::getDocumentSelector,
-            target.getDocumentUri(), target.getLanguageId());
     }
 
     @Override

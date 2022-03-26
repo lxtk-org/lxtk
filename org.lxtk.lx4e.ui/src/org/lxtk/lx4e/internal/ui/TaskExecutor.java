@@ -15,6 +15,7 @@ package org.lxtk.lx4e.internal.ui;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
@@ -24,12 +25,40 @@ import org.eclipse.core.runtime.jobs.JobGroup;
 
 public class TaskExecutor
 {
+    public static <P> void parallelExecute(P[] inputElements, BiConsumer<P, IProgressMonitor> task,
+        String taskName, Duration timeout, IProgressMonitor monitor)
+    {
+        if (inputElements.length == 0)
+            return;
+
+        JobGroup jobGroup = new JobGroup(taskName, 0, inputElements.length);
+
+        for (P inputElement : inputElements)
+        {
+            Job job = Job.create(taskName, pm ->
+            {
+                task.accept(inputElement, pm);
+            });
+            job.setJobGroup(jobGroup);
+            job.schedule();
+        }
+
+        try
+        {
+            jobGroup.join(timeout != null ? timeout.toMillis() : 0, monitor);
+        }
+        catch (InterruptedException e)
+        {
+            // ignore
+        }
+    }
+
     public static <P, R> Map<P, R> parallelCompute(P[] inputElements,
         BiFunction<P, IProgressMonitor, R> taskFunction, String taskName, Duration timeout,
         IProgressMonitor monitor)
     {
         if (inputElements.length == 0)
-            throw new IllegalArgumentException();
+            return Map.of();
 
         Map<P, R> results = new LinkedHashMap<>();
 
@@ -38,55 +67,52 @@ public class TaskExecutor
             results.put(inputElement, null); // initialize iteration order
         }
 
-        JobGroup jobGroup = new JobGroup(taskName, 0, inputElements.length);
-
-        for (P inputElement : inputElements)
+        parallelExecute(inputElements, (inputElement, pm) ->
         {
-            Job job = Job.create(taskName, pm ->
+            R result = taskFunction.apply(inputElement, pm);
+
+            synchronized (results)
             {
-                R result = taskFunction.apply(inputElement, pm);
-
-                synchronized (results)
-                {
-                    results.put(inputElement, result);
-                }
-            });
-            job.setJobGroup(jobGroup);
-            job.schedule();
-        }
-
-        try
-        {
-            jobGroup.join(timeout.toMillis(), monitor);
-        }
-        catch (InterruptedException e)
-        {
-            // ignore
-        }
+                results.put(inputElement, result);
+            }
+        }, taskName, timeout, monitor);
 
         return results;
     }
 
-    public static <P, R> Map<P, R> sequentialCompute(P[] inputElements,
-        BiFunction<P, Duration, R> taskFunction, Predicate<R> stopPredicate, Duration timeout)
+    public static <P> void sequentialExecute(P[] inputElements,
+        BiFunction<P, Duration, Boolean> task, Duration timeout)
     {
-        Map<P, R> results = new LinkedHashMap<>();
-
         for (P inputElement : inputElements)
         {
             long startTimeMillis = System.currentTimeMillis();
 
-            R result = taskFunction.apply(inputElement, timeout);
-
-            results.put(inputElement, result);
-
-            if (stopPredicate.test(result))
+            if (Boolean.TRUE.equals(task.apply(inputElement, timeout)))
                 break;
 
             timeout = timeout.minusMillis(System.currentTimeMillis() - startTimeMillis);
             if (timeout.isNegative() || timeout.isZero())
                 break;
         }
+    }
+
+    public static <P, R> Map<P, R> sequentialCompute(P[] inputElements,
+        BiFunction<P, Duration, R> taskFunction, Predicate<R> stopPredicate, Duration timeout)
+    {
+        if (inputElements.length == 0)
+            return Map.of();
+
+        Map<P, R> results = new LinkedHashMap<>();
+
+        sequentialExecute(inputElements, (inputElement, taskTimeout) ->
+        {
+            R result = taskFunction.apply(inputElement, taskTimeout);
+
+            results.put(inputElement, result);
+
+            return stopPredicate.test(result);
+
+        }, timeout);
 
         return results;
     }
