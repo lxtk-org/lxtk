@@ -35,9 +35,9 @@ public class TaskExecutor
 
         for (P inputElement : inputElements)
         {
-            Job job = Job.create(taskName, pm ->
+            Job job = Job.create(taskName, taskMonitor ->
             {
-                task.accept(inputElement, pm);
+                task.accept(inputElement, taskMonitor);
             });
             job.setJobGroup(jobGroup);
             job.schedule();
@@ -64,12 +64,15 @@ public class TaskExecutor
 
         for (P inputElement : inputElements)
         {
+            if (results.containsKey(inputElement))
+                throw new IllegalArgumentException("Duplicate input element: " + inputElement); //$NON-NLS-1$
+
             results.put(inputElement, null); // initialize iteration order
         }
 
-        parallelExecute(inputElements, (inputElement, pm) ->
+        parallelExecute(inputElements, (inputElement, taskMonitor) ->
         {
-            R result = taskFunction.apply(inputElement, pm);
+            R result = taskFunction.apply(inputElement, taskMonitor);
 
             synchronized (results)
             {
@@ -106,6 +109,9 @@ public class TaskExecutor
 
         sequentialExecute(inputElements, (inputElement, taskTimeout) ->
         {
+            if (results.containsKey(inputElement))
+                throw new IllegalArgumentException("Duplicate input element: " + inputElement); //$NON-NLS-1$
+
             R result = taskFunction.apply(inputElement, taskTimeout);
 
             results.put(inputElement, result);

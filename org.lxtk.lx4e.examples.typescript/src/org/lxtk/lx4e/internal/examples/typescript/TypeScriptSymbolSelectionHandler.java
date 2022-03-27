@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -13,7 +13,9 @@
 package org.lxtk.lx4e.internal.examples.typescript;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
@@ -50,19 +52,19 @@ public class TypeScriptSymbolSelectionHandler
         if (resource == null)
             return null;
 
-        WorkspaceSymbolProvider provider = null;
+        List<WorkspaceSymbolProvider> providers = new ArrayList<>();
         IProject project = resource.getProject();
         while (it.hasNext())
         {
-            provider = it.next();
+            WorkspaceSymbolProvider provider = it.next();
             if (project.equals(provider.getContext()))
-                break;
+                providers.add(provider);
         }
-        if (provider == null)
+        if (providers.isEmpty())
             return null;
 
-        WorkspaceSymbolSelectionDialog dialog =
-            new WorkspaceSymbolSelectionDialog(shell, provider, true);
+        WorkspaceSymbolSelectionDialog dialog = new WorkspaceSymbolSelectionDialog(shell,
+            providers.toArray(WorkspaceSymbolProvider[]::new), true);
         dialog.setTitle(MessageFormat.format("Open Symbol in ''{0}''", project.getName()));
         return dialog;
     }

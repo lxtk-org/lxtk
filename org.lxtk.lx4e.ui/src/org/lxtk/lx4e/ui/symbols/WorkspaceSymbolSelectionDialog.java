@@ -17,7 +17,6 @@ import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletionException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,6 +39,7 @@ import org.lxtk.lx4e.IUriHandler;
 import org.lxtk.lx4e.ResourceUriHandler;
 import org.lxtk.lx4e.UriHandlers;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.requests.WorkspaceSymbolRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
@@ -55,7 +55,27 @@ public class WorkspaceSymbolSelectionDialog
     private static final IUriHandler URI_HANDLER =
         UriHandlers.compose(new ResourceUriHandler(), new EfsUriHandler());
 
-    private final WorkspaceSymbolProvider provider;
+    private final WorkspaceSymbolProvider[] providers;
+
+    /**
+     * Creates a new dialog instance.
+     *
+     * @param shell a parent shell
+     * @param providers {@link WorkspaceSymbolProvider}s (not <code>null</code>)
+     * @param multi indicates whether the dialog will allow to select more than one item
+     */
+    public WorkspaceSymbolSelectionDialog(Shell shell, WorkspaceSymbolProvider[] providers,
+        boolean multi)
+    {
+        super(shell, multi);
+        for (WorkspaceSymbolProvider provider : providers)
+            Objects.requireNonNull(provider);
+        this.providers = providers;
+        setTitle(Messages.WorkspaceSymbolSelectionDialog_defaultTitle);
+        setMessage(Messages.WorkspaceSymbolSelectionDialog_defaultMessage);
+        setListLabelProvider(new ListLabelProvider());
+        setDetailsLabelProvider(new DetailsLabelProvider());
+    }
 
     /**
      * Creates a new dialog instance.
@@ -67,12 +87,7 @@ public class WorkspaceSymbolSelectionDialog
     public WorkspaceSymbolSelectionDialog(Shell shell, WorkspaceSymbolProvider provider,
         boolean multi)
     {
-        super(shell, multi);
-        this.provider = Objects.requireNonNull(provider);
-        setTitle(Messages.WorkspaceSymbolSelectionDialog_defaultTitle);
-        setMessage(Messages.WorkspaceSymbolSelectionDialog_defaultMessage);
-        setListLabelProvider(new ListLabelProvider());
-        setDetailsLabelProvider(new DetailsLabelProvider());
+        this(shell, new WorkspaceSymbolProvider[] { provider }, multi);
     }
 
     /**
@@ -98,17 +113,46 @@ public class WorkspaceSymbolSelectionDialog
         return Status.OK_STATUS;
     }
 
+    /**
+     * Returns the workspace symbol providers for this dialog.
+     *
+     * @return the workspace symbol providers (not <code>null</code>)
+     */
+    protected WorkspaceSymbolProvider[] getWorkspaceSymbolProviders()
+    {
+        return providers;
+    }
+
     @Override
     protected void fillContentProvider(AbstractContentProvider contentProvider,
         ItemsFilter itemsFilter, IProgressMonitor monitor) throws CoreException
     {
+        TaskExecutor.parallelExecute(getWorkspaceSymbolProviders(),
+            (workspaceSymbolProvider, taskMonitor) -> fillContentProvider(contentProvider,
+                itemsFilter, workspaceSymbolProvider, taskMonitor),
+            Messages.WorkspaceSymbolSelectionDialog_searchTaskName, null, monitor);
+    }
+
+    /**
+     * Fills the given content provider with symbol information supplied by the given
+     * workspace symbol provider.
+     *
+     * @param contentProvider never <code>null</code>
+     * @param itemsFilter never <code>null</code>
+     * @param workspaceSymbolProvider never <code>null</code>
+     * @param monitor may be <code>null</code>
+     */
+    protected void fillContentProvider(AbstractContentProvider contentProvider,
+        ItemsFilter itemsFilter, WorkspaceSymbolProvider workspaceSymbolProvider,
+        IProgressMonitor monitor)
+    {
         WorkspaceSymbolRequest request = newWorkspaceSymbolRequest();
-        request.setProvider(provider);
+        request.setProvider(workspaceSymbolProvider);
         request.setParams(new WorkspaceSymbolParams(itemsFilter.getPattern()));
         request.setProgressMonitor(monitor);
         request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-        request.setUpPartialResultProgress((
-            () -> new AbstractPartialResultProgress<List<? extends SymbolInformation>>()
+        request.setUpPartialResultProgress(
+            (() -> new AbstractPartialResultProgress<List<? extends SymbolInformation>>()
             {
                 @Override
                 protected void onAccept(List<? extends SymbolInformation> items)
@@ -117,17 +161,9 @@ public class WorkspaceSymbolSelectionDialog
                         contentProvider.add(item, itemsFilter);
                 }
             }));
+        request.setMayThrow(false);
 
-        List<? extends SymbolInformation> result;
-        try
-        {
-            result = request.sendAndReceive();
-        }
-        catch (CompletionException e)
-        {
-            throw new CoreException(
-                Activator.createErrorStatus(request.getErrorMessage(), e.getCause()));
-        }
+        List<? extends SymbolInformation> result = request.sendAndReceive();
 
         if (result == null)
             return;
