@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.lxtk.lx4e.refactoring.rename;
 
-import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
@@ -21,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -46,8 +46,8 @@ import org.lxtk.lx4e.requests.PrepareRenameRequest;
 import org.lxtk.lx4e.requests.RenameRequest;
 
 /**
- * Default implementation of a rename refactoring that uses a {@link
- * RenameProvider} to compute the rename edits.
+ * Default implementation of a rename refactoring that uses {@link RenameProvider}s
+ * to compute the rename edits.
  */
 public class RenameRefactoring
     extends WorkspaceEditRefactoring
@@ -56,7 +56,8 @@ public class RenameRefactoring
     private final IDocument document;
     private final int offset;
     private Position position;
-    private RenameProvider renameProvider;
+    private RenameProvider[] renameProviders;
+    private RenameProvider prepareRenameProvider;
     private Either<Range, PrepareRenameResult> prepareRenameResult;
     private String newName, currentName;
 
@@ -222,52 +223,67 @@ public class RenameRefactoring
      */
     public boolean isApplicable()
     {
-        return getRenameProvider() != null;
+        return getRenameProviders().length != 0;
     }
 
     @Override
     public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
         throws CoreException, OperationCanceledException
     {
-        prepareRenameResult = null;
+        setPrepareRenameResult(null, null);
 
-        RenameProvider renameProvider = getRenameProvider();
-        if (renameProvider == null)
+        RenameProvider[] renameProviders = getRenameProviders();
+        if (renameProviders.length == 0)
             return RefactoringStatus.createFatalErrorStatus(
                 Messages.RenameRefactoring_No_rename_provider);
 
-        if (!Boolean.TRUE.equals(renameProvider.getRegistrationOptions().getPrepareProvider()))
-            return new RefactoringStatus();
+        RefactoringStatus status = new RefactoringStatus();
 
-        PrepareRenameRequest request = newPrepareRenameRequest();
-        request.setProvider(renameProvider);
-        request.setParams(new PrepareRenameParams(
-            DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), getPosition()));
-        request.setProgressMonitor(pm);
+        SubMonitor subMonitor = SubMonitor.convert(pm, renameProviders.length);
 
-        try
+        for (int i = 0; i < renameProviders.length; i++)
         {
-            prepareRenameResult = request.sendAndReceive();
-        }
-        catch (CompletionException e)
-        {
-            return handleError(e.getCause(), request.getErrorMessage());
+            RenameProvider renameProvider = renameProviders[i];
+
+            if (!Boolean.TRUE.equals(renameProvider.getRegistrationOptions().getPrepareProvider()))
+                return new RefactoringStatus();
+
+            PrepareRenameRequest request = newPrepareRenameRequest();
+            request.setProvider(renameProvider);
+            PrepareRenameParams params = new PrepareRenameParams(
+                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), getPosition());
+            request.setParams(params);
+            request.setProgressMonitor(subMonitor.split(1));
+
+            Either<Range, PrepareRenameResult> prepareRenameResult = null;
+            try
+            {
+                prepareRenameResult = request.sendAndReceive();
+            }
+            catch (CompletionException e)
+            {
+                status.merge(handleError(e.getCause(), request.getErrorMessage()));
+            }
+
+            if (prepareRenameResult != null)
+            {
+                setPrepareRenameResult(renameProvider, prepareRenameResult);
+                return new RefactoringStatus();
+            }
         }
 
-        if (prepareRenameResult == null)
-            return RefactoringStatus.createFatalErrorStatus(
-                Messages.RenameRefactoring_No_prepare_rename_result);
-
-        setCurrentName(null);
-        return new RefactoringStatus();
+        // no prepare rename result
+        if (!status.hasFatalError())
+            status.addFatalError(Messages.RenameRefactoring_No_prepare_rename_result);
+        return status;
     }
 
     @Override
     public RefactoringStatus checkFinalConditions(IProgressMonitor pm)
         throws CoreException, OperationCanceledException
     {
-        RenameProvider renameProvider = getRenameProvider();
-        if (renameProvider == null)
+        RenameProvider[] renameProviders = getRenameProviders();
+        if (renameProviders.length == 0)
             return RefactoringStatus.createFatalErrorStatus(
                 Messages.RenameRefactoring_No_rename_provider);
 
@@ -275,32 +291,88 @@ public class RenameRefactoring
         if (status.hasFatalError())
             return status;
 
-        RenameRequest request = newRenameRequest();
-        request.setProvider(renameProvider);
-        request.setParams(
-            new RenameParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                getPosition(), getNewName()));
-        request.setProgressMonitor(pm);
-        request.setUpWorkDoneProgress(
-            () -> new DefaultWorkDoneProgress(Either.forLeft(UUID.randomUUID().toString())));
+        WorkspaceEdit workspaceEdit = null;
 
-        WorkspaceEdit workspaceEdit;
-        try
+        int i = 0;
+        if (prepareRenameProvider != null)
+            while (i < renameProviders.length && renameProviders[i] != prepareRenameProvider)
+                i++;
+
+        SubMonitor subMonitor = SubMonitor.convert(pm, renameProviders.length - i);
+
+        while (i < renameProviders.length)
         {
-            workspaceEdit = request.sendAndReceive();
+            RenameProvider renameProvider = renameProviders[i++];
+
+            RenameRequest request = newRenameRequest();
+            request.setProvider(renameProvider);
+            request.setParams(
+                new RenameParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
+                    getPosition(), getNewName()));
+            request.setProgressMonitor(subMonitor.split(1));
+            request.setUpWorkDoneProgress(
+                () -> new DefaultWorkDoneProgress(Either.forLeft(UUID.randomUUID().toString())));
+
+            try
+            {
+                workspaceEdit = request.sendAndReceive();
+            }
+            catch (CompletionException e)
+            {
+                status.merge(handleError(e.getCause(), request.getErrorMessage()));
+            }
+
+            if (workspaceEdit != null)
+            {
+                setWorkspaceEdit(workspaceEdit);
+
+                return super.checkFinalConditions(null);
+            }
         }
-        catch (CompletionException e)
-        {
-            return handleError(e.getCause(), request.getErrorMessage());
-        }
 
-        if (workspaceEdit == null)
-            return RefactoringStatus.createFatalErrorStatus(
-                Messages.RenameRefactoring_No_workspace_edit);
+        // no workspace edit
+        if (!status.hasFatalError())
+            status.addFatalError(Messages.RenameRefactoring_No_workspace_edit);
+        return status;
+    }
 
-        setWorkspaceEdit(workspaceEdit);
+    /**
+     * Sets the result of preparing the rename operation.
+     *
+     * @param provider may be <code>null</code> iff the <code>result</code> is <code>null</code>
+     * @param result may be <code>null</code> iff the <code>provider</code> is <code>null</code>
+     */
+    protected void setPrepareRenameResult(RenameProvider provider,
+        Either<Range, PrepareRenameResult> result)
+    {
+        if (provider == null ^ result == null)
+            throw new IllegalArgumentException();
 
-        return super.checkFinalConditions(null);
+        prepareRenameProvider = provider;
+        prepareRenameResult = result;
+
+        if (result != null)
+            setCurrentName(null);
+    }
+
+    /**
+     * Returns the rename provider that was used for preparing the rename operation.
+     *
+     * @return a {@link RenameProvider}, or <code>null</code> if none
+     */
+    protected final RenameProvider getPrepareRenameProvider()
+    {
+        return prepareRenameProvider;
+    }
+
+    /**
+     * Returns the result of preparing the rename operation.
+     *
+     * @return the result of preparing the rename operation, or <code>null</code> if none
+     */
+    protected final Either<Range, PrepareRenameResult> getPrepareRenameResult()
+    {
+        return prepareRenameResult;
     }
 
     /**
@@ -323,20 +395,39 @@ public class RenameRefactoring
         return new RenameRequest();
     }
 
-    private RenameProvider getRenameProvider()
+    /**
+     * Returns the rename providers for this refactoring.
+     *
+     * @return an array of rename providers (never <code>null</code>, never contains <code>null</code>s)
+     */
+    protected final RenameProvider[] getRenameProviders()
     {
-        if (renameProvider == null)
-        {
-            URI documentUri = target.getDocumentUri();
-            LanguageService languageService = target.getLanguageService();
-            renameProvider = languageService.getDocumentMatcher().getBestMatch(
-                languageService.getRenameProviders(), RenameProvider::getDocumentSelector,
-                documentUri, target.getLanguageId());
-        }
-        return renameProvider;
+        if (renameProviders == null)
+            renameProviders = getRenameProviders(target);
+        return renameProviders;
     }
 
-    private Position getPosition() throws CoreException
+    /**
+     * Returns the rename providers for the given target.
+     *
+     * @param target never <code>null</code>
+     * @return an array of rename providers (not <code>null</code>, does not contain <code>null</code>s)
+     */
+    protected RenameProvider[] getRenameProviders(LanguageOperationTarget target)
+    {
+        LanguageService languageService = target.getLanguageService();
+        return languageService.getDocumentMatcher().getSortedMatches(
+            languageService.getRenameProviders(), RenameProvider::getDocumentSelector,
+            target.getDocumentUri(), target.getLanguageId()).toArray(RenameProvider[]::new);
+    }
+
+    /**
+     * Returns the target document position for this refactoring.
+     *
+     * @return the target document position (never <code>null</code>)
+     * @throws CoreException if there is no valid position
+     */
+    protected final Position getPosition() throws CoreException
     {
         if (position == null)
         {
@@ -352,7 +443,17 @@ public class RenameRefactoring
         return position;
     }
 
-    private static RefactoringStatus handleError(Throwable e, String msg) throws CoreException
+    /**
+     * Handles the given exception by either returning a {@link RefactoringStatus} or throwing
+     * a {@link CoreException}.
+     *
+     * @param e not <code>null</code>
+     * @param msg may be <code>null</code>, in which case the message of the given exception is used
+     * @return the corresponding refactoring status (never <code>null</code>)
+     * @throws CoreException if returning a refactoring status is not appropriate for the given
+     *  exception
+     */
+    protected static RefactoringStatus handleError(Throwable e, String msg) throws CoreException
     {
         if (msg == null)
             msg = e.getMessage();
