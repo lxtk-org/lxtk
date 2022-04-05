@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC and others.
+ * Copyright (c) 2021, 2022 1C-Soft LLC and others.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -40,13 +40,15 @@ import org.lxtk.DocumentUri;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
 import org.lxtk.LinkedEditingRangeProvider;
+import org.lxtk.jsonrpc.JsonUtil;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.internal.ui.LinkedEditingPubSub;
+import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.requests.LinkedEditingRangeRequest;
 
 /**
  * Starts linked editing mode for a local rename (does not change references in other files).
- * Uses {@link LinkedEditingRangeProvider} to compute the linked editing ranges.
+ * Uses {@link LinkedEditingRangeProvider}s to compute the linked editing ranges.
  */
 public class RenameLinkedModeStarter
 {
@@ -79,10 +81,6 @@ public class RenameLinkedModeStarter
         if (document == null)
             return null;
 
-        LinkedEditingRangeProvider provider = getLinkedEditingRangeProvider();
-        if (provider == null)
-            return null;
-
         Point originalSelection = viewer.getSelectedRange();
         int invocationOffset = originalSelection.x;
 
@@ -90,13 +88,7 @@ public class RenameLinkedModeStarter
         params.setTextDocument(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()));
         params.setPosition(DocumentUtil.toPosition(document, invocationOffset));
 
-        LinkedEditingRangeRequest request = newLinkedEditingRangeRequest();
-        request.setProvider(provider);
-        request.setParams(params);
-        request.setTimeout(getLinkedEditingRangeTimeout());
-        request.setMayThrow(false);
-
-        LinkedEditingRanges result = request.sendAndReceive();
+        LinkedEditingRanges result = getLinkedEditingRanges(params);
         if (result == null || result.getRanges().isEmpty())
             return null;
 
@@ -157,6 +149,54 @@ public class RenameLinkedModeStarter
     }
 
     /**
+     * Returns the linked editing ranges for the given {@link LinkedEditingRangeParams}.
+     *
+     * @param params never <code>null</code>
+     * @return the corresponding {@link LinkedEditingRanges}, or <code>null</code> if none
+     */
+    protected LinkedEditingRanges getLinkedEditingRanges(LinkedEditingRangeParams params)
+    {
+        LinkedEditingRanges[] ranges = new LinkedEditingRanges[1];
+
+        TaskExecutor.sequentialExecute(getLinkedEditingRangeProviders(target),
+            (provider, timeout) ->
+            {
+                LinkedEditingRangeRequest request = newLinkedEditingRangeRequest();
+                request.setProvider(provider);
+                request.setParams(JsonUtil.deepCopy(params));
+                request.setTimeout(timeout);
+                request.setMayThrow(false);
+
+                LinkedEditingRanges result = request.sendAndReceive();
+                if (result == null || result.getRanges().isEmpty())
+                    return false;
+
+                ranges[0] = result;
+                return true;
+
+            }, getLinkedEditingRangeTimeout());
+
+        return ranges[0];
+    }
+
+    /**
+     * Returns the linked editing range providers for the given target.
+     *
+     * @param target never <code>null</code>
+     * @return an array of linked editing range providers (not <code>null</code>,
+     *  does not contain <code>null</code>s)
+     */
+    protected LinkedEditingRangeProvider[] getLinkedEditingRangeProviders(
+        LanguageOperationTarget target)
+    {
+        LanguageService languageService = target.getLanguageService();
+        return languageService.getDocumentMatcher().getSortedMatches(
+            languageService.getLinkedEditingRangeProviders(),
+            LinkedEditingRangeProvider::getDocumentSelector, target.getDocumentUri(),
+            target.getLanguageId()).toArray(LinkedEditingRangeProvider[]::new);
+    }
+
+    /**
      * Returns the timeout for a linked editing range request.
      *
      * @return a positive duration
@@ -174,20 +214,6 @@ public class RenameLinkedModeStarter
     protected LinkedEditingRangeRequest newLinkedEditingRangeRequest()
     {
         return new LinkedEditingRangeRequest();
-    }
-
-    /**
-     * Returns the linked editing range provider.
-     *
-     * @return the linked editing range provider, or <code>null</code> if none is available
-     */
-    protected LinkedEditingRangeProvider getLinkedEditingRangeProvider()
-    {
-        LanguageService languageService = target.getLanguageService();
-        return languageService.getDocumentMatcher().getBestMatch(
-            languageService.getLinkedEditingRangeProviders(),
-            LinkedEditingRangeProvider::getDocumentSelector, target.getDocumentUri(),
-            target.getLanguageId());
     }
 
     private static List<IRegion> toRegions(IDocument document, List<Range> ranges)
