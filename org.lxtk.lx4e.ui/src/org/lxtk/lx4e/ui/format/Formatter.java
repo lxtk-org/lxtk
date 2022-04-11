@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -39,7 +39,6 @@ import org.lxtk.LanguageService;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.requests.DocumentFormattingRequest;
 import org.lxtk.lx4e.requests.DocumentRangeFormattingRequest;
-import org.lxtk.lx4e.requests.Request;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 
 /**
@@ -49,7 +48,7 @@ import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
  * @see DocumentFormattingProvider
  * @see DocumentRangeFormattingProvider
  */
-public final class Formatter
+public class Formatter
     implements IRunnableWithProgress
 {
     private final LanguageOperationTarget target;
@@ -75,6 +74,38 @@ public final class Formatter
     }
 
     /**
+     * Returns the {@link LanguageOperationTarget} for this formatter.
+     *
+     * @return the <code>LanguageOperationTarget</code> for the formatter
+     *  (never <code>null</code>)
+     */
+    public final LanguageOperationTarget getLanguageOperationTarget()
+    {
+        return target;
+    }
+
+    /**
+     * Returns the target {@link IDocument} for this formatter.
+     *
+     * @return the target document for the formatter (never <code>null</code>)
+     */
+    public final IDocument getDocument()
+    {
+        return document;
+    }
+
+    /**
+     * Returns the target document selection for this formatter.
+     *
+     * @return the target document selection for the formatter (never <code>null</code>,
+     *  may be empty)
+     */
+    public final ITextSelection getSelection()
+    {
+        return selection;
+    }
+
+    /**
      * Sets the formatting options.
      *
      * @param options the formatting options (not <code>null</code>)
@@ -82,6 +113,17 @@ public final class Formatter
     public void setOptions(FormattingOptions options)
     {
         this.options = Objects.requireNonNull(options);
+    }
+
+    /**
+     * Returns the formatting options.
+     *
+     * @return the formatting options, or <code>null</code> if no options have been set
+     * @see #setOptions(FormattingOptions)
+     */
+    public final FormattingOptions getOptions()
+    {
+        return options;
     }
 
     /**
@@ -118,16 +160,10 @@ public final class Formatter
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
     {
-        Request<List<? extends TextEdit>> request = createFormattingRequest();
-        if (request == null)
-            return;
-
-        request.setProgressMonitor(monitor);
-
         List<? extends TextEdit> edits;
         try
         {
-            edits = request.sendAndReceive();
+            edits = computeFormattingEdits(monitor);
         }
         catch (OperationCanceledException e)
         {
@@ -160,38 +196,37 @@ public final class Formatter
     }
 
     /**
-     * Returns a new instance of {@link DocumentFormattingRequest}.
+     * Computes the formatting edits.
      *
-     * @return the created request object (not <code>null</code>)
+     * @param monitor a progress monitor
+     * @return the computed edits (may be <code>null</code> or empty)
      */
-    protected DocumentFormattingRequest newDocumentFormattingRequest()
-    {
-        return new DocumentFormattingRequest();
-    }
-
-    /**
-     * Returns a new instance of {@link DocumentRangeFormattingRequest}.
-     *
-     * @return the created request object (not <code>null</code>)
-     */
-    protected DocumentRangeFormattingRequest newDocumentRangeFormattingRequest()
-    {
-        return new DocumentRangeFormattingRequest();
-    }
-
-    private Request<List<? extends TextEdit>> createFormattingRequest()
+    protected List<? extends TextEdit> computeFormattingEdits(IProgressMonitor monitor)
     {
         if (options == null)
             throw new IllegalStateException("Formatting options have not been set"); //$NON-NLS-1$
 
-        LanguageService languageService = target.getLanguageService();
-        URI documentUri = target.getDocumentUri();
-        String languageId = target.getLanguageId();
-        DocumentMatcher documentMatcher = languageService.getDocumentMatcher();
+        if (selection.getLength() <= 0)
+        {
+            DocumentFormattingProvider documentFormattingProvider = getDocumentFormattingProvider();
+            if (documentFormattingProvider != null)
+            {
+                DocumentFormattingParams params = new DocumentFormattingParams();
+                params.setTextDocument(
+                    DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()));
+                params.setOptions(options);
+
+                DocumentFormattingRequest request = newDocumentFormattingRequest();
+                request.setProvider(documentFormattingProvider);
+                request.setParams(params);
+                request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+                request.setProgressMonitor(monitor);
+                return request.sendAndReceive();
+            }
+        }
 
         DocumentRangeFormattingProvider documentRangeFormattingProvider =
-            documentMatcher.getBestMatch(languageService.getDocumentRangeFormattingProviders(),
-                DocumentRangeFormattingProvider::getDocumentSelector, documentUri, languageId);
+            getDocumentRangeFormattingProvider();
         if (documentRangeFormattingProvider != null)
         {
             int offset;
@@ -214,7 +249,7 @@ public final class Formatter
             }
 
             DocumentRangeFormattingParams params = new DocumentRangeFormattingParams();
-            params.setTextDocument(DocumentUri.toTextDocumentIdentifier(documentUri));
+            params.setTextDocument(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()));
             params.setRange(range);
             params.setOptions(options);
 
@@ -222,26 +257,58 @@ public final class Formatter
             request.setProvider(documentRangeFormattingProvider);
             request.setParams(params);
             request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-            return request;
+            request.setProgressMonitor(monitor);
+            return request.sendAndReceive();
         }
-        else if (selection.getLength() <= 0)
-        {
-            DocumentFormattingProvider documentFormattingProvider =
-                documentMatcher.getBestMatch(languageService.getDocumentFormattingProviders(),
-                    DocumentFormattingProvider::getDocumentSelector, documentUri, languageId);
-            if (documentFormattingProvider != null)
-            {
-                DocumentFormattingParams params = new DocumentFormattingParams();
-                params.setTextDocument(DocumentUri.toTextDocumentIdentifier(documentUri));
-                params.setOptions(options);
 
-                DocumentFormattingRequest request = newDocumentFormattingRequest();
-                request.setProvider(documentFormattingProvider);
-                request.setParams(params);
-                request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-                return request;
-            }
-        }
         return null;
+    }
+
+    /**
+     * Returns the document formatting provider for this formatter.
+     *
+     * @return the document formatting provider, or <code>null</code> if none
+     */
+    protected DocumentFormattingProvider getDocumentFormattingProvider()
+    {
+        LanguageService languageService = target.getLanguageService();
+        return languageService.getDocumentMatcher().getBestMatch(
+            languageService.getDocumentFormattingProviders(),
+            DocumentFormattingProvider::getDocumentSelector, target.getDocumentUri(),
+            target.getLanguageId());
+    }
+
+    /**
+     * Returns the document range formatting provider for this formatter.
+     *
+     * @return the document range formatting provider, or <code>null</code> if none
+     */
+    protected DocumentRangeFormattingProvider getDocumentRangeFormattingProvider()
+    {
+        LanguageService languageService = target.getLanguageService();
+        return languageService.getDocumentMatcher().getBestMatch(
+            languageService.getDocumentRangeFormattingProviders(),
+            DocumentRangeFormattingProvider::getDocumentSelector, target.getDocumentUri(),
+            target.getLanguageId());
+    }
+
+    /**
+     * Returns a new instance of {@link DocumentFormattingRequest}.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected DocumentFormattingRequest newDocumentFormattingRequest()
+    {
+        return new DocumentFormattingRequest();
+    }
+
+    /**
+     * Returns a new instance of {@link DocumentRangeFormattingRequest}.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected DocumentRangeFormattingRequest newDocumentRangeFormattingRequest()
+    {
+        return new DocumentRangeFormattingRequest();
     }
 }
