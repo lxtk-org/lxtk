@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,8 +16,12 @@ import static org.lxtk.lx4e.internal.util.AnnotationUtil.replaceAnnotations;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -90,14 +94,13 @@ public class FoldingAnnotations
         }
         else
         {
+            foldingRanges = sanitizeFoldingRanges(foldingRanges);
+
             Collection<FoldingAnnotation> toRemove = new ArrayList<>(structure.keySet());
             Map<FoldingAnnotation, Position> toAdd = new IdentityHashMap<>(foldingRanges.size());
 
             for (FoldingRange foldingRange : foldingRanges)
             {
-                if (foldingRange.getStartLine() == foldingRange.getEndLine())
-                    continue;
-
                 Position position;
                 try
                 {
@@ -211,5 +214,54 @@ public class FoldingAnnotations
                 return existingAnnotation;
         }
         return null;
+    }
+
+    private static Collection<FoldingRange> sanitizeFoldingRanges(Collection<FoldingRange> ranges)
+    {
+        List<FoldingRange> result = new ArrayList<>(ranges);
+        result.sort((r1, r2) -> r1.getStartLine() - r2.getStartLine());
+
+        Deque<FoldingRange> nested = new LinkedList<>();
+        Iterator<FoldingRange> it = result.iterator();
+        while (it.hasNext())
+        {
+            FoldingRange range = it.next();
+            if (!isValid(range))
+            {
+                it.remove(); // remove invalid range
+            }
+            else
+            {
+                FoldingRange top = nested.peek();
+                while (top != null && range.getStartLine() > top.getEndLine())
+                {
+                    nested.pop();
+                    top = nested.peek();
+                }
+                if (top == null) // top-level range
+                {
+                    nested.push(range);
+                }
+                else // overlapping or nested range
+                {
+                    if (range.getStartLine() > top.getStartLine()
+                        && range.getEndLine() <= top.getEndLine()) // nested range
+                    {
+                        nested.push(range);
+                    }
+                    else // overlapping range
+                    {
+                        it.remove(); // remove invalid range
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static boolean isValid(FoldingRange r)
+    {
+        return r.getStartLine() >= 0 && r.getEndLine() >= 0 && r.getStartLine() < r.getEndLine();
     }
 }

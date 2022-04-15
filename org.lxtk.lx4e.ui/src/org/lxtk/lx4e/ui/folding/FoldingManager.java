@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -12,9 +12,11 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.folding;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,12 +36,17 @@ import org.lxtk.DocumentUri;
 import org.lxtk.FoldingRangeProvider;
 import org.lxtk.LanguageOperationTarget;
 import org.lxtk.LanguageService;
+import org.lxtk.jsonrpc.JsonUtil;
+import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.requests.FoldingRangeRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
 import org.lxtk.util.Disposable;
+import org.lxtk.util.Registry;
+import org.lxtk.util.SafeRun;
 
 /**
- * Manages annotations for document folding ranges computed using a {@link FoldingRangeProvider}.
+ * Manages annotations for document folding ranges computed using {@link FoldingRangeProvider}s.
  */
 public class FoldingManager
 {
@@ -117,33 +124,50 @@ public class FoldingManager
      */
     protected Disposable addFoldingSupport()
     {
+        LanguageOperationTarget target = targetSupplier.get();
         IDocument document = viewer.getDocument();
-        FoldingAnnotations annotations =
-            newFoldingAnnotations(document, viewer.getProjectionAnnotationModel());
-        Job job = new FoldingJob(annotations);
-        IDocumentListener documentListener = new IDocumentListener()
-        {
-            @Override
-            public void documentAboutToBeChanged(DocumentEvent event)
-            {
-            }
+        if (target == null || document == null)
+            return null;
 
-            @Override
-            public void documentChanged(DocumentEvent event)
+        return SafeRun.runWithResult(rollback ->
+        {
+            FoldingAnnotations annotations =
+                newFoldingAnnotations(document, viewer.getProjectionAnnotationModel());
+            Job job = new FoldingJob(target, annotations);
+
+            IDocumentListener documentListener = new IDocumentListener()
+            {
+                @Override
+                public void documentAboutToBeChanged(DocumentEvent event)
+                {
+                }
+
+                @Override
+                public void documentChanged(DocumentEvent event)
+                {
+                    job.cancel();
+                    job.schedule(500);
+                }
+            };
+            document.addDocumentListener(documentListener);
+            rollback.add(() -> document.removeDocumentListener(documentListener));
+
+            Consumer<FoldingRangeProvider> providersListener = provider ->
             {
                 job.cancel();
-                job.schedule(500);
-            }
-        };
-        document.addDocumentListener(documentListener);
-        job.schedule();
+                job.schedule();
+            };
+            Registry<FoldingRangeProvider> providers =
+                target.getLanguageService().getFoldingRangeProviders();
+            rollback.add(providers.onDidAdd().subscribe(providersListener)::dispose);
+            rollback.add(providers.onDidRemove().subscribe(providersListener)::dispose);
 
-        return () ->
-        {
-            document.removeDocumentListener(documentListener);
-            job.cancel();
-            annotations.dispose();
-        };
+            job.schedule();
+            rollback.add(job::cancel);
+
+            rollback.setLogger(e -> Activator.logError(e));
+            return rollback::run;
+        });
     }
 
     /**
@@ -160,6 +184,67 @@ public class FoldingManager
     }
 
     /**
+     * Returns folding range providers that match the given target.
+     *
+     * @param target never <code>null</code>
+     * @return the matching folding range providers (not <code>null</code>)
+     */
+    protected FoldingRangeProvider[] getFoldingRangeProviders(LanguageOperationTarget target)
+    {
+        LanguageService languageService = target.getLanguageService();
+        return languageService.getDocumentMatcher().getSortedMatches(
+            languageService.getFoldingRangeProviders(), FoldingRangeProvider::getDocumentSelector,
+            target.getDocumentUri(), target.getLanguageId()).toArray(FoldingRangeProvider[]::new);
+    }
+
+    /**
+     * Computes the folding range results for the given {@link FoldingRangeRequestParams}
+     * using the given folding range providers.
+     *
+     * @param providers never <code>null</code>
+     * @param params never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the computed folding range results, or <code>null</code> if none
+     */
+    protected FoldingRangeResults computeFoldingRangeResults(FoldingRangeProvider[] providers,
+        FoldingRangeRequestParams params, IProgressMonitor monitor)
+    {
+        if (providers.length == 0)
+            return null;
+
+        return new FoldingRangeResults(TaskExecutor.parallelCompute(providers,
+            (provider, taskMonitor) -> computeFoldingRangeResult(provider, params, taskMonitor),
+            Messages.Computing_folding_ranges, null, monitor));
+    }
+
+    /**
+     * Computes a folding range result for the given {@link FoldingRangeRequestParams}
+     * using the given folding range provider.
+     *
+     * @param provider never <code>null</code>
+     * @param params never <code>null</code>
+     * @param monitor a progress monitor, or <code>null</code>
+     *  if progress reporting is not desired. The caller must not rely on
+     *  {@link IProgressMonitor#done()} having been called by the receiver
+     * @return the computed folding range result, or <code>null</code> if none
+     */
+    protected FoldingRangeResult computeFoldingRangeResult(FoldingRangeProvider provider,
+        FoldingRangeRequestParams params, IProgressMonitor monitor)
+    {
+        FoldingRangeRequest request = newFoldingRangeRequest();
+        request.setProvider(provider);
+        // note that request params can get modified as part of request processing
+        // (e.g. a progress token can be set); therefore we need to copy the given params
+        request.setParams(JsonUtil.deepCopy(params));
+        request.setProgressMonitor(monitor);
+        request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
+        request.setMayThrow(false);
+        return new FoldingRangeResult(request.sendAndReceive());
+    }
+
+    /**
      * Returns a new instance of {@link FoldingRangeRequest}.
      *
      * @return the created request object (not <code>null</code>)
@@ -169,14 +254,72 @@ public class FoldingManager
         return new FoldingRangeRequest();
     }
 
+    /**
+     * Represents a group of {@link FoldingRangeResult}s.
+     */
+    protected static class FoldingRangeResults
+    {
+        private final Map<FoldingRangeProvider, FoldingRangeResult> results;
+
+        /**
+         * Constructor.
+         *
+         * @param results not <code>null</code>
+         */
+        public FoldingRangeResults(Map<FoldingRangeProvider, FoldingRangeResult> results)
+        {
+            this.results = Objects.requireNonNull(results);
+        }
+
+        /**
+         * Returns the folding range results as a map.
+         *
+         * @return the folding range results as a map (never <code>null</code>)
+         */
+        public Map<FoldingRangeProvider, FoldingRangeResult> asMap()
+        {
+            return results;
+        }
+    }
+
+    /**
+     * Represents the result of a folding range request.
+     */
+    protected static class FoldingRangeResult
+    {
+        private final List<FoldingRange> foldingRanges;
+
+        /**
+         * Constructor.
+         *
+         * @param foldingRanges may be <code>null</code>
+         */
+        public FoldingRangeResult(List<FoldingRange> foldingRanges)
+        {
+            this.foldingRanges = foldingRanges;
+        }
+
+        /**
+         * Returns a list of folding ranges.
+         *
+         * @return a list of folding ranges, or <code>null</code> if none
+         */
+        public List<FoldingRange> getFoldingRanges()
+        {
+            return foldingRanges;
+        }
+    }
+
     private class FoldingJob
         extends Job
     {
+        private final LanguageOperationTarget target;
         private final FoldingAnnotations annotations;
 
-        FoldingJob(FoldingAnnotations annotations)
+        FoldingJob(LanguageOperationTarget target, FoldingAnnotations annotations)
         {
             super(FoldingJob.class.getName());
+            this.target = Objects.requireNonNull(target);
             this.annotations = Objects.requireNonNull(annotations);
             setPriority(DECORATE);
             setSystem(true);
@@ -193,26 +336,24 @@ public class FoldingManager
 
         private List<FoldingRange> computeFoldingRanges(IProgressMonitor monitor)
         {
-            LanguageOperationTarget target = targetSupplier.get();
-            if (target == null)
+            FoldingRangeResults results = computeFoldingRangeResults(
+                getFoldingRangeProviders(target), new FoldingRangeRequestParams(
+                    DocumentUri.toTextDocumentIdentifier(target.getDocumentUri())),
+                monitor);
+            if (results == null)
                 return null;
 
-            URI documentUri = target.getDocumentUri();
-            LanguageService languageService = target.getLanguageService();
-            FoldingRangeProvider provider = languageService.getDocumentMatcher().getBestMatch(
-                languageService.getFoldingRangeProviders(),
-                FoldingRangeProvider::getDocumentSelector, documentUri, target.getLanguageId());
-            if (provider == null)
-                return null;
-
-            FoldingRangeRequest request = newFoldingRangeRequest();
-            request.setProvider(provider);
-            request.setParams(
-                new FoldingRangeRequestParams(DocumentUri.toTextDocumentIdentifier(documentUri)));
-            request.setProgressMonitor(monitor);
-            request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-            request.setMayThrow(false);
-            return request.sendAndReceive();
+            List<FoldingRange> allFoldingRanges = new ArrayList<>();
+            results.asMap().forEach((provider, result) ->
+            {
+                if (result != null)
+                {
+                    List<FoldingRange> foldingRanges = result.getFoldingRanges();
+                    if (foldingRanges != null)
+                        allFoldingRanges.addAll(foldingRanges);
+                }
+            });
+            return allFoldingRanges;
         }
     }
 }
