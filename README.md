@@ -61,7 +61,27 @@ except for resource operations
 - [x] [Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbol)
 
 LXTK 0.2 does not support features introduced in LSP 3.15 and above.
-Future LXTK versions will add support for the latest LSP features.
+
+The upcoming LXTK version (0.3) adds support for new features
+of LSP 3.15 and 3.16, including:
+
+- [x] [Progress Support](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#progress)
+   - [x] [Work Done Progress](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workDoneProgress)
+   - [x] [Partial Result Progress](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#partialResults)
+- [x] [Call Hierarchy](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareCallHierarchy)
+- [x] [Change Annotations](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#changeAnnotation)
+- [x] Events for File Operations
+  - [x] [WillCreateFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_willCreateFiles)
+and [DidCreateFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_didCreateFiles)
+  - [x] [WillDeleteFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_willDeleteFiles)
+and [DidDeleteFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_didDeleteFiles)
+  - [x] [WillRenameFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_willRenameFiles)
+and [DidRenameFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_didRenameFiles)
+- [x] [Linked Editing](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_linkedEditingRange)
+- [x] [Semantic Tokens](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens)
+
+It also adds support for resource operations in workspace edits
+that was missing in LXTK 0.2.
 
 ## Architectural Overview
 
