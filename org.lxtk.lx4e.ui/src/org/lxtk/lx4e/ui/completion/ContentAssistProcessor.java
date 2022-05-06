@@ -371,11 +371,10 @@ public class ContentAssistProcessor
         URI documentUri = target.getDocumentUri();
         LanguageService languageService = target.getLanguageService();
 
-        List<SignatureHelpProvider> providers =
-            languageService.getDocumentMatcher().getSortedMatches(
-                languageService.getSignatureHelpProviders(),
-                SignatureHelpProvider::getDocumentSelector, documentUri, target.getLanguageId());
-        if (providers.isEmpty())
+        SignatureHelpProvider[] providers = languageService.getDocumentMatcher().getSortedMatches(
+            languageService.getSignatureHelpProviders(), SignatureHelpProvider::getDocumentSelector,
+            documentUri, target.getLanguageId()).toArray(SignatureHelpProvider[]::new);
+        if (providers.length == 0)
             return null;
 
         IDocument document = viewer.getDocument();
@@ -394,24 +393,30 @@ public class ContentAssistProcessor
         SignatureHelpParams params = new SignatureHelpParams(
             DocumentUri.toTextDocumentIdentifier(documentUri), position, context);
 
-        for (SignatureHelpProvider provider : providers)
+        SignatureHelpResult[] result = new SignatureHelpResult[1];
+
+        TaskExecutor.sequentialExecute(providers, (provider, timeout) ->
         {
             SignatureHelpRequest request = newSignatureHelpRequest();
             request.setProvider(provider);
             // note that request params can get modified as part of request processing
             // (e.g. a progress token can be set); therefore we need to copy the original params
             request.setParams(JsonUtil.deepCopy(params));
-            request.setTimeout(getSignatureHelpTimeout());
+            request.setTimeout(timeout);
             request.setMayThrow(false);
             request.setUpWorkDoneProgress(
                 () -> WorkDoneProgressFactory.newWorkDoneProgressWithJob(false));
 
             SignatureHelp signatureHelp = request.sendAndReceive();
-            if (signatureHelp != null)
-                return new SignatureHelpResult(signatureHelp);
-        }
+            if (signatureHelp == null)
+                return false;
 
-        return null;
+            result[0] = new SignatureHelpResult(signatureHelp);
+            return true;
+
+        }, getSignatureHelpTimeout());
+
+        return result[0];
     }
 
     /**
