@@ -83,6 +83,8 @@ and [DidRenameFiles](https://microsoft.github.io/language-server-protocol/specif
 It also adds support for resource operations in workspace edits
 that was missing in LXTK 0.2.
 
+A detailed list of the changes can be found in [CHANGELOG](CHANGELOG.md).
+
 ## Architectural Overview
 
 Currently, there are two main architectural layers in LXTK:
