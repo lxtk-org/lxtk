@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -78,19 +78,41 @@ public abstract class LanguageSourceFile
 
     private final FileWrapper fileWrapper;
     private final String languageId;
+    private final DocumentSymbolProvider symbolProvider;
 
     /**
      * Constructs a handle for a source file with the given parent element,
      * workspace file, and language.
+     * <p>
+     * This constructor is a shortcut to <code>LanguageSourceFile(parent, file, languageId, null)</code>.
+     * </p>
      *
      * @param parent the parent of the source file,
      *  or <code>null</code> if the source file has no parent
      * @param file the underlying workspace file (not <code>null</code>)
      * @param languageId the language identifier (not <code>null</code>)
+     * @see #LanguageSourceFile(LanguageElement, IFile, String, DocumentSymbolProvider)
      */
     public LanguageSourceFile(LanguageElement parent, IFile file, String languageId)
     {
-        this(parent, FileWrapper.forFile(file), languageId);
+        this(parent, file, languageId, null);
+    }
+
+    /**
+     * Constructs a handle for a source file with the given parent element,
+     * workspace file, language, and document symbol provider.
+     *
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param file the underlying workspace file (not <code>null</code>)
+     * @param languageId the language identifier (not <code>null</code>)
+     * @param symbolProvider the document symbol provider,
+     *  or <code>null</code> if the best matching provider is to be used
+     */
+    public LanguageSourceFile(LanguageElement parent, IFile file, String languageId,
+        DocumentSymbolProvider symbolProvider)
+    {
+        this(parent, FileWrapper.forFile(file), languageId, symbolProvider);
     }
 
     /**
@@ -99,11 +121,15 @@ public abstract class LanguageSourceFile
      * passing to <code>EFS.getStore(URI)</code>. This constructor is intended
      * to be used for source files that have an underlying {@link IFileStore}
      * outside the workspace.
+     * <p>
+     * This constructor is a shortcut to <code>LanguageSourceFile(parent, locationUri, languageId, null)</code>.
+     * </p>
      *
      * @param parent the parent of the source file,
      *  or <code>null</code> if the source file has no parent
      * @param locationUri the file system location URI (not <code>null</code>)
      * @param languageId the language identifier (not <code>null</code>)
+     * @see #LanguageSourceFile(LanguageElement, URI, String, DocumentSymbolProvider)
      */
     /*
      * Note: We use URI rather than IFileStore as the second argument type
@@ -114,32 +140,85 @@ public abstract class LanguageSourceFile
      */
     public LanguageSourceFile(LanguageElement parent, URI locationUri, String languageId)
     {
-        this(parent, FileWrapper.forLocationUri(locationUri), languageId);
+        this(parent, locationUri, languageId, null);
+    }
+
+    /**
+     * Constructs a handle for a source file with the given parent element,
+     * file system location URI, language, and document symbol provider. The URI must be
+     * suitable to passing to <code>EFS.getStore(URI)</code>. This constructor is intended
+     * to be used for source files that have an underlying {@link IFileStore}
+     * outside the workspace.
+     *
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param locationUri the file system location URI (not <code>null</code>)
+     * @param languageId the language identifier (not <code>null</code>)
+     * @param symbolProvider the document symbol provider,
+     *  or <code>null</code> if the best matching provider is to be used
+     */
+    /*
+     * Note: We use URI rather than IFileStore as the second argument type
+     * to avoid introducing a compile-time dependency on org.eclipse.core.filesystem
+     * in subclasses that do not otherwise depend on it. For the same reason,
+     * we chose not to override getFileStore_(), although a more efficient
+     * implementation could have been provided.
+     */
+    public LanguageSourceFile(LanguageElement parent, URI locationUri, String languageId,
+        DocumentSymbolProvider symbolProvider)
+    {
+        this(parent, FileWrapper.forLocationUri(locationUri), languageId, symbolProvider);
     }
 
     /**
      * Constructs a handle for a source file with the given parent element, name,
      * and language. This constructor is intended to be used for source files
      * that have no underlying file object.
+     * <p>
+     * This constructor is a shortcut to <code>LanguageSourceFile(parent, name, languageId, null)</code>.
+     * </p>
      *
      * @param parent the parent of the source file,
      *  or <code>null</code> if the source file has no parent
      * @param name the name of the source file, or <code>null</code>
      *  if the source file has no name
      * @param languageId the language identifier (not <code>null</code>)
+     * @see #LanguageSourceFile(LanguageElement, String, String, DocumentSymbolProvider)
      */
     public LanguageSourceFile(LanguageElement parent, String name, String languageId)
+    {
+        this(parent, name, languageId, null);
+    }
+
+    /**
+     * Constructs a handle for a source file with the given parent element, name,
+     * language, and document symbol provider. This constructor is intended to be used for
+     * source files that have no underlying file object.
+     *
+     * @param parent the parent of the source file,
+     *  or <code>null</code> if the source file has no parent
+     * @param name the name of the source file, or <code>null</code>
+     *  if the source file has no name
+     * @param languageId the language identifier (not <code>null</code>)
+     * @param symbolProvider the document symbol provider,
+     *  or <code>null</code> if the best matching provider is to be used
+     */
+    public LanguageSourceFile(LanguageElement parent, String name, String languageId,
+        DocumentSymbolProvider symbolProvider)
     {
         super(parent, name);
         this.fileWrapper = FileWrapper.NULL;
         this.languageId = Objects.requireNonNull(languageId);
+        this.symbolProvider = symbolProvider;
     }
 
-    private LanguageSourceFile(LanguageElement parent, FileWrapper fileWrapper, String languageId)
+    private LanguageSourceFile(LanguageElement parent, FileWrapper fileWrapper, String languageId,
+        DocumentSymbolProvider symbolProvider)
     {
         super(parent, fileWrapper.getName());
         this.fileWrapper = fileWrapper;
         this.languageId = Objects.requireNonNull(languageId);
+        this.symbolProvider = symbolProvider;
     }
 
     @Override
@@ -147,7 +226,9 @@ public abstract class LanguageSourceFile
     {
         if (!(obj instanceof LanguageSourceFile))
             return false;
-        return languageId.equals(((LanguageSourceFile)obj).languageId) && super.equals(obj);
+        LanguageSourceFile other = (LanguageSourceFile)obj;
+        return languageId.equals(other.languageId) && symbolProvider == other.symbolProvider
+            && super.equals(obj);
     }
 
     @Override
@@ -155,7 +236,7 @@ public abstract class LanguageSourceFile
     {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + languageId.hashCode();
+        result = prime * result + Objects.hash(languageId, symbolProvider);
         return result;
     }
 
@@ -337,9 +418,18 @@ public abstract class LanguageSourceFile
     private DocumentSymbolProvider getDocumentSymbolProvider(LanguageService languageService,
         URI documentUri)
     {
-        return languageService.getDocumentMatcher().getBestMatch(
+        if (symbolProvider == null)
+            return languageService.getDocumentMatcher().getBestMatch(
+                languageService.getDocumentSymbolProviders(),
+                DocumentSymbolProvider::getDocumentSelector, documentUri, getLanguageId());
+
+        if (languageService.getDocumentMatcher().getMatches(
             languageService.getDocumentSymbolProviders(),
-            DocumentSymbolProvider::getDocumentSelector, documentUri, getLanguageId());
+            DocumentSymbolProvider::getDocumentSelector, documentUri, getLanguageId()).contains(
+                symbolProvider))
+            return symbolProvider;
+
+        return null;
     }
 
     private List<DocumentSymbol> getDocumentSymbols(DocumentSymbolProvider provider,
