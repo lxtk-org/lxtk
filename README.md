@@ -32,9 +32,11 @@ model as a pillar for an Eclipse-based IDE.
 
 ## Features
 
-The current LXTK version (0.2) provides client-side support for the following
+The current LXTK version (0.3) provides client-side support for the following
 LSP features:
 
+- [x] [Call Hierarchy](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareCallHierarchy)
+- [x] [Change Annotations](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#changeAnnotation)
 - [x] [Code Action](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_codeAction)
 - [x] [Code Lens](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_codeLens),
 including [Code Lens Resolve](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#codeLens_resolve)
@@ -45,31 +47,6 @@ including [Completion Item Resolve](https://microsoft.github.io/language-server-
 including [Range Formatting](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_rangeFormatting)
 - [x] [Document Highlights](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_documentHighlight)
 - [x] [Document Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_documentSymbol)
-- [x] [Find References](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_references)
-- [x] [Folding Range](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_foldingRange)
-- [x] [Go to Declaration](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_declaration)
-- [x] [Go to Definition](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_definition)
-- [x] [Go to Implementation](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_implementation)
-- [x] [Go to Type Definition](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_typeDefinition)
-- [x] [Hover](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_hover)
-- [x] [Rename](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_rename),
-including [Prepare Rename](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareRename)
-- [x] [Signature Help](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_signatureHelp)
-- [x] [Workspace Edit](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_applyEdit),
-except for resource operations
-- [x] [Workspace Folders](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_workspaceFolders)
-- [x] [Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbol)
-
-LXTK 0.2 does not support features introduced in LSP 3.15 and above.
-
-The upcoming LXTK version (0.3) adds support for new features
-of LSP 3.15 and 3.16, including:
-
-- [x] [Progress Support](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#progress)
-   - [x] [Work Done Progress](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workDoneProgress)
-   - [x] [Partial Result Progress](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#partialResults)
-- [x] [Call Hierarchy](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareCallHierarchy)
-- [x] [Change Annotations](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#changeAnnotation)
 - [x] Events for File Operations
   - [x] [WillCreateFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_willCreateFiles)
 and [DidCreateFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_didCreateFiles)
@@ -77,13 +54,27 @@ and [DidCreateFiles](https://microsoft.github.io/language-server-protocol/specif
 and [DidDeleteFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_didDeleteFiles)
   - [x] [WillRenameFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_willRenameFiles)
 and [DidRenameFiles](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_didRenameFiles)
+- [x] [Find References](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_references)
+- [x] [Folding Range](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_foldingRange)
+- [x] [Go to Declaration](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_declaration)
+- [x] [Go to Definition](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_definition)
+- [x] [Go to Implementation](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_implementation)
+- [x] [Go to Type Definition](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_typeDefinition)
+- [x] [Hover](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_hover)
 - [x] [Linked Editing](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_linkedEditingRange)
+- [x] [Progress Support](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#progress)
+   - [x] [Work Done Progress](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workDoneProgress)
+   - [x] [Partial Result Progress](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#partialResults)
+- [x] [Rename](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_rename),
+including [Prepare Rename](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareRename)
 - [x] [Semantic Tokens](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens)
+- [x] [Signature Help](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_signatureHelp)
+- [x] [Workspace Edit](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_applyEdit),
+including [Resource Operations](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#resourceChanges)
+- [x] [Workspace Folders](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_workspaceFolders)
+- [x] [Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbol)
 
-It also adds support for resource operations in workspace edits
-that was missing in LXTK 0.2.
-
-A detailed list of the changes can be found in [CHANGELOG](CHANGELOG.md).
+LXTK 0.3 does not support features introduced in LSP 3.17 or above.
 
 ## Architectural Overview
 

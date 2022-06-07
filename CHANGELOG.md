@@ -5,6 +5,8 @@ The LXTK project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-06-07
+
 This release adds client-side support for new features of LSP 3.15 and 3.16,
 including:
 
@@ -127,5 +129,6 @@ except for resource operations
 
 LXTK 0.2 does not support features introduced in LSP 3.15 and above.
 
-[Unreleased]: https://github.com/lxtk-org/lxtk/compare/v0.2...HEAD
+[Unreleased]: https://github.com/lxtk-org/lxtk/compare/v0.3...HEAD
+[0.3.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.3
 [0.2.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.2
