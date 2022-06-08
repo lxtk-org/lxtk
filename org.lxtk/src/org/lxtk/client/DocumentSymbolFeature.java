@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -26,7 +26,6 @@ import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.DocumentSymbolRegistrationOptions;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
-import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DocumentSymbolProvider;
@@ -121,9 +120,10 @@ public final class DocumentSymbolFeature
                 return getLanguageClient().getProgressService();
             }
 
+            @SuppressWarnings("deprecation")
             @Override
-            public CompletableFuture<
-                List<Either<SymbolInformation, DocumentSymbol>>> getDocumentSymbols(
+            public CompletableFuture<List<
+                Either<org.eclipse.lsp4j.SymbolInformation, DocumentSymbol>>> getDocumentSymbols(
                     DocumentSymbolParams params)
             {
                 return getLanguageServer().getTextDocumentService().documentSymbol(params);

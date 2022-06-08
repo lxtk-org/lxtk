@@ -5,6 +5,23 @@ The LXTK project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Breaking changes:
+
+- Return type of `WorkspaceSymbolProvider.getWorkspaceSymbols` method changed
+  from `CompletableFuture<List<? extends SymbolInformation>>` to
+  `CompletableFuture<Either<List<? extends SymbolInformation>, List<? extends WorkspaceSymbol>>>`
+
+- Result type for `WorkspaceSymbolRequest` changed from `List<? extends SymbolInformation>`
+  to `Either<List<? extends SymbolInformation>, List<? extends WorkspaceSymbol>>`
+
+- Type of elements returned by `WorkspaceSymbolSelectionDialog.getResult` method
+  changed from `SymbolInformation` to `WorkspaceSymbolItem`
+
+Deprecated API elements:
+
+- `SymbolLabelProvider` has been marked as deprecated and will be removed
+   in a next release
+
 ## [0.3.0] - 2022-06-07
 
 This release adds client-side support for new features of LSP 3.15 and 3.16,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -232,7 +232,7 @@ public final class EclipseTextDocument
         {
             throw new AssertionError(e); // must never happen
         }
-        return new TextDocumentContentChangeEvent(range, event.getLength(), event.getText());
+        return new TextDocumentContentChangeEvent(range, event.getText());
     }
 
     private EclipseTextDocumentChangeEvent newChangeEvent(TextDocumentContentChangeEvent event,

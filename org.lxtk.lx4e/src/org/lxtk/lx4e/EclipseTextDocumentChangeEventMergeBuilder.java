@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -87,10 +87,8 @@ public final class EclipseTextDocumentChangeEventMergeBuilder
             throw new AssertionError(e); // must never happen
         }
 
-        return new EclipseTextDocumentChangeEvent(currentSnapshot,
-            Collections.singletonList(new TextDocumentContentChangeEvent(range,
-                mergedEvent.getLength(), mergedEvent.getText())),
-            mergedEvent);
+        return new EclipseTextDocumentChangeEvent(currentSnapshot, Collections.singletonList(
+            new TextDocumentContentChangeEvent(range, mergedEvent.getText())), mergedEvent);
     }
 
     @Override

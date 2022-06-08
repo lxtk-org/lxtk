@@ -23,10 +23,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.WorkspaceSymbol;
+import org.eclipse.lsp4j.WorkspaceSymbolLocation;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -39,6 +46,7 @@ import org.lxtk.lx4e.IUriHandler;
 import org.lxtk.lx4e.ResourceUriHandler;
 import org.lxtk.lx4e.UriHandlers;
 import org.lxtk.lx4e.internal.ui.Activator;
+import org.lxtk.lx4e.internal.ui.LSPImages;
 import org.lxtk.lx4e.internal.ui.TaskExecutor;
 import org.lxtk.lx4e.requests.WorkspaceSymbolRequest;
 import org.lxtk.lx4e.ui.WorkDoneProgressFactory;
@@ -104,7 +112,7 @@ public class WorkspaceSymbolSelectionDialog
     @Override
     public String getElementName(Object item)
     {
-        return ((SymbolInformation)item).getName();
+        return ((WorkspaceSymbolItem)item).getName();
     }
 
     @Override
@@ -142,6 +150,7 @@ public class WorkspaceSymbolSelectionDialog
      * @param workspaceSymbolProvider never <code>null</code>
      * @param monitor may be <code>null</code>
      */
+    @SuppressWarnings("deprecation")
     protected void fillContentProvider(AbstractContentProvider contentProvider,
         ItemsFilter itemsFilter, WorkspaceSymbolProvider workspaceSymbolProvider,
         IProgressMonitor monitor)
@@ -151,25 +160,40 @@ public class WorkspaceSymbolSelectionDialog
         request.setParams(new WorkspaceSymbolParams(itemsFilter.getPattern()));
         request.setProgressMonitor(monitor);
         request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-        request.setUpPartialResultProgress(
-            (() -> new AbstractPartialResultProgress<List<? extends SymbolInformation>>()
+        request.setUpPartialResultProgress((() -> new AbstractPartialResultProgress<Either<
+            List<? extends org.eclipse.lsp4j.SymbolInformation>, List<? extends WorkspaceSymbol>>>()
+        {
+            @Override
+            protected void onAccept(Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
+                List<? extends WorkspaceSymbol>> result)
             {
-                @Override
-                protected void onAccept(List<? extends SymbolInformation> items)
-                {
-                    for (SymbolInformation item : items)
-                        contentProvider.add(item, itemsFilter);
-                }
-            }));
+                fillContentProvider(contentProvider, itemsFilter, result);
+            }
+        }));
         request.setMayThrow(false);
 
-        List<? extends SymbolInformation> result = request.sendAndReceive();
+        fillContentProvider(contentProvider, itemsFilter, request.sendAndReceive());
+    }
 
+    @SuppressWarnings("deprecation")
+    private static void fillContentProvider(AbstractContentProvider contentProvider,
+        ItemsFilter itemsFilter, Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
+            List<? extends WorkspaceSymbol>> result)
+    {
         if (result == null)
             return;
 
-        for (SymbolInformation item : result)
-            contentProvider.add(item, itemsFilter);
+        if (result.isLeft())
+        {
+            result.getLeft().forEach(
+                (org.eclipse.lsp4j.SymbolInformation symbol) -> contentProvider.add(
+                    new WorkspaceSymbolItem(symbol), itemsFilter));
+        }
+        else if (result.isRight())
+        {
+            result.getRight().forEach((WorkspaceSymbol symbol) -> contentProvider.add(
+                new WorkspaceSymbolItem(symbol), itemsFilter));
+        }
     }
 
     /**
@@ -204,8 +228,9 @@ public class WorkspaceSymbolSelectionDialog
     @Override
     protected Comparator getItemsComparator()
     {
-        return Comparator.comparing(this::getElementName).thenComparing(this::getUri).thenComparing(
-            this::getLine);
+        return Comparator.comparing(this::getElementName).thenComparing(
+            WorkspaceSymbolSelectionDialog::getUri).thenComparing(
+                WorkspaceSymbolSelectionDialog::getLine);
     }
 
     @Override
@@ -226,38 +251,62 @@ public class WorkspaceSymbolSelectionDialog
         return null;
     }
 
-    private URI getUri(Object item)
+    private static URI getUri(Object item)
     {
-        return DocumentUri.convert(((SymbolInformation)item).getLocation().getUri());
+        return DocumentUri.convert(((WorkspaceSymbolItem)item).getLocation().map(Location::getUri,
+            WorkspaceSymbolLocation::getUri));
     }
 
-    private int getLine(Object item)
+    private static int getLine(Object item)
     {
-        return ((SymbolInformation)item).getLocation().getRange().getStart().getLine();
+        Either<Location, WorkspaceSymbolLocation> location =
+            ((WorkspaceSymbolItem)item).getLocation();
+
+        if (location.isLeft())
+            return location.getLeft().getRange().getStart().getLine();
+
+        return 0;
     }
 
-    private static String getDetails(SymbolInformation info)
+    private static String getDetails(WorkspaceSymbolItem item)
     {
-        URI uri = DocumentUri.convert(info.getLocation().getUri());
+        URI uri = getUri(item);
         String location = UriHandlers.toDisplayString(uri, URI_HANDLER);
-        String containerName = info.getContainerName();
+        String containerName = item.getContainerName();
         if (containerName == null || containerName.isEmpty())
             return location;
         return MessageFormat.format(Messages.WorkspaceSymbolSelectionDialog_detailsPattern,
             containerName, location);
     }
 
-    private class ListLabelProvider
-        extends SymbolLabelProvider
+    private static class ListLabelProvider
+        extends LabelProvider
+        implements IStyledLabelProvider
     {
+        private static final Styler DEPRECATED_STYLER = new Styler()
+        {
+            @Override
+            public void applyStyles(TextStyle textStyle)
+            {
+                textStyle.strikeout = true;
+            };
+        };
+
         @Override
         public StyledString getStyledText(Object element)
         {
-            StyledString ss = super.getStyledText(element);
-            if (element instanceof SymbolInformation)
+            StyledString ss = new StyledString();
+            if (element instanceof WorkspaceSymbolItem)
             {
+                WorkspaceSymbolItem item = (WorkspaceSymbolItem)element;
+
+                if (item.isDeprecated())
+                    ss.append(item.getName(), DEPRECATED_STYLER);
+                else
+                    ss.append(item.getName());
+
                 ss.append(MessageFormat.format(Messages.WorkspaceSymbolSelectionDialog_itemPattern,
-                    getDetails((SymbolInformation)element)), StyledString.QUALIFIER_STYLER);
+                    getDetails(item)), StyledString.QUALIFIER_STYLER);
             }
             return ss;
         }
@@ -267,6 +316,15 @@ public class WorkspaceSymbolSelectionDialog
         {
             return getStyledText(element).getString();
         }
+
+        @Override
+        public Image getImage(Object element)
+        {
+            if (element instanceof WorkspaceSymbolItem)
+                return LSPImages.imageFromSymbolKind(((WorkspaceSymbolItem)element).getKind());
+
+            return super.getImage(element);
+        }
     }
 
     private static class DetailsLabelProvider
@@ -275,9 +333,9 @@ public class WorkspaceSymbolSelectionDialog
         @Override
         public String getText(Object element)
         {
-            if (element instanceof SymbolInformation)
+            if (element instanceof WorkspaceSymbolItem)
             {
-                return getDetails((SymbolInformation)element);
+                return getDetails((WorkspaceSymbolItem)element);
             }
             return super.getText(element);
         }

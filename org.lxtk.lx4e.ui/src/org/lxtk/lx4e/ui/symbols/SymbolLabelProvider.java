@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -26,7 +26,10 @@ import org.lxtk.lx4e.internal.ui.LSPImages;
 
 /**
  * Default implementation of a label provider for {@link SymbolInformation} objects.
+ *
+ * @deprecated Will be removed in a next release.
  */
+@Deprecated
 public class SymbolLabelProvider
     extends LabelProvider
     implements IStyledLabelProvider
@@ -77,8 +80,6 @@ public class SymbolLabelProvider
         if (tags != null && tags.contains(SymbolTag.Deprecated))
             return true;
 
-        @SuppressWarnings("deprecation")
-        boolean deprecated = Boolean.TRUE.equals(symbol.getDeprecated());
-        return deprecated;
+        return Boolean.TRUE.equals(symbol.getDeprecated());
     }
 }

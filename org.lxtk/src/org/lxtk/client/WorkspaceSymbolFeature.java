@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.Registration;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
-import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.lsp4j.WorkspaceSymbol;
 import org.eclipse.lsp4j.WorkspaceSymbolOptions;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
 import org.eclipse.lsp4j.WorkspaceSymbolRegistrationOptions;
@@ -131,9 +131,10 @@ public final class WorkspaceSymbolFeature
                 return context;
             }
 
+            @SuppressWarnings("deprecation")
             @Override
-            public CompletableFuture<List<? extends SymbolInformation>> getWorkspaceSymbols(
-                WorkspaceSymbolParams params)
+            public CompletableFuture<Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
+                List<? extends WorkspaceSymbol>>> getWorkspaceSymbols(WorkspaceSymbolParams params)
             {
                 return getLanguageServer().getWorkspaceService().symbol(params);
             }
