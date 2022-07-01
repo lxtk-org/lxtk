@@ -23,6 +23,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.WorkspaceSymbolLocation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.swt.widgets.Shell;
@@ -75,12 +77,13 @@ public class TypeScriptSymbolSelectionHandler
     protected Location getLocation(Object item)
     {
         Either<Location, WorkspaceSymbolLocation> location =
-            ((WorkspaceSymbolItem)item).getLocation();
+            ((WorkspaceSymbolItem)item).getResolvedLocation();
 
         if (location.isLeft())
             return location.getLeft();
 
-        throw new AssertionError(); // TODO workspaceSymbol/resolve is currently not supported
+        return new Location(location.getRight().getUri(),
+            new Range(new Position(0, 0), new Position(0, 0)));
     }
 
     private static IResource getResource(ExecutionEvent event)

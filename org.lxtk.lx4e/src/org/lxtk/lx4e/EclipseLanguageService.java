@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -13,6 +13,7 @@
 package org.lxtk.lx4e;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.CodeActionCapabilities;
@@ -47,6 +48,7 @@ import org.eclipse.lsp4j.SymbolKindCapabilities;
 import org.eclipse.lsp4j.SymbolTag;
 import org.eclipse.lsp4j.SymbolTagSupportCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
+import org.eclipse.lsp4j.WorkspaceSymbolResolveSupportCapabilities;
 import org.lxtk.DefaultLanguageService;
 import org.lxtk.LanguageService;
 import org.lxtk.lx4e.internal.Activator;
@@ -226,9 +228,14 @@ public class EclipseLanguageService
         SymbolTagSupportCapabilities tagSupport = new SymbolTagSupportCapabilities();
         tagSupport.setValueSet(Arrays.asList(SymbolTag.values()));
 
+        WorkspaceSymbolResolveSupportCapabilities resolveSupport =
+            new WorkspaceSymbolResolveSupportCapabilities();
+        resolveSupport.setProperties(List.of("location.range")); //$NON-NLS-1$
+
         SymbolCapabilities workspaceSymbol = new SymbolCapabilities();
         workspaceSymbol.setSymbolKind(symbolKind);
         workspaceSymbol.setTagSupport(tagSupport);
+        workspaceSymbol.setResolveSupport(resolveSupport);
         return workspaceSymbol;
     }
 

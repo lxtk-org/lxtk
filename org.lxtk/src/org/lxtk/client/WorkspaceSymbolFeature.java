@@ -89,6 +89,7 @@ public final class WorkspaceSymbolFeature
         WorkspaceSymbolOptions options = capability.getRight();
         if (options != null)
         {
+            registerOptions.setResolveProvider(options.getResolveProvider());
             registerOptions.setWorkDoneProgress(options.getWorkDoneProgress());
         }
 
@@ -137,6 +138,17 @@ public final class WorkspaceSymbolFeature
                 List<? extends WorkspaceSymbol>>> getWorkspaceSymbols(WorkspaceSymbolParams params)
             {
                 return getLanguageServer().getWorkspaceService().symbol(params);
+            }
+
+            @Override
+            public CompletableFuture<WorkspaceSymbol> resolveWorkspaceSymbol(
+                WorkspaceSymbol workspaceSymbol)
+            {
+                if (!Boolean.TRUE.equals(options.getResolveProvider()))
+                    throw new UnsupportedOperationException();
+
+                return getLanguageServer().getWorkspaceService().resolveWorkspaceSymbol(
+                    workspaceSymbol);
             }
         });
     }

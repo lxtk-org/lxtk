@@ -39,6 +39,17 @@ public interface WorkspaceSymbolProvider
         List<? extends WorkspaceSymbol>>> getWorkspaceSymbols(WorkspaceSymbolParams params);
 
     /**
+     * Requests additional information for the given workspace symbol.
+     *
+     * @param workspaceSymbol not <code>null</code>
+     * @return result future (never <code>null</code>)
+     * @throws UnsupportedOperationException if no support for resolving
+     *  additional information for a workspace symbol is available
+     * @see WorkspaceSymbolRegistrationOptions#getResolveProvider()
+     */
+    CompletableFuture<WorkspaceSymbol> resolveWorkspaceSymbol(WorkspaceSymbol workspaceSymbol);
+
+    /**
      * Returns the context object associated with this provider.
      *
      * @return the associated context object, or <code>null</code> if none

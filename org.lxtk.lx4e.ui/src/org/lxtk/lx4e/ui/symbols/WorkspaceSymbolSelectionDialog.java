@@ -167,17 +167,19 @@ public class WorkspaceSymbolSelectionDialog
             protected void onAccept(Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
                 List<? extends WorkspaceSymbol>> result)
             {
-                fillContentProvider(contentProvider, itemsFilter, result);
+                fillContentProvider(contentProvider, itemsFilter, workspaceSymbolProvider, result);
             }
         }));
         request.setMayThrow(false);
 
-        fillContentProvider(contentProvider, itemsFilter, request.sendAndReceive());
+        fillContentProvider(contentProvider, itemsFilter, workspaceSymbolProvider,
+            request.sendAndReceive());
     }
 
     @SuppressWarnings("deprecation")
-    private static void fillContentProvider(AbstractContentProvider contentProvider,
-        ItemsFilter itemsFilter, Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
+    private void fillContentProvider(AbstractContentProvider contentProvider,
+        ItemsFilter itemsFilter, WorkspaceSymbolProvider workspaceSymbolProvider,
+        Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
             List<? extends WorkspaceSymbol>> result)
     {
         if (result == null)
@@ -185,15 +187,33 @@ public class WorkspaceSymbolSelectionDialog
 
         if (result.isLeft())
         {
-            result.getLeft().forEach(
-                (org.eclipse.lsp4j.SymbolInformation symbol) -> contentProvider.add(
-                    new WorkspaceSymbolItem(symbol), itemsFilter));
+            result.getLeft().forEach(symbol -> contentProvider.add(
+                newWorkspaceSymbolItem(Either.forLeft(symbol), workspaceSymbolProvider),
+                itemsFilter));
         }
         else if (result.isRight())
         {
-            result.getRight().forEach((WorkspaceSymbol symbol) -> contentProvider.add(
-                new WorkspaceSymbolItem(symbol), itemsFilter));
+            result.getRight().forEach(symbol -> contentProvider.add(
+                newWorkspaceSymbolItem(Either.forRight(symbol), workspaceSymbolProvider),
+                itemsFilter));
         }
+    }
+
+    /**
+     * Returns a new content provider item for the given workspace symbol.
+     *
+     * @param symbol never <code>null</code>
+     * @param workspaceSymbolProvider never <code>null</code>
+     * @return the created workspace symbol item (not <code>null</code>)
+     */
+    @SuppressWarnings("deprecation")
+    protected Object newWorkspaceSymbolItem(
+        Either<org.eclipse.lsp4j.SymbolInformation, WorkspaceSymbol> symbol,
+        WorkspaceSymbolProvider workspaceSymbolProvider)
+    {
+        WorkspaceSymbolItem workspaceSymbolItem = new WorkspaceSymbolItem(symbol);
+        workspaceSymbolItem.setWorkspaceSymbolProvider(workspaceSymbolProvider);
+        return workspaceSymbolItem;
     }
 
     /**

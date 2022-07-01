@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -50,6 +50,7 @@ class Messages
     public static String SignatureHelpRequest_title;
     public static String TypeDefinitionRequest_title;
     public static String WorkspaceSymbolRequest_title;
+    public static String WorkspaceSymbolResolveRequest_title;
 
     static
     {

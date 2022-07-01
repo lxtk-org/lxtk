@@ -5,6 +5,10 @@ The LXTK project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+This release adds client-side support for new features of LSP 3.17, including:
+
+- [x] [Lazy Resolution for Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbolResolve)
+
 Breaking changes:
 
 - Return type of `WorkspaceSymbolProvider.getWorkspaceSymbols` method changed

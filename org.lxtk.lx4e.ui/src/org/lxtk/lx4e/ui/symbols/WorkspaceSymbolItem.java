@@ -12,9 +12,11 @@
  *******************************************************************************/
 package org.lxtk.lx4e.ui.symbols;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.SymbolKind;
@@ -22,6 +24,8 @@ import org.eclipse.lsp4j.SymbolTag;
 import org.eclipse.lsp4j.WorkspaceSymbol;
 import org.eclipse.lsp4j.WorkspaceSymbolLocation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.lxtk.WorkspaceSymbolProvider;
+import org.lxtk.lx4e.requests.WorkspaceSymbolResolveRequest;
 
 /**
  * Wraps a workspace symbol.
@@ -29,14 +33,15 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 @SuppressWarnings("deprecation")
 public class WorkspaceSymbolItem
 {
-    private final Either<WorkspaceSymbol, SymbolInformation> symbol;
+    private final Either<SymbolInformation, WorkspaceSymbol> symbol;
+    private WorkspaceSymbolProvider provider;
 
     /**
      * Constructor.
      *
      * @param symbol not <code>null</code>
      */
-    public WorkspaceSymbolItem(WorkspaceSymbol symbol)
+    public WorkspaceSymbolItem(SymbolInformation symbol)
     {
         this.symbol = Either.forLeft(Objects.requireNonNull(symbol));
     }
@@ -46,9 +51,40 @@ public class WorkspaceSymbolItem
      *
      * @param symbol not <code>null</code>
      */
-    public WorkspaceSymbolItem(SymbolInformation symbol)
+    public WorkspaceSymbolItem(WorkspaceSymbol symbol)
     {
         this.symbol = Either.forRight(Objects.requireNonNull(symbol));
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param symbol not <code>null</code>
+     */
+    public WorkspaceSymbolItem(Either<SymbolInformation, WorkspaceSymbol> symbol)
+    {
+        Assert.isTrue(symbol.isLeft() || symbol.isRight());
+        this.symbol = symbol;
+    }
+
+    /**
+     * Sets the workspace symbol provider.
+     *
+     * @param provider may be <code>null</code>
+     */
+    public final void setWorkspaceSymbolProvider(WorkspaceSymbolProvider provider)
+    {
+        this.provider = provider;
+    }
+
+    /**
+     * Returns the workspace symbol provider.
+     *
+     * @return the workspace symbol provider, or <code>null</code> if none
+     */
+    public final WorkspaceSymbolProvider getWorkspaceSymbolProvider()
+    {
+        return provider;
     }
 
     /**
@@ -56,9 +92,9 @@ public class WorkspaceSymbolItem
      *
      * @return the symbol name (never <code>null</code>)
      */
-    public String getName()
+    public final String getName()
     {
-        return symbol.map(WorkspaceSymbol::getName, SymbolInformation::getName);
+        return symbol.map(SymbolInformation::getName, WorkspaceSymbol::getName);
     }
 
     /**
@@ -66,9 +102,9 @@ public class WorkspaceSymbolItem
      *
      * @return the symbol kind (never <code>null</code>)
      */
-    public SymbolKind getKind()
+    public final SymbolKind getKind()
     {
-        return symbol.map(WorkspaceSymbol::getKind, SymbolInformation::getKind);
+        return symbol.map(SymbolInformation::getKind, WorkspaceSymbol::getKind);
     }
 
     /**
@@ -76,9 +112,9 @@ public class WorkspaceSymbolItem
      *
      * @return the symbol tags (may be <code>null</code> or empty)
      */
-    public List<SymbolTag> getTags()
+    public final List<SymbolTag> getTags()
     {
-        return symbol.map(WorkspaceSymbol::getTags, SymbolInformation::getTags);
+        return symbol.map(SymbolInformation::getTags, WorkspaceSymbol::getTags);
     }
 
     /**
@@ -86,12 +122,31 @@ public class WorkspaceSymbolItem
      *
      * @return the symbol location (never <code>null</code>)
      */
-    public Either<Location, WorkspaceSymbolLocation> getLocation()
+    public final Either<Location, WorkspaceSymbolLocation> getLocation()
+    {
+        if (symbol.isRight())
+            return symbol.getRight().getLocation();
+
+        return Either.forLeft(symbol.getLeft().getLocation());
+    }
+
+    /**
+     * Returns the location of the symbol, attempting to resolve it if necessary.
+     *
+     * @return the symbol location (never <code>null</code>)
+     */
+    public final Either<Location, WorkspaceSymbolLocation> getResolvedLocation()
     {
         if (symbol.isLeft())
-            return symbol.getLeft().getLocation();
+            return Either.forLeft(symbol.getLeft().getLocation());
 
-        return Either.forLeft(symbol.getRight().getLocation());
+        WorkspaceSymbol workspaceSymbol = symbol.getRight();
+
+        Either<Location, WorkspaceSymbolLocation> location = workspaceSymbol.getLocation();
+        if (location.isLeft())
+            return location;
+
+        return resolveWorkspaceSymbol(workspaceSymbol).getLocation();
     }
 
     /**
@@ -99,9 +154,9 @@ public class WorkspaceSymbolItem
      *
      * @return the name of the containing symbol (may be <code>null</code>)
      */
-    public String getContainerName()
+    public final String getContainerName()
     {
-        return symbol.map(WorkspaceSymbol::getContainerName, SymbolInformation::getContainerName);
+        return symbol.map(SymbolInformation::getContainerName, WorkspaceSymbol::getContainerName);
     }
 
     /**
@@ -109,18 +164,53 @@ public class WorkspaceSymbolItem
      *
      * @return <code>true</code> if the symbol is deprecated, and <code>false</code> otherwise
      */
-    public boolean isDeprecated()
+    public final boolean isDeprecated()
     {
         List<SymbolTag> tags = getTags();
 
         if (tags == null)
         {
-            if (symbol.isRight())
-                return Boolean.TRUE.equals(symbol.getRight().getDeprecated());
+            if (symbol.isLeft())
+                return Boolean.TRUE.equals(symbol.getLeft().getDeprecated());
 
             return false;
         }
 
         return tags.contains(SymbolTag.Deprecated);
+    }
+
+    /**
+     * Returns a new instance of {@link WorkspaceSymbolResolveRequest}.
+     *
+     * @return the created request object (not <code>null</code>)
+     */
+    protected WorkspaceSymbolResolveRequest newWorkspaceSymbolResolveRequest()
+    {
+        return new WorkspaceSymbolResolveRequest();
+    }
+
+    /**
+     * Returns the timeout for a workspace symbol resolve request.
+     *
+     * @return a positive duration
+     */
+    protected Duration getWorkspaceSymbolResolveTimeout()
+    {
+        return Duration.ofSeconds(1);
+    }
+
+    private WorkspaceSymbol resolveWorkspaceSymbol(WorkspaceSymbol symbol)
+    {
+        if (provider == null
+            || !Boolean.TRUE.equals(provider.getRegistrationOptions().getResolveProvider()))
+            return symbol;
+
+        WorkspaceSymbolResolveRequest request = newWorkspaceSymbolResolveRequest();
+        request.setProvider(provider);
+        request.setParams(symbol);
+        request.setDefaultResult(symbol);
+        request.setTimeout(getWorkspaceSymbolResolveTimeout());
+        request.setMayThrow(false);
+        return request.sendAndReceive();
     }
 }
