@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -33,6 +33,7 @@ import org.eclipse.lsp4j.SemanticTokensCapabilities;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
+import org.eclipse.lsp4j.TypeHierarchyCapabilities;
 import org.lxtk.util.Registry;
 
 /**
@@ -374,6 +375,22 @@ public interface LanguageService
      * @return the registry of type definition providers (never <code>null</code>)
      */
     Registry<TypeDefinitionProvider> getTypeDefinitionProviders();
+
+    /**
+     * Returns type hierarchy capabilities provided by this service.
+     *
+     * @return type hierarchy capabilities (never <code>null</code>).
+     *  Clients may modify the returned object; the objects returned by
+     *  previous or subsequent invocations of this method will not be affected
+     */
+    TypeHierarchyCapabilities getTypeHierarchyCapabilities();
+
+    /**
+     * Returns the registry of type hierarchy providers for this service.
+     *
+     * @return the registry of type hierarchy providers (never <code>null</code>)
+     */
+    Registry<TypeHierarchyProvider> getTypeHierarchyProviders();
 
     /**
      * Returns workspace symbol capabilities provided by this service.

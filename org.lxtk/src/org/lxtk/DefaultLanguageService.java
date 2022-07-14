@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -71,6 +71,7 @@ import org.eclipse.lsp4j.SemanticTokensClientCapabilitiesRequests;
 import org.eclipse.lsp4j.SignatureHelpCapabilities;
 import org.eclipse.lsp4j.SymbolCapabilities;
 import org.eclipse.lsp4j.TypeDefinitionCapabilities;
+import org.eclipse.lsp4j.TypeHierarchyCapabilities;
 import org.lxtk.util.Registry;
 
 /**
@@ -104,6 +105,7 @@ public class DefaultLanguageService
     private final Registry<RenameProvider> renameProviders = newRegistry();
     private final Registry<SignatureHelpProvider> signatureHelpProviders = newRegistry();
     private final Registry<TypeDefinitionProvider> typeDefinitionProviders = newRegistry();
+    private final Registry<TypeHierarchyProvider> typeHierarchyProviders = newRegistry();
     private final Registry<WorkspaceSymbolProvider> workspaceSymbolProviders = newRegistry();
 
     @Override
@@ -350,6 +352,18 @@ public class DefaultLanguageService
     public Registry<TypeDefinitionProvider> getTypeDefinitionProviders()
     {
         return typeDefinitionProviders;
+    }
+
+    @Override
+    public TypeHierarchyCapabilities getTypeHierarchyCapabilities()
+    {
+        return new TypeHierarchyCapabilities();
+    }
+
+    @Override
+    public Registry<TypeHierarchyProvider> getTypeHierarchyProviders()
+    {
+        return typeHierarchyProviders;
     }
 
     @Override

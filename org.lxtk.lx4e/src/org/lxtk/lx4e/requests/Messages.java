@@ -41,6 +41,7 @@ class Messages
     public static String LinkedEditingRangeRequest_title;
     public static String PrepareCallHierarchyRequest_title;
     public static String PrepareRenameRequest_title;
+    public static String PrepareTypeHierarchyRequest_title;
     public static String ReferencesRequest_title;
     public static String RenameRequest_title;
     public static String Request_Error_occurred;
@@ -49,6 +50,8 @@ class Messages
     public static String Request_Timeout_occurred__0__1;
     public static String SignatureHelpRequest_title;
     public static String TypeDefinitionRequest_title;
+    public static String TypeHierarchySubtypesRequest_title;
+    public static String TypeHierarchySupertypesRequest_title;
     public static String WorkspaceSymbolRequest_title;
     public static String WorkspaceSymbolResolveRequest_title;
 
