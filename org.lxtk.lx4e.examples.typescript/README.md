@@ -10,6 +10,6 @@ Before you begin, make sure you have [npx][2] installed.
 Note that GUI apps on macOS might have a problem with finding `npx`; see
 [My Mac .apps don’t find /usr/local/bin utilities][3] for how to fix this.
 
-[1]: https://www.npmjs.com/package/vscode-json-languageserver
+[1]: https://github.com/typescript-language-server/typescript-language-server
 [2]: https://www.npmjs.com/package/npx
 [3]: https://docs.brew.sh/FAQ#my-mac-apps-dont-find-usrlocalbin-utilities
