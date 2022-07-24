@@ -8,10 +8,9 @@ may contain arbitrary text.
 
 Before you begin, install the language server according to its
 [installation instructions][2]. Also, make sure you have [npx][3] installed.
-Note that GUI apps on macOS might have a problem with finding `npx`; see
-[My Mac .apps don’t find /usr/local/bin utilities][4] for how to fix this.
+Note that GUI apps on macOS might have a problem with finding `npx`; you can fix
+this by running `sudo launchctl config user path "$(npm bin -g):${PATH}"`.
 
 [1]: https://github.com/lxtk-org/proto-language-server
 [2]: https://github.com/lxtk-org/proto-language-server#installing
 [3]: https://www.npmjs.com/package/npx
-[4]: https://docs.brew.sh/FAQ#my-mac-apps-dont-find-usrlocalbin-utilities
