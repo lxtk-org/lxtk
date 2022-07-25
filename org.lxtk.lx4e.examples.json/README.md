@@ -8,8 +8,14 @@ the server knows the JSON schema for `package.json` files; other schemas can be
 specified in JSON files using the `$schema` property.
 
 Before you begin, make sure you have [npx][2] installed.
-Note that GUI apps on macOS might have a problem with finding `npx`; you can fix
-this by running `sudo launchctl config user path "$(npm bin -g):${PATH}"`.
+
+Note that GUI apps on macOS might have a problem with finding `npx`;
+if the folder outputted by `npm bin -g` is not in the `PATH` reported by
+`launchctl getenv PATH`, you can fix this by running
+```
+sudo launchctl config user path "$(npm bin -g):$(launchctl getenv PATH))"
+```
+and then rebooting, as documented in `man launchctl`.
 
 [1]: https://www.npmjs.com/package/vscode-json-languageserver
 [2]: https://www.npmjs.com/package/npx
