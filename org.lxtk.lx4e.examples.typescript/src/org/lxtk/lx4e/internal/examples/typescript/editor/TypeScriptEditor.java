@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,6 +16,10 @@ import static org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceCon
 import static org.lxtk.lx4e.internal.examples.typescript.TypeScriptPreferenceConstants.EDITOR_MATCHING_BRACKETS_COLOR;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.projection.ProjectionSupport;
+import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm4e.languageconfiguration.LanguageConfigurationCharacterPairMatcher;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
@@ -25,6 +29,7 @@ import org.lxtk.LanguageOperationTarget;
 import org.lxtk.lx4e.internal.examples.typescript.Activator;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptOperationTargetProvider;
 import org.lxtk.lx4e.internal.examples.typescript.TypeScriptSourceViewerConfiguration;
+import org.lxtk.lx4e.ui.folding.FoldingManager;
 import org.lxtk.lx4e.ui.highlight.Highlighter;
 
 /**
@@ -34,6 +39,8 @@ public class TypeScriptEditor
     extends AbstractDecoratedTextEditor
 {
     private IContentOutlinePage outlinePage;
+    private ProjectionSupport projectionSupport;
+    private FoldingManager foldingManager;
     private Highlighter highlighter;
     private final Object reconcilerLock = new Object();
 
@@ -67,12 +74,33 @@ public class TypeScriptEditor
     }
 
     @Override
+    protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles)
+    {
+        ProjectionViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(),
+            isOverviewRulerVisible(), styles);
+        // ensure decoration support has been created and configured.
+        getSourceViewerDecorationSupport(viewer);
+        return viewer;
+    }
+
+    @Override
     public void createPartControl(Composite parent)
     {
         super.createPartControl(parent);
-        highlighter = new Highlighter(getSourceViewer(), getSelectionProvider(),
-            this::getLanguageOperationTarget);
+
+        ProjectionViewer viewer = (ProjectionViewer)getSourceViewer();
+
+        projectionSupport = new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors());
+        projectionSupport.install();
+
+        foldingManager = new FoldingManager(viewer, this::getLanguageOperationTarget);
+        foldingManager.install();
+
+        highlighter =
+            new Highlighter(viewer, getSelectionProvider(), this::getLanguageOperationTarget);
         highlighter.install();
+
+        viewer.doOperation(ProjectionViewer.TOGGLE);
     }
 
     @Override
@@ -83,6 +111,16 @@ public class TypeScriptEditor
             highlighter.uninstall();
             highlighter.dispose();
             highlighter = null;
+        }
+        if (foldingManager != null)
+        {
+            foldingManager.uninstall();
+            foldingManager = null;
+        }
+        if (projectionSupport != null)
+        {
+            projectionSupport.dispose();
+            projectionSupport = null;
         }
         super.dispose();
     }
