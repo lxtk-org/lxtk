@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -76,6 +76,9 @@ public class FileOperationParticipantSupport
     public Change computePreCreateChange(List<FileCreate> files, IProgressMonitor monitor)
         throws CoreException
     {
+        if (files.isEmpty())
+            return null;
+
         Request<List<WorkspaceEdit>> request = new Request<>()
         {
             @Override
@@ -106,6 +109,9 @@ public class FileOperationParticipantSupport
     public Change computePreDeleteChange(List<FileDelete> files, IProgressMonitor monitor)
         throws CoreException
     {
+        if (files.isEmpty())
+            return null;
+
         Request<List<WorkspaceEdit>> request = new Request<>()
         {
             @Override
@@ -136,6 +142,9 @@ public class FileOperationParticipantSupport
     public Change computePreRenameChange(List<FileRename> files, IProgressMonitor monitor)
         throws CoreException
     {
+        if (files.isEmpty())
+            return null;
+
         Request<List<WorkspaceEdit>> request = new Request<>()
         {
             @Override
@@ -166,6 +175,9 @@ public class FileOperationParticipantSupport
     public Change computePostCreateChange(List<FileCreate> files, IProgressMonitor monitor)
         throws CoreException
     {
+        if (files.isEmpty())
+            return null;
+
         CompositeChange result = new CompositeChange("Post-create changes") //$NON-NLS-1$
         {
             @Override
@@ -183,6 +195,9 @@ public class FileOperationParticipantSupport
     public Change computePostDeleteChange(List<FileDelete> files, IProgressMonitor monitor)
         throws CoreException
     {
+        if (files.isEmpty())
+            return null;
+
         CompositeChange result = new CompositeChange("Post-delete changes") //$NON-NLS-1$
         {
             @Override
@@ -200,6 +215,9 @@ public class FileOperationParticipantSupport
     public Change computePostRenameChange(List<FileRename> files, IProgressMonitor monitor)
         throws CoreException
     {
+        if (files.isEmpty())
+            return null;
+
         CompositeChange result = new CompositeChange("Post-rename changes") //$NON-NLS-1$
         {
             @Override
