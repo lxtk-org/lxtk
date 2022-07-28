@@ -8,12 +8,12 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Activator: org.lxtk.lx4e.internal.Activator
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.core.filesystem;bundle-version="[1.7.0,2.0.0)",
- org.eclipse.jface.text;bundle-version="[3.15.0,4.0.0)",
- org.eclipse.text;bundle-version="[3.8.0,4.0.0)",
- org.eclipse.ltk.core.refactoring;bundle-version="[3.9.0,4.0.0)",
+Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.22.0,4.0.0)",
+ org.eclipse.core.resources;bundle-version="[3.15.0,4.0.0)",
+ org.eclipse.core.filesystem;bundle-version="[1.9.0,2.0.0)",
+ org.eclipse.jface.text;bundle-version="[3.18.0,4.0.0)",
+ org.eclipse.text;bundle-version="[3.12.0,4.0.0)",
+ org.eclipse.ltk.core.refactoring;bundle-version="[3.11.0,4.0.0)",
  org.eclipse.lsp4j;bundle-version="[0.14.0,0.15.0)",
  org.eclipse.lsp4j.jsonrpc;bundle-version="[0.14.0,0.15.0)",
  org.eclipse.handly;bundle-version="[1.6.0,2.0.0)",
