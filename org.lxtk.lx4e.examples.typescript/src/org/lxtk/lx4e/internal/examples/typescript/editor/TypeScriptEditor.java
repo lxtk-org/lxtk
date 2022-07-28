@@ -81,6 +81,7 @@ public class TypeScriptEditor
         if (highlighter != null)
         {
             highlighter.uninstall();
+            highlighter.dispose();
             highlighter = null;
         }
         super.dispose();
@@ -94,10 +95,6 @@ public class TypeScriptEditor
             if (outlinePage == null)
                 outlinePage = new TypeScriptOutlinePage(this);
             return adapter.cast(outlinePage);
-        }
-        else if (adapter == Highlighter.class)
-        {
-            return adapter.cast(highlighter);
         }
         return super.getAdapter(adapter);
     }
