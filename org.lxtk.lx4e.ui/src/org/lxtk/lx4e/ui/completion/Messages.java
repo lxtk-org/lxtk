@@ -22,6 +22,7 @@ class Messages
     public static String Computing_completion_proposals;
     public static String Execution_error;
     public static String Tooltip_affordance_string;
+    public static String Qualifier_string;
 
     static
     {

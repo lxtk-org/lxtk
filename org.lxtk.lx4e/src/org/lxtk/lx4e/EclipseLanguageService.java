@@ -102,6 +102,7 @@ public class EclipseLanguageService
         completionItem.setInsertReplaceSupport(true);
         completionItem.setInsertTextModeSupport(new CompletionItemInsertTextModeSupportCapabilities(
             Arrays.asList(InsertTextMode.AsIs)));
+        completionItem.setLabelDetailsSupport(true);
 
         CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
         completionItemKind.setValueSet(Arrays.asList(CompletionItemKind.values()));

@@ -41,6 +41,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionItemLabelDetails;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.InsertReplaceEdit;
 import org.eclipse.lsp4j.InsertTextFormat;
@@ -175,13 +176,27 @@ public class BaseCompletionProposal
     @Override
     public String getDisplayString()
     {
-        return completionItem.getLabel();
+        return getStyledDisplayString().getString();
     }
 
     @Override
     public StyledString getStyledDisplayString()
     {
-        return new StyledString(getDisplayString());
+        StyledString styledDisplayString = new StyledString(completionItem.getLabel());
+        CompletionItemLabelDetails labelDetails = completionItem.getLabelDetails();
+        if (labelDetails != null)
+        {
+            String detail = labelDetails.getDetail();
+            if (detail != null)
+                styledDisplayString.append(detail, StyledString.DECORATIONS_STYLER);
+
+            String description = labelDetails.getDescription();
+            if (description != null)
+                styledDisplayString.append(
+                    MessageFormat.format(Messages.Qualifier_string, description),
+                    StyledString.QUALIFIER_STYLER);
+        }
+        return styledDisplayString;
     }
 
     @Override
