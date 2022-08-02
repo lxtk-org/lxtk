@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.lxtk.lx4e;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -66,7 +65,7 @@ public class EclipseLanguageService
     public CodeActionCapabilities getCodeActionCapabilities()
     {
         CodeActionKindCapabilities codeActionKind = new CodeActionKindCapabilities();
-        codeActionKind.setValueSet(Arrays.asList(CodeActionKind.QuickFix, CodeActionKind.Refactor,
+        codeActionKind.setValueSet(List.of(CodeActionKind.QuickFix, CodeActionKind.Refactor,
             CodeActionKind.RefactorExtract, CodeActionKind.RefactorInline,
             CodeActionKind.RefactorRewrite, CodeActionKind.Source,
             CodeActionKind.SourceOrganizeImports));
@@ -78,8 +77,7 @@ public class EclipseLanguageService
         CodeActionCapabilities codeAction = new CodeActionCapabilities();
         codeAction.setCodeActionLiteralSupport(codeActionLiteralSupport);
         codeAction.setDisabledSupport(true);
-        codeAction.setResolveSupport(
-            new CodeActionResolveSupportCapabilities(Arrays.asList("edit"))); //$NON-NLS-1$
+        codeAction.setResolveSupport(new CodeActionResolveSupportCapabilities(List.of("edit"))); //$NON-NLS-1$
         codeAction.setDataSupport(true);
         codeAction.setHonorsChangeAnnotations(true);
         return codeAction;
@@ -90,22 +88,21 @@ public class EclipseLanguageService
     {
         CompletionItemTagSupportCapabilities tagSupport =
             new CompletionItemTagSupportCapabilities();
-        tagSupport.setValueSet(Arrays.asList(CompletionItemTag.values()));
+        tagSupport.setValueSet(List.of(CompletionItemTag.values()));
 
         CompletionItemCapabilities completionItem = new CompletionItemCapabilities();
         completionItem.setSnippetSupport(true);
-        completionItem.setDocumentationFormat(
-            Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
+        completionItem.setDocumentationFormat(List.of(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         completionItem.setDeprecatedSupport(true);
         completionItem.setTagSupport(tagSupport);
         completionItem.setCommitCharactersSupport(true);
         completionItem.setInsertReplaceSupport(true);
-        completionItem.setInsertTextModeSupport(new CompletionItemInsertTextModeSupportCapabilities(
-            Arrays.asList(InsertTextMode.AsIs)));
+        completionItem.setInsertTextModeSupport(
+            new CompletionItemInsertTextModeSupportCapabilities(List.of(InsertTextMode.AsIs)));
         completionItem.setLabelDetailsSupport(true);
 
         CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
-        completionItemKind.setValueSet(Arrays.asList(CompletionItemKind.values()));
+        completionItemKind.setValueSet(List.of(CompletionItemKind.values()));
 
         CompletionCapabilities completion = new CompletionCapabilities();
         completion.setCompletionItem(completionItem);
@@ -149,10 +146,10 @@ public class EclipseLanguageService
     public DocumentSymbolCapabilities getDocumentSymbolCapabilities()
     {
         SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
-        symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
+        symbolKind.setValueSet(List.of(SymbolKind.values()));
 
         SymbolTagSupportCapabilities tagSupport = new SymbolTagSupportCapabilities();
-        tagSupport.setValueSet(Arrays.asList(SymbolTag.values()));
+        tagSupport.setValueSet(List.of(SymbolTag.values()));
 
         DocumentSymbolCapabilities documentSymbol = new DocumentSymbolCapabilities();
         documentSymbol.setSymbolKind(symbolKind);
@@ -173,7 +170,7 @@ public class EclipseLanguageService
     public HoverCapabilities getHoverCapabilities()
     {
         HoverCapabilities hover = new HoverCapabilities();
-        hover.setContentFormat(Arrays.asList(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
+        hover.setContentFormat(List.of(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
         return hover;
     }
 
@@ -224,10 +221,10 @@ public class EclipseLanguageService
     public SymbolCapabilities getWorkspaceSymbolCapabilities()
     {
         SymbolKindCapabilities symbolKind = new SymbolKindCapabilities();
-        symbolKind.setValueSet(Arrays.asList(SymbolKind.values()));
+        symbolKind.setValueSet(List.of(SymbolKind.values()));
 
         SymbolTagSupportCapabilities tagSupport = new SymbolTagSupportCapabilities();
-        tagSupport.setValueSet(Arrays.asList(SymbolTag.values()));
+        tagSupport.setValueSet(List.of(SymbolTag.values()));
 
         WorkspaceSymbolResolveSupportCapabilities resolveSupport =
             new WorkspaceSymbolResolveSupportCapabilities();
