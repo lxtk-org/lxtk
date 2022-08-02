@@ -27,6 +27,7 @@ import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.CompletionItemKindCapabilities;
 import org.eclipse.lsp4j.CompletionItemTag;
 import org.eclipse.lsp4j.CompletionItemTagSupportCapabilities;
+import org.eclipse.lsp4j.CompletionListCapabilities;
 import org.eclipse.lsp4j.DeclarationCapabilities;
 import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentLinkCapabilities;
@@ -104,9 +105,14 @@ public class EclipseLanguageService
         CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
         completionItemKind.setValueSet(List.of(CompletionItemKind.values()));
 
+        CompletionListCapabilities completionList = new CompletionListCapabilities();
+        completionList.setItemDefaults(List.of("commitCharacters", "editRange", //$NON-NLS-1$ //$NON-NLS-2$
+            "insertTextFormat")); //$NON-NLS-1$
+
         CompletionCapabilities completion = new CompletionCapabilities();
         completion.setCompletionItem(completionItem);
         completion.setCompletionItemKind(completionItemKind);
+        completion.setCompletionList(completionList);
         return completion;
     }
 

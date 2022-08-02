@@ -22,6 +22,9 @@ Breaking changes:
 - Type of elements returned by `WorkspaceSymbolSelectionDialog.getResult` method
   changed from `SymbolInformation` to `WorkspaceSymbolItem`
 
+- Added a required parameter of type `CompletionList` to constructors for
+  `BaseCompletionProposal` and `CompletionProposal`
+
 Deprecated API elements:
 
 - `SymbolLabelProvider` has been marked as deprecated and will be removed

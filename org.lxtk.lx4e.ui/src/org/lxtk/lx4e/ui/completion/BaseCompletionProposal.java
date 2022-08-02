@@ -42,6 +42,7 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemLabelDetails;
+import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.InsertReplaceEdit;
 import org.eclipse.lsp4j.InsertTextFormat;
@@ -62,6 +63,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.lxtk.CommandHandler;
 import org.lxtk.CommandService;
+import org.lxtk.CompletionItemUtil;
 import org.lxtk.CompletionProvider;
 import org.lxtk.ProgressService;
 import org.lxtk.WorkDoneProgress;
@@ -89,11 +91,13 @@ public class BaseCompletionProposal
     private static final TextEdit[] NO_EDITS = new TextEdit[0];
     private static final DefaultMatcher MATCHER = new DefaultMatcher();
 
-    /** The given completion item. */
+    /** The given completion item (never <code>null</code>) */
     protected final CompletionItem completionItem;
-    /** The given completion provider. */
+    /** The given completion list (never <code>null</code>) */
+    protected final CompletionList completionList;
+    /** The given completion provider (never <code>null</code>) */
     protected final CompletionProvider completionProvider;
-    /** The given completion context. */
+    /** The given completion context (never <code>null</code>) */
     protected final CompletionContext completionContext;
 
     private IRegion selectedRegion;
@@ -105,13 +109,15 @@ public class BaseCompletionProposal
      * Constructor.
      *
      * @param completionItem not <code>null</code>
+     * @param completionList not <code>null</code>
      * @param completionProvider not <code>null</code>
      * @param completionContext not <code>null</code>
      */
-    public BaseCompletionProposal(CompletionItem completionItem,
+    public BaseCompletionProposal(CompletionItem completionItem, CompletionList completionList,
         CompletionProvider completionProvider, CompletionContext completionContext)
     {
         this.completionItem = Objects.requireNonNull(completionItem);
+        this.completionList = Objects.requireNonNull(completionList);
         this.completionProvider = Objects.requireNonNull(completionProvider);
         this.completionContext = Objects.requireNonNull(completionContext);
     }
@@ -513,7 +519,7 @@ public class BaseCompletionProposal
         String replacementString;
         int replacementOffset, replacementEndOffset;
         Either<org.eclipse.lsp4j.TextEdit, InsertReplaceEdit> textEditOrInsertReplaceEdit =
-            completionItem.getTextEdit();
+            CompletionItemUtil.getTextEdit(completionItem, completionList.getItemDefaults());
         if (textEditOrInsertReplaceEdit == null)
         {
             replacementString = completionItem.getInsertText();
@@ -559,7 +565,8 @@ public class BaseCompletionProposal
             }
         }
         List<TabStop> tabStops = Collections.emptyList();
-        if (InsertTextFormat.Snippet.equals(completionItem.getInsertTextFormat()))
+        if (InsertTextFormat.Snippet.equals(CompletionItemUtil.getInsertTextFormat(completionItem,
+            completionList.getItemDefaults())))
         {
             try
             {

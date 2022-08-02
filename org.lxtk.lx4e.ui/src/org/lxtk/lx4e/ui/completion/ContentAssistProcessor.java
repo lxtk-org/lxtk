@@ -349,8 +349,10 @@ public class ContentAssistProcessor
         CompletionContext completionContext)
     {
         return completionList.isIncomplete()
-            ? new BaseCompletionProposal(completionItem, completionProvider, completionContext)
-            : new CompletionProposal(completionItem, completionProvider, completionContext);
+            ? new BaseCompletionProposal(completionItem, completionList, completionProvider,
+                completionContext)
+            : new CompletionProposal(completionItem, completionList, completionProvider,
+                completionContext);
     }
 
     /**

@@ -23,6 +23,8 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
+import org.lxtk.CompletionItemUtil;
 import org.lxtk.CompletionProvider;
 import org.lxtk.lx4e.internal.ui.Activator;
 
@@ -42,13 +44,14 @@ public class CompletionProposal
      * Constructor.
      *
      * @param completionItem not <code>null</code>
+     * @param completionList not <code>null</code>
      * @param completionProvider not <code>null</code>
      * @param completionContext not <code>null</code>
      */
-    public CompletionProposal(CompletionItem completionItem, CompletionProvider completionProvider,
-        CompletionContext completionContext)
+    public CompletionProposal(CompletionItem completionItem, CompletionList completionList,
+        CompletionProvider completionProvider, CompletionContext completionContext)
     {
-        super(completionItem, completionProvider, completionContext);
+        super(completionItem, completionList, completionProvider, completionContext);
     }
 
     @Override
@@ -116,7 +119,8 @@ public class CompletionProposal
 
     private char[] computeTriggerCharacters()
     {
-        List<String> commitCharacters = completionItem.getCommitCharacters();
+        List<String> commitCharacters = CompletionItemUtil.getCommitCharacters(completionItem,
+            completionList.getItemDefaults());
         if (commitCharacters == null || commitCharacters.isEmpty())
             return NO_CHARS;
 
