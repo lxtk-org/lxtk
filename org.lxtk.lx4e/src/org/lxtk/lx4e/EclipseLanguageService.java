@@ -98,8 +98,8 @@ public class EclipseLanguageService
         completionItem.setTagSupport(tagSupport);
         completionItem.setCommitCharactersSupport(true);
         completionItem.setInsertReplaceSupport(true);
-        completionItem.setInsertTextModeSupport(
-            new CompletionItemInsertTextModeSupportCapabilities(List.of(InsertTextMode.AsIs)));
+        completionItem.setInsertTextModeSupport(new CompletionItemInsertTextModeSupportCapabilities(
+            List.of(InsertTextMode.AsIs, InsertTextMode.AdjustIndentation)));
         completionItem.setLabelDetailsSupport(true);
 
         CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
@@ -107,12 +107,13 @@ public class EclipseLanguageService
 
         CompletionListCapabilities completionList = new CompletionListCapabilities();
         completionList.setItemDefaults(List.of("commitCharacters", "editRange", //$NON-NLS-1$ //$NON-NLS-2$
-            "insertTextFormat")); //$NON-NLS-1$
+            "insertTextFormat", "insertTextMode")); //$NON-NLS-1$ //$NON-NLS-2$
 
         CompletionCapabilities completion = new CompletionCapabilities();
         completion.setCompletionItem(completionItem);
         completion.setCompletionItemKind(completionItemKind);
         completion.setCompletionList(completionList);
+        completion.setInsertTextMode(InsertTextMode.AsIs);
         return completion;
     }
 

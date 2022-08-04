@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
@@ -46,6 +47,7 @@ import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.InsertReplaceEdit;
 import org.eclipse.lsp4j.InsertTextFormat;
+import org.eclipse.lsp4j.InsertTextMode;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -297,6 +299,11 @@ public class BaseCompletionProposal
     {
         IDocument document = viewer.getDocument();
         ProposedEdit edit = computeProposedEdit(viewer, trigger, stateMask, offset);
+        if (InsertTextMode.AdjustIndentation.equals(
+            CompletionItemUtil.getInsertTextMode(completionItem, completionList.getItemDefaults())))
+        {
+            edit = adjustIndentation(viewer, offset, edit);
+        }
         MultiTextEdit editTree = new MultiTextEdit();
         TextEdit textEdit = !document.get(edit.replacementOffset, edit.replacementLength).equals(
             edit.replacementString)
@@ -595,6 +602,80 @@ public class BaseCompletionProposal
         }
         return new ProposedEdit(replacementOffset, replacementEndOffset - replacementOffset,
             replacementString, cursorPosition, tabStops);
+    }
+
+    private ProposedEdit adjustIndentation(ITextViewer viewer, int offset, ProposedEdit edit)
+    {
+        if (edit.replacementString.indexOf('\n') < 0 && edit.replacementString.indexOf('\r') < 0)
+            return edit;
+
+        String lineLeadingWhitespace = getLineLeadingWhitespace(viewer.getDocument(), offset);
+        int lineLeadingWhitespaceLength = lineLeadingWhitespace.length();
+        if (lineLeadingWhitespaceLength == 0)
+            return edit;
+
+        int cursorPosition = edit.cursorPosition;
+        List<TabStop> tabStops = edit.tabStops;
+
+        Document document = new Document(edit.replacementString);
+        int numberOfLines = document.getNumberOfLines();
+        for (int line = 1; line < numberOfLines; line++)
+        {
+            try
+            {
+                int lineOffset = document.getLineOffset(line);
+
+                document.replace(lineOffset, 0, lineLeadingWhitespace);
+
+                if (cursorPosition >= lineOffset)
+                    cursorPosition += lineLeadingWhitespaceLength;
+
+                for (TabStop tabStop : tabStops)
+                {
+                    int[] offsets = tabStop.getOffsets();
+                    // break encapsulation and update offsets in place
+                    for (int j = 0; j < offsets.length; j++)
+                    {
+                        if (offsets[j] >= lineOffset)
+                            offsets[j] += lineLeadingWhitespaceLength;
+                    }
+                }
+            }
+            catch (BadLocationException e)
+            {
+                throw new AssertionError(e); // should never happen
+            }
+        }
+        return new ProposedEdit(edit.replacementOffset, edit.replacementLength, document.get(),
+            cursorPosition, tabStops);
+    }
+
+    private static String getLineLeadingWhitespace(IDocument document, int offset)
+    {
+        try
+        {
+            int start = document.getLineInformationOfOffset(offset).getOffset();
+            int end = findEndOfWhitespace(document, start, offset);
+            return document.get(start, end - start);
+        }
+        catch (BadLocationException e)
+        {
+            return ""; //$NON-NLS-1$
+        }
+    }
+
+    private static int findEndOfWhitespace(IDocument document, int offset, int end)
+        throws BadLocationException
+    {
+        while (offset < end)
+        {
+            char c = document.getChar(offset);
+            if (c != ' ' && c != '\t')
+                return offset;
+
+            offset++;
+        }
+        return end;
     }
 
     private int guessReplacementOffset(IDocument document, String replacementString, int wordOffset,
