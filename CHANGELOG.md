@@ -25,6 +25,8 @@ Breaking changes:
 - Added a required parameter of type `CompletionList` to constructors for
   `BaseCompletionProposal` and `CompletionProposal`
 
+- Parameter type of `WordFinder.isWordPart` method changed from `char` to `int`
+
 Deprecated API elements:
 
 - `SymbolLabelProvider` has been marked as deprecated and will be removed
