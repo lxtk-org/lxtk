@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -14,13 +14,14 @@ package org.lxtk;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.PrepareRenameDefaultBehavior;
 import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.RenameOptions;
 import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.messages.Either3;
 
 /**
  * Provides the {@link WorkspaceEdit} for renaming the symbol denoted by
@@ -48,5 +49,7 @@ public interface RenameProvider
      *  is available
      * @see RenameOptions#getPrepareProvider()
      */
-    CompletableFuture<Either<Range, PrepareRenameResult>> prepareRename(PrepareRenameParams params);
+    CompletableFuture<
+        Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>> prepareRename(
+            PrepareRenameParams params);
 }

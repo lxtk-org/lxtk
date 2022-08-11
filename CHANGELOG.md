@@ -12,6 +12,20 @@ This release adds client-side support for new features of LSP 3.17, including:
 
 Breaking changes:
 
+- Return type of `RenameProvider.prepareRename` method changed from
+  `CompletableFuture<Either<Range, PrepareRenameResult>>` to
+  `CompletableFuture<Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>>`
+
+- Result type for `PrepareRenameRequest` changed from `Either<Range, PrepareRenameResult>`
+  to `Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>`
+
+- Return type of `RenameRefactoring.getPrepareRenameResult` method changed from
+  `Either<Range, PrepareRenameResult>` to `Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>`
+
+- Type of `result` parameter of `RenameRefactoring.setPrepareRenameResult` method
+  changed from `Either<Range, PrepareRenameResult>` to
+  `Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>`
+
 - Return type of `WorkspaceSymbolProvider.getWorkspaceSymbols` method changed
   from `CompletableFuture<List<? extends SymbolInformation>>` to
   `CompletableFuture<Either<List<? extends SymbolInformation>, List<? extends WorkspaceSymbol>>>`

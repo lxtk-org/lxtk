@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,22 +15,24 @@ package org.lxtk.lx4e.requests;
 import java.text.MessageFormat;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.PrepareRenameDefaultBehavior;
 import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.messages.Either3;
 import org.lxtk.RenameProvider;
 
 /**
  * Requests preparation for rename of the symbol denoted by the given text document position.
  */
 public class PrepareRenameRequest
-    extends
-    LanguageFeatureRequest<RenameProvider, PrepareRenameParams, Either<Range, PrepareRenameResult>>
+    extends LanguageFeatureRequest<RenameProvider, PrepareRenameParams,
+        Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>>
 {
     @Override
-    protected CompletableFuture<Either<Range, PrepareRenameResult>> send(RenameProvider provider,
-        PrepareRenameParams params)
+    protected CompletableFuture<
+        Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>> send(
+            RenameProvider provider, PrepareRenameParams params)
     {
         setTitle(MessageFormat.format(Messages.PrepareRenameRequest_title, params));
         return provider.prepareRename(params);

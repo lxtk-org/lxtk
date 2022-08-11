@@ -25,6 +25,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.PrepareRenameDefaultBehavior;
 import org.eclipse.lsp4j.PrepareRenameParams;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
@@ -32,6 +33,7 @@ import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.messages.Either3;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.lxtk.DefaultWorkDoneProgress;
 import org.lxtk.DocumentUri;
@@ -58,7 +60,7 @@ public class RenameRefactoring
     private Position position;
     private RenameProvider[] renameProviders;
     private RenameProvider prepareRenameProvider;
-    private Either<Range, PrepareRenameResult> prepareRenameResult;
+    private Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior> prepareRenameResult;
     private String newName, currentName;
 
     /**
@@ -180,11 +182,12 @@ public class RenameRefactoring
      */
     public String getCurrentName()
     {
-        if (currentName == null && prepareRenameResult != null)
+        if (currentName == null && prepareRenameResult != null
+            && (prepareRenameResult.isFirst() || prepareRenameResult.isSecond()))
         {
-            Range range = prepareRenameResult.getLeft();
+            Range range = prepareRenameResult.getFirst();
             if (range == null)
-                range = prepareRenameResult.getRight().getRange();
+                range = prepareRenameResult.getSecond().getRange();
             try
             {
                 IRegion r = DocumentUtil.toRegion(document, range);
@@ -206,10 +209,10 @@ public class RenameRefactoring
      */
     public String getProposedNewName()
     {
-        if (prepareRenameResult == null || !prepareRenameResult.isRight())
+        if (prepareRenameResult == null || !prepareRenameResult.isSecond())
             return getCurrentName();
 
-        return prepareRenameResult.getRight().getPlaceholder();
+        return prepareRenameResult.getSecond().getPlaceholder();
     }
 
     /**
@@ -255,7 +258,8 @@ public class RenameRefactoring
             request.setParams(params);
             request.setProgressMonitor(subMonitor.split(1));
 
-            Either<Range, PrepareRenameResult> prepareRenameResult = null;
+            Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior> prepareRenameResult =
+                null;
             try
             {
                 prepareRenameResult = request.sendAndReceive();
@@ -343,7 +347,7 @@ public class RenameRefactoring
      * @param result may be <code>null</code> iff the <code>provider</code> is <code>null</code>
      */
     protected void setPrepareRenameResult(RenameProvider provider,
-        Either<Range, PrepareRenameResult> result)
+        Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior> result)
     {
         if (provider == null ^ result == null)
             throw new IllegalArgumentException();
@@ -370,7 +374,8 @@ public class RenameRefactoring
      *
      * @return the result of preparing the rename operation, or <code>null</code> if none
      */
-    protected final Either<Range, PrepareRenameResult> getPrepareRenameResult()
+    protected final Either3<Range, PrepareRenameResult,
+        PrepareRenameDefaultBehavior> getPrepareRenameResult()
     {
         return prepareRenameResult;
     }
