@@ -33,6 +33,8 @@ import org.eclipse.lsp4j.DefinitionCapabilities;
 import org.eclipse.lsp4j.DocumentLinkCapabilities;
 import org.eclipse.lsp4j.DocumentSymbolCapabilities;
 import org.eclipse.lsp4j.FoldingRangeCapabilities;
+import org.eclipse.lsp4j.FoldingRangeKind;
+import org.eclipse.lsp4j.FoldingRangeKindSupportCapabilities;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.ImplementationCapabilities;
 import org.eclipse.lsp4j.InsertTextMode;
@@ -75,10 +77,14 @@ public class EclipseLanguageService
             new CodeActionLiteralSupportCapabilities();
         codeActionLiteralSupport.setCodeActionKind(codeActionKind);
 
+        CodeActionResolveSupportCapabilities resolveSupport =
+            new CodeActionResolveSupportCapabilities();
+        resolveSupport.setProperties(List.of("edit")); //$NON-NLS-1$
+
         CodeActionCapabilities codeAction = new CodeActionCapabilities();
         codeAction.setCodeActionLiteralSupport(codeActionLiteralSupport);
         codeAction.setDisabledSupport(true);
-        codeAction.setResolveSupport(new CodeActionResolveSupportCapabilities(List.of("edit"))); //$NON-NLS-1$
+        codeAction.setResolveSupport(resolveSupport);
         codeAction.setDataSupport(true);
         codeAction.setHonorsChangeAnnotations(true);
         return codeAction;
@@ -91,6 +97,11 @@ public class EclipseLanguageService
             new CompletionItemTagSupportCapabilities();
         tagSupport.setValueSet(List.of(CompletionItemTag.values()));
 
+        CompletionItemInsertTextModeSupportCapabilities insertTextModeSupport =
+            new CompletionItemInsertTextModeSupportCapabilities();
+        insertTextModeSupport.setValueSet(
+            List.of(InsertTextMode.AsIs, InsertTextMode.AdjustIndentation));
+
         CompletionItemCapabilities completionItem = new CompletionItemCapabilities();
         completionItem.setSnippetSupport(true);
         completionItem.setDocumentationFormat(List.of(MarkupKind.MARKDOWN, MarkupKind.PLAINTEXT));
@@ -98,8 +109,7 @@ public class EclipseLanguageService
         completionItem.setTagSupport(tagSupport);
         completionItem.setCommitCharactersSupport(true);
         completionItem.setInsertReplaceSupport(true);
-        completionItem.setInsertTextModeSupport(new CompletionItemInsertTextModeSupportCapabilities(
-            List.of(InsertTextMode.AsIs, InsertTextMode.AdjustIndentation)));
+        completionItem.setInsertTextModeSupport(insertTextModeSupport);
         completionItem.setLabelDetailsSupport(true);
 
         CompletionItemKindCapabilities completionItemKind = new CompletionItemKindCapabilities();
@@ -168,9 +178,15 @@ public class EclipseLanguageService
     @Override
     public FoldingRangeCapabilities getFoldingRangeCapabilities()
     {
-        FoldingRangeCapabilities capabilities = new FoldingRangeCapabilities();
-        capabilities.setLineFoldingOnly(true);
-        return capabilities;
+        FoldingRangeKindSupportCapabilities foldingRangeKind =
+            new FoldingRangeKindSupportCapabilities();
+        foldingRangeKind.setValueSet(
+            List.of(FoldingRangeKind.Comment, FoldingRangeKind.Imports, FoldingRangeKind.Region));
+
+        FoldingRangeCapabilities foldingRange = new FoldingRangeCapabilities();
+        foldingRange.setLineFoldingOnly(true);
+        foldingRange.setFoldingRangeKind(foldingRangeKind);
+        return foldingRange;
     }
 
     @Override
