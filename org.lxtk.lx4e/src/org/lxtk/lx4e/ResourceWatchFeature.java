@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -45,9 +45,11 @@ import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.FileSystemWatcher;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Registration;
+import org.eclipse.lsp4j.RelativePattern;
 import org.eclipse.lsp4j.Unregistration;
 import org.eclipse.lsp4j.WatchKind;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentUri;
 import org.lxtk.client.DynamicFeature;
@@ -317,8 +319,11 @@ public class ResourceWatchFeature
 
         static Watcher fromFileSystemWatcher(FileSystemWatcher watcher)
         {
+            Either<String, RelativePattern> globPattern = watcher.getGlobPattern();
+            if (!globPattern.isLeft())
+                throw new IllegalArgumentException("Relative patterns are not supported"); //$NON-NLS-1$
             return new Watcher(
-                FileSystems.getDefault().getPathMatcher("glob:" + watcher.getGlobPattern()), //$NON-NLS-1$
+                FileSystems.getDefault().getPathMatcher("glob:" + globPattern.getLeft()), //$NON-NLS-1$
                 watcher.getKind());
         }
 
