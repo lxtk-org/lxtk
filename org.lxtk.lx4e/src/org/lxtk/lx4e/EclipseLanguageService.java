@@ -71,7 +71,7 @@ public class EclipseLanguageService
         codeActionKind.setValueSet(List.of(CodeActionKind.QuickFix, CodeActionKind.Refactor,
             CodeActionKind.RefactorExtract, CodeActionKind.RefactorInline,
             CodeActionKind.RefactorRewrite, CodeActionKind.Source,
-            CodeActionKind.SourceOrganizeImports));
+            CodeActionKind.SourceOrganizeImports, CodeActionKind.SourceFixAll));
 
         CodeActionLiteralSupportCapabilities codeActionLiteralSupport =
             new CodeActionLiteralSupportCapabilities();

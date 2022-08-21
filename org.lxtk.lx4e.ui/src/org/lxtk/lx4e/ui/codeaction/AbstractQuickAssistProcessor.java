@@ -36,6 +36,7 @@ import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
 import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.CodeActionTriggerKind;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -104,10 +105,13 @@ public abstract class AbstractQuickAssistProcessor
         if (invocationContext instanceof AnnotationInvocationContext)
             annotation = ((AnnotationInvocationContext)invocationContext).getAnnotation();
 
-        CodeActionResults results = computeCodeActionResults(getCodeActionProviders(target),
-            new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                range, getCodeActionContext(
-                    new AnnotationInvocationContext(viewer, offset, length, annotation))));
+        CodeActionContext context = getCodeActionContext(
+            new AnnotationInvocationContext(viewer, offset, length, annotation));
+        context.setTriggerKind(CodeActionTriggerKind.Invoked);
+
+        CodeActionResults results =
+            computeCodeActionResults(getCodeActionProviders(target), new CodeActionParams(
+                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), range, context));
         if (results == null)
             return null;
 

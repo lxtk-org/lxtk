@@ -25,6 +25,7 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
 import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.CodeActionTriggerKind;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -82,9 +83,13 @@ public abstract class AbstractCodeActionMenu
         if (range == null)
             return NO_ITEMS;
 
-        CodeActionResults results = computeCodeActionResults(getCodeActionProviders(target),
-            new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                range, new CodeActionContext(Collections.emptyList(), getCodeActionKinds())));
+        CodeActionContext context =
+            new CodeActionContext(Collections.emptyList(), getCodeActionKinds());
+        context.setTriggerKind(CodeActionTriggerKind.Invoked);
+
+        CodeActionResults results =
+            computeCodeActionResults(getCodeActionProviders(target), new CodeActionParams(
+                DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()), range, context));
         if (results == null)
             return NO_ITEMS;
 

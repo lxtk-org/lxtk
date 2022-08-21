@@ -24,6 +24,7 @@ import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionContext;
 import org.eclipse.lsp4j.CodeActionKind;
 import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.CodeActionTriggerKind;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -71,10 +72,13 @@ public abstract class AbstractMarkerResolutionGenerator
         if (target == null)
             return NO_RESOLUTIONS;
 
+        CodeActionContext context = new CodeActionContext(Collections.singletonList(diagnostic),
+            Collections.singletonList(CodeActionKind.QuickFix));
+        context.setTriggerKind(CodeActionTriggerKind.Invoked);
+
         CodeActionResults results = computeCodeActionResults(getCodeActionProviders(target),
             new CodeActionParams(DocumentUri.toTextDocumentIdentifier(target.getDocumentUri()),
-                diagnostic.getRange(), new CodeActionContext(Collections.singletonList(diagnostic),
-                    Collections.singletonList(CodeActionKind.QuickFix))));
+                diagnostic.getRange(), context));
         if (results == null)
             return NO_RESOLUTIONS;
 
