@@ -24,6 +24,7 @@ import static org.eclipse.lsp4j.SemanticTokenModifiers.Readonly;
 import static org.eclipse.lsp4j.SemanticTokenModifiers.Static;
 import static org.eclipse.lsp4j.SemanticTokenTypes.Class;
 import static org.eclipse.lsp4j.SemanticTokenTypes.Comment;
+import static org.eclipse.lsp4j.SemanticTokenTypes.Decorator;
 import static org.eclipse.lsp4j.SemanticTokenTypes.Enum;
 import static org.eclipse.lsp4j.SemanticTokenTypes.EnumMember;
 import static org.eclipse.lsp4j.SemanticTokenTypes.Event;
@@ -234,7 +235,7 @@ public class DefaultLanguageService
         return new SemanticTokensCapabilities(new SemanticTokensClientCapabilitiesRequests(),
             List.of(Namespace, Type, Class, Enum, Interface, Struct, TypeParameter, Parameter,
                 Variable, Property, EnumMember, Event, Function, Method, Macro, Keyword, Modifier,
-                Comment, String, Number, Regexp, Operator),
+                Comment, String, Number, Regexp, Operator, Decorator),
             List.of(Declaration, Definition, Readonly, Static, Deprecated, Abstract, Async,
                 Modification, Documentation, DefaultLibrary),
             List.of(Relative));
