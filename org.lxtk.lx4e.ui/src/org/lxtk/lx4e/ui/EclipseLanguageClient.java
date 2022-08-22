@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,7 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -35,8 +34,10 @@ import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
 import org.eclipse.lsp4j.ApplyWorkspaceEditResponse;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.FailureHandlingKind;
+import org.eclipse.lsp4j.GeneralClientCapabilities;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
+import org.eclipse.lsp4j.PositionEncodingKind;
 import org.eclipse.lsp4j.PublishDiagnosticsCapabilities;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Range;
@@ -46,6 +47,7 @@ import org.eclipse.lsp4j.ShowDocumentCapabilities;
 import org.eclipse.lsp4j.ShowDocumentParams;
 import org.eclipse.lsp4j.ShowDocumentResult;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
+import org.eclipse.lsp4j.StaleRequestCapabilities;
 import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.WindowClientCapabilities;
 import org.eclipse.lsp4j.WindowShowMessageRequestCapabilities;
@@ -143,7 +145,7 @@ public class EclipseLanguageClient<S extends LanguageServer>
         workspace.setApplyEdit(true);
         WorkspaceEditCapabilities workspaceEdit = new WorkspaceEditCapabilities();
         workspaceEdit.setDocumentChanges(true);
-        workspaceEdit.setResourceOperations(Arrays.asList(ResourceOperationKind.Create,
+        workspaceEdit.setResourceOperations(List.of(ResourceOperationKind.Create,
             ResourceOperationKind.Delete, ResourceOperationKind.Rename));
         workspaceEdit.setFailureHandling(FailureHandlingKind.Undo);
         WorkspaceEditChangeAnnotationSupportCapabilities changeAnnotationSupport =
@@ -157,6 +159,13 @@ public class EclipseLanguageClient<S extends LanguageServer>
         window.setShowMessage(new WindowShowMessageRequestCapabilities());
         window.setShowDocument(new ShowDocumentCapabilities(true));
         capabilities.setWindow(window);
+
+        GeneralClientCapabilities general = new GeneralClientCapabilities();
+        general.setPositionEncodings(List.of(PositionEncodingKind.UTF16));
+        StaleRequestCapabilities staleRequestSupport = new StaleRequestCapabilities();
+        staleRequestSupport.setCancel(true);
+        general.setStaleRequestSupport(staleRequestSupport);
+        capabilities.setGeneral(general);
 
         super.fillClientCapabilities(capabilities);
     }
