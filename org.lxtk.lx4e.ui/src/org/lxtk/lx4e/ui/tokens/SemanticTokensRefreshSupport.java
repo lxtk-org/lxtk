@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -99,8 +99,8 @@ public final class SemanticTokensRefreshSupport
                     target.getLanguageId());
             for (DocumentSemanticTokensProvider provider : providers)
             {
-                subscriptions.put(provider, provider.onDidChangeSemanticTokens().subscribe(
-                    this::onDidChangeSemanticTokens));
+                subscriptions.put(provider,
+                    provider.onRefreshSemanticTokens().subscribe(this::onRefreshSemanticTokens));
             }
         });
     }
@@ -122,7 +122,7 @@ public final class SemanticTokensRefreshSupport
                 target.getDocumentUri(), target.getLanguageId()))
         {
             subscriptions.put(provider,
-                provider.onDidChangeSemanticTokens().subscribe(this::onDidChangeSemanticTokens));
+                provider.onRefreshSemanticTokens().subscribe(this::onRefreshSemanticTokens));
             refreshJob.schedule();
         }
     }
@@ -137,7 +137,7 @@ public final class SemanticTokensRefreshSupport
         }
     }
 
-    private synchronized void onDidChangeSemanticTokens(Void x)
+    private synchronized void onRefreshSemanticTokens(Void x)
     {
         refreshJob.cancel();
         refreshJob.schedule(10);

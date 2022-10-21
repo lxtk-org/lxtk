@@ -14,6 +14,10 @@ This release adds client-side support for new features of LSP 3.17, including:
 
 Breaking changes:
 
+- Renamed `DocumentSemanticTokensProvider.onDidChangeSemanticTokens()` to `onRefreshSemanticTokens()`
+
+- Renamed `AbstractLanguageClient.onDidChangeSemanticTokens()` to `onRefreshSemanticTokens()`
+
 - Return type of `RenameProvider.prepareRename` method changed from
   `CompletableFuture<Either<Range, PrepareRenameResult>>` to
   `CompletableFuture<Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>>`

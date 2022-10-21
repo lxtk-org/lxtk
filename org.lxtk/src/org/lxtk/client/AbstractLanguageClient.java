@@ -67,7 +67,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private final Consumer<PublishDiagnosticsParams> diagnosticConsumer;
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures = new HashMap<>();
-    private final EventEmitter<Void> onDidChangeSemanticTokens = new EventEmitter<>();
+    private final EventEmitter<Void> onRefreshSemanticTokens = new EventEmitter<>();
     private S languageServer;
     private ServerInfo serverInfo;
     private List<DocumentFilter> documentSelector;
@@ -159,15 +159,15 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     }
 
     /**
-     * Returns a stream of events that are emitted when semantic tokens provided by
-     * the language server have changed.
+     * Returns a stream of events that are emitted when semantic tokens need to be refreshed
+     * in response to the {@link #refreshSemanticTokens()} request.
      *
-     * @return a stream of events that are emitted when semantic tokens provided by
-     *  the language server have changed (never <code>null</code>)
+     * @return a stream of events that are emitted when semantic tokens need to be refreshed
+     *  (never <code>null</code>)
      */
-    public EventStream<Void> onDidChangeSemanticTokens()
+    public EventStream<Void> onRefreshSemanticTokens()
     {
-        return onDidChangeSemanticTokens;
+        return onRefreshSemanticTokens;
     }
 
     @Override
@@ -310,7 +310,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     {
         return CompletableFuture.runAsync(() ->
         {
-            onDidChangeSemanticTokens.emit(null, log::error);
+            onRefreshSemanticTokens.emit(null, log::error);
         });
     }
 

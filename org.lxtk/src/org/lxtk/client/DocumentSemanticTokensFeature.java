@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 1C-Soft LLC.
+ * Copyright (c) 2021, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -34,6 +34,7 @@ import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
 import org.eclipse.lsp4j.SemanticTokensWorkspaceCapabilities;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DocumentSemanticTokensProvider;
 import org.lxtk.LanguageService;
 import org.lxtk.ProgressService;
@@ -55,6 +56,8 @@ public final class DocumentSemanticTokensFeature
     private static final String METHOD = "textDocument/semanticTokens"; //$NON-NLS-1$
     private static final Set<String> METHODS = Collections.singleton(METHOD);
 
+    private Consumer<Throwable> logger;
+
     /**
      * Constructor.
      *
@@ -63,6 +66,13 @@ public final class DocumentSemanticTokensFeature
     public DocumentSemanticTokensFeature(LanguageService languageService)
     {
         super(languageService);
+    }
+
+    @Override
+    public void setLanguageClient(AbstractLanguageClient<? extends LanguageServer> client)
+    {
+        super.setLanguageClient(client);
+        logger = client.log()::error;
     }
 
     @Override
@@ -119,7 +129,7 @@ public final class DocumentSemanticTokensFeature
     Disposable registerLanguageFeatureProvider(String method,
         SemanticTokensWithRegistrationOptions options)
     {
-        EventEmitter<Void> onDidChangeSemanticTokens = new EventEmitter<>();
+        EventEmitter<Void> onRefreshSemanticTokens = new EventEmitter<>();
         return SafeRun.runWithResult(rollback ->
         {
             Disposable registration = getLanguageService().getDocumentSemanticTokensProviders().add(
@@ -178,24 +188,19 @@ public final class DocumentSemanticTokensFeature
                     }
 
                     @Override
-                    public EventStream<Void> onDidChangeSemanticTokens()
+                    public EventStream<Void> onRefreshSemanticTokens()
                     {
-                        return onDidChangeSemanticTokens;
+                        return onRefreshSemanticTokens;
                     }
                 });
             rollback.add(registration::dispose);
 
-            Disposable subscription = getLanguageClient().onDidChangeSemanticTokens().subscribe(
-                e -> onDidChangeSemanticTokens.emit(e, getLogger()));
+            Disposable subscription = getLanguageClient().onRefreshSemanticTokens().subscribe(
+                e -> onRefreshSemanticTokens.emit(e, logger));
             rollback.add(subscription::dispose);
 
-            rollback.setLogger(getLogger());
+            rollback.setLogger(logger);
             return rollback::run;
         });
-    }
-
-    private Consumer<Throwable> getLogger()
-    {
-        return thrown -> getLanguageClient().log().error(thrown.getMessage(), thrown);
     }
 }
