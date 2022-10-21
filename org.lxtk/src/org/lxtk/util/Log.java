@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2020 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -40,6 +40,16 @@ public interface Log
     }
 
     /**
+     * Logs the given <code>Throwable</code> as an error.
+     *
+     * @param thrown not <code>null</code>
+     */
+    default void error(Throwable thrown)
+    {
+        error(format(null, thrown));
+    }
+
+    /**
      * Logs a warning message.
      *
      * @param message not <code>null</code>
@@ -56,6 +66,16 @@ public interface Log
     default void warning(String message, Throwable thrown)
     {
         warning(format(message, thrown));
+    }
+
+    /**
+     * Logs the given <code>Throwable</code> as a warning.
+     *
+     * @param thrown not <code>null</code>
+     */
+    default void warning(Throwable thrown)
+    {
+        warning(format(null, thrown));
     }
 
     /**
@@ -78,9 +98,19 @@ public interface Log
     }
 
     /**
+     * Logs the given <code>Throwable</code> as an info.
+     *
+     * @param thrown not <code>null</code>
+     */
+    default void info(Throwable thrown)
+    {
+        info(format(null, thrown));
+    }
+
+    /**
      * Formats a message, with associated <code>Throwable</code>.
      *
-     * @param message not <code>null</code>
+     * @param message may be <code>null</code>
      * @param thrown the <code>Throwable</code> associated with the message
      *  (not <code>null</code>)
      * @return a formatted message (never <code>null</code>)
@@ -90,7 +120,8 @@ public interface Log
         StringWriter sw = new StringWriter();
         try (PrintWriter pw = new PrintWriter(sw))
         {
-            pw.println(message);
+            if (message != null)
+                pw.println(message);
             thrown.printStackTrace(pw);
         }
         return sw.toString();

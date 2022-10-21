@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -310,8 +310,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     {
         return CompletableFuture.runAsync(() ->
         {
-            onDidChangeSemanticTokens.emit(null,
-                thrown -> log().error(thrown.getMessage(), thrown));
+            onDidChangeSemanticTokens.emit(null, log::error);
         });
     }
 

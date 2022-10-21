@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021 1C-Soft LLC.
+ * Copyright (c) 2019, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
@@ -66,7 +67,10 @@ import org.lxtk.TextDocumentWillSaveEvent;
 import org.lxtk.TextDocumentWillSaveEventSource;
 import org.lxtk.TextDocumentWillSaveWaitUntilEventSource;
 import org.lxtk.jsonrpc.DefaultGson;
+import org.lxtk.util.AsyncEventEmitter;
 import org.lxtk.util.Disposable;
+import org.lxtk.util.EventEmitter;
+import org.lxtk.util.EventStream;
 import org.lxtk.util.WaitUntilEvent;
 
 import com.google.gson.JsonElement;
@@ -94,12 +98,15 @@ public final class TextDocumentSyncFeature
     private final TextDocumentWillSaveEventSource willSaveEventSource;
     private final TextDocumentWillSaveWaitUntilEventSource willSaveWaitUntilEventSource;
     private final TextDocumentSaveEventSource saveEventSource;
+    private Consumer<Throwable> logger;
     private LanguageServer languageServer;
     private Map<String, Map<String, TextDocumentRegistrationOptions>> registrations;
     private final Map<String, Disposable> subscriptions = new HashMap<>();
     private final Map<TextDocument, Integer> syncedDocumentVersions = new HashMap<>();
     private final PendingChangeManager pendingChangeManager =
         new PendingChangeManager(this::flushPendingChange);
+    private final EventEmitter<TextDocumentChangeEvent> onDidFlushPendingChange =
+        new AsyncEventEmitter<>();
 
     /**
      * Convenience factory method.
@@ -154,6 +161,23 @@ public final class TextDocumentSyncFeature
         this.willSaveEventSource = willSaveEventSource;
         this.willSaveWaitUntilEventSource = willSaveWaitUntilEventSource;
         this.saveEventSource = saveEventSource;
+    }
+
+    @Override
+    public void setLanguageClient(AbstractLanguageClient<? extends LanguageServer> client)
+    {
+        logger = client.log()::error;
+    }
+
+    /**
+     * Returns a stream of events that are emitted when pending change is flushed.
+     *
+     * @return a stream of events that are emitted when pending change is flushed
+     *  (never <code>null</code>)
+     */
+    public EventStream<TextDocumentChangeEvent> onDidFlushPendingChange()
+    {
+        return onDidFlushPendingChange;
     }
 
     /**
@@ -502,34 +526,33 @@ public final class TextDocumentSyncFeature
         if (registrationOptions == null)
             return;
 
-        int version;
-        List<TextDocumentContentChangeEvent> contentChanges;
+        TextDocumentChangeEvent changeEvent;
 
         if (registrationOptions.getSyncKind() == TextDocumentSyncKind.Full
             || change.getSyncKind() == TextDocumentSyncKind.Full)
         {
             TextDocumentSnapshot snapshot = document.getLastChange().getSnapshot();
-            version = snapshot.getVersion();
-            contentChanges =
-                Collections.singletonList(new TextDocumentContentChangeEvent(snapshot.getText()));
+            changeEvent = new TextDocumentChangeEvent(snapshot,
+                Collections.singletonList(new TextDocumentContentChangeEvent(snapshot.getText())));
         }
         else
         {
-            TextDocumentChangeEvent changeEvent = change.getEvent();
-            version = changeEvent.getSnapshot().getVersion();
-            contentChanges = changeEvent.getContentChanges();
+            changeEvent = change.getEvent();
         }
 
+        int version = changeEvent.getSnapshot().getVersion();
         if (syncedDocumentVersion >= version)
             return;
 
         DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
         params.setTextDocument(
             new VersionedTextDocumentIdentifier(DocumentUri.convert(document.getUri()), version));
-        params.setContentChanges(contentChanges);
+        params.setContentChanges(changeEvent.getContentChanges());
 
         languageServer.getTextDocumentService().didChange(params);
         syncedDocumentVersions.put(document, version);
+
+        onDidFlushPendingChange.emit(changeEvent, logger);
     }
 
     private synchronized void onWillSave(TextDocumentWillSaveEvent event)
