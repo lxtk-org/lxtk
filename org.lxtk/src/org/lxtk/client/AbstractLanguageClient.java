@@ -68,6 +68,7 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     private final Set<Feature<? super S>> featureSet;
     private final Map<String, DynamicFeature<? super S>> dynamicFeatures = new HashMap<>();
     private final EventEmitter<Void> onRefreshSemanticTokens = new EventEmitter<>();
+    private final EventEmitter<Void> onRefreshDiagnostics = new EventEmitter<>();
     private S languageServer;
     private ServerInfo serverInfo;
     private List<DocumentFilter> documentSelector;
@@ -168,6 +169,18 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
     public EventStream<Void> onRefreshSemanticTokens()
     {
         return onRefreshSemanticTokens;
+    }
+
+    /**
+     * Returns a stream of events that are emitted when diagnostics need to be refreshed
+     * in response to the {@link #refreshDiagnostics()} request.
+     *
+     * @return a stream of events that are emitted when diagnostics need to be refreshed
+     *  (never <code>null</code>)
+     */
+    public EventStream<Void> onRefreshDiagnostics()
+    {
+        return onRefreshDiagnostics;
     }
 
     @Override
@@ -311,6 +324,15 @@ public abstract class AbstractLanguageClient<S extends LanguageServer>
         return CompletableFuture.runAsync(() ->
         {
             onRefreshSemanticTokens.emit(null, log::error);
+        });
+    }
+
+    @Override
+    public CompletableFuture<Void> refreshDiagnostics()
+    {
+        return CompletableFuture.runAsync(() ->
+        {
+            onRefreshDiagnostics.emit(null, log::error);
         });
     }
 

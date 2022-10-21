@@ -29,6 +29,7 @@ import java.util.function.Predicate;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.DiagnosticCapabilities;
 import org.eclipse.lsp4j.DiagnosticRegistrationOptions;
+import org.eclipse.lsp4j.DiagnosticWorkspaceCapabilities;
 import org.eclipse.lsp4j.DocumentDiagnosticParams;
 import org.eclipse.lsp4j.DocumentDiagnosticReport;
 import org.eclipse.lsp4j.DocumentFilter;
@@ -69,12 +70,13 @@ public final class DiagnosticFeature
     private final CompletableFuture<? extends UiDocumentService> uiDocumentServiceFuture;
     private final EventStream<TextDocumentChangeEvent> onDidFlushPendingChange;
     private final Function<DiagnosticProvider, DiagnosticRequestor> diagnosticRequestorFactory;
-    private final EventEmitter<Set<TextDocument>> onDiagnosticRefresh = new EventEmitter<>();
+    private final EventEmitter<Set<TextDocument>> onRefreshDiagnostics = new EventEmitter<>();
     private final Set<TextDocument> trackedDocuments = new HashSet<>();
 
     private DocumentMatcher documentMatcher = DefaultDocumentMatcher.INSTANCE;
     private AbstractLanguageClient<? extends LanguageServer> languageClient;
     private Consumer<Throwable> logger;
+    private Disposable clientDisposable;
     private LanguageServer languageServer;
     private Map<String, RegistrationData> registrations;
     private Set<String> pendingRegistrations;
@@ -111,6 +113,8 @@ public final class DiagnosticFeature
     {
         languageClient = Objects.requireNonNull(client);
         logger = client.log()::error;
+        clientDisposable =
+            client.onRefreshDiagnostics().subscribe(e -> onRefreshDiagnostics.emit(null, logger));
     }
 
     @Override
@@ -126,6 +130,12 @@ public final class DiagnosticFeature
         diagnostic.setDynamicRegistration(true);
         diagnostic.setRelatedDocumentSupport(false);
         ClientCapabilitiesUtil.getOrCreateTextDocument(capabilities).setDiagnostic(diagnostic);
+
+        DiagnosticWorkspaceCapabilities workspaceDiagnostics =
+            new DiagnosticWorkspaceCapabilities();
+        workspaceDiagnostics.setRefreshSupport(true);
+        ClientCapabilitiesUtil.getOrCreateWorkspace(capabilities).setDiagnostics(
+            workspaceDiagnostics);
     }
 
     @Override
@@ -174,6 +184,8 @@ public final class DiagnosticFeature
         List<Disposable> result = new ArrayList<>();
         if (registrations != null)
             result.addAll(registrations.values());
+        if (clientDisposable != null)
+            result.add(clientDisposable);
         if (diagnosticPullFuture != null)
             result.add(() -> diagnosticPullFuture.thenAccept(Disposable::dispose));
         return result;
@@ -269,7 +281,7 @@ public final class DiagnosticFeature
             }
 
             if (!documents.isEmpty())
-                onDiagnosticRefresh.emit(documents, logger);
+                onRefreshDiagnostics.emit(documents, logger);
         }
     }
 
@@ -415,7 +427,7 @@ public final class DiagnosticFeature
             });
             rollback.add(disposable::dispose);
 
-            disposable = onDiagnosticRefresh.subscribe(documents ->
+            disposable = onRefreshDiagnostics.subscribe(documents ->
             {
                 synchronized (DiagnosticFeature.this)
                 {
