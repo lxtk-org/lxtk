@@ -14,7 +14,6 @@ package org.lxtk.client;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,7 +21,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
-import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticServerCancellationData;
 import org.eclipse.lsp4j.DocumentDiagnosticParams;
 import org.eclipse.lsp4j.DocumentDiagnosticReport;
@@ -55,7 +53,7 @@ public final class DefaultDiagnosticRequestor
     implements DiagnosticRequestor
 {
     private final DiagnosticProvider diagnosticProvider;
-    private final BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer;
+    private final BiConsumer<URI, ? super RelatedFullDocumentDiagnosticReport> diagnosticConsumer;
     private final Log log;
     private final Map<URI, SequenceData> sequences = new HashMap<>();
     private DocumentMatcher documentMatcher = DefaultDocumentMatcher.INSTANCE;
@@ -68,7 +66,7 @@ public final class DefaultDiagnosticRequestor
      * @param log not <code>null</code>
      */
     public DefaultDiagnosticRequestor(DiagnosticProvider diagnosticProvider,
-        BiConsumer<URI, Collection<Diagnostic>> diagnosticConsumer, Log log)
+        BiConsumer<URI, ? super RelatedFullDocumentDiagnosticReport> diagnosticConsumer, Log log)
     {
         this.diagnosticProvider = Objects.requireNonNull(diagnosticProvider);
         this.diagnosticConsumer = Objects.requireNonNull(diagnosticConsumer);
@@ -189,69 +187,98 @@ public final class DefaultDiagnosticRequestor
         request.future = diagnosticProvider.getDocumentDiagnostics(params);
         request.future.whenCompleteAsync((DocumentDiagnosticReport result, Throwable e) ->
         {
-            synchronized (this)
+            try
             {
-                if (sequences.get(documentUri) != sequence)
-                    return;
-
-                try
+                synchronized (DefaultDiagnosticRequestor.this)
                 {
-                    if (result != null)
+                    if (sequences.get(documentUri) != sequence)
+                        return;
+
+                    try
                     {
-                        if (result.isLeft())
+                        if (result != null)
                         {
-                            RelatedFullDocumentDiagnosticReport report = result.getLeft();
-                            sequence.resultId = report.getResultId();
-                            diagnosticConsumer.accept(documentUri, report.getItems());
-                        }
-                        else if (result.isRight())
-                        {
-                            RelatedUnchangedDocumentDiagnosticReport report = result.getRight();
-                            sequence.resultId = report.getResultId();
-                        }
-                    }
-                    else if (e != null)
-                    {
-                        if (e instanceof CancellationException)
-                            return;
-
-                        if (e instanceof ResponseErrorException)
-                        {
-                            ResponseError responseError =
-                                ((ResponseErrorException)e).getResponseError();
-
-                            if (responseError.getCode() == ResponseErrorCode.RequestCancelled.getValue())
-                                return;
-
-                            if (responseError.getCode() == ResponseErrorCode.ServerCancelled.getValue())
+                            if (result.isLeft())
                             {
-                                DiagnosticServerCancellationData data =
-                                    getDiagnosticServerCancellationData(responseError.getData());
-                                if (data == null || data.isRetriggerRequest())
-                                    request.retrigger = true;
-                                return;
+                                RelatedFullDocumentDiagnosticReport report = result.getLeft();
+                                try
+                                {
+                                    diagnosticConsumer.accept(documentUri, report);
+                                    sequence.resultId = report.getResultId();
+                                }
+                                catch (Throwable t)
+                                {
+                                    log.error(MessageFormat.format(Messages.getString(
+                                        "DefaultDiagnosticRequestor.Error.AcceptingDiagnosticsFailed"), //$NON-NLS-1$
+                                        documentUri), t);
+                                }
+                            }
+                            else if (result.isRight())
+                            {
+                                RelatedUnchangedDocumentDiagnosticReport report = result.getRight();
+                                sequence.resultId = report.getResultId();
                             }
                         }
+                        else if (e != null)
+                        {
+                            if (e instanceof CancellationException)
+                                return;
 
-                        log.error(MessageFormat.format(
-                            Messages.getString("DefaultDiagnosticRequestor.Error.RequestFailed"), //$NON-NLS-1$
-                            documentUri), e);
+                            if (e instanceof ResponseErrorException)
+                            {
+                                ResponseError responseError =
+                                    ((ResponseErrorException)e).getResponseError();
+
+                                if (responseError.getCode() == ResponseErrorCode.RequestCancelled.getValue())
+                                    return;
+
+                                if (responseError.getCode() == ResponseErrorCode.ServerCancelled.getValue())
+                                {
+                                    DiagnosticServerCancellationData data =
+                                        getDiagnosticServerCancellationData(
+                                            responseError.getData());
+                                    if (data == null || data.isRetriggerRequest())
+                                        request.retrigger = true;
+                                    return;
+                                }
+                            }
+
+                            log.error(MessageFormat.format(
+                                Messages.getString(
+                                    "DefaultDiagnosticRequestor.Error.RequestFailed"), //$NON-NLS-1$
+                                documentUri), e);
+                        }
                     }
-                }
-                finally
-                {
-                    request.future = null;
-                    if (request.retrigger)
+                    finally
                     {
-                        request.retrigger = false;
-                        triggerPullRequest(documentUri, sequence);
+                        request.future = null;
+                        if (request.retrigger)
+                        {
+                            request.retrigger = false;
+                            try
+                            {
+                                triggerPullRequest(documentUri, sequence);
+                            }
+                            catch (Throwable t)
+                            {
+                                log.error(MessageFormat.format(Messages.getString(
+                                    "DefaultDiagnosticRequestor.Error.FailedToRetriggerRequest"), //$NON-NLS-1$
+                                    documentUri), t);
+                            }
+                        }
                     }
                 }
+            }
+            catch (Throwable t)
+            {
+                log.error(MessageFormat.format(
+                    Messages.getString("DefaultDiagnosticRequestor.Error.ResponseProcessingFailed"), //$NON-NLS-1$
+                    documentUri), t);
             }
         });
     }
 
-    private static DiagnosticServerCancellationData getDiagnosticServerCancellationData(Object data)
+    static DiagnosticServerCancellationData getDiagnosticServerCancellationData(Object data)
     {
         if (data instanceof DiagnosticServerCancellationData)
             return (DiagnosticServerCancellationData)data;
