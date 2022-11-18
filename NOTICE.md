@@ -30,7 +30,7 @@ Eclipse Handly 1.6.0-1.7.0
 
  * License: EPL-2.0
 
-Eclipse LSP4J 0.16.0-0.17.0
+Eclipse LSP4J 0.19.0
 
  * License: EPL-2.0
 
