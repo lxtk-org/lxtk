@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.diagnostics;
+package org.lxtk.lx4e.ui.diagnostics;
 
 import java.net.URI;
 import java.util.List;
@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.lxtk.DocumentUri;
 import org.lxtk.TextDocument;
 import org.lxtk.lx4e.EclipseTextDocument;
+import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.util.ResourceUtil;
 import org.lxtk.util.Disposable;
 

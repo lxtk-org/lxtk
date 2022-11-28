@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -10,7 +10,7 @@
  * Contributors:
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
-package org.lxtk.lx4e.diagnostics;
+package org.lxtk.lx4e.ui.diagnostics;
 
 import org.eclipse.jface.text.quickassist.IQuickFixableAnnotation;
 import org.eclipse.lsp4j.Diagnostic;

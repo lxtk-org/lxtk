@@ -15,6 +15,8 @@ This release adds client-side support for new features of LSP 3.17, including:
 
 Breaking changes:
 
+- Moved classes related to diagnostic annotations from LX4E Core to LX4E UI
+
 - Renamed `DocumentSemanticTokensProvider.onDidChangeSemanticTokens()` to `onRefreshSemanticTokens()`
 
 - Renamed `AbstractLanguageClient.onDidChangeSemanticTokens()` to `onRefreshSemanticTokens()`

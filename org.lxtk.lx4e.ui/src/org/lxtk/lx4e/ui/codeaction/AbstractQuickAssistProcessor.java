@@ -52,10 +52,10 @@ import org.lxtk.jsonrpc.DefaultGson;
 import org.lxtk.lx4e.DocumentUtil;
 import org.lxtk.lx4e.IWorkspaceEditChangeFactory;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
-import org.lxtk.lx4e.diagnostics.IDiagnosticAnnotation;
 import org.lxtk.lx4e.internal.ui.Activator;
 import org.lxtk.lx4e.requests.CodeActionRequest;
 import org.lxtk.lx4e.ui.AnnotationInvocationContext;
+import org.lxtk.lx4e.ui.diagnostics.IDiagnosticAnnotation;
 
 /**
  * Partial implementation of an {@link IQuickAssistProcessor} that computes

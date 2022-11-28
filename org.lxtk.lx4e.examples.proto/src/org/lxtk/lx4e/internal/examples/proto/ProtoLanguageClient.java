@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -38,12 +38,12 @@ import org.lxtk.client.WorkspaceFoldersFeature;
 import org.lxtk.jsonrpc.AbstractJsonRpcConnectionFactory;
 import org.lxtk.jsonrpc.JsonRpcConnectionFactory;
 import org.lxtk.lx4e.EclipseLog;
-import org.lxtk.lx4e.diagnostics.DefaultDiagnosticConsumer;
-import org.lxtk.lx4e.diagnostics.DiagnosticAnnotations;
 import org.lxtk.lx4e.diagnostics.DiagnosticMarkers;
 import org.lxtk.lx4e.refactoring.WorkspaceEditChangeFactory;
 import org.lxtk.lx4e.ui.EclipseLanguageClient;
 import org.lxtk.lx4e.ui.EclipseLanguageClientController;
+import org.lxtk.lx4e.ui.diagnostics.DefaultDiagnosticConsumer;
+import org.lxtk.lx4e.ui.diagnostics.DiagnosticAnnotations;
 import org.lxtk.util.Log;
 import org.lxtk.util.connect.StdioConnection;
 import org.lxtk.util.connect.StreamBasedConnection;

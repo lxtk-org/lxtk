@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2022 1C-Soft LLC.
+ * Copyright (c) 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -11,6 +11,6 @@
  *     Vladimir Piskarev (1C) - initial API and implementation
  *******************************************************************************/
 /**
- * Provides support for representing LSP diagnostics as resource markers in Eclipse.
+ * Provides support for representing LSP diagnostics as text editor annotations in Eclipse.
  */
-package org.lxtk.lx4e.diagnostics;
+package org.lxtk.lx4e.ui.diagnostics;
