@@ -42,6 +42,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.lxtk.DefaultDocumentMatcher;
 import org.lxtk.DiagnosticProvider;
 import org.lxtk.DocumentMatcher;
+import org.lxtk.ProgressService;
 import org.lxtk.TextDocument;
 import org.lxtk.TextDocumentChangeEvent;
 import org.lxtk.UiDocumentService;
@@ -70,6 +71,8 @@ public final class DiagnosticFeature
     private final CompletableFuture<? extends UiDocumentService> uiDocumentServiceFuture;
     private final EventStream<TextDocumentChangeEvent> onDidFlushPendingChange;
     private final Function<DiagnosticProvider, DiagnosticRequestor> diagnosticRequestorFactory;
+    private final Function<DiagnosticProvider,
+        WorkspaceDiagnosticRequestor> workspaceDiagnosticRequestorFactory;
     private final EventEmitter<Set<TextDocument>> onRefreshDiagnostics = new EventEmitter<>();
     private final Set<TextDocument> trackedDocuments = new HashSet<>();
 
@@ -88,14 +91,19 @@ public final class DiagnosticFeature
      * @param uiDocumentServiceFuture not <code>null</code>
      * @param textDocumentSyncFeature not <code>null</code>
      * @param diagnosticRequestorFactory not <code>null</code>
+     * @param workspaceDiagnosticRequestorFactory may be <code>null</code>, in which case
+     *  workspace diagnostics will not be supported by this feature
      */
     public DiagnosticFeature(CompletableFuture<? extends UiDocumentService> uiDocumentServiceFuture,
         TextDocumentSyncFeature textDocumentSyncFeature,
-        Function<DiagnosticProvider, DiagnosticRequestor> diagnosticRequestorFactory)
+        Function<DiagnosticProvider, DiagnosticRequestor> diagnosticRequestorFactory, //
+        Function<DiagnosticProvider,
+            WorkspaceDiagnosticRequestor> workspaceDiagnosticRequestorFactory)
     {
         this.uiDocumentServiceFuture = Objects.requireNonNull(uiDocumentServiceFuture);
         this.onDidFlushPendingChange = textDocumentSyncFeature.onDidFlushPendingChange();
         this.diagnosticRequestorFactory = Objects.requireNonNull(diagnosticRequestorFactory);
+        this.workspaceDiagnosticRequestorFactory = workspaceDiagnosticRequestorFactory;
     }
 
     /**
@@ -221,17 +229,23 @@ public final class DiagnosticFeature
             {
                 if (e != null)
                 {
+                    synchronized (DiagnosticFeature.this)
+                    {
+                        pendingRegistrations = null;
+                    }
+
                     if (languageClient != null)
                         languageClient.log().error(Messages.getString(
                             "DiagnosticFeature.Error.FailedToStartDiagnosticPull"), e); //$NON-NLS-1$
                     else // should never happen
                         e.printStackTrace();
 
-                    dispose();
+                    if (!supportsWorkspaceDiagnostics())
+                        dispose();
                 }
             });
         }
-        else
+        else if (!diagnosticPullFuture.isCompletedExceptionally())
         {
             if (pendingRegistrations == null)
                 pendingRegistrations = new HashSet<>();
@@ -239,6 +253,14 @@ public final class DiagnosticFeature
             pendingRegistrations.add(registration.getId());
 
             diagnosticPullFuture.thenRunAsync(this::handlePendingRegistrations);
+        }
+
+        if (supportsWorkspaceDiagnostics() && options.isWorkspaceDiagnostics())
+        {
+            WorkspaceDiagnosticRequestor workspaceDiagnosticRequestor =
+                registrationData.getWorkspaceDiagnosticRequestor();
+            if (workspaceDiagnosticRequestor != null)
+                workspaceDiagnosticRequestor.triggerWorkspacePull();
         }
     }
 
@@ -322,7 +344,33 @@ public final class DiagnosticFeature
 
                 return languageServer.getWorkspaceService().diagnostic(params);
             }
+
+            @Override
+            public ProgressService getProgressService()
+            {
+                return languageClient != null ? languageClient.getProgressService() : null;
+            }
         });
+    }
+
+    /**
+     * Triggers workspace diagnostic pull.
+     */
+    public synchronized void triggerWorkspacePull()
+    {
+        if (!supportsWorkspaceDiagnostics() || registrations == null)
+            return;
+
+        for (RegistrationData registrationData : registrations.values())
+        {
+            if (registrationData.getRegistrationOptions().isWorkspaceDiagnostics())
+            {
+                WorkspaceDiagnosticRequestor workspaceDiagnosticRequestor =
+                    registrationData.getWorkspaceDiagnosticRequestor();
+                if (workspaceDiagnosticRequestor != null)
+                    workspaceDiagnosticRequestor.triggerWorkspacePull();
+            }
+        }
     }
 
     synchronized void triggerDocumentPull(TextDocument document, TriggeringContext context)
@@ -461,11 +509,17 @@ public final class DiagnosticFeature
         });
     }
 
+    private boolean supportsWorkspaceDiagnostics()
+    {
+        return workspaceDiagnosticRequestorFactory != null;
+    }
+
     private class RegistrationData
         implements Disposable
     {
         private final DiagnosticProvider diagnosticProvider;
         private DiagnosticRequestor diagnosticRequestor;
+        private WorkspaceDiagnosticRequestor workspaceDiagnosticRequestor;
 
         RegistrationData(DiagnosticProvider diagnosticProvider)
         {
@@ -484,11 +538,18 @@ public final class DiagnosticFeature
             return diagnosticRequestor;
         }
 
+        synchronized WorkspaceDiagnosticRequestor getWorkspaceDiagnosticRequestor()
+        {
+            if (workspaceDiagnosticRequestor == null)
+                workspaceDiagnosticRequestor =
+                    workspaceDiagnosticRequestorFactory.apply(diagnosticProvider);
+            return workspaceDiagnosticRequestor;
+        }
+
         @Override
         public synchronized void dispose()
         {
-            if (diagnosticRequestor != null)
-                diagnosticRequestor.dispose();
+            Disposable.disposeAll(diagnosticRequestor, workspaceDiagnosticRequestor);
         }
     }
 

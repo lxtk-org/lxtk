@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 1C-Soft LLC.
+ * Copyright (c) 2020, 2022 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
@@ -121,21 +123,19 @@ public class SelectAnnotationRulerAction
      */
     protected void run(Annotation annotation)
     {
-        if (annotation instanceof SimpleMarkerAnnotation)
-        {
-            MarkerViewUtil.showMarker(editor.getSite().getPage(),
-                ((SimpleMarkerAnnotation)annotation).getMarker(), false);
-        }
-
         IAnnotationModel model = getAnnotationModel();
         if (model == null)
             return;
 
         Position position = model.getPosition(annotation);
-        if (position == null || position.isDeleted)
+        if (position == null || position.isDeleted())
             return;
 
         editor.selectAndReveal(position.getOffset(), position.getLength());
+
+        IMarker marker = getMarker(annotation);
+        if (marker != null)
+            MarkerViewUtil.showMarker(editor.getSite().getPage(), marker, false);
 
         if (annotation instanceof IQuickFixableAnnotation)
         {
@@ -365,11 +365,48 @@ public class SelectAnnotationRulerAction
         return false;
     }
 
+    /**
+     * Returns the marker that corresponds to the given annotation.
+     *
+     * @param annotation never <code>null</code>
+     * @return the corresponding marker, or <code>null</code> if none
+     */
+    protected IMarker getMarker(Annotation annotation)
+    {
+        if (annotation instanceof SimpleMarkerAnnotation)
+            return ((SimpleMarkerAnnotation)annotation).getMarker();
+
+        IAnnotationModel model = getAnnotationModel();
+        if (model == null)
+            return null;
+
+        Position position = model.getPosition(annotation);
+        if (position == null || position.isDeleted())
+            return null;
+
+        List<Annotation> annotations = new ArrayList<>();
+        Iterator<Annotation> it =
+            !(model instanceof IAnnotationModelExtension2) ? model.getAnnotationIterator()
+                : ((IAnnotationModelExtension2)model).getAnnotationIterator(position.getOffset(),
+                    position.getLength(), false, false);
+        while (it.hasNext())
+        {
+            Annotation a = it.next();
+            if (a instanceof SimpleMarkerAnnotation)
+            {
+                Position p = model.getPosition(a);
+                if (position.equals(p) && !p.isDeleted())
+                    annotations.add(a);
+            }
+        }
+        Annotation a = chooseAnnotation(annotations);
+        if (a instanceof SimpleMarkerAnnotation)
+            return ((SimpleMarkerAnnotation)a).getMarker();
+        return null;
+    }
+
     private boolean isVisible(Annotation annotation)
     {
-        if (annotation.isMarkedDeleted())
-            return false;
-
         AnnotationPreference preference =
             annotationPreferenceLookup.getAnnotationPreference(annotation);
         if (preference == null)

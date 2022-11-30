@@ -52,4 +52,11 @@ public interface DiagnosticProvider
      */
     CompletableFuture<WorkspaceDiagnosticReport> getWorkspaceDiagnostics(
         WorkspaceDiagnosticParams params);
+
+    /**
+     * Returns the progress service for this provider.
+     *
+     * @return the progress service, or <code>null</code> if none
+     */
+    ProgressService getProgressService();
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2021 Rogue Wave Software Inc. and others.
+ * Copyright (c) 2016, 2022 Rogue Wave Software Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -20,9 +20,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.SymbolKind;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
@@ -39,7 +43,22 @@ public class LSPImages {
 //    private static final Map<java.awt.Color, Image> colorToImageCache = new HashMap<>();
     private static final String ICONS_PATH = "$nl$/icons/full/"; //$NON-NLS-1$
     private static final String OBJECT = ICONS_PATH + "obj16/"; // basic colors - size 16x16 //$NON-NLS-1$
-    private static final Image EMPTY_IMAGE = new Image(PlatformUI.getWorkbench().getDisplay(), 16, 16);
+    private static final Image EMPTY_IMAGE;
+    private static final Image ERROR_IMAGE_GRAY;
+    private static final Image WARN_IMAGE_GRAY;
+    private static final Image INFO_IMAGE_GRAY;
+    static {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        Display display = workbench.getDisplay();
+        ISharedImages sharedImages= workbench.getSharedImages();
+        EMPTY_IMAGE = new Image(display, 16, 16);
+        ERROR_IMAGE_GRAY = new Image(display,
+            sharedImages.getImage(ISharedImages.IMG_OBJS_ERROR_TSK), SWT.IMAGE_GRAY);
+        WARN_IMAGE_GRAY = new Image(display,
+            sharedImages.getImage(ISharedImages.IMG_OBJS_WARN_TSK), SWT.IMAGE_GRAY);
+        INFO_IMAGE_GRAY = new Image(display,
+            sharedImages.getImage(ISharedImages.IMG_OBJS_INFO_TSK), SWT.IMAGE_GRAY);
+    }
 
     public static final String IMG_MODULE = "IMG_MODULE"; //$NON-NLS-1$
     public static final String IMG_NAMESPACE = "IMG_NAMESPACE"; //$NON-NLS-1$
@@ -128,6 +147,20 @@ public class LSPImages {
             imageRegistry = Activator.getDefault().getImageRegistry();
         }
         return imageRegistry;
+    }
+
+    public static Image getDiagnosticImageGray(DiagnosticSeverity severity)
+    {
+        if (severity == null)
+            severity = DiagnosticSeverity.Error;
+        switch (severity) {
+        case Error:
+            return ERROR_IMAGE_GRAY;
+        case Warning:
+            return WARN_IMAGE_GRAY;
+        default:
+            return INFO_IMAGE_GRAY;
+        }
     }
 
     public static Image imageFromSymbolKind(SymbolKind kind) {
