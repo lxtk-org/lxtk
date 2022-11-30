@@ -9,6 +9,7 @@ This release adds client-side support for new features of LSP 3.17, including:
 
 - [x] [Diagnostic Pull Requests](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_pullDiagnostics)
    - [x] [Document Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_diagnostic)
+   - [x] [Workspace Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_diagnostic)
    - [x] [Diagnostics Refresh](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#diagnostic_refresh)
 - [x] [Lazy Resolution for Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbolResolve)
 - [x] [Type Hierarchy](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareTypeHierarchy)
