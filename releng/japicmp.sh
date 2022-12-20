@@ -20,7 +20,7 @@
 # corresponding jars in the 'old' subdirectory.
 #
 # Requirements:
-# * japicmp-0.15.7-jar-with-dependencies.jar in the current directory
+# * japicmp-0.17.1-jar-with-dependencies.jar in the current directory
 # * new jars in the 'new' subdirectory
 # * old jars in the 'old' subdirectory
 #
@@ -32,4 +32,4 @@ function join() {
     echo "$*"
 }
 
-java -jar japicmp-0.15.7-jar-with-dependencies.jar --old $(join ';' old/*.jar) --new $(join ';' new/*.jar) --exclude '*.internal.*' --ignore-missing-classes --only-modified --html-file japicmp.html > japicmp.diff
+java -jar japicmp-0.17.1-jar-with-dependencies.jar --old $(join ';' old/*.jar) --new $(join ';' new/*.jar) --exclude '*.internal.*' --ignore-missing-classes --only-modified --html-file japicmp.html > japicmp.diff
