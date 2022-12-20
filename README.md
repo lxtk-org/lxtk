@@ -104,6 +104,9 @@ custom Eclipse-based IDE.
 LX4E includes several examples (`org.lxtk.lx4e.examples.*` bundles) that
 demonstrate main aspects of its usage.
 
+For additional information on how to use some of the features of LXTK Core
+Framework and LX4E, see [FAQ](FAQ.md).
+
 For an overview of the API provided by LXTK Core Framework and LX4E, please see
 the Javadocs for the exported packages of the respective bundles.
 
