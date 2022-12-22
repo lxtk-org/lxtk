@@ -14,7 +14,7 @@
 <feature
       id="org.lxtk"
       label="%featureName"
-      version="0.4.0.qualifier"
+      version="0.5.0.qualifier"
       provider-name="%providerName"
       plugin="org.lxtk"
       license-feature="org.eclipse.license"

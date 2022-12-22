@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.lxtk.lx4e.examples.json;singleton:=true
 Automatic-Module-Name: org.lxtk.lx4e.examples.json
-Bundle-Version: 0.4.0.qualifier
+Bundle-Version: 0.5.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Activator: org.lxtk.lx4e.internal.examples.json.Activator
@@ -25,9 +25,9 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.22.0,4.0.0)",
  org.eclipse.tm4e.core;bundle-version="[0.4.0,0.5.0)",
  org.eclipse.tm4e.ui;bundle-version="[0.4.0,0.6.0)",
  org.eclipse.tm4e.languageconfiguration;bundle-version="[0.3.0,0.5.0)",
- org.lxtk;bundle-version="[0.4.0,0.5.0)",
- org.lxtk.lx4e;bundle-version="[0.4.0,0.5.0)",
- org.lxtk.lx4e.ui;bundle-version="[0.4.0,0.5.0)"
+ org.lxtk;bundle-version="[0.5.0,0.6.0)",
+ org.lxtk.lx4e;bundle-version="[0.5.0,0.6.0)",
+ org.lxtk.lx4e.ui;bundle-version="[0.5.0,0.6.0)"
 Export-Package: org.lxtk.lx4e.examples.json,
  org.lxtk.lx4e.internal.examples.json;x-internal:=true,
  org.lxtk.lx4e.internal.examples.json.editor;x-internal:=true

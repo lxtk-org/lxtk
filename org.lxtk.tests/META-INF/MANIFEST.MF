@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: LXTK Core Tests
 Bundle-SymbolicName: org.lxtk.tests
 Automatic-Module-Name: org.lxtk.tests
-Bundle-Version: 0.4.0.qualifier
+Bundle-Version: 0.5.0.qualifier
 Bundle-Vendor: lxtk.org
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Fragment-Host: org.lxtk;bundle-version="[0.4.0,0.5.0)"
+Fragment-Host: org.lxtk;bundle-version="[0.5.0,0.6.0)"
 Import-Package: junit.framework

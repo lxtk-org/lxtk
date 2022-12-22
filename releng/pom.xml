@@ -17,7 +17,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.lxtk</groupId>
   <artifactId>releng</artifactId>
-  <version>0.4.0-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <prerequisites>
     <maven>3.6.3</maven>
@@ -179,7 +179,7 @@
                 <artifact>
                   <groupId>org.lxtk.targets</groupId>
                   <artifactId>base</artifactId>
-                  <version>0.4.0-SNAPSHOT</version>
+                  <version>0.5.0-SNAPSHOT</version>
                 </artifact>
               </target>
             </configuration>
@@ -205,7 +205,7 @@
                 <artifact>
                   <groupId>org.lxtk.targets</groupId>
                   <artifactId>latest</artifactId>
-                  <version>0.4.0-SNAPSHOT</version>
+                  <version>0.5.0-SNAPSHOT</version>
                 </artifact>
               </target>
             </configuration>
