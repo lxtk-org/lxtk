@@ -32,7 +32,7 @@ model as a pillar for an Eclipse-based IDE.
 
 ## Features
 
-The current LXTK version (0.3) provides client-side support for the following
+The current LXTK version (0.4) provides client-side support for the following
 LSP features:
 
 - [x] [Call Hierarchy](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareCallHierarchy)
@@ -42,7 +42,10 @@ LSP features:
 including [Code Lens Resolve](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#codeLens_resolve)
 - [x] [Completion](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_completion),
 including [Completion Item Resolve](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#completionItem_resolve)
-- [x] [Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_publishDiagnostics)
+- [x] [Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_publishDiagnostics),
+including [Pull Requests](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_pullDiagnostics)
+for [Document Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_diagnostic)
+and [Workspace Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_diagnostic)
 - [x] [Document Formatting](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_formatting),
 including [Range Formatting](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_rangeFormatting)
 - [x] [Document Highlights](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_documentHighlight)
@@ -69,12 +72,12 @@ and [DidRenameFiles](https://microsoft.github.io/language-server-protocol/specif
 including [Prepare Rename](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareRename)
 - [x] [Semantic Tokens](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens)
 - [x] [Signature Help](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_signatureHelp)
+- [x] [Type Hierarchy](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareTypeHierarchy)
 - [x] [Workspace Edit](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_applyEdit),
 including [Resource Operations](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#resourceChanges)
 - [x] [Workspace Folders](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_workspaceFolders)
-- [x] [Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbol)
-
-LXTK 0.3 does not support features introduced in LSP 3.17 or above.
+- [x] [Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbol),
+including [Workspace Symbol Resolve](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbolResolve)
 
 ## Architectural Overview
 

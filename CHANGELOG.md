@@ -5,7 +5,10 @@ The LXTK project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-This release adds client-side support for new features of LSP 3.17, including:
+## [0.4.0] - 2022-12-22
+
+This release adds client-side support for some of the new features of LSP 3.17,
+including:
 
 - [x] [Diagnostic Pull Requests](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_pullDiagnostics)
    - [x] [Document Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_diagnostic)
@@ -179,8 +182,9 @@ except for resource operations
 - [x] [Workspace Folders](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_workspaceFolders)
 - [x] [Workspace Symbols](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_symbol)
 
-LXTK 0.2 does not support features introduced in LSP 3.15 and above.
+LXTK 0.2 does not support features introduced in LSP 3.15 or above.
 
-[Unreleased]: https://github.com/lxtk-org/lxtk/compare/v0.3...HEAD
+[Unreleased]: https://github.com/lxtk-org/lxtk/compare/v0.4...HEAD
+[0.4.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.4
 [0.3.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.3
 [0.2.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.2
