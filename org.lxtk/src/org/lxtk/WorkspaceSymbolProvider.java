@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2022 1C-Soft LLC.
+ * Copyright (c) 2020, 2023 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -15,6 +15,7 @@ package org.lxtk;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.WorkspaceSymbol;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
 import org.eclipse.lsp4j.WorkspaceSymbolRegistrationOptions;
@@ -34,8 +35,7 @@ public interface WorkspaceSymbolProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    @SuppressWarnings("deprecation")
-    CompletableFuture<Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
+    CompletableFuture<Either<List<? extends SymbolInformation>,
         List<? extends WorkspaceSymbol>>> getWorkspaceSymbols(WorkspaceSymbolParams params);
 
     /**

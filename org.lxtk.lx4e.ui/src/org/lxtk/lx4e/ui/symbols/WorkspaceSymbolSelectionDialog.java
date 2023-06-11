@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2022 1C-Soft LLC.
+ * Copyright (c) 2020, 2023 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.WorkspaceSymbol;
 import org.eclipse.lsp4j.WorkspaceSymbolLocation;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
@@ -150,7 +151,6 @@ public class WorkspaceSymbolSelectionDialog
      * @param workspaceSymbolProvider never <code>null</code>
      * @param monitor may be <code>null</code>
      */
-    @SuppressWarnings("deprecation")
     protected void fillContentProvider(AbstractContentProvider contentProvider,
         ItemsFilter itemsFilter, WorkspaceSymbolProvider workspaceSymbolProvider,
         IProgressMonitor monitor)
@@ -160,12 +160,12 @@ public class WorkspaceSymbolSelectionDialog
         request.setParams(new WorkspaceSymbolParams(itemsFilter.getPattern()));
         request.setProgressMonitor(monitor);
         request.setUpWorkDoneProgress(WorkDoneProgressFactory::newWorkDoneProgress);
-        request.setUpPartialResultProgress((() -> new AbstractPartialResultProgress<Either<
-            List<? extends org.eclipse.lsp4j.SymbolInformation>, List<? extends WorkspaceSymbol>>>()
+        request.setUpPartialResultProgress((() -> new AbstractPartialResultProgress<
+            Either<List<? extends SymbolInformation>, List<? extends WorkspaceSymbol>>>()
         {
             @Override
-            protected void onAccept(Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
-                List<? extends WorkspaceSymbol>> result)
+            protected void onAccept(
+                Either<List<? extends SymbolInformation>, List<? extends WorkspaceSymbol>> result)
             {
                 fillContentProvider(contentProvider, itemsFilter, workspaceSymbolProvider, result);
             }
@@ -176,11 +176,9 @@ public class WorkspaceSymbolSelectionDialog
             request.sendAndReceive());
     }
 
-    @SuppressWarnings("deprecation")
     private void fillContentProvider(AbstractContentProvider contentProvider,
         ItemsFilter itemsFilter, WorkspaceSymbolProvider workspaceSymbolProvider,
-        Either<List<? extends org.eclipse.lsp4j.SymbolInformation>,
-            List<? extends WorkspaceSymbol>> result)
+        Either<List<? extends SymbolInformation>, List<? extends WorkspaceSymbol>> result)
     {
         if (result == null)
             return;
@@ -206,9 +204,7 @@ public class WorkspaceSymbolSelectionDialog
      * @param workspaceSymbolProvider never <code>null</code>
      * @return the created workspace symbol item (not <code>null</code>)
      */
-    @SuppressWarnings("deprecation")
-    protected Object newWorkspaceSymbolItem(
-        Either<org.eclipse.lsp4j.SymbolInformation, WorkspaceSymbol> symbol,
+    protected Object newWorkspaceSymbolItem(Either<SymbolInformation, WorkspaceSymbol> symbol,
         WorkspaceSymbolProvider workspaceSymbolProvider)
     {
         WorkspaceSymbolItem workspaceSymbolItem = new WorkspaceSymbolItem(symbol);

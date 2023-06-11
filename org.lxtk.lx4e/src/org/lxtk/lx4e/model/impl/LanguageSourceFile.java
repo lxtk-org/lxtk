@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2022 1C-Soft LLC.
+ * Copyright (c) 2019, 2023 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -48,6 +48,7 @@ import org.eclipse.handly.util.Property;
 import org.eclipse.jface.text.Document;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
+import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.lxtk.DefaultWorkDoneProgress;
@@ -431,7 +432,6 @@ public abstract class LanguageSourceFile
         return null;
     }
 
-    @SuppressWarnings("deprecation")
     private List<DocumentSymbol> getDocumentSymbols(DocumentSymbolProvider provider,
         URI documentUri, IProgressMonitor monitor) throws CoreException
     {
@@ -444,7 +444,7 @@ public abstract class LanguageSourceFile
         request.setUpWorkDoneProgress(
             () -> new DefaultWorkDoneProgress(Either.forLeft(UUID.randomUUID().toString())));
 
-        List<Either<org.eclipse.lsp4j.SymbolInformation, DocumentSymbol>> result;
+        List<Either<SymbolInformation, DocumentSymbol>> result;
         try
         {
             result = request.sendAndReceive();
@@ -459,7 +459,7 @@ public abstract class LanguageSourceFile
             return Collections.emptyList();
 
         List<DocumentSymbol> symbols = new ArrayList<>(result.size());
-        for (Either<org.eclipse.lsp4j.SymbolInformation, DocumentSymbol> item : result)
+        for (Either<SymbolInformation, DocumentSymbol> item : result)
         {
             if (item.isRight())
                 symbols.add(item.getRight());

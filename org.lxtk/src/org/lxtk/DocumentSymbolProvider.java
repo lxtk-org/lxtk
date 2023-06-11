@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2022 1C-Soft LLC.
+ * Copyright (c) 2019, 2023 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.DocumentSymbolRegistrationOptions;
+import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
@@ -34,8 +35,6 @@ public interface DocumentSymbolProvider
      * @param params not <code>null</code>
      * @return result future (never <code>null</code>)
      */
-    @SuppressWarnings("deprecation")
-    CompletableFuture<
-        List<Either<org.eclipse.lsp4j.SymbolInformation, DocumentSymbol>>> getDocumentSymbols(
-            DocumentSymbolParams params);
+    CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> getDocumentSymbols(
+        DocumentSymbolParams params);
 }
