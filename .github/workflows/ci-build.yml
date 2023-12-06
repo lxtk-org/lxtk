@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build-latest-target:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
 
   build-base-target:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
