@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (c) 2019, 2022 1C-Soft LLC.
+   Copyright (c) 2019, 2023 1C-Soft LLC.
 
    This program and the accompanying materials are made available under
    the terms of the Eclipse Public License 2.0 which is available at
@@ -44,6 +44,12 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-plugin</artifactId>
         <executions>
+          <execution>
+            <id>default-p2-metadata-default</id>
+            <configuration>
+              <attachP2Metadata>false</attachP2Metadata>
+            </configuration>
+          </execution>
           <execution>
             <id>attach-p2-metadata</id>
             <phase>package</phase>
