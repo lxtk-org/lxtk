@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (c) 2019, 2022 1C-Soft LLC.
+   Copyright (c) 2019, 2023 1C-Soft LLC.
 
    This program and the accompanying materials are made available under
    the terms of the Eclipse Public License 2.0 which is available at
@@ -19,12 +19,9 @@
   <artifactId>releng</artifactId>
   <version>0.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <prerequisites>
-    <maven>3.6.3</maven>
-  </prerequisites>
   <properties>
-    <tycho.version>2.7.5</tycho.version>
-    <tycho.extras.version>2.7.5</tycho.extras.version>
+    <tycho.version>4.0.4</tycho.version>
+    <tycho.extras.version>4.0.4</tycho.extras.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
@@ -86,9 +83,10 @@
           <version>${tycho.version}</version>
           <configuration>
             <encoding>UTF-8</encoding>
-            <compilerArguments>
-              <properties>${project.basedir}/.settings/org.eclipse.jdt.core.prefs</properties>
-            </compilerArguments>
+            <compilerArgs>
+              <arg>-properties</arg>
+              <arg>${project.basedir}/.settings/org.eclipse.jdt.core.prefs</arg>
+            </compilerArgs>
             <showWarnings>true</showWarnings>
             <showDeprecation>true</showDeprecation>
             <verbose>true</verbose>

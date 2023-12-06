@@ -26,7 +26,7 @@ Google Gson 2.10.1
 
  * License: Apache-2.0
 
-Eclipse Handly 1.6.0-1.7.3
+Eclipse Handly 1.6.0-1.7.5
 
  * License: EPL-2.0
 
@@ -34,11 +34,11 @@ Eclipse LSP4J 0.21.0
 
  * License: EPL-2.0
 
-Eclipse Mylyn WikiText 3.0.42-3.0.46
+Eclipse Mylyn WikiText 3.0.42-3.0.48
 
  * License: EPL-2.0
 
-Eclipse Platform 4.20-4.28
+Eclipse Platform 4.20-4.30
 
  * License: EPL-2.0
 
