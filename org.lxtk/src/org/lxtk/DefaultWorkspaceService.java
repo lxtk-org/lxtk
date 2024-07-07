@@ -55,7 +55,8 @@ public class DefaultWorkspaceService
         if (newFolders != null && !newFolders.isEmpty())
         {
             newSortedFolders =
-                new TreeMap<>(Comparator.comparingInt((String s) -> s.length()).reversed());
+                new TreeMap<>(Comparator.comparingInt((String s) -> s.length()).thenComparing(
+                    String::compareTo).reversed());
             dryRun(newFolders, newSortedFolders);
         }
 
