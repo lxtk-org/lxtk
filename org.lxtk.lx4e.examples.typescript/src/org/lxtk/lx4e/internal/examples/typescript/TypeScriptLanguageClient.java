@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2022 1C-Soft LLC.
+ * Copyright (c) 2019, 2024 1C-Soft LLC.
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which is available at
@@ -16,6 +16,7 @@ import static org.lxtk.lx4e.examples.typescript.TypeScriptCore.DOCUMENT_SERVICE;
 import static org.lxtk.lx4e.examples.typescript.TypeScriptCore.LANGUAGE_ID;
 import static org.lxtk.lx4e.examples.typescript.TypeScriptCore.LANGUAGE_SERVICE;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -27,6 +28,7 @@ import java.util.Objects;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.lsp4j.DocumentFilter;
 import org.eclipse.lsp4j.InitializeParams;
@@ -72,6 +74,7 @@ import org.lxtk.util.connect.StreamBasedConnection;
 public class TypeScriptLanguageClient
     extends EclipseLanguageClientController<LanguageServer>
 {
+    private static final String NODE_HOME = System.getProperty("node.home", ""); //$NON-NLS-1$ //$NON-NLS-2$
     private static final String NPX =
         Platform.getOS().toLowerCase().startsWith("win") ? "npx.cmd" : "npx"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -187,11 +190,16 @@ public class TypeScriptLanguageClient
             @Override
             protected StreamBasedConnection newStreamBasedConnection()
             {
+                String npxPath = new Path(NODE_HOME).append(NPX).toOSString();
+                ProcessBuilder processBuilder =
+                    new ProcessBuilder(npxPath, "typescript-language-server", "--stdio"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (!NODE_HOME.isEmpty())
+                    processBuilder.environment().merge("PATH", NODE_HOME, //$NON-NLS-1$
+                        (oldValue, value) -> value + File.pathSeparator + oldValue);
                 Process process;
                 try
                 {
-                    process = new ProcessBuilder(NPX, "typescript-language-server", //$NON-NLS-1$
-                        "--stdio").start(); //$NON-NLS-1$
+                    process = processBuilder.start();
                 }
                 catch (IOException e)
                 {

@@ -6,15 +6,15 @@ The server is started for a project when the first TypeScript file in the projec
 is opened. Note that this example does not support external files (i.e. files
 outside the Eclipse workspace).
 
-Before you begin, make sure you have [npx][2] installed.
+Before you begin, make sure you have [node][2] installed.
 
-Note that GUI apps on macOS might have a problem with finding `npx`;
-if the folder outputted by `npm bin -g` is not in the `PATH` reported by
-`launchctl getenv PATH`, you can fix this by running
-```
-sudo launchctl config user path "$(npm bin -g):$(launchctl getenv PATH))"
-```
-and then rebooting, as documented in `man launchctl`.
+You can set the `node.home` system property in the launch configuration
+to point to the directory where `node` resides. This is usually necessary on macOS,
+where that directory is not in the application `PATH` by default.
+
+If the language client is unable to connect to the language server and the Error Log contains
+`java.io.IOException: Cannot run program "npx": error=2, No such file or directory`,
+consider setting the `node.home` system property as described above.
 
 [1]: https://github.com/typescript-language-server/typescript-language-server
-[2]: https://www.npmjs.com/package/npx
+[2]: https://nodejs.org
