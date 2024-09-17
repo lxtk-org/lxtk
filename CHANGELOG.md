@@ -5,6 +5,12 @@ The LXTK project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-09-18
+
+This release aligns with the latest Eclipse SimRel, 2024-09. In particular,
+it ensures compatibility with recent LSP4J versions. There are no new features
+or breaking changes in this release.
+
 ## [0.4.0] - 2022-12-22
 
 This release adds client-side support for some of the new features of LSP 3.17,
@@ -184,7 +190,8 @@ except for resource operations
 
 LXTK 0.2 does not support features introduced in LSP 3.15 or above.
 
-[Unreleased]: https://github.com/lxtk-org/lxtk/compare/v0.4...HEAD
+[Unreleased]: https://github.com/lxtk-org/lxtk/compare/v0.5...HEAD
+[0.5.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.5
 [0.4.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.4
 [0.3.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.3
 [0.2.0]: https://github.com/lxtk-org/lxtk/releases/tag/v0.2

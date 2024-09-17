@@ -32,8 +32,7 @@ model as a pillar for an Eclipse-based IDE.
 
 ## Features
 
-The current LXTK version (0.4) provides client-side support for the following
-LSP features:
+LXTK provides client-side support for the following LSP features:
 
 - [x] [Call Hierarchy](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_prepareCallHierarchy)
 - [x] [Change Annotations](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#changeAnnotation)
