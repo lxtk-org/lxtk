@@ -3,16 +3,16 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.lxtk
 Automatic-Module-Name: org.lxtk
-Bundle-Version: 0.5.0.qualifier
+Bundle-Version: 0.6.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Export-Package: org.lxtk;version="0.5.0",
- org.lxtk.client;version="0.5.0",
- org.lxtk.jsonrpc;version="0.5.0",
- org.lxtk.util;version="0.5.0",
- org.lxtk.util.completion;version="0.5.0",
- org.lxtk.util.completion.snippet;version="0.5.0",
- org.lxtk.util.connect;version="0.5.0"
+Export-Package: org.lxtk;version="0.6.0",
+ org.lxtk.client;version="0.6.0",
+ org.lxtk.jsonrpc;version="0.6.0",
+ org.lxtk.util;version="0.6.0",
+ org.lxtk.util.completion;version="0.6.0",
+ org.lxtk.util.completion.snippet;version="0.6.0",
+ org.lxtk.util.connect;version="0.6.0"
 Import-Package: com.google.gson;version="[2.10.0,2.12.0)",
  org.eclipse.lsp4j;version="[0.21.0,0.24.0)",
  org.eclipse.lsp4j.jsonrpc;version="[0.21.0,0.24.0)",
