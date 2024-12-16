@@ -213,4 +213,23 @@ public class WorkspaceSymbolItem
         request.setMayThrow(false);
         return request.sendAndReceive();
     }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(this.symbol);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final WorkspaceSymbolItem other = (WorkspaceSymbolItem)obj;
+        return Objects.equals(this.symbol, other.symbol);
+    }
 }
