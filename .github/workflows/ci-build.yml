@@ -1,56 +1,54 @@
-name: build
+name: CI
 
 on: [push, pull_request]
 
 jobs:
   build-latest-target:
+    name: Build & Test (Latest Target)
 
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Check out source code
+      uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
+        java-version: |
+          11
+          21
         distribution: 'temurin'
-        java-version: 17
+        cache: 'maven'
+        cache-dependency-path: |
+          **/pom.xml
+          targets/latest/latest.target
 
-    - name: Cache maven repo
-      uses: actions/cache@v3
-      if: github.event_name == 'push' || github.event_name == 'pull_request'
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-latest-${{ hashFiles('**/pom.xml') }}-${{ hashFiles('targets/latest/latest.target') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-latest-
-
-    - name: Build with Maven (latest target)
+    - name: Build and test
+      run: mvn verify -Dtycho.localArtifacts=ignore -B -V -Pbree-libs
       working-directory: ./releng
-      run: mvn clean verify -Dtycho.localArtifacts=ignore -B -V
 
   build-base-target:
+    name: Build & Test (Base Target)
 
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Check out source code
+      uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
+        java-version: |
+          11
+          21
         distribution: 'temurin'
-        java-version: 17
+        cache: 'maven'
+        cache-dependency-path: |
+          **/pom.xml
+          targets/base/base.target
 
-    - name: Cache maven repo
-      uses: actions/cache@v3
-      if: github.event_name == 'push' || github.event_name == 'pull_request'
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-base-${{ hashFiles('**/pom.xml') }}-${{ hashFiles('targets/base/base.target') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-base-
-
-    - name: Build with Maven (base target)
+    - name: Build and test
+      run: mvn verify -Dtycho.localArtifacts=ignore -Dtarget=base -B -V -Pbree-libs
       working-directory: ./releng
-      run: mvn clean verify -Dtycho.localArtifacts=ignore -Dtarget=base -B -V
