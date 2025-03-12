@@ -11,26 +11,24 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Check out source code
+      uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
+        java-version: |
+          11
+          21
         distribution: 'temurin'
-        java-version: 17
+        cache: 'maven'
+        cache-dependency-path: |
+          **/pom.xml
+          targets/base/base.target
 
-    - name: Cache maven repo
-      uses: actions/cache@v3
-      if: github.event_name == 'push'
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-base-${{ hashFiles('**/pom.xml') }}-${{ hashFiles('targets/base/base.target') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-base-
-
-    - name: Build with Maven (base target)
+    - name: Build and test
+      run: mvn verify -Dtycho.localArtifacts=ignore -Dtarget=base -B -V -Pjavadoc -Pbree-libs
       working-directory: ./releng
-      run: mvn clean verify -Dtycho.localArtifacts=ignore -Dtarget=base -Pjavadoc -B -V
 
     - name: Prepare P2 repository and Javadocs
       working-directory: ./repository/target
